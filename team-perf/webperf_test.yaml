@@ -1,0 +1,96 @@
+# https://prometheus.io/docs/prometheus/latest/configuration/unit_testing_rules/
+# Test locally using `promtool test rules webperf_test.yml`
+rule_files:
+  - webperf.yaml
+evaluation_interval: 1m
+tests:
+ - interval: 1m
+   input_series:
+    - series: 'webperf_errors'
+      values: '0+120x20'
+   alert_rule_test:
+    - alertname: NavtimingErrorsHigh
+      eval_time: 7m
+    - alertname: NavtimingErrorsHigh
+      eval_time: 8m
+      exp_alerts:
+       - exp_labels:
+           severity: critical
+           team: perf
+         exp_annotations:
+           summary: 'Navtiming elevated exceptions: 2/s'
+           description: "This metric counts Python exceptions."
+           dashboard: https://grafana.wikimedia.org/d/000000143/navigation-timing
+           runbook: https://wikitech.wikimedia.org/wiki/Performance/Runbook/Webperf-processor_services
+ - interval: 1m
+   input_series:
+    - series: 'webperf_navtiming_invalid_events'
+      values: '0+600x20'
+   alert_rule_test:
+    - alertname: NavtimingInvalidsHigh
+      eval_time: 7m
+    - alertname: NavtimingInvalidsHigh
+      eval_time: 8m
+      exp_alerts:
+       - exp_labels:
+           severity: warning
+           team: perf
+         exp_annotations:
+           summary: 'Navtiming elevated invalid events: 10/s'
+           description: "This metric counts discarded messages.  A discard rate under 0.5 events/sec is normal."
+           dashboard: https://grafana.wikimedia.org/d/000000143/navigation-timing
+           runbook: https://wikitech.wikimedia.org/wiki/Performance/Runbook/Webperf-processor_services
+ - interval: 1m
+   input_series:
+    - series: 'webperf_painttiming_invalid_events'
+      values: '0+600x20'
+   alert_rule_test:
+    - alertname: PainttimingInvalidsHigh
+      eval_time: 7m
+    - alertname: PainttimingInvalidsHigh
+      eval_time: 8m
+      exp_alerts:
+       - exp_labels:
+           severity: warning
+           team: perf
+         exp_annotations:
+           summary: 'Painttiming elevated invalid events: 10/s'
+           description: "This metric counts discarded messages.  A discard rate under 0.5 events/sec is normal."
+           dashboard: https://grafana.wikimedia.org/d/IROgrArMk/paint-timing
+           runbook: https://wikitech.wikimedia.org/wiki/Performance/Runbook/Webperf-processor_services
+ - interval: 1m
+   input_series:
+    - series: 'webperf_firstinputtiming_invalid_events'
+      values: '0+600x20'
+   alert_rule_test:
+    - alertname: FirstinputtimingInvalidsHigh
+      eval_time: 7m
+    - alertname: FirstinputtimingInvalidsHigh
+      eval_time: 8m
+      exp_alerts:
+       - exp_labels:
+           severity: warning
+           team: perf
+         exp_annotations:
+           summary: 'Firstinputtiming elevated invalid events: 10/s'
+           description: "This metric counts discarded messages.  A discard rate under 0.5 events/sec is normal."
+           dashboard: https://grafana.wikimedia.org/d/9zeb91jWk/first-input-delay
+           runbook: https://wikitech.wikimedia.org/wiki/Performance/Runbook/Webperf-processor_services
+ - interval: 1m
+   input_series:
+    - series: 'webperf_savetiming_invalid_events'
+      values: '0+600x20'
+   alert_rule_test:
+    - alertname: SavetimingInvalidsHigh
+      eval_time: 7m
+    - alertname: SavetimingInvalidsHigh
+      eval_time: 8m
+      exp_alerts:
+       - exp_labels:
+           severity: warning
+           team: perf
+         exp_annotations:
+           summary: 'Savetiming elevated invalid events: 10/s'
+           description: "This metric counts discarded messages.  A discard rate under 0.5 events/sec is normal."
+           dashboard: https://grafana.wikimedia.org/d/000000085/save-timing
+           runbook: https://wikitech.wikimedia.org/wiki/Performance/Runbook/Webperf-processor_services
