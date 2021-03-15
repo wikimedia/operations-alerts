@@ -1,0 +1,15 @@
+version: v4
+base: docker-registry.wikimedia.org/python3-buster:latest
+
+apt:
+  packages:
+    - prometheus
+    - tox
+
+variants:
+  test:
+    copies: [local]
+    entrypoint: [tox]
+    # Required so tox can write to the container
+    runs:
+      insecurely: True
