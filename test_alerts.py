@@ -29,7 +29,7 @@ def all_testfiles(paths):
         p = pathlib.Path(path)
         files.extend(p.glob("**/*_test.yaml"))
 
-    return [x.as_posix() for x in files]
+    return files
 
 
 def all_rulefiles(paths):
@@ -40,15 +40,16 @@ def all_rulefiles(paths):
         p = pathlib.Path(path)
         files.extend(p.glob("**/*[!_test].yaml"))
 
-    return [x.as_posix() for x in files]
+    return files
 
 
 @pytest.mark.parametrize("testfile", all_testfiles(SUBDIRS))
 def test_alerts(testfile):
     """Run alert unit tests for testfile."""
+    path = testfile.as_posix()
     p = subprocess.run(
-        ["/usr/bin/promtool", "test", "rules", os.path.basename(testfile)],
-        cwd=os.path.dirname(testfile),
+        ["/usr/bin/promtool", "test", "rules", os.path.basename(path)],
+        cwd=os.path.dirname(path),
         capture_output=True,
     )
     assert p.returncode == 0, "promtool test rules failed: %r %r" % (p.stdout, p.stderr)
@@ -58,9 +59,10 @@ def test_alerts(testfile):
 def test_valid_rule(rulefile):
     """Validate rulefile with promtool"""
 
+    path = rulefile.as_posix()
     p = subprocess.run(
-        ["/usr/bin/promtool", "check", "rules", os.path.basename(rulefile)],
-        cwd=os.path.dirname(rulefile),
+        ["/usr/bin/promtool", "check", "rules", os.path.basename(path)],
+        cwd=os.path.dirname(path),
         capture_output=True,
     )
     assert p.returncode == 0, "promtool check rules failed: %r %r" % (
