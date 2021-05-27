@@ -1,0 +1,23 @@
+rule_files:
+  - traffic.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    input_series:
+      - series: 'job_method_status:varnish_requests:rate5m{method="GET",job="varnish-text",site="esams",status="200"}'
+        # See https://prometheus.io/docs/prometheus/latest/configuration/unit_testing_rules/
+        values: '5000+0x58 3000'
+      - series: 'job_method_status:varnish_requests:rate5m{method="GET",job="varnish-text",site="esams",status="404"}'
+        values: '42+0x59'
+    alert_rule_test:
+    - alertname: VarnishTrafficDrop
+      eval_time: 60m
+      exp_alerts:
+       - exp_labels:
+           severity: critical
+           team: traffic
+           site: esams
+         exp_annotations:
+           summary: '60% GET drop in text@esams during the past 30 minutes'
+           description: "Critical if GET requests percentage difference compared to 30 minutes ago is more than 70%"
+           dashboard: https://grafana.wikimedia.org/d/000000180/varnish-http-requests?viewPanel=6
