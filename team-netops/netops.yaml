@@ -1,0 +1,14 @@
+groups:
+  - name: netops
+    rules:
+      - alert: PingOffloadMissingIP
+        expr: node_netstat_Ip_InAddrErrors{instance=~"^ping[1-9]00[1-9]:9100"} >= 1
+        for: 1m
+        labels:
+          team: sre
+          severity: critical
+        annotations:
+          summary: "Target IP missing on {{ $labels.instance }} loopback in {{ $externalLabels.site }}"
+          description: "The server is receiving packets for an unknown IP"
+          dashboard: https://grafana.wikimedia.org/d/000000513/ping-offload
+          runbook: https://wikitech.wikimedia.org/wiki/Ping_offload#InAddrErrors_alert

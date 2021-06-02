@@ -1,0 +1,24 @@
+rule_files:
+  - netops.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    input_series:
+      - series: 'node_netstat_Ip_InAddrErrors{instance="ping1001:9100", site="eqiad"}'
+        values: '1'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+    - alertname: PingOffloadMissingIP
+      eval_time: 1m
+      exp_alerts:
+       - exp_labels:
+           severity: critical
+           team: sre
+           site: eqiad
+           instance: ping1001:9100
+         exp_annotations:
+           summary: 'Target IP missing on ping1001:9100 loopback in eqiad'
+           description: 'The server is receiving packets for an unknown IP'
+           dashboard: https://grafana.wikimedia.org/d/000000513/ping-offload
+           runbook: https://wikitech.wikimedia.org/wiki/Ping_offload#InAddrErrors_alert
