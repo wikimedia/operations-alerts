@@ -22,3 +22,85 @@ tests:
            description: 'The server is receiving packets for an unknown IP'
            dashboard: https://grafana.wikimedia.org/d/000000513/ping-offload
            runbook: https://wikitech.wikimedia.org/wiki/Ping_offload#InAddrErrors_alert
+  - interval: 1m
+    input_series:
+      - series: 'routinator_rtr_current_connections{instance="rpki1001:9100"}'
+        values: '2'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+    - alertname: RoutinatorRTRConnections
+      eval_time: 1m
+      exp_alerts:
+       - exp_labels:
+           severity: critical
+           team: sre
+           instance: rpki1001:9100
+         exp_annotations:
+           summary: 'Important drop of Routinator RTR connections on rpki1001:9100'
+           description: 'Currently at 2'
+           dashboard: https://grafana.wikimedia.org/d/UwUa77GZk/rpki
+           runbook: https://wikitech.wikimedia.org/wiki/RPKI#RTR_Connections_drop
+  - interval: 1m
+    input_series:
+      - series: 'routinator_rsync_status{instance="rpki1001:9100"}'
+        values: '0+0x35'
+      - series: 'routinator_rsync_status{instance="rpki1001:9100"}'
+        values: '1+0x35'
+      - series: 'routinator_rsync_status{instance="rpki1001:9100"}'
+        values: '2+0x35'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+    - alertname: RoutinatorRsyncErrors
+      eval_time: 30m
+      exp_alerts:
+       - exp_labels:
+           severity: critical
+           team: sre
+         exp_annotations:
+           summary: 'Routinator rsync fetching issue in eqiad'
+           description: 'rsync error to 50% of targets'
+           dashboard: https://grafana.wikimedia.org/d/UwUa77GZk/rpki
+           runbook: https://wikitech.wikimedia.org/wiki/RPKI#RSYNC_status
+  - interval: 1m
+    input_series:
+      - series: 'routinator_rrdp_status{instance="rpki1001:9100"}'
+        values: '200+0x35'
+      - series: 'routinator_rrdp_status{instance="rpki1001:9100"}'
+        values: '403+0x35'
+      - series: 'routinator_rrdp_status{instance="rpki1001:9100"}'
+        values: '403+0x35'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+    - alertname: RoutinatorRRDPErrors
+      eval_time: 30m
+      exp_alerts:
+       - exp_labels:
+           severity: critical
+           team: sre
+         exp_annotations:
+           summary: 'Routinator RRDP fetching issue in eqiad'
+           description: 'RRDP error to 50% of targets'
+           dashboard: https://grafana.wikimedia.org/d/UwUa77GZk/rpki
+           runbook: https://wikitech.wikimedia.org/wiki/RPKI#RRDP_status
+  - interval: 1m
+    input_series:
+      - series: 'routinator_valid_roas{instance="rpki1001:9100"}'
+        values: 1000
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+    - alertname: RoutinatorValidROAs
+      eval_time: 1m
+      exp_alerts:
+       - exp_labels:
+           severity: critical
+           team: sre
+           instance: rpki1001:9100
+         exp_annotations:
+           summary: 'Important drop of valid Routinator ROAs on rpki1001:9100'
+           description: 'Currently at 1000'
+           dashboard: https://grafana.wikimedia.org/d/UwUa77GZk/rpki
+           runbook: https://wikitech.wikimedia.org/wiki/RPKI#Valid_ROAs_decreasing
