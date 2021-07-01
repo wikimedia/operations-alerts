@@ -51,8 +51,12 @@ def test_alerts(testfile):
         ["/usr/bin/promtool", "test", "rules", os.path.basename(path)],
         cwd=os.path.dirname(path),
         capture_output=True,
+        encoding="utf8",
     )
-    assert p.returncode == 0, "promtool test rules failed: %r %r" % (p.stdout, p.stderr)
+    assert p.returncode == 0, "promtool test rules failed: %s\n%s" % (
+        p.stdout,
+        p.stderr,
+    )
 
 
 @pytest.mark.parametrize("rulefile", all_rulefiles(SUBDIRS))
@@ -64,8 +68,9 @@ def test_valid_rule(rulefile):
         ["/usr/bin/promtool", "check", "rules", os.path.basename(path)],
         cwd=os.path.dirname(path),
         capture_output=True,
+        encoding="utf8",
     )
-    assert p.returncode == 0, "promtool check rules failed: %r %r" % (
+    assert p.returncode == 0, "promtool check rules failed: %s\n%s" % (
         p.stdout,
         p.stderr,
     )
