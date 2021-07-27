@@ -38,7 +38,8 @@ def all_rulefiles(paths):
 
     for path in paths:
         p = pathlib.Path(path)
-        files.extend(p.glob("**/*[!_test].yaml"))
+        non_test_files = set(p.glob("**/*.yaml")) - set(p.glob("**/*_test.yaml"))
+        files.extend(non_test_files)
 
     return files
 
