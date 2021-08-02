@@ -4,25 +4,25 @@ groups:
       # NavtimingStaleBeacon has 'critical' and 'warning' severities, depending
       # on the threshold.
       - alert: NavtimingStaleBeacon
-        expr: time() - max(webperf_latest_handled_time_seconds) by (schema) > 24 * 60 * 60
+        expr: time() - min(webperf_latest_handled_time_seconds) > 24 * 60 * 60
         for: 1h
         labels:
           severity: critical
           team: perf
         annotations:
-          summary: "No Navtiming {{ $labels.schema }} messages in {{ $value | humanizeDuration }}"
+          summary: "Navtiming beacon is stale: {{ $value | humanizeDuration }}"
           description: "Critical if more than 24 hours since latest message."
           dashboard: https://grafana.wikimedia.org/d/000000143/navigation-timing
           runbook: https://wikitech.wikimedia.org/wiki/Performance/Runbook/Webperf-processor_services
 
       - alert: NavtimingStaleBeacon
-        expr: time() - max(webperf_latest_handled_time_seconds) by (schema) > 15 * 60
+        expr: time() - min(webperf_latest_handled_time_seconds) > 15 * 60
         for: 5m
         labels:
           severity: warning
           team: perf
         annotations:
-          summary: "No Navtiming {{ $labels.schema }} messages in {{ $value | humanizeDuration }}"
+          summary: "Navtiming beacon is stale: {{ $value | humanizeDuration }}"
           description: "Warning if more than 15 minutes since latest message."
           dashboard: https://grafana.wikimedia.org/d/000000143/navigation-timing
           runbook: https://wikitech.wikimedia.org/wiki/Performance/Runbook/Webperf-processor_services
@@ -96,7 +96,7 @@ groups:
           severity: critical
           team: perf
         annotations:
-          summary: "Arclamp minimum log file age in {{ $externalLabels.site }}: {{ $value | humanizeDuration }}"
+          summary: "Arclamp minimum log file age in $site: {{ $value | humanizeDuration }}"
           description: "Criticial if more than 24 hours since data written by arclamp-log.py."
           dashboard: https://grafana.wikimedia.org/d/yVf-D1RWk/arc-lamp
           runbook: https://wikitech.wikimedia.org/wiki/Performance/Runbook/Arc_Lamp_service
@@ -108,7 +108,7 @@ groups:
           severity: warning
           team: perf
         annotations:
-          summary: "Arclamp minimum hourly log file age in {{ $externalLabels.site }}: {{ $value | humanizeDuration }}"
+          summary: "Arclamp minimum hourly log file age in $site: {{ $value | humanizeDuration }}"
           description: "Warning if than one 15 minutes since data written by arclamp-log.py."
           dashboard: https://grafana.wikimedia.org/d/yVf-D1RWk/arc-lamp
           runbook: https://wikitech.wikimedia.org/wiki/Performance/Runbook/Arc_Lamp_service
@@ -120,7 +120,7 @@ groups:
           severity: warning
           team: perf
         annotations:
-          summary: "Arclamp maximum log file age in {{ $externalLabels.site }}: {{ $value | humanizeDuration }}"
+          summary: "Arclamp maximum log file age in $site: {{ $value | humanizeDuration }}"
           description: "Files are supposed to be pruned by arclamp-log after 90 days."
           dashboard: https://grafana.wikimedia.org/d/yVf-D1RWk/arc-lamp
           runbook: https://wikitech.wikimedia.org/wiki/Performance/Runbook/Arc_Lamp_service
@@ -132,7 +132,7 @@ groups:
           severity: warning
           team: perf
         annotations:
-          summary: "Arclamp maximum uncompressed log file age in {{ $externalLabels.site }}: {{ $value | humanizeDuration }}"
+          summary: "Arclamp maximum uncompressed log file age in $site: {{ $value | humanizeDuration }}"
           description: "Files are supposed to be compressed by arclamp-compress-logs after 7 days."
           dashboard: https://grafana.wikimedia.org/d/yVf-D1RWk/arc-lamp
           runbook: https://wikitech.wikimedia.org/wiki/Performance/Runbook/Arc_Lamp_service
@@ -144,7 +144,7 @@ groups:
           severity: warning
           team: perf
         annotations:
-          summary: "Arclamp maximum SVG file age in {{ $externalLabels.site }}: {{ $value | humanizeDuration }}"
+          summary: "Arclamp maximum SVG file age in $site: {{ $value | humanizeDuration }}"
           description: "Files are supposed to be removed by arclamp-generate-svgs after 90 days."
           dashboard: https://grafana.wikimedia.org/d/yVf-D1RWk/arc-lamp
           runbook: https://wikitech.wikimedia.org/wiki/Performance/Runbook/Arc_Lamp_service
@@ -156,7 +156,7 @@ groups:
           severity: warning
           team: perf
         annotations:
-          summary: "Arclamp maximum temporary file age in {{ $externalLabels.site }}: {{ $value | humanizeDuration }}"
+          summary: "Arclamp maximum temporary file age in $site: {{ $value | humanizeDuration }}"
           description: "Files are supposed to be removed next time arclamp-compress-logs runs."
           dashboard: https://grafana.wikimedia.org/d/yVf-D1RWk/arc-lamp
           runbook: https://wikitech.wikimedia.org/wiki/Performance/Runbook/Arc_Lamp_service
@@ -168,7 +168,7 @@ groups:
           severity: warning
           team: perf
         annotations:
-          summary: "Arclamp truncated file count in {{ $externalLabels.site }}: {{ $value | humanize }}"
+          summary: "Arclamp truncated file count in $site: {{ $value | humanize }}"
           description: "Files are supposed to be recreated next time arclamp-generate-svgs runs."
           dashboard: https://grafana.wikimedia.org/d/yVf-D1RWk/arc-lamp
           runbook: https://wikitech.wikimedia.org/wiki/Performance/Runbook/Arc_Lamp_service

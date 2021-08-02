@@ -1,36 +1,9 @@
 # https://prometheus.io/docs/prometheus/latest/configuration/unit_testing_rules/
-# Test locally using `promtool test rules webperf_test.yaml`
+# Test locally using `promtool test rules webperf_test.yml`
 rule_files:
   - webperf.yaml
 evaluation_interval: 1m
 tests:
- - interval: 1m
-   input_series:
-    - series: 'webperf_latest_handled_time_seconds{schema="NavigationTiming",site="eqiad"}'
-      # time() behavior in unit tests is from zero, not the current time.  See:
-      # https://github.com/prometheus/prometheus/issues/4817#issuecomment-514765285
-      values: '0+60x5 0+0x16'
-    - series: 'webperf_latest_handled_time_seconds{schema="PaintTiming",site="eqiad"}'
-      values: '0+60x21'
-    - series: 'webperf_latest_handled_time_seconds{schema="NavigationTiming",site="codfw"}'
-      values: '0+0x21'
-    - series: 'webperf_latest_handled_time_seconds{schema="PaintTiming",site="codfw"}'
-      values: '0+0x21'
-   alert_rule_test:
-    - alertname: NavtimingStaleBeacon
-      eval_time: 5m
-    - alertname: NavtimingStaleBeacon
-      eval_time: 21m
-      exp_alerts:
-       - exp_labels:
-           schema: NavigationTiming
-           severity: warning
-           team: perf
-         exp_annotations:
-           summary: "No Navtiming NavigationTiming messages in 21m 0s"
-           description: "Warning if more than 15 minutes since latest message."
-           dashboard: https://grafana.wikimedia.org/d/000000143/navigation-timing
-           runbook: https://wikitech.wikimedia.org/wiki/Performance/Runbook/Webperf-processor_services
  - interval: 1m
    input_series:
     - series: 'webperf_errors'
