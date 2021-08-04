@@ -8,7 +8,7 @@ groups:
           team: sre
           severity: critical
         annotations:
-          summary: "Target IP missing on {{ $labels.instance }} loopback in {{ $externalLabels.site }}"
+          summary: "Target IP missing on {{ $labels.instance }} loopback"
           description: "The server is receiving packets for an unknown IP"
           dashboard: https://grafana.wikimedia.org/d/000000513/ping-offload
           runbook: https://wikitech.wikimedia.org/wiki/Ping_offload#InAddrErrors_alert
@@ -19,7 +19,7 @@ groups:
           team: sre
           severity: critical
         annotations:
-          summary: "Routinator rsync fetching issue in {{ $externalLabels.site }}"
+          summary: "Routinator rsync fetching issue"
           description: "rsync error to 50% of targets"
           dashboard: https://grafana.wikimedia.org/d/UwUa77GZk/rpki
           runbook: https://wikitech.wikimedia.org/wiki/RPKI#RSYNC_status
@@ -30,7 +30,7 @@ groups:
           team: sre
           severity: critical
         annotations:
-          summary: "Routinator RRDP fetching issue in {{ $externalLabels.site }}"
+          summary: "Routinator RRDP fetching issue"
           description: "RRDP error to 50% of targets"
           dashboard: https://grafana.wikimedia.org/d/UwUa77GZk/rpki
           runbook: https://wikitech.wikimedia.org/wiki/RPKI#RRDP_status
