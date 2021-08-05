@@ -1,0 +1,22 @@
+rule_files:
+  - puppet-agent.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    input_series:
+      - series: 'puppet_agent_failed{cluster="alerting",instance="alert1001:9100"}'
+        values: '0+1x90'
+    alert_rule_test:
+    - alertname: PuppetFailure
+      eval_time: 90m
+      exp_alerts:
+       - exp_labels:
+           severity: critical
+           team: sre
+           instance: alert1001:9100
+           cluster: alerting
+         exp_annotations:
+           summary: Puppet has failed on alerting hosts
+           description: 'Puppet failure on alert1001:9100'
+           dashboard: https://grafana.wikimedia.org/d/yOxVDGvWk/puppet
+           runbook: https://puppetboard.wikimedia.org/nodes?status=failed

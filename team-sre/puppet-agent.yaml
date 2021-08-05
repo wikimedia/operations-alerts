@@ -1,0 +1,17 @@
+groups:
+  - name: puppet-agent-fail
+    rules:
+    # This alert is a crutch on 'alerting' cluster only, until puppet failure
+    # alerts are fully ported to AM and issued per-cluster
+    # https://phabricator.wikimedia.org/T283151
+    - alert: PuppetFailure
+      annotations:
+        description: Puppet failure on {{$labels.instance}}
+        dashboard: https://grafana.wikimedia.org/d/yOxVDGvWk/puppet
+        runbook: https://puppetboard.wikimedia.org/nodes?status=failed
+        summary: Puppet has failed on alerting hosts
+      expr: puppet_agent_failed{cluster="alerting"} > 0
+      for: 80m # At least two puppet runs
+      labels:
+        severity: critical
+        team: sre
