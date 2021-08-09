@@ -18,7 +18,7 @@ tests:
            site: eqiad
            instance: ping1001:9100
          exp_annotations:
-           summary: 'Target IP missing on ping1001:9100 loopback'
+           summary: 'Target IP missing on ping1001:9100 loopback in eqiad'
            description: 'The server is receiving packets for an unknown IP'
            dashboard: https://grafana.wikimedia.org/d/000000513/ping-offload
            runbook: https://wikitech.wikimedia.org/wiki/Ping_offload#InAddrErrors_alert
@@ -59,7 +59,7 @@ tests:
            severity: critical
            team: sre
          exp_annotations:
-           summary: 'Routinator rsync fetching issue'
+           summary: 'Routinator rsync fetching issue in eqiad'
            description: 'rsync error to 50% of targets'
            dashboard: https://grafana.wikimedia.org/d/UwUa77GZk/rpki
            runbook: https://wikitech.wikimedia.org/wiki/RPKI#RSYNC_status
@@ -81,7 +81,7 @@ tests:
            severity: critical
            team: sre
          exp_annotations:
-           summary: 'Routinator RRDP fetching issue'
+           summary: 'Routinator RRDP fetching issue in eqiad'
            description: 'RRDP error to 50% of targets'
            dashboard: https://grafana.wikimedia.org/d/UwUa77GZk/rpki
            runbook: https://wikitech.wikimedia.org/wiki/RPKI#RRDP_status
