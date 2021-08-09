@@ -21,3 +21,20 @@ tests:
            summary: '60% GET drop in text@esams during the past 30 minutes'
            description: "Critical if GET requests percentage difference compared to 30 minutes ago is more than 70%"
            dashboard: https://grafana.wikimedia.org/d/000000180/varnish-http-requests?viewPanel=6
+
+  - interval: 1m
+    input_series:
+      - series: 'up{instance="cp3030:9331", job="varnish-text"}'
+        values: '1 0 0 0 0 0 0'
+    alert_rule_test:
+    - alertname: VarnishPrometheusExporterDown
+      eval_time: 6m
+      exp_alerts:
+       - exp_labels:
+           severity: warning
+           team: traffic
+           instance: "cp3030:9331"
+           job: "varnish-text"
+         exp_annotations:
+           summary: "Varnish Exporter on instance cp3030:9331 is unreachable"
+           description: "Prometheus has been unable to fetch metrics from Varnish Exporter on host cp3030:9331 job(varnish-text) for more than 5 minutes. Make sure the exporter is running on the host."

@@ -15,3 +15,13 @@ groups:
           summary: "{{ $value }}% GET drop in text@{{ $labels.site }} during the past 30 minutes"
           description: "Critical if GET requests percentage difference compared to 30 minutes ago is more than 70%"
           dashboard: https://grafana.wikimedia.org/d/000000180/varnish-http-requests?viewPanel=6
+
+      - alert: VarnishPrometheusExporterDown
+        expr: up{instance=~"cp[0-9]{4}:9331"} == 0
+        for: 5m
+        labels:
+          team: traffic
+          severity: warning
+        annotations:
+          summary: "Varnish Exporter on instance {{ $labels.instance }} is unreachable"
+          description: "Prometheus has been unable to fetch metrics from Varnish Exporter on host {{ $labels.instance }} job({{ $labels.job }}) for more than 5 minutes. Make sure the exporter is running on the host."
