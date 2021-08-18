@@ -1,0 +1,22 @@
+# https://prometheus.io/docs/prometheus/latest/configuration/unit_testing_rules/
+# Test locally using `promtool test rules kubernetes_test.yaml`
+rule_files:
+  - kubernetes.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    input_series:
+      - series: 'up{instance="kubefake1001:9091", job="calico-felix"}'
+        values: "1 0 0 0 0 0 0"
+    alert_rule_test:
+      - alertname: KubernetesCalicoDown
+        eval_time: 6m
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              team: sre
+              instance: "kubefake1001:9091"
+              job: "calico-felix"
+            exp_annotations:
+              summary: "kubefake1001:9091 is not running calico-node Pod"
+              description: "Prometheus has been unable to scrape metrics from calico on host kubefake1001:9091 job(calico-felix) for more than 5 minutes. Make sure the calico-node Pod is running on that node."

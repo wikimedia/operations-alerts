@@ -1,0 +1,12 @@
+groups:
+  - name: kubernetes
+    rules:
+      - alert: KubernetesCalicoDown
+        expr: up{job="calico-felix"} == 0
+        for: 5m
+        labels:
+          team: sre
+          severity: critical
+        annotations:
+          summary: "{{ $labels.instance }} is not running calico-node Pod"
+          description: "Prometheus has been unable to scrape metrics from calico on host {{ $labels.instance }} job({{ $labels.job }}) for more than 5 minutes. Make sure the calico-node Pod is running on that node."
