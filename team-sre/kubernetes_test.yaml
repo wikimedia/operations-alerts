@@ -20,3 +20,4 @@ tests:
             exp_annotations:
               summary: "kubefake1001:9091 is not running calico-node Pod"
               description: "Prometheus has been unable to scrape metrics from calico on host kubefake1001:9091 job(calico-felix) for more than 5 minutes. Make sure the calico-node Pod is running on that node."
+              runbook: https://wikitech.wikimedia.org/wiki/Calico#Operations
