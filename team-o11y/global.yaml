@@ -1,0 +1,20 @@
+# deploy-tag: global
+
+# These alerts need a "global view" to be effective.
+groups:
+  - name: thanos-global
+    rules:
+
+    # Taken from upstream https://github.com/thanos-io/thanos/blob/main/examples/alerts/alerts.md#compaction
+    - alert: ThanosCompactMultipleRunning
+      annotations:
+        description: No more than one Thanos Compact instance should be running at once.
+          There are {{$value}} instances running.
+        summary: Thanos Compact has multiple instances running.
+        dashboard: https://grafana.wikimedia.org/d/651943d05a8123e32867b4673963f42b/thanos-compact
+        runbook: https://wikitech.wikimedia.org/wiki/Thanos#Alerts
+      expr: sum by (job) (up{job=~".*thanos-compact.*"}) > 1
+      for: 5m
+      labels:
+        severity: warning
+        team: o11y
