@@ -1,0 +1,69 @@
+# Taken from upstream https://github.com/thanos-io/thanos/blob/main/examples/alerts/alerts.md#sidecar
+groups:
+  - name: thanos-sidecar
+    rules:
+
+    - alert: ThanosSidecarPrometheusDown
+      annotations:
+        description: Thanos Sidecar {{$labels.instance}} cannot connect to Prometheus.
+        summary: Thanos Sidecar cannot connect to Prometheus
+        dashboard: https://grafana.wikimedia.org/d/b19644bfbf0ec1e108027cce268d99f7/thanos-sidecar
+        runbook: https://wikitech.wikimedia.org/wiki/Thanos#Alerts
+      expr: |
+        thanos_sidecar_prometheus_up{job=~".*thanos-sidecar.*"} == 0
+      for: 5m
+      labels:
+        severity: critical
+        team: o11y
+
+    - alert: ThanosSidecarBucketOperationsFailed
+      annotations:
+        description: Thanos Sidecar {{$labels.instance}} bucket operations are failing
+        summary: Thanos Sidecar bucket operations are failing
+        dashboard: https://grafana.wikimedia.org/d/b19644bfbf0ec1e108027cce268d99f7/thanos-sidecar
+        runbook: https://wikitech.wikimedia.org/wiki/Thanos#Alerts
+      expr: |
+        sum by (job, instance) (rate(thanos_objstore_bucket_operation_failures_total{job=~".*thanos-sidecar.*"}[5m])) > 0
+      for: 5m
+      labels:
+        severity: critical
+        team: o11y
+
+    - alert: ThanosSidecarUnhealthy
+      annotations:
+        description: Thanos Sidecar {{$labels.instance}} is unhealthy for more than {{$value}}
+          seconds.
+        summary: Thanos Sidecar is unhealthy.
+        dashboard: https://grafana.wikimedia.org/d/b19644bfbf0ec1e108027cce268d99f7/thanos-sidecar
+        runbook: https://wikitech.wikimedia.org/wiki/Thanos#Alerts
+      expr: |
+        time() - max by (job, instance) (thanos_sidecar_last_heartbeat_success_time_seconds{job=~".*thanos-sidecar.*"}) >= 240
+      for: 5m
+      labels:
+        severity: critical
+        team: o11y
+
+    - alert: ThanosSidecarUploadFailure
+      annotations:
+        description: Thanos Sidecar {{$labels.instance}} is failing to upload blocks to object storage
+        summary: Thanos Sidecar is failing block upload.
+        dashboard: https://grafana.wikimedia.org/d/b19644bfbf0ec1e108027cce268d99f7/thanos-sidecar
+        runbook: https://wikitech.wikimedia.org/wiki/Thanos#Alerts
+      expr: thanos_shipper_upload_failures_total > 1
+      for: 5m
+      labels:
+        severity: critical
+        team: o11y
+
+    # Not from upstream, see also See also https://phabricator.wikimedia.org/T265632
+    - alert: ThanosSidecarUploadFailure
+      annotations:
+        description: Thanos Sidecar {{$labels.instance}} is not configured to upload blocks.
+        summary: Thanos Sidecar is not uploading blocks.
+        dashboard: https://grafana.wikimedia.org/d/b19644bfbf0ec1e108027cce268d99f7/thanos-sidecar
+        runbook: https://wikitech.wikimedia.org/wiki/Thanos#Alerts
+      expr: absent(thanos_shipper_upload_failures_total)
+      for: 5m
+      labels:
+        severity: critical
+        team: o11y
