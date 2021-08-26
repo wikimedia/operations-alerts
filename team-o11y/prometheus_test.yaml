@@ -1,0 +1,47 @@
+rule_files:
+  - prometheus.yaml
+evaluation_interval: 1m
+tests:
+ - interval: 1m
+   input_series:
+    - series: 'prometheus_config_last_reload_successful'
+      values: '1 1 1 0+0x30'
+   external_labels:
+     site: eqiad
+     prometheus: ops
+   alert_rule_test:
+    - alertname: PrometheusConfigFailure
+      eval_time: 30m
+      exp_alerts:
+       - exp_labels:
+           severity: warning
+           team: o11y
+         exp_annotations:
+           summary: "Prometheus/ops has failed to reload configuration."
+           description: A failure has been encountered while reloading Prometheus configuration. Check logs of instance ops in eqiad.
+           dashboard: https://grafana.wikimedia.org/d/GWvEXWDZk/prometheus-server?var-datasource=eqiad%20prometheus%2Fops
+           runbook: https://wikitech.wikimedia.org/wiki/Prometheus#Configuration_reload_failure
+
+ - interval: 1m
+   input_series:
+     - series: 'process_start_time_seconds{job="prometheus"}'
+       values: '0+10x5'
+   external_labels:
+     site: eqiad
+     prometheus: ops
+   alert_rule_test:
+    - alertname: PrometheusRestarted
+      eval_time: 5m
+      exp_alerts:
+       - exp_labels:
+           severity: warning
+           team: o11y
+           job: prometheus
+         exp_annotations:
+           summary: "Prometheus/ops restarted: beware monitoring artifacts."
+           description: Prometheus ops in eqiad has recently restarted.
+             Prometheus restarts can sometimes cause odd monitoring artifacts
+             -- missing data, rate computations being lower than they should
+             be, etc.
+           dashboard: https://grafana.wikimedia.org/d/GWvEXWDZk/prometheus-server?var-datasource=eqiad%20prometheus%2Fops
+           runbook: https://wikitech.wikimedia.org/wiki/Prometheus#Prometheus_was_restarted

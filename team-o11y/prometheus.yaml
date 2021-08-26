@@ -1,0 +1,32 @@
+groups:
+  - name: prometheus
+    rules:
+
+    - alert: PrometheusConfigFailure
+      annotations:
+        description: A failure has been encountered while reloading Prometheus
+          configuration. Check logs of instance {{ $externalLabels.prometheus }}
+          in {{ $externalLabels.site }}.
+        summary: Prometheus/{{ $externalLabels.prometheus }} has failed to reload configuration.
+        dashboard: https://grafana.wikimedia.org/d/GWvEXWDZk/prometheus-server?var-datasource={{ $externalLabels.site }}%20prometheus%2F{{ $externalLabels.prometheus }}
+        runbook: https://wikitech.wikimedia.org/wiki/Prometheus#Configuration_reload_failure
+      expr: prometheus_config_last_reload_successful == 0
+      for: 5m
+      labels:
+        severity: warning
+        team: o11y
+
+    - alert: PrometheusRestarted
+      annotations:
+        description: Prometheus {{ $externalLabels.prometheus }} in {{ $externalLabels.site }}
+          has recently restarted. Prometheus restarts can sometimes cause odd
+          monitoring artifacts -- missing data, rate computations being lower
+          than they should be, etc.
+        summary: "Prometheus/{{ $externalLabels.prometheus }} restarted: beware monitoring artifacts."
+        dashboard: https://grafana.wikimedia.org/d/GWvEXWDZk/prometheus-server?var-datasource={{ $externalLabels.site }}%20prometheus%2F{{ $externalLabels.prometheus }}
+        runbook: https://wikitech.wikimedia.org/wiki/Prometheus#Prometheus_was_restarted
+      expr: time() - process_start_time_seconds{job="prometheus"} < 1800
+      for: 5m
+      labels:
+        severity: warning
+        team: o11y
