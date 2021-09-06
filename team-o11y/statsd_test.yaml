@@ -1,0 +1,27 @@
+rule_files:
+  - statsd.yaml
+evaluation_interval: 1m
+tests:
+ - interval: 1m
+   input_series:
+    - series: 'node_netstat_Udp_InErrors{cluster="graphite",instance="host1:1234"}'
+      values: '0 0 10+10x30'
+    - series: 'node_netstat_Udp_InDatagrams{cluster="graphite",instance="host1:1234"}'
+      values: '9+3x30'
+   external_labels:
+     site: eqiad
+     prometheus: ops
+   alert_rule_test:
+    - alertname: UDPInErrors
+      eval_time: 15m
+      exp_alerts:
+       - exp_labels:
+           severity: critical
+           team: o11y
+           cluster: graphite
+           instance: host1:1234
+         exp_annotations:
+           summary: Elevated UDP receive errors for statsd
+           description: statsd host host1:1234 is not able to handle the UDP incoming traffic. Check for clients sending a lot of traffic.
+           dashboard: https://grafana.wikimedia.org/dashboard/db/graphite-eqiad?panelId=16&fullscreen"
+           runbook: https://wikitech.wikimedia.org/wiki/Statsd
