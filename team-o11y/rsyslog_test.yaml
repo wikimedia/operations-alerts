@@ -1,0 +1,25 @@
+rule_files:
+  - rsyslog.yaml
+evaluation_interval: 1m
+tests:
+ - interval: 1m
+   input_series:
+    - series: 'rsyslog_action_suspended{action="mmkubernetes"}'
+      values: '0 0 1x30'
+    - series: 'rsyslog_action_failed{action="mmkubernetes"}'
+      values: '0 0 1000+1000x30'
+   external_labels:
+     site: eqiad
+   alert_rule_test:
+    - alertname: RSyslogDeliveryFailure
+      eval_time: 15m
+      exp_alerts:
+       - exp_labels:
+           severity: warning
+           team: o11y
+           action: mmkubernetes
+         exp_annotations:
+           summary: rsyslog is failing to deliver messages
+           description: Rsyslog is unable to submit messages to the mmkubernetes output.  The output target may be down or malfunctioning.
+           dashboard: https://grafana.wikimedia.org/d/000000596/rsyslog?var-datasource=eqiad prometheus/ops
+           runbook: https://wikitech.wikimedia.org/wiki/Rsyslog
