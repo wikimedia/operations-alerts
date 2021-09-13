@@ -1,0 +1,13 @@
+groups:
+  - name: blazegraph
+    rules:
+      - alert: BlazegraphFreeAllocatorsDecreasingRapidly
+        expr: deriv(blazegraph_free_allocators[10m]) < -0.01
+        for: 1m
+        labels:
+          team: search-platform
+          severity: critical
+        annotations:
+          summary: "Blazegraph instance {{$labels.instance}} is burning free allocators at a very high rate"
+          description: "Blazegraph is misbehaving and will rapidly corrupt its journal."
+          runbook: https://wikitech.wikimedia.org/wiki/Wikidata_Query_Service/Runbook#Free_allocators_decrease_rapidly

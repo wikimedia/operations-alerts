@@ -1,0 +1,24 @@
+# https://prometheus.io/docs/prometheus/latest/configuration/unit_testing_rules/
+# Test locally using `promtool test rules blazegraph_test.yaml`
+rule_files:
+  - blazegraph.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    input_series:
+      - series: 'blazegraph_free_allocators{instance="wdqs1010:9193"}'
+        values: "200000 199990 199980 199970 199960 199950 199940 199930 199920 199910"
+      - series: 'blazegraph_free_allocators{instance="wdqs1011:9193"}'
+        values: "200000 200000 200000 199999 199999 199999 199998 199998 199998 199997"
+    alert_rule_test:
+      - alertname: BlazegraphFreeAllocatorsDecreasingRapidly
+        eval_time: 10m
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              team: search-platform
+              instance: "wdqs1010:9193"
+            exp_annotations:
+              summary: "Blazegraph instance wdqs1010:9193 is burning free allocators at a very high rate"
+              description: "Blazegraph is misbehaving and will rapidly corrupt its journal."
+              runbook: https://wikitech.wikimedia.org/wiki/Wikidata_Query_Service/Runbook#Free_allocators_decrease_rapidly
