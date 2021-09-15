@@ -3,6 +3,8 @@ rule_files:
 evaluation_interval: 1m
 tests:
   - interval: 1m
+    external_labels:
+      site: esams
     input_series:
       - series: 'job_method_status:varnish_requests:rate5m{method="GET",job="varnish-text",site="esams",status="200"}'
         # See https://prometheus.io/docs/prometheus/latest/configuration/unit_testing_rules/

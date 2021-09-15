@@ -12,7 +12,7 @@ groups:
           team: traffic
           severity: critical
         annotations:
-          summary: "{{ $value }}% GET drop in text@{{ $labels.site }} during the past 30 minutes"
+          summary: "{{ $value }}% GET drop in text@{{ $externalLabels.site }} during the past 30 minutes"
           description: "Critical if GET requests percentage difference compared to 30 minutes ago is more than 70%"
           dashboard: https://grafana.wikimedia.org/d/000000180/varnish-http-requests?viewPanel=6
 
