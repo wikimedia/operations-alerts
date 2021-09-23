@@ -1,0 +1,20 @@
+rule_files:
+  - prometheus-mysqld-exporter.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    input_series:
+      - series: 'mysql_exporter_last_scrape_error{instance="db1099:13318"}'
+        values: '0 1x40'
+    alert_rule_test:
+    - alertname: PrometheusMysqldExporterFailed
+      eval_time: 40m
+      exp_alerts:
+       - exp_labels:
+           severity: warning
+           team: data-persistence
+           instance: db1099:13318
+         exp_annotations:
+           summary: "Prometheus-mysqld-exporter failed (db1099:13318)"
+           description: "Prometheus mysqld exporter failed on db1099:13318, it probably needs restarting"
+           dashboard: https://grafana.wikimedia.org/d/000000278/mysql-aggregated
