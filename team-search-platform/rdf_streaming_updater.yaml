@@ -2,9 +2,15 @@ groups:
   - name: rdf-streaming-updater
     rules:
       - alert: WdqsStreamingUpdaterFlinkJobUnstable
+        # We try to detect crashloop, use the uptime of the job and take its max over a 10minute period.
+        # Using resets() or repetive instant checks for 10m do not seem to work because:
+        # - the series might differ if the k8s pod crashes making resets unable to detect the resets of the counter
+        # - the series might disappear while the job is being restarted making instant checks flappy
+        # max_over_time does seem to workaround these problems and will only fail if the series goes away for more than
+        # 10 mins in which case the WdqsStreamingUpdaterFlinkJobNotRunning alert should have been triggered a long time ago
         expr: |
-          flink_jobmanager_job_uptime{job_name="WDQS_Streaming_Updater", kubernetes_namespace="rdf-streaming-updater"} < 300000
-        for: 10m
+          max by (job_name, kubernetes_namespace) (max_over_time(flink_jobmanager_job_uptime{job_name="WDQS_Streaming_Updater", kubernetes_namespace="rdf-streaming-updater"}[10m])) < 300000
+        for: 1m
         labels:
           team: search-platform
           severity: critical
