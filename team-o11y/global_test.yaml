@@ -1,0 +1,22 @@
+rule_files:
+  - global.yaml
+evaluation_interval: 1m
+tests:
+ - interval: 1m
+   input_series:
+    - series: 'alertmanager_config_hash{site="eqiad"}'
+      values: '1000+3x50'
+    - series: 'alertmanager_config_hash{site="codfw"}'
+      values: '2000+3x50'
+   alert_rule_test:
+    - alertname: AlertManagerConfigDesync
+      eval_time: 35m
+      exp_alerts:
+       - exp_labels:
+           severity: warning
+           team: o11y
+         exp_annotations:
+           description: AlertManager cluster configuration is out of sync, check logs
+           summary: AlertManager cluster configuration out of sync
+           dashboard: https://grafana.wikimedia.org/d/eea-9_sik/alertmanager
+           runbook: https://wikitech.wikimedia.org/wiki/Alertmanager#Alerts

@@ -1,0 +1,96 @@
+groups:
+  - name: alertmanager
+    rules:
+
+    - alert: AlertManagerInvalidConfig
+      annotations:
+        description: AlertManager's configuration is not valid, check the runbook and logs
+        summary: AlertManager invalid configuration
+        dashboard: https://grafana.wikimedia.org/d/eea-9_sik/alertmanager
+        runbook: https://wikitech.wikimedia.org/wiki/Alertmanager#Alerts
+      expr: alertmanager_config_last_reload_successful == 0
+      for: 2m
+      labels:
+        severity: warning
+        team: o11y
+
+    - alert: AlertManagerNoAlerts
+      annotations:
+        description: AlertManager has not been receiving alerts, check the runbook and logs
+        summary: AlertManager is not receiving alerts
+        dashboard: https://grafana.wikimedia.org/d/eea-9_sik/alertmanager
+        runbook: https://wikitech.wikimedia.org/wiki/Alertmanager#Alerts
+      expr: sum(rate(alertmanager_alerts_received_total[5m])) < 2
+      for: 2m
+      labels:
+        severity: warning
+        team: o11y
+    - alert: AlertManagerNoAlerts
+      annotations:
+        description: AlertManager has not been receiving alerts, check the runbook and logs
+        summary: AlertManager is not receiving alerts
+        dashboard: https://grafana.wikimedia.org/d/eea-9_sik/alertmanager
+        runbook: https://wikitech.wikimedia.org/wiki/Alertmanager#Alerts
+      expr: sum(rate(alertmanager_alerts_received_total[5m])) < 1
+      for: 2m
+      labels:
+        severity: critical
+        team: o11y
+
+    - alert: AlertManagerNotificationFail
+      annotations:
+        description: AlertManager is failing to deliver notifications
+        summary: AlertManager is failing to deliver notifications
+        dashboard: https://grafana.wikimedia.org/d/eea-9_sik/alertmanager
+        runbook: https://wikitech.wikimedia.org/wiki/Alertmanager#Alerts
+      expr: rate(alertmanager_notifications_failed_total[2m]) > 0.1
+      for: 5m
+      labels:
+        severity: warning
+        team: o11y
+    - alert: AlertManagerNotificationFail
+      annotations:
+        description: AlertManager is failing to deliver notifications
+        summary: AlertManager is failing to deliver notifications
+        dashboard: https://grafana.wikimedia.org/d/eea-9_sik/alertmanager
+        runbook: https://wikitech.wikimedia.org/wiki/Alertmanager#Alerts
+      expr: rate(alertmanager_notifications_failed_total[2m]) > 0.2
+      for: 5m
+      labels:
+        severity: critical
+        team: o11y
+
+    - alert: AlertManagerIRCNotConnected
+      annotations:
+        description: AlertManager IRC relay is not connected, check the logs
+        summary: AlertManager IRC relay is not connected
+        dashboard: https://grafana.wikimedia.org/d/eea-9_sik/alertmanager
+        runbook: https://wikitech.wikimedia.org/wiki/Alertmanager#Alerts
+      expr: irc_connected{job="alertmanager"} == 0
+      for: 5m
+      labels:
+        severity: warning
+        team: o11y
+
+    - alert: PrometheusNotConnectedToAM
+      annotations:
+        description: Prometheus is failing to connect to AlertManager
+        summary: Prometheus is failing to connect to AlertManager
+        dashboard: https://grafana.wikimedia.org/d/eea-9_sik/alertmanager
+        runbook: https://wikitech.wikimedia.org/wiki/Alertmanager#Alerts
+      expr: prometheus_notifications_alertmanagers_discovered < 2
+      for: 5m
+      labels:
+        severity: warning
+        team: o11y
+    - alert: PrometheusNotConnectedToAM
+      annotations:
+        description: Prometheus is failing to connect to AlertManager
+        summary: Prometheus is failing to connect to AlertManager
+        dashboard: https://grafana.wikimedia.org/d/eea-9_sik/alertmanager
+        runbook: https://wikitech.wikimedia.org/wiki/Alertmanager#Alerts
+      expr: prometheus_notifications_alertmanagers_discovered < 1
+      for: 5m
+      labels:
+        severity: critical
+        team: o11y
