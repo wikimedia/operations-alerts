@@ -1,0 +1,15 @@
+groups:
+  - name: mtail
+    rules:
+
+    - alert: MtailNoLinesReceived
+      annotations:
+        description: Mtail instance {{$labels.instance}} is not receiving any log lines
+        summary: Mtail is not receiving any log lines from the configured logs. check for a misconfiguration
+        dashboard: https://grafana.wikimedia.org/d/LBTPH9Hnk/mtail
+        runbook: https://wikitech.wikimedia.org/wiki/Mtail
+      expr: sum(irate(mtail_lines_total{instance=~"centrallog.*"}[5m])) by (instance) == 0
+      for: 15m
+      labels:
+        severity: warning
+        team: o11y

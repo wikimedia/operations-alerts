@@ -1,0 +1,21 @@
+rule_files:
+ - mtail.yaml
+evaluation_interval: 1m
+tests:
+ - interval: 1m
+   input_series:
+    - series: 'mtail_lines_total{instance="centrallog0000:1234"}'
+      values: '0+0x100'
+   alert_rule_test:
+    - alertname: MtailNoLinesReceived
+      eval_time: 30m
+      exp_alerts:
+       - exp_labels:
+           severity: warning
+           team: o11y
+           instance: centrallog0000:1234
+         exp_annotations:
+           description: Mtail instance centrallog0000:1234 is not receiving any log lines
+           summary: Mtail is not receiving any log lines from the configured logs. check for a misconfiguration
+           dashboard: https://grafana.wikimedia.org/d/LBTPH9Hnk/mtail
+           runbook: https://wikitech.wikimedia.org/wiki/Mtail
