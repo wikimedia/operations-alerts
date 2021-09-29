@@ -15,3 +15,10 @@ On Debian systems the `promtool` binary is part of `prometheus` package, which w
 
     systemctl stop prometheus
     systemctl mask prometheus
+
+
+Deploying
+----
+The repository is self-service for `wmf` LDAP group users. In other words a +2
+will trigger CI tests and merge (if tests pass). Post merge the alerts will be
+deployed at the next Puppet run (i.e. in 30 min).
