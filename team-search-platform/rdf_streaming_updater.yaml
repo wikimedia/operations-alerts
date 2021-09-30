@@ -1,3 +1,8 @@
+##
+# flink alerts for the WDQS Streaming Updater
+# Not adding k8s-staging yet as there's no way to deploy charts to the staging
+# cluster in codfw yet.
+# deploy-tag: k8s
 groups:
   - name: rdf-streaming-updater
     rules:
