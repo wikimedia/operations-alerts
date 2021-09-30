@@ -8,6 +8,7 @@
 
 import os
 import pathlib
+import re
 import subprocess
 import warnings
 
@@ -87,6 +88,39 @@ def test_rule_metadata(rulefile):
     for group in alerts["groups"]:
         for rule in group["rules"]:
             _validate_rule(rule)
+
+
+@pytest.mark.parametrize("rulefile", all_rulefiles(SUBDIRS))
+def test_deploy_metadata(rulefile):
+    """Ensure the file 'deploy-tag' metadata is valid"""
+
+    with open(rulefile) as f:
+        tag = _get_tag(f, "deploy-tag")
+        if tag is None:
+            return
+
+    tags = re.split(r",\s*", tag)
+
+    if len(tags) > 1:
+        for value in ("global", "local"):
+            assert value not in tags, "%r not allowed with multiple tags" % value
+
+
+def _get_tag(fobj, name):
+    """Read tag 'name' from fobj "header". The header ends when a non-comment or non-empty line, the
+    rest is ignored. Return None on tag not found."""
+
+    # FIXME Use format strings
+    tag_re = re.compile("^# *{name}: *(.+)$".format(name=name))
+
+    for line in fobj:
+        m = tag_re.match(line)
+        if m:
+            return m.group(1)
+        # stop looking after comments and empty lines
+        if not line.startswith("#") and not line.startswith(" "):
+            return None
+    return None
 
 
 def _validate_rule(rule):
