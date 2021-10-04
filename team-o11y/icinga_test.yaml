@@ -1,0 +1,22 @@
+rule_files:
+  - icinga.yaml
+evaluation_interval: 1m
+tests:
+ - interval: 1m
+   input_series:
+    - series: icinga_avg_check_latency
+      values: '90 100 120+10x30'
+   external_labels:
+     site: eqiad
+     prometheus: ops
+   alert_rule_test:
+    - alertname: IcingaOverload
+      eval_time: 10m
+      exp_alerts:
+       - exp_labels:
+           severity: critical
+           team: o11y
+         exp_annotations:
+           description: Average latency for checks is elevated (200), check dashboard for signs of overload
+           summary: Checks are taking long to execute
+           dashboard: https://grafana.wikimedia.org/d/rsCfQfuZz/icinga
