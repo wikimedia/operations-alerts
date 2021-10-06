@@ -5,9 +5,9 @@ groups:
     - alert: IcingaOverload
       annotations:
         description: Average latency for checks is elevated ({{ $value }}), check dashboard for signs of overload
-        summary: Checks are taking long to execute
+        summary: Checks are taking long to execute on {{ $labels.instance }}
         dashboard: https://grafana.wikimedia.org/d/rsCfQfuZz/icinga
-      expr: icinga_avg_check_latency > 110
+      expr: icinga_avg_check_latency >= 130
       for: 5m
       labels:
         severity: critical
