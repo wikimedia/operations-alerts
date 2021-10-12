@@ -22,7 +22,8 @@ tests:
          exp_annotations:
            summary: '60% GET drop in text@esams during the past 30 minutes'
            description: "Critical if GET requests percentage difference compared to 30 minutes ago is more than 70%"
-           dashboard: https://grafana.wikimedia.org/d/000000180/varnish-http-requests?viewPanel=6
+           dashboard: https://grafana.wikimedia.org/d/000000541/varnish-caching-last-week-comparison?viewPanel=5&var-cluster=text&var-site=esams
+           runbook: https://wikitech.wikimedia.org/wiki/Monitoring/VarnishTrafficDrop
 
   - interval: 1m
     input_series:
