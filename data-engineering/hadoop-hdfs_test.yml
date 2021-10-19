@@ -1,0 +1,23 @@
+rule_files:
+  - hadoop-hdfs.yaml
+evaluation_interval: 1m
+tests:
+    - interval: 1m
+      input_series:
+        - series: Hadoop_NameNode_CapacityRemainingGB{cluster="analytics", hadoop_cluster="analytics-hadoop", instance="an-master1001:10080"}
+          values: '179636'
+        - series: Hadoop_NameNode_CapacityTotalGB{cluster="analytics", hadoop_cluster="analytics-hadoop", instance="an-master1001:10080"}
+          values: '3666049'
+      alert_rule_test:
+      - alertname: HdfsCapacityRemainingPercent
+        eval_time: 1m
+        exp_alerts:
+        - exp_labels:
+            severity: page
+            team: data-engineering
+            instance: an-master1001:10080
+          exp_annotations:
+            summary: Free space on the analytics-hadoop HDFS cluster is below the paging threshold of 5%.
+            description: Dangerously low free space on the analytics-hadoop HDFS cluster.
+            dashboard: https://grafana.wikimedia.org/dashboard/db/hadoop?var-hadoop_cluster={{ $labels.hadoop_cluster }}&orgId=1&panelId=106&fullscreen
+            runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#HDFS_Capacity_Remaining
