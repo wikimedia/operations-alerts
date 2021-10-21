@@ -1,0 +1,41 @@
+rule_files:
+  - hadoop-hdfs.yaml
+evaluation_interval: 1m
+tests:
+    - interval: 1m
+      input_series:
+        - series: Hadoop_NameNode_CapacityRemainingGB{hadoop_cluster="analytics-hadoop", instance="an-master1001:10080"}
+          values: '17234'
+        - series: Hadoop_NameNode_CapacityTotalGB{hadoop_cluster="analytics-hadoop", instance="an-master1001:10080"}
+          values: '3666049'
+      alert_rule_test:
+      - alertname: HdfsCapacityRemainingPercent
+        eval_time: 5m
+        exp_alerts:
+        - exp_labels:
+            severity: page
+            team: data-engineering
+            hadoop_cluster: analytics-hadoop
+          exp_annotations:
+            description: Free space on the analytics-hadoop HDFS cluster is below the paging threshold of 5%.
+            summary: Dangerously low free space on the analytics-hadoop HDFS cluster.
+            dashboard: https://grafana.wikimedia.org/dashboard/db/hadoop?var-hadoop_cluster=analytics-hadoop&orgId=1&panelId=106&fullscreen
+            runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#HDFS_Capacity_Remaining
+        - exp_labels:
+            severity: critical
+            team: data-engineering
+            hadoop_cluster: analytics-hadoop
+          exp_annotations:
+            description: Free space on the analytics-hadoop HDFS cluster is below the critical threshold of 10%.
+            summary: Critically low free space on the analytics-hadoop HDFS cluster.
+            dashboard: https://grafana.wikimedia.org/dashboard/db/hadoop?var-hadoop_cluster=analytics-hadoop&orgId=1&panelId=106&fullscreen
+            runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#HDFS_Capacity_Remaining
+        - exp_labels:
+            severity: warning
+            team: data-engineering
+            hadoop_cluster: analytics-hadoop
+          exp_annotations:
+            description: Free space on the analytics-hadoop HDFS cluster is below the warning threshold of 15%.
+            summary: Alarmingly low free space on the analytics-hadoop HDFS cluster.
+            dashboard: https://grafana.wikimedia.org/dashboard/db/hadoop?var-hadoop_cluster=analytics-hadoop&orgId=1&panelId=106&fullscreen
+            runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#HDFS_Capacity_Remaining

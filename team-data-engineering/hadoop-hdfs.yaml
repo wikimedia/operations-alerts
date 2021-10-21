@@ -8,7 +8,7 @@ groups:
         summary: Dangerously low free space on the analytics-hadoop HDFS cluster.
         dashboard: https://grafana.wikimedia.org/dashboard/db/hadoop?var-hadoop_cluster={{ $labels.hadoop_cluster }}&orgId=1&panelId=106&fullscreen
         runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#HDFS_Capacity_Remaining
-      expr: max by (hadoop_cluster) (Hadoop_NameNode_CapacityRemainingGB{hadoop_cluster="analytics-hadoop"} / Hadoop_NameNode_CapacityTotalGB * 100)  < 5
+      expr: max by (hadoop_cluster) (Hadoop_NameNode_CapacityRemainingGB{hadoop_cluster="analytics-hadoop"} / Hadoop_NameNode_CapacityTotalGB{hadoop_cluster="analytics-hadoop"} * 100)  < 5
       for: 5m
       labels:
         severity: page
