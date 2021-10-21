@@ -37,3 +37,27 @@ groups:
       labels:
         severity: warning
         team: data-engineering
+
+    - alert: HdfsCorruptBlocks
+      annotations:
+        description: More than 50 HDFS corrupt blocks detected on the {{ $labels.hadoop_cluster }} HDFS cluster.
+        summary: HDFS corrupt blocks detected on the {{ $labels.hadoop_cluster }} HDFS cluster.
+        dashboard: https://grafana.wikimedia.org/dashboard/db/hadoop?var-hadoop_cluster={{ $labels.hadoop_cluster }}&orgId=1&panelId=39&fullscreen
+        runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#HDFS_corrupt_blocks
+      expr: max by (hadoop_cluster) (Hadoop_NameNode_CorruptBlocks) > 50
+      for: 5m
+      labels:
+        severity: critical
+        team: data-engineering
+
+    - alert: HdfsCorruptBlocks
+      annotations:
+        description: More than 30 HDFS corrupt blocks detected on the {{ $labels.hadoop_cluster }} HDFS cluster.
+        summary: HDFS corrupt blocks detected on the {{ $labels.hadoop_cluster }} HDFS cluster.
+        dashboard: https://grafana.wikimedia.org/dashboard/db/hadoop?var-hadoop_cluster={{ $labels.hadoop_cluster }}&orgId=1&panelId=39&fullscreen
+        runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#HDFS_corrupt_blocks
+      expr: max by (hadoop_cluster) (Hadoop_NameNode_CorruptBlocks) > 30
+      for: 5m
+      labels:
+        severity: warning
+        team: data-engineering

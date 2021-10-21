@@ -39,3 +39,30 @@ tests:
             summary: Alarmingly low free space on the analytics-hadoop HDFS cluster.
             dashboard: https://grafana.wikimedia.org/dashboard/db/hadoop?var-hadoop_cluster=analytics-hadoop&orgId=1&panelId=106&fullscreen
             runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#HDFS_Capacity_Remaining
+
+    - interval: 1m
+      input_series:
+        - series: Hadoop_NameNode_CorruptBlocks{hadoop_cluster="analytics-hadoop", instance="an-master1001:10080"}
+          values: '60'
+      alert_rule_test:
+      - alertname: HdfsCorruptBlocks
+        eval_time: 5m
+        exp_alerts:
+        - exp_labels:
+            severity: critical
+            team: data-engineering
+            hadoop_cluster: analytics-hadoop
+          exp_annotations:
+            description: More than 50 HDFS corrupt blocks detected on the analytics-hadoop HDFS cluster.
+            summary: HDFS corrupt blocks detected on the analytics-hadoop HDFS cluster.
+            dashboard: https://grafana.wikimedia.org/dashboard/db/hadoop?var-hadoop_cluster=analytics-hadoop&orgId=1&panelId=39&fullscreen
+            runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#HDFS_corrupt_blocks
+        - exp_labels:
+            severity: warning
+            team: data-engineering
+            hadoop_cluster: analytics-hadoop
+          exp_annotations:
+            description: More than 30 HDFS corrupt blocks detected on the analytics-hadoop HDFS cluster.
+            summary: HDFS corrupt blocks detected on the analytics-hadoop HDFS cluster.
+            dashboard: https://grafana.wikimedia.org/dashboard/db/hadoop?var-hadoop_cluster=analytics-hadoop&orgId=1&panelId=39&fullscreen
+            runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#HDFS_corrupt_blocks
