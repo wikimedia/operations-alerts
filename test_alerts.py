@@ -45,6 +45,13 @@ def all_rulefiles(paths):
     return files
 
 
+def test_yml_extension():
+    for path in SUBDIRS:
+        p = pathlib.Path(path)
+        yml_files = set(p.glob("**/*.yml"))
+        assert yml_files == set(), "use yaml extension not yml"
+
+
 @pytest.mark.parametrize("testfile", all_testfiles(SUBDIRS))
 def test_alerts(testfile):
     """Run alert unit tests for testfile."""
