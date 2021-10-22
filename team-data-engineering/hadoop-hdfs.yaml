@@ -61,3 +61,75 @@ groups:
       labels:
         severity: warning
         team: data-engineering
+
+    - alert: HdfsMissingBlocks
+      annotations:
+        description: More than 5 HDFS missing blocks detected on the {{ $labels.hadoop_cluster }} HDFS cluster.
+        summary: HDFS missing blocks detected on the {{ $labels.hadoop_cluster }} HDFS cluster.
+        dashboard: https://grafana.wikimedia.org/dashboard/db/hadoop?var-hadoop_cluster={{ $labels.hadoop_cluster }}&orgId=1&panelId=40&fullscreen
+        runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#HDFS_missing_blocks
+      expr: max by (hadoop_cluster) (Hadoop_NameNode_MissingBlocks) > 5
+      for: 5m
+      labels:
+        severity: critical
+        team: data-engineering
+
+    - alert: HdfsMissingBlocks
+      annotations:
+        description: More than 2 HDFS missing blocks detected on the {{ $labels.hadoop_cluster }} HDFS cluster.
+        summary: HDFS missing blocks detected on the {{ $labels.hadoop_cluster }} HDFS cluster.
+        dashboard: https://grafana.wikimedia.org/dashboard/db/hadoop?var-hadoop_cluster={{ $labels.hadoop_cluster }}&orgId=1&panelId=40&fullscreen
+        runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#HDFS_missing_blocks
+      expr: max by (hadoop_cluster) (Hadoop_NameNode_MissingBlocks) > 2
+      for: 5m
+      labels:
+        severity: warning
+        team: data-engineering
+
+    - alert: HdfsTotalFilesHeap
+      annotations:
+        description: The total number of files on the {{ $labels.hadoop_cluster }} HDFS cluster are more than the heap can support.
+        summary: Total files on the {{ $labels.hadoop_cluster }} HDFS cluster are more than the heap can support.
+        dashboard: https://grafana.wikimedia.org/dashboard/db/hadoop?var-hadoop_cluster={{ $labels.hadoop_cluster }}&orgId=1&panelId=28&fullscreen
+        runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#HDFS_total_files_and_heap_size
+      expr: max by (hadoop_cluster) (Hadoop_NameNode_FilesTotal) > 70000000
+      for: 5m
+      labels:
+        severity: critical
+        team: data-engineering
+
+    - alert: HdfsTotalFilesHeap
+      annotations:
+        description: The total number of files on the {{ $labels.hadoop_cluster }} HDFS cluster are more than the heap can support.
+        summary: Total files on the {{ $labels.hadoop_cluster }} HDFS cluster are more than the heap can support.
+        dashboard: https://grafana.wikimedia.org/dashboard/db/hadoop?var-hadoop_cluster={{ $labels.hadoop_cluster }}&orgId=1&panelId=28&fullscreen
+        runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#HDFS_total_files_and_heap_size
+      expr: max by (hadoop_cluster) (Hadoop_NameNode_FilesTotal) > 68000000
+      for: 5m
+      labels:
+        severity: warning
+        team: data-engineering
+
+    - alert: HdfsRpcQueueLength
+      annotations:
+        description: The HDFS Namenode RPC 8020 call queue length on the {{ $labels.hadoop_cluster }} cluster is too high.
+        summary: RPC call queue length on the {{ $labels.hadoop_cluster }} cluster is too high.
+        dashboard: https://grafana.wikimedia.org/dashboard/db/hadoop?var-hadoop_cluster={{ $labels.hadoop_cluster }}&orgId=1&panelId=54&fullscreen
+        runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#HDFS_Namenode_RPC_length_queue
+      expr: max by (hadoop_cluster) (Hadoop_NameNode_CallQueueLength{name="RpcActivityForPort8020"}) > 20
+      for: 5m
+      labels:
+        severity: critical
+        team: data-engineering
+
+    - alert: HdfsRpcQueueLength
+      annotations:
+        description: The HDFS Namenode RPC 8020 call queue length on the {{ $labels.hadoop_cluster }} cluster is too high.
+        summary: RPC call queue length on the {{ $labels.hadoop_cluster }} cluster is too high.
+        dashboard: https://grafana.wikimedia.org/dashboard/db/hadoop?var-hadoop_cluster={{ $labels.hadoop_cluster }}&orgId=1&panelId=54&fullscreen
+        runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#HDFS_Namenode_RPC_length_queue
+      expr: max by (hadoop_cluster) (Hadoop_NameNode_CallQueueLength{name="RpcActivityForPort8020"}) > 10
+      for: 5m
+      labels:
+        severity: warning
+        team: data-engineering

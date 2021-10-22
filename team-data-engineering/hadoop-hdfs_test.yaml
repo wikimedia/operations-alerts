@@ -66,3 +66,84 @@ tests:
             summary: HDFS corrupt blocks detected on the analytics-hadoop HDFS cluster.
             dashboard: https://grafana.wikimedia.org/dashboard/db/hadoop?var-hadoop_cluster=analytics-hadoop&orgId=1&panelId=39&fullscreen
             runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#HDFS_corrupt_blocks
+
+    - interval: 1m
+      input_series:
+        - series: Hadoop_NameNode_MissingBlocks{hadoop_cluster="analytics-hadoop", instance="an-master1001:10080"}
+          values: '10'
+      alert_rule_test:
+      - alertname: HdfsMissingBlocks
+        eval_time: 5m
+        exp_alerts:
+        - exp_labels:
+            severity: critical
+            team: data-engineering
+            hadoop_cluster: analytics-hadoop
+          exp_annotations:
+            description: More than 5 HDFS missing blocks detected on the analytics-hadoop HDFS cluster.
+            summary: HDFS missing blocks detected on the analytics-hadoop HDFS cluster.
+            dashboard: https://grafana.wikimedia.org/dashboard/db/hadoop?var-hadoop_cluster=analytics-hadoop&orgId=1&panelId=40&fullscreen
+            runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#HDFS_missing_blocks
+        - exp_labels:
+            severity: warning
+            team: data-engineering
+            hadoop_cluster: analytics-hadoop
+          exp_annotations:
+            description: More than 2 HDFS missing blocks detected on the analytics-hadoop HDFS cluster.
+            summary: HDFS missing blocks detected on the analytics-hadoop HDFS cluster.
+            dashboard: https://grafana.wikimedia.org/dashboard/db/hadoop?var-hadoop_cluster=analytics-hadoop&orgId=1&panelId=40&fullscreen
+            runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#HDFS_missing_blocks
+
+    - interval: 1m
+      input_series:
+        - series: Hadoop_NameNode_FilesTotal{hadoop_cluster="analytics-hadoop", instance="an-master1001:10080"}
+          values: '70000001'
+      alert_rule_test:
+      - alertname: HdfsTotalFilesHeap
+        eval_time: 5m
+        exp_alerts:
+        - exp_labels:
+            severity: critical
+            team: data-engineering
+            hadoop_cluster: analytics-hadoop
+          exp_annotations:
+            description: The total number of files on the analytics-hadoop HDFS cluster are more than the heap can support.
+            summary: Total files on the analytics-hadoop HDFS cluster are more than the heap can support.
+            dashboard: https://grafana.wikimedia.org/dashboard/db/hadoop?var-hadoop_cluster=analytics-hadoop&orgId=1&panelId=28&fullscreen
+            runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#HDFS_total_files_and_heap_size
+        - exp_labels:
+            severity: warning
+            team: data-engineering
+            hadoop_cluster: analytics-hadoop
+          exp_annotations:
+            description: The total number of files on the analytics-hadoop HDFS cluster are more than the heap can support.
+            summary: Total files on the analytics-hadoop HDFS cluster are more than the heap can support.
+            dashboard: https://grafana.wikimedia.org/dashboard/db/hadoop?var-hadoop_cluster=analytics-hadoop&orgId=1&panelId=28&fullscreen
+            runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#HDFS_total_files_and_heap_size
+
+    - interval: 1m
+      input_series:
+        - series: Hadoop_NameNode_CallQueueLength{name="RpcActivityForPort8020", hadoop_cluster="analytics-hadoop", instance="an-master1001:10080"}
+          values: '21'
+      alert_rule_test:
+      - alertname: HdfsRpcQueueLength
+        eval_time: 5m
+        exp_alerts:
+        - exp_labels:
+            severity: critical
+            team: data-engineering
+            hadoop_cluster: analytics-hadoop
+          exp_annotations:
+            description: The HDFS Namenode RPC 8020 call queue length on the analytics-hadoop cluster is too high.
+            summary: RPC call queue length on the analytics-hadoop cluster is too high.
+            dashboard: https://grafana.wikimedia.org/dashboard/db/hadoop?var-hadoop_cluster=analytics-hadoop&orgId=1&panelId=54&fullscreen
+            runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#HDFS_Namenode_RPC_length_queue
+        - exp_labels:
+            severity: warning
+            team: data-engineering
+            hadoop_cluster: analytics-hadoop
+          exp_annotations:
+            description: The HDFS Namenode RPC 8020 call queue length on the analytics-hadoop cluster is too high.
+            summary: RPC call queue length on the analytics-hadoop cluster is too high.
+            dashboard: https://grafana.wikimedia.org/dashboard/db/hadoop?var-hadoop_cluster=analytics-hadoop&orgId=1&panelId=54&fullscreen
+            runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#HDFS_Namenode_RPC_length_queue
