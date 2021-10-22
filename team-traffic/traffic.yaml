@@ -1,21 +1,21 @@
 groups:
   - name: traffic
     rules:
-      - alert: VarnishTrafficDrop
+      - alert: EdgeTrafficDrop
         expr: >
           round(
-            (sum(job_method_status:varnish_requests:rate5m{method="GET",job="varnish-text"}) by (site)) * 100 /
-            (sum(job_method_status:varnish_requests:rate5m{method="GET",job="varnish-text"} offset 30m) by (site))
+            (sum(cluster_layer_code:trafficserver_responses_total:rate5m{cluster="cache_text", layer="tls"}) by (site)) * 100 /
+            (sum(cluster_layer_code:trafficserver_responses_total:rate5m{cluster="cache_text", layer="tls"} offset 30m) by (site))
           ) < 70
         for: 1m
         labels:
           team: traffic
           severity: critical
         annotations:
-          summary: "{{ $value }}% GET drop in text@{{ $externalLabels.site }} during the past 30 minutes"
-          description: "Critical if GET requests percentage difference compared to 30 minutes ago is more than 70%"
-          dashboard: "https://grafana.wikimedia.org/d/000000541/varnish-caching-last-week-comparison?viewPanel=5&var-cluster=text&var-site={{ $externalLabels.site}}"
-          runbook: https://wikitech.wikimedia.org/wiki/Monitoring/VarnishTrafficDrop
+          summary: "{{ $value }}% request drop in text@{{ $externalLabels.site }} during the past 30 minutes"
+          description: "Critical if requests percentage difference compared to 30 minutes ago is more than 70%"
+          dashboard: "https://grafana.wikimedia.org/d/000000479/frontend-traffic?viewPanel=12&orgId=1&from=now-24h&to=now&var-site={{ $externalLabels.site }}&var-cache_type=text"
+          runbook: https://wikitech.wikimedia.org/wiki/Monitoring/EdgeTrafficDrop
 
       - alert: VarnishPrometheusExporterDown
         expr: up{instance=~"cp[0-9]{4}:9331"} == 0

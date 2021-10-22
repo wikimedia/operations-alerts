@@ -6,13 +6,13 @@ tests:
     external_labels:
       site: esams
     input_series:
-      - series: 'job_method_status:varnish_requests:rate5m{method="GET",job="varnish-text",site="esams",status="200"}'
+      - series: 'cluster_layer_code:trafficserver_responses_total:rate5m{cluster="cache_text",layer="tls",site="esams",code="200"}'
         # See https://prometheus.io/docs/prometheus/latest/configuration/unit_testing_rules/
         values: '5000+0x58 3000'
-      - series: 'job_method_status:varnish_requests:rate5m{method="GET",job="varnish-text",site="esams",status="404"}'
+      - series: 'cluster_layer_code:trafficserver_responses_total:rate5m{cluster="cache_text",layer="tls",site="esams",code="404"}'
         values: '42+0x59'
     alert_rule_test:
-    - alertname: VarnishTrafficDrop
+    - alertname: EdgeTrafficDrop
       eval_time: 60m
       exp_alerts:
        - exp_labels:
@@ -20,10 +20,10 @@ tests:
            team: traffic
            site: esams
          exp_annotations:
-           summary: '60% GET drop in text@esams during the past 30 minutes'
-           description: "Critical if GET requests percentage difference compared to 30 minutes ago is more than 70%"
-           dashboard: https://grafana.wikimedia.org/d/000000541/varnish-caching-last-week-comparison?viewPanel=5&var-cluster=text&var-site=esams
-           runbook: https://wikitech.wikimedia.org/wiki/Monitoring/VarnishTrafficDrop
+           summary: '60% request drop in text@esams during the past 30 minutes'
+           description: "Critical if requests percentage difference compared to 30 minutes ago is more than 70%"
+           dashboard: https://grafana.wikimedia.org/d/000000479/frontend-traffic?viewPanel=12&orgId=1&from=now-24h&to=now&var-site=esams&var-cache_type=text
+           runbook: https://wikitech.wikimedia.org/wiki/Monitoring/EdgeTrafficDrop
 
   - interval: 1m
     input_series:
