@@ -2,6 +2,7 @@ groups:
   - name: hadoop-hdfs
     rules:
 
+## HDFS Capacity Remaining alerts
     - alert: HdfsCapacityRemainingPercent
       annotations:
         description: Free space on the analytics-hadoop HDFS cluster is below the paging threshold of 5%.
@@ -38,6 +39,7 @@ groups:
         severity: warning
         team: data-engineering
 
+## HDFS Corrupt Blocks alerts
     - alert: HdfsCorruptBlocks
       annotations:
         description: More than 50 HDFS corrupt blocks detected on the {{ $labels.hadoop_cluster }} HDFS cluster.
@@ -62,6 +64,7 @@ groups:
         severity: warning
         team: data-engineering
 
+## HDFS Missing Blocks alerts
     - alert: HdfsMissingBlocks
       annotations:
         description: More than 5 HDFS missing blocks detected on the {{ $labels.hadoop_cluster }} HDFS cluster.
@@ -86,6 +89,7 @@ groups:
         severity: warning
         team: data-engineering
 
+## HDFS Total Files alerts
     - alert: HdfsTotalFilesHeap
       annotations:
         description: The total number of files on the {{ $labels.hadoop_cluster }} HDFS cluster are more than the heap can support.
@@ -110,6 +114,7 @@ groups:
         severity: warning
         team: data-engineering
 
+## HDFS Namenode RPC Call Queue Length alerts
     - alert: HdfsRpcQueueLength
       annotations:
         description: The HDFS Namenode RPC 8020 call queue length on the {{ $labels.hadoop_cluster }} cluster is too high.

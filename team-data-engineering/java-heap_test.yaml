@@ -1,0 +1,210 @@
+rule_files:
+  - java-heap.yaml
+evaluation_interval: 1m
+tests:
+## HDFS Namenode Heap Usage tests
+    - interval: 1m
+      input_series:
+        - series: jvm_memory_bytes_used{area="heap", cluster="analytics", hadoop_cluster="analytics-hadoop", instance="an-master1001:10080", job="jmx_hadoop", prometheus="analytics", site="eqiad"}
+          values: '46422556000'
+        - series: jvm_memory_bytes_max{area="heap", cluster="analytics", hadoop_cluster="analytics-hadoop", instance="an-master1001:10080", job="jmx_hadoop", prometheus="analytics", site="eqiad"}
+          values: '46422556672'
+      alert_rule_test:
+      - alertname: HdfsNameNodeHeapUsage
+        eval_time: 5m
+        exp_alerts:
+        - exp_labels:
+            severity: critical
+            team: data-engineering
+            hadoop_cluster: analytics-hadoop
+            instance: an-master1001:10080
+            area: heap
+            cluster: analytics
+            job: jmx_hadoop
+            prometheus: analytics
+            site: eqiad
+          exp_annotations:
+            description: HDFS Namenode JVM Heap usage on an-master1001:10080 is above 95%.
+            summary: Namenode heap usage on an-master1001:10080 is above 95%.
+            dashboard: https://grafana.wikimedia.org/dashboard/db/hadoop?var-hadoop_cluster=analytics-hadoop&panelId=4&fullscreen&orgId=1
+            runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#HDFS_total_files_and_heap_size
+        - exp_labels:
+            severity: warning
+            team: data-engineering
+            hadoop_cluster: analytics-hadoop
+            instance: an-master1001:10080
+            area: heap
+            cluster: analytics
+            job: jmx_hadoop
+            prometheus: analytics
+            site: eqiad
+          exp_annotations:
+            description: HDFS Namenode JVM Heap usage on an-master1001:10080 is above 90%.
+            summary: Namenode heap usage on an-master1001:10080 is above 90%.
+            dashboard: https://grafana.wikimedia.org/dashboard/db/hadoop?var-hadoop_cluster=analytics-hadoop&panelId=4&fullscreen&orgId=1
+            runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#HDFS_total_files_and_heap_size
+
+## HDFS Datanode Heap Usage tests
+    - interval: 1m
+      input_series:
+        - series: jvm_memory_bytes_used{area="heap", cluster="analytics", hadoop_cluster="analytics-hadoop", instance="an-worker1099:51010", job="jmx_hadoop", prometheus="analytics", site="eqiad"}
+          values: '8335654900'
+        - series: jvm_memory_bytes_max{area="heap", cluster="analytics", hadoop_cluster="analytics-hadoop", instance="an-worker1099:51010", job="jmx_hadoop", prometheus="analytics", site="eqiad"}
+          values: '8335654912'
+      alert_rule_test:
+      - alertname: HdfsDataNodeHeapUsage
+        eval_time: 5m
+        exp_alerts:
+        - exp_labels:
+            severity: critical
+            team: data-engineering
+            hadoop_cluster: analytics-hadoop
+            instance: an-worker1099:51010
+            area: heap
+            cluster: analytics
+            job: jmx_hadoop
+            prometheus: analytics
+            site: eqiad
+          exp_annotations:
+            description: HDFS Datanode JVM Heap usage on an-worker1099:51010 is above 95%.
+            summary: Datanode heap usage on an-worker1099:51010 is above 95%.
+            dashboard: https://grafana.wikimedia.org/dashboard/db/hadoop?var-hadoop_cluster=analytics-hadoop&panelId=1&fullscreen&orgId=1
+            runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#HDFS_Datanode_JVM_Heap_Usage
+        - exp_labels:
+            severity: warning
+            team: data-engineering
+            hadoop_cluster: analytics-hadoop
+            instance: an-worker1099:51010
+            area: heap
+            cluster: analytics
+            job: jmx_hadoop
+            prometheus: analytics
+            site: eqiad
+          exp_annotations:
+            description: HDFS Datanode JVM Heap usage on an-worker1099:51010 is above 90%.
+            summary: Datanode heap usage on an-worker1099:51010 is above 90%.
+            dashboard: https://grafana.wikimedia.org/dashboard/db/hadoop?var-hadoop_cluster=analytics-hadoop&panelId=1&fullscreen&orgId=1
+            runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#HDFS_Datanode_JVM_Heap_Usage
+
+## YARN ResourceManager Heap Usage tests
+    - interval: 1m
+      input_series:
+        - series: jvm_memory_bytes_used{area="heap", hadoop_cluster="analytics-hadoop", cluster="analytics", instance="an-master1001:10083", job="jmx_hadoop", prometheus="analytics", site="eqiad"}
+          values: '30024523000'
+        - series: jvm_memory_bytes_max{area="heap", hadoop_cluster="analytics-hadoop", cluster="analytics", instance="an-master1001:10083", job="jmx_hadoop", prometheus="analytics", site="eqiad"}
+          values: '30024523048'
+      alert_rule_test:
+      - alertname: YarnResourceManagerHeapUsage
+        eval_time: 5m
+        exp_alerts:
+        - exp_labels:
+            severity: critical
+            team: data-engineering
+            hadoop_cluster: analytics-hadoop
+            instance: an-master1001:10083
+            area: heap
+            cluster: analytics
+            job: jmx_hadoop
+            prometheus: analytics
+            site: eqiad
+          exp_annotations:
+            description: YARN Resource Manager JVM Heap usage is above 95% on an-master1001:10083
+            summary: YARN Heap usage is above 95% on an-master1001:10083
+            dashboard: https://grafana.wikimedia.org/dashboard/db/hadoop?var-hadoop_cluster=analytics-hadoop&panelId=12&fullscreen&orgId=1"
+            runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#Yarn_Nodemanager_JVM_Heap_Usage
+        - exp_labels:
+            severity: warning
+            team: data-engineering
+            hadoop_cluster: analytics-hadoop
+            instance: an-master1001:10083
+            area: heap
+            cluster: analytics
+            job: jmx_hadoop
+            prometheus: analytics
+            site: eqiad
+          exp_annotations:
+            description: YARN Resource Manager JVM Heap usage is above 90% on an-master1001:10083
+            summary: YARN Heap usage is above 90% on an-master1001:10083
+            dashboard: https://grafana.wikimedia.org/dashboard/db/hadoop?var-hadoop_cluster=analytics-hadoop&panelId=12&fullscreen&orgId=1"
+            runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#Yarn_Nodemanager_JVM_Heap_Usage
+
+## Hive Metastore Heap Usage tests
+    - interval: 1m
+      input_series:
+        - series: jvm_memory_bytes_used{area="heap", cluster="analytics", instance="an-coord1001:9183", job="jmx_hive", prometheus="analytics", site="eqiad"}
+          values: '4294967200'
+        - series: jvm_memory_bytes_max{area="heap", cluster="analytics", instance="an-coord1001:9183", job="jmx_hive", prometheus="analytics", site="eqiad"}
+          values: '4294967296'
+      alert_rule_test:
+      - alertname: HiveMetastoreHeapUsage
+        eval_time: 5m
+        exp_alerts:
+        - exp_labels:
+            severity: critical
+            team: data-engineering
+            instance: an-coord1001:9183
+            area: heap
+            cluster: analytics
+            job: jmx_hive
+            prometheus: analytics
+            site: eqiad
+          exp_annotations:
+            description: Hive Metastore JVM Heap usage is above 90% on an-coord1001:9183
+            summary: Hive Metastore JVM Heap usage is above 90% on an-coord1001:9183
+            dashboard: https://grafana.wikimedia.org/d/000000379/hive?panelId=2&fullscreen&orgId=1&var-instance=an-coord1001:9183
+            runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hive/Alerts#Hive_Metastore_Heap_Usage
+        - exp_labels:
+            severity: warning
+            team: data-engineering
+            instance: an-coord1001:9183
+            area: heap
+            cluster: analytics
+            job: jmx_hive
+            prometheus: analytics
+            site: eqiad
+          exp_annotations:
+            description: Hive Metastore JVM Heap usage is above 80% on an-coord1001:9183
+            summary: Hive Metastore JVM Heap usage is above 80% on an-coord1001:9183
+            dashboard: https://grafana.wikimedia.org/d/000000379/hive?panelId=2&fullscreen&orgId=1&var-instance=an-coord1001:9183
+            runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hive/Alerts#Hive_Metastore_Heap_Usage
+
+## Hive Server Heap Usage tests
+    - interval: 1m
+      input_series:
+        - series: jvm_memory_bytes_used{area="heap", cluster="analytics", instance="an-coord1001:10100", job="jmx_hive", prometheus="analytics", site="eqiad"}
+          values: '4148951400'
+        - series: jvm_memory_bytes_max{area="heap", cluster="analytics", instance="an-coord1001:10100", job="jmx_hive", prometheus="analytics", site="eqiad"}
+          values: '4148951468'
+      alert_rule_test:
+      - alertname: HiveServerHeapUsage
+        eval_time: 5m
+        exp_alerts:
+        - exp_labels:
+            severity: critical
+            team: data-engineering
+            instance: an-coord1001:10100
+            area: heap
+            cluster: analytics
+            job: jmx_hive
+            prometheus: analytics
+            site: eqiad
+          exp_annotations:
+            description: Hive Server JVM Heap usage is above 90% on an-coord1001:10100
+            summary: Hive Server JVM Heap usage is above 90% on an-coord1001:10100
+            dashboard: https://grafana.wikimedia.org/d/000000379/hive?panelId=7&fullscreen&orgId=1&var-instance=an-coord1001:10100
+            runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hive/Alerts#Hive_Server_Heap_Usage
+        - exp_labels:
+            severity: warning
+            team: data-engineering
+            instance: an-coord1001:10100
+            area: heap
+            cluster: analytics
+            job: jmx_hive
+            prometheus: analytics
+            site: eqiad
+          exp_annotations:
+            description: Hive Server JVM Heap usage is above 80% on an-coord1001:10100
+            summary: Hive Server JVM Heap usage is above 80% on an-coord1001:10100
+            dashboard: https://grafana.wikimedia.org/d/000000379/hive?panelId=7&fullscreen&orgId=1&var-instance=an-coord1001:10100
+            runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hive/Alerts#Hive_Server_Heap_Usage
+

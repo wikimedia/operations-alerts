@@ -1,0 +1,128 @@
+groups:
+  - name: java-heap
+    rules:
+
+## HDFS Namenode JVM Heap alerts
+    - alert: HdfsNameNodeHeapUsage
+      annotations:
+        description: HDFS Namenode JVM Heap usage on {{ $labels.instance }} is above 95%.
+        summary: Namenode heap usage on {{ $labels.instance }} is above 95%.
+        dashboard: https://grafana.wikimedia.org/dashboard/db/hadoop?var-hadoop_cluster={{ $labels.hadoop_cluster }}&panelId=4&fullscreen&orgId=1
+        runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#HDFS_total_files_and_heap_size
+      expr: avg_over_time(jvm_memory_bytes_used{job="jmx_hadoop", instance=~"an-(test-)?master.*:10080", area="heap"}[60m])/avg_over_time(jvm_memory_bytes_max{job="jmx_hadoop", instance=~"an-(test-)?master.*:10080", area="heap"}[60m]) > 0.95
+      for: 5m
+      labels:
+        severity: critical
+        team: data-engineering
+
+    - alert: HdfsNameNodeHeapUsage
+      annotations:
+        description: HDFS Namenode JVM Heap usage on {{ $labels.instance }} is above 90%.
+        summary: Namenode heap usage on {{ $labels.instance }} is above 90%.
+        dashboard: https://grafana.wikimedia.org/dashboard/db/hadoop?var-hadoop_cluster={{ $labels.hadoop_cluster }}&panelId=4&fullscreen&orgId=1
+        runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#HDFS_total_files_and_heap_size
+      expr: avg_over_time(jvm_memory_bytes_used{job="jmx_hadoop", instance=~"an-(test-)?master.*:10080", area="heap"}[60m])/avg_over_time(jvm_memory_bytes_max{job="jmx_hadoop", instance=~"an-(test-)?master.*:10080", area="heap"}[60m]) > 0.9
+      for: 5m
+      labels:
+        severity: warning
+        team: data-engineering
+
+## HDFS Datanode JVM Heap alerts
+    - alert: HdfsDataNodeHeapUsage
+      annotations:
+        description: HDFS Datanode JVM Heap usage on {{ $labels.instance }} is above 95%.
+        summary: Datanode heap usage on {{ $labels.instance }} is above 95%.
+        dashboard: https://grafana.wikimedia.org/dashboard/db/hadoop?var-hadoop_cluster={{ $labels.hadoop_cluster }}&panelId=1&fullscreen&orgId=1
+        runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#HDFS_Datanode_JVM_Heap_Usage
+      expr: avg_over_time(jvm_memory_bytes_used{job="jmx_hadoop", instance=~".*:51010", area="heap"}[60m])/avg_over_time(jvm_memory_bytes_max{job="jmx_hadoop", instance=~".*:51010", area="heap"}[60m]) > 0.95
+      for: 5m
+      labels:
+        severity: critical
+        team: data-engineering
+
+    - alert: HdfsDataNodeHeapUsage
+      annotations:
+        description: HDFS Datanode JVM Heap usage on {{ $labels.instance }} is above 90%.
+        summary: Datanode heap usage on {{ $labels.instance }} is above 90%.
+        dashboard: https://grafana.wikimedia.org/dashboard/db/hadoop?var-hadoop_cluster={{ $labels.hadoop_cluster }}&panelId=1&fullscreen&orgId=1
+        runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#HDFS_Datanode_JVM_Heap_Usage
+      expr: avg_over_time(jvm_memory_bytes_used{job="jmx_hadoop", instance=~".*:51010", area="heap"}[60m])/avg_over_time(jvm_memory_bytes_max{job="jmx_hadoop", instance=~".*:51010", area="heap"}[60m]) > 0.9
+      for: 5m
+      labels:
+        severity: warning
+        team: data-engineering
+
+## Hadoop YARN Resource Manager JVM heap alerts
+    - alert: YarnResourceManagerHeapUsage
+      annotations:
+        description: YARN Resource Manager JVM Heap usage is above 95% on {{ $labels.instance}}
+        summary: YARN Heap usage is above 95% on {{ $labels.instance}}
+        dashboard: https://grafana.wikimedia.org/dashboard/db/hadoop?var-hadoop_cluster={{ $labels.hadoop_cluster }}&panelId=12&fullscreen&orgId=1"
+        runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#Yarn_Nodemanager_JVM_Heap_Usage
+      expr: avg_over_time(jvm_memory_bytes_used{job="jmx_hadoop", instance=~".*:10083", area="heap"}[60m])/avg_over_time(jvm_memory_bytes_max{job="jmx_hadoop", instance=~".*:10083", area="heap"}[60m]) > 0.95
+      for: 5m
+      labels:
+        severity: critical
+        team: data-engineering
+
+    - alert: YarnResourceManagerHeapUsage
+      annotations:
+        description: YARN Resource Manager JVM Heap usage is above 90% on {{ $labels.instance}}
+        summary: YARN Heap usage is above 90% on {{ $labels.instance}}
+        dashboard: https://grafana.wikimedia.org/dashboard/db/hadoop?var-hadoop_cluster={{ $labels.hadoop_cluster }}&panelId=12&fullscreen&orgId=1"
+        runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#Yarn_Nodemanager_JVM_Heap_Usage
+      expr: avg_over_time(jvm_memory_bytes_used{job="jmx_hadoop", instance=~".*:10083", area="heap"}[60m])/avg_over_time(jvm_memory_bytes_max{job="jmx_hadoop", instance=~".*:10083", area="heap"}[60m]) > 0.9
+      for: 5m
+      labels:
+        severity: warning
+        team: data-engineering
+
+## Hive Metastore JVM Heap alerts
+    - alert: HiveMetastoreHeapUsage
+      annotations:
+        description: Hive Metastore JVM Heap usage is above 90% on {{ $labels.instance}}
+        summary: Hive Metastore JVM Heap usage is above 90% on {{ $labels.instance}}
+        dashboard: https://grafana.wikimedia.org/d/000000379/hive?panelId=2&fullscreen&orgId=1&var-instance={{ $labels.instance}}
+        runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hive/Alerts#Hive_Metastore_Heap_Usage
+      expr: avg_over_time(jvm_memory_bytes_used{job="jmx_hive", instance=~"an-(test-)?coord.*:9183", area="heap"}[60m])/avg_over_time(jvm_memory_bytes_max{job="jmx_hive", instance=~"an-(test-)?coord.*:9183", area="heap"}[60m]) > 0.9
+      for: 5m
+      labels:
+        severity: critical
+        team: data-engineering
+
+    - alert: HiveMetastoreHeapUsage
+      annotations:
+        description: Hive Metastore JVM Heap usage is above 80% on {{ $labels.instance}}
+        summary: Hive Metastore JVM Heap usage is above 80% on {{ $labels.instance}}
+        dashboard: https://grafana.wikimedia.org/d/000000379/hive?panelId=2&fullscreen&orgId=1&var-instance={{ $labels.instance}}
+        runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hive/Alerts#Hive_Metastore_Heap_Usage
+      expr: avg_over_time(jvm_memory_bytes_used{job="jmx_hive", instance=~"an-(test-)?coord.*:9183", area="heap"}[60m])/avg_over_time(jvm_memory_bytes_max{job="jmx_hive", instance=~"an-(test-)?coord.*:9183", area="heap"}[60m]) > 0.8
+      for: 5m
+      labels:
+        severity: warning
+        team: data-engineering
+
+## Hive Server JVM heap alerts
+    - alert: HiveServerHeapUsage
+      annotations:
+        description: Hive Server JVM Heap usage is above 90% on {{ $labels.instance}}
+        summary: Hive Server JVM Heap usage is above 90% on {{ $labels.instance}}
+        dashboard: https://grafana.wikimedia.org/d/000000379/hive?panelId=7&fullscreen&orgId=1&var-instance={{ $labels.instance}}
+        runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hive/Alerts#Hive_Server_Heap_Usage
+      expr: avg_over_time(jvm_memory_bytes_used{job="jmx_hive", instance=~"an-(test-)?coord.*:10100", area="heap"}[60m])/avg_over_time(jvm_memory_bytes_max{job="jmx_hive", instance=~"an-(test-)?coord.*:10100", area="heap"}[60m]) > 0.9
+      for: 5m
+      labels:
+        severity: critical
+        team: data-engineering
+
+    - alert: HiveServerHeapUsage
+      annotations:
+        description: Hive Server JVM Heap usage is above 80% on {{ $labels.instance}}
+        summary: Hive Server JVM Heap usage is above 80% on {{ $labels.instance}}
+        dashboard: https://grafana.wikimedia.org/d/000000379/hive?panelId=7&fullscreen&orgId=1&var-instance={{ $labels.instance}}
+        runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hive/Alerts#Hive_Server_Heap_Usage
+      expr: avg_over_time(jvm_memory_bytes_used{job="jmx_hive", instance=~"an-(test-)?coord.*:10100", area="heap"}[60m])/avg_over_time(jvm_memory_bytes_max{job="jmx_hive", instance=~"an-(test-)?coord.*:10100", area="heap"}[60m]) > 0.8
+      for: 5m
+      labels:
+        severity: warning
+        team: data-engineering

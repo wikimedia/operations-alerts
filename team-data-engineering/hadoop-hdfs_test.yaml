@@ -2,6 +2,8 @@ rule_files:
   - hadoop-hdfs.yaml
 evaluation_interval: 1m
 tests:
+
+## HDFS Capacity Remaining tests
     - interval: 1m
       input_series:
         - series: Hadoop_NameNode_CapacityRemainingGB{hadoop_cluster="analytics-hadoop", instance="an-master1001:10080"}
@@ -40,6 +42,7 @@ tests:
             dashboard: https://grafana.wikimedia.org/dashboard/db/hadoop?var-hadoop_cluster=analytics-hadoop&orgId=1&panelId=106&fullscreen
             runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#HDFS_Capacity_Remaining
 
+## HDFS Corrupt Blocks tests
     - interval: 1m
       input_series:
         - series: Hadoop_NameNode_CorruptBlocks{hadoop_cluster="analytics-hadoop", instance="an-master1001:10080"}
@@ -67,6 +70,7 @@ tests:
             dashboard: https://grafana.wikimedia.org/dashboard/db/hadoop?var-hadoop_cluster=analytics-hadoop&orgId=1&panelId=39&fullscreen
             runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#HDFS_corrupt_blocks
 
+## HDFS Missing Blocks tests
     - interval: 1m
       input_series:
         - series: Hadoop_NameNode_MissingBlocks{hadoop_cluster="analytics-hadoop", instance="an-master1001:10080"}
@@ -94,6 +98,7 @@ tests:
             dashboard: https://grafana.wikimedia.org/dashboard/db/hadoop?var-hadoop_cluster=analytics-hadoop&orgId=1&panelId=40&fullscreen
             runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#HDFS_missing_blocks
 
+## HDFS Total Files tests
     - interval: 1m
       input_series:
         - series: Hadoop_NameNode_FilesTotal{hadoop_cluster="analytics-hadoop", instance="an-master1001:10080"}
@@ -121,6 +126,7 @@ tests:
             dashboard: https://grafana.wikimedia.org/dashboard/db/hadoop?var-hadoop_cluster=analytics-hadoop&orgId=1&panelId=28&fullscreen
             runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#HDFS_total_files_and_heap_size
 
+## HDFS Namenode RPC Call Queue Length tests
     - interval: 1m
       input_series:
         - series: Hadoop_NameNode_CallQueueLength{name="RpcActivityForPort8020", hadoop_cluster="analytics-hadoop", instance="an-master1001:10080"}
