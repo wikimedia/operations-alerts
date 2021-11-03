@@ -1,0 +1,36 @@
+rule_files:
+  - eventgate.yaml
+evaluation_interval: 1m
+tests:
+
+## Eventgate Logging Latency tests
+    - interval: 1m
+      input_series:
+        - series: service_method:express_router_request_duration_seconds:90pct5m{method="GET", service="eventgate-logging-external"}
+          values: '1.5'
+      external_labels:
+            site: eqiad
+      alert_rule_test:
+      - alertname: EventgateLoggingExternalLatency
+        eval_time: 5m
+        exp_alerts:
+        - exp_labels:
+            severity: critical
+            team: data-engineering
+            service: eventgate-logging-external
+            method: GET
+          exp_annotations:
+            description: Critical latency for 90th percentile of GET method events on eventgate-logging-external in eqiad.
+            summary: Critical latency for GET events on eventgate-logging-external in eqiad.
+            dashboard: https://grafana.wikimedia.org/d/ZB39Izmnz/eventgate?viewPanel=79&orgId=1&var-service=eventgate-logging-external
+            runbook: https://wikitech.wikimedia.org/wiki/Event_Platform/EventGate
+        - exp_labels:
+            severity: warning
+            team: data-engineering
+            service: eventgate-logging-external
+            method: GET
+          exp_annotations:
+            description: Elevated latency for 90th percentile of GET method events on eventgate-logging-external in eqiad.
+            summary: Elevated latency for GET events on eventgate-logging-external in eqiad.
+            dashboard: https://grafana.wikimedia.org/d/ZB39Izmnz/eventgate?viewPanel=79&orgId=1&var-service=eventgate-logging-external
+            runbook: https://wikitech.wikimedia.org/wiki/Event_Platform/EventGate
