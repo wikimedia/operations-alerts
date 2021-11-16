@@ -1,0 +1,13 @@
+groups:
+ - name: cirrussearch
+   rules:
+    - alert: CirrusSearchJVMGCOldPoolFlatlined
+      expr: max_over_time(elasticsearch_jvm_memory_pool_used_bytes{exported_cluster=~"production-search-.*", pool="old"}[1d]) - on (name) min_over_time(elasticsearch_jvm_memory_pool_used_bytes{exported_cluster=~"production-search-.*", pool="old"}[1d]) < 100000000
+      for: 1m
+      labels:
+        team: search-platform
+        severity: warning
+      annotations:
+        summary: "Elasticsearch instance {{$labels.name}} is showing memory pressure in the old pool"
+        description: "Elasticsearch is out of memory and will have degraded latency"
+        runbook: https://wikitech.wikimedia.org/wiki/Search#Stuck_in_old_GC_hell
