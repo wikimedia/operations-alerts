@@ -30,11 +30,11 @@ groups:
 ## Druid Segments Unavailable alerts
     - alert: DruidSegmentsUnavailable
       annotations:
-        description: More than 30 segments of the {{ $labels.datasource }} datastource have been reported as being unavailable on the {{ $labels.cluster }} Druid cluster, over a 15 minutes period.
-        summary: More than 30 segments have been unavailable for {{ $labels.datasource }} on the {{ $labels.cluster }} Druid cluster.
+        description: More than 10 segments of the {{ $labels.datasource }} datastource have been reported as being unavailable on the {{ $labels.cluster }} Druid cluster, over a 15 minutes period.
+        summary: More than 10 segments have been unavailable for {{ $labels.datasource }} on the {{ $labels.cluster }} Druid cluster.
         dashboard: https://grafana.wikimedia.org/dashboard/db/druid?refresh=1m&var-cluster=druid_analytics&panelId=49&fullscreen&orgId=1&var-cluster={{ $labels.cluster }}
         runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Druid/Alerts#Druid_Segments_Unavailable
-      expr: sum by (datasource, cluster) (sum_over_time(druid_coordinator_segment_unavailable_count[15m])) > 30
+      expr: max by (datasource, cluster) (avg_over_time(druid_coordinator_segment_unavailable_count[15m])) > 10
       for: 5m
       labels:
         severity: critical
@@ -42,11 +42,11 @@ groups:
 
     - alert: DruidSegmentsUnavailable
       annotations:
-        description: More than 20 segments of the {{ $labels.datasource }} datastource have been reported as being unavailable on the {{ $labels.cluster }} Druid cluster, over a 15 minutes period.
-        summary: More than 20 segments have been unavailable for {{ $labels.datasource }} on the {{ $labels.cluster }} Druid cluster.
+        description: More than 5 segments of the {{ $labels.datasource }} datastource have been reported as being unavailable on the {{ $labels.cluster }} Druid cluster, over a 15 minutes period.
+        summary: More than 5 segments have been unavailable for {{ $labels.datasource }} on the {{ $labels.cluster }} Druid cluster.
         dashboard: https://grafana.wikimedia.org/dashboard/db/druid?refresh=1m&var-cluster=druid_analytics&panelId=49&fullscreen&orgId=1&var-cluster={{ $labels.cluster }}
         runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Druid/Alerts#Druid_Segments_Unavailable
-      expr: sum by (datasource, cluster) (sum_over_time(druid_coordinator_segment_unavailable_count[15m])) > 20
+      expr: max by (datasource, cluster) (avg_over_time(druid_coordinator_segment_unavailable_count[15m])) > 5
       for: 5m
       labels:
         severity: warning

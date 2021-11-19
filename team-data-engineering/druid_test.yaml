@@ -41,15 +41,7 @@ tests:
     - interval: 1m
       input_series:
         - series: druid_coordinator_segment_unavailable_count{cluster="druid_analytics", datasource="event_navigationtiming", instance="an-druid1001:8000", job="druid", prometheus="analytics", site="eqiad"}
-          values: '7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7'
-        - series: druid_coordinator_segment_unavailable_count{cluster="druid_analytics", datasource="event_navigationtiming", instance="an-druid1002:8000", job="druid", prometheus="analytics", site="eqiad"}
-          values: '7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7'
-        - series: druid_coordinator_segment_unavailable_count{cluster="druid_analytics", datasource="event_navigationtiming", instance="an-druid1003:8000", job="druid", prometheus="analytics", site="eqiad"}
-          values: '7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7'
-        - series: druid_coordinator_segment_unavailable_count{cluster="druid_analytics", datasource="event_navigationtiming", instance="an-druid1004:8000", job="druid", prometheus="analytics", site="eqiad"}
-          values: '7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7'
-        - series: druid_coordinator_segment_unavailable_count{cluster="druid_analytics", datasource="event_navigationtiming", instance="an-druid1005:8000", job="druid", prometheus="analytics", site="eqiad"}
-          values: '7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 7'
+          values: '11 11 11 11 11 11 11 11 11 11 11 11 11 11 11'
       alert_rule_test:
       - alertname: DruidSegmentsUnavailable
         eval_time: 5m
@@ -60,8 +52,8 @@ tests:
             cluster: druid_analytics
             datasource: event_navigationtiming
           exp_annotations:
-            description: More than 30 segments of the event_navigationtiming datastource have been reported as being unavailable on the druid_analytics Druid cluster, over a 15 minutes period.
-            summary: More than 30 segments have been unavailable for event_navigationtiming on the druid_analytics Druid cluster.
+            description: More than 10 segments of the event_navigationtiming datastource have been reported as being unavailable on the druid_analytics Druid cluster, over a 15 minutes period.
+            summary: More than 10 segments have been unavailable for event_navigationtiming on the druid_analytics Druid cluster.
             dashboard: https://grafana.wikimedia.org/dashboard/db/druid?refresh=1m&var-cluster=druid_analytics&panelId=49&fullscreen&orgId=1&var-cluster=druid_analytics
             runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Druid/Alerts#Druid_Segments_Unavailable
         - exp_labels:
@@ -70,7 +62,7 @@ tests:
             cluster: druid_analytics
             datasource: event_navigationtiming
           exp_annotations:
-            description: More than 20 segments of the event_navigationtiming datastource have been reported as being unavailable on the druid_analytics Druid cluster, over a 15 minutes period.
-            summary: More than 20 segments have been unavailable for event_navigationtiming on the druid_analytics Druid cluster.
+            description: More than 5 segments of the event_navigationtiming datastource have been reported as being unavailable on the druid_analytics Druid cluster, over a 15 minutes period.
+            summary: More than 5 segments have been unavailable for event_navigationtiming on the druid_analytics Druid cluster.
             dashboard: https://grafana.wikimedia.org/dashboard/db/druid?refresh=1m&var-cluster=druid_analytics&panelId=49&fullscreen&orgId=1&var-cluster=druid_analytics
             runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Druid/Alerts#Druid_Segments_Unavailable
