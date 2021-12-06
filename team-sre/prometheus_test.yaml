@@ -1,0 +1,38 @@
+rule_files:
+  - prometheus.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    input_series:
+      - series: 'up{job="fail"}'
+        values: '0+0x90'
+      - series: 'up{job="ok"}'
+        values: '1+0x90'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+    - alertname: JobUnavailable
+      eval_time: 10m
+      exp_alerts:
+       - exp_labels:
+           job: fail
+           team: sre
+           severity: warning
+         exp_annotations:
+           description: The Prometheus job fail has been unable to
+             scrape 0% of its targets. Check if the targets are
+             reachable and exporting metrics.
+           summary: Reduced availability for job fail in eqiad
+           dashboard: 'https://grafana.wikimedia.org/d/NEJu05xZz/prometheus-targets'
+           runbook: 'https://wikitech.wikimedia.org/wiki/Prometheus#Prometheus_job_unavailable'
+       - exp_labels:
+           job: fail
+           team: sre
+           severity: critical
+         exp_annotations:
+           description: The Prometheus job fail has been unable to
+             scrape 0% of its targets. Check if the targets are
+             reachable and exporting metrics.
+           summary: Reduced availability for job fail in eqiad
+           dashboard: 'https://grafana.wikimedia.org/d/NEJu05xZz/prometheus-targets'
+           runbook: 'https://wikitech.wikimedia.org/wiki/Prometheus#Prometheus_job_unavailable'
