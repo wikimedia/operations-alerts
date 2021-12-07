@@ -54,7 +54,7 @@ tests:
           exp_annotations:
             description: More than 10 segments of the event_navigationtiming datastource have been reported as being unavailable on the druid_analytics Druid cluster, over a 15 minutes period.
             summary: More than 10 segments have been unavailable for event_navigationtiming on the druid_analytics Druid cluster.
-            dashboard: https://grafana.wikimedia.org/dashboard/db/druid?refresh=1m&var-cluster=druid_analytics&panelId=49&fullscreen&orgId=1&var-cluster=druid_analytics
+            dashboard: https://grafana.wikimedia.org/dashboard/db/druid?refresh=1m&var-cluster=druid_analytics&panelId=49&fullscreen&orgId=1
             runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Druid/Alerts#Druid_Segments_Unavailable
         - exp_labels:
             severity: warning
@@ -64,5 +64,5 @@ tests:
           exp_annotations:
             description: More than 5 segments of the event_navigationtiming datastource have been reported as being unavailable on the druid_analytics Druid cluster, over a 15 minutes period.
             summary: More than 5 segments have been unavailable for event_navigationtiming on the druid_analytics Druid cluster.
-            dashboard: https://grafana.wikimedia.org/dashboard/db/druid?refresh=1m&var-cluster=druid_analytics&panelId=49&fullscreen&orgId=1&var-cluster=druid_analytics
+            dashboard: https://grafana.wikimedia.org/dashboard/db/druid?refresh=1m&var-cluster=druid_analytics&panelId=49&fullscreen&orgId=1
             runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Druid/Alerts#Druid_Segments_Unavailable
