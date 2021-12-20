@@ -23,7 +23,7 @@ groups:
         summary: Elevated latency for {{ $labels.method }} events on eventgate-logging-external in {{ $externalLabels.site }}.
         dashboard: https://grafana.wikimedia.org/d/ZB39Izmnz/eventgate?viewPanel=79&orgId=1&var-service=eventgate-logging-external
         runbook: https://wikitech.wikimedia.org/wiki/Event_Platform/EventGate
-      expr: service_method:express_router_request_duration_seconds:90pct5m{service="eventgate-logging-external"} > 0.5
+      expr: service_method:express_router_request_duration_seconds:90pct5m{service="eventgate-logging-external"} > 0.98
       for: 5m
       labels:
         severity: warning
