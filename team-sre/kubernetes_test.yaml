@@ -21,3 +21,20 @@ tests:
               summary: "kubefake1001:9091 is not running calico-node Pod"
               description: "Prometheus has been unable to scrape metrics from calico on host kubefake1001:9091 job(calico-felix) for more than 5 minutes. Make sure the calico-node Pod is running on that node."
               runbook: https://wikitech.wikimedia.org/wiki/Calico#Operations
+
+  - interval: 1m
+    input_series:
+      - series: 'rsyslog_kubernetes_record_seen_total{instance="kubefake1001:9105"}'
+        values: "1 0 0 0 0 0"
+    alert_rule_test:
+      - alertname: KubernetesRsyslogDown
+        eval_time: 6m
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              team: sre
+              instance: "kubefake1001:9105"
+            exp_annotations:
+              summary: "rsyslog on kubefake1001:9105 is missing kubernetes logs"
+              description: "Rsyslog mmkubernetes plugin on kubefake1001:9105 did not see any records in the last 5 minutes. This might mean that the plugin was terminated."
+              runbook: https://wikitech.wikimedia.org/wiki/Kubernetes/Logging#Common_issues

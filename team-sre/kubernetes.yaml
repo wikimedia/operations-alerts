@@ -11,3 +11,13 @@ groups:
           summary: "{{ $labels.instance }} is not running calico-node Pod"
           description: "Prometheus has been unable to scrape metrics from calico on host {{ $labels.instance }} job({{ $labels.job }}) for more than 5 minutes. Make sure the calico-node Pod is running on that node."
           runbook: https://wikitech.wikimedia.org/wiki/Calico#Operations
+      - alert: KubernetesRsyslogDown
+        expr: increase(rsyslog_kubernetes_record_seen_total[5m]) == 0
+        for: 5m
+        labels:
+          team: sre
+          severity: critical
+        annotations:
+          summary: "rsyslog on {{ $labels.instance }} is missing kubernetes logs"
+          description: "Rsyslog mmkubernetes plugin on {{ $labels.instance }} did not see any records in the last 5 minutes. This might mean that the plugin was terminated."
+          runbook: https://wikitech.wikimedia.org/wiki/Kubernetes/Logging#Common_issues
