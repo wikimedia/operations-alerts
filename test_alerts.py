@@ -56,12 +56,7 @@ def test_yml_extension():
 def test_alerts(testfile):
     """Run alert unit tests for testfile."""
     path = testfile.as_posix()
-    p = subprocess.run(
-        ["/usr/bin/promtool", "test", "rules", os.path.basename(path)],
-        cwd=os.path.dirname(path),
-        capture_output=True,
-        encoding="utf8",
-    )
+    p = _run_promtool(["test", "rules", os.path.basename(path)], path)
     assert p.returncode == 0, "promtool test rules failed: %s\n%s" % (
         p.stdout,
         p.stderr,
@@ -73,12 +68,7 @@ def test_valid_rule(rulefile):
     """Validate rulefile with promtool"""
 
     path = rulefile.as_posix()
-    p = subprocess.run(
-        ["/usr/bin/promtool", "check", "rules", os.path.basename(path)],
-        cwd=os.path.dirname(path),
-        capture_output=True,
-        encoding="utf8",
-    )
+    p = _run_promtool(["check", "rules", os.path.basename(path)], path)
     assert p.returncode == 0, "promtool check rules failed: %s\n%s" % (
         p.stdout,
         p.stderr,
@@ -150,3 +140,16 @@ def _validate_rule(rule):
             warnings.warn(
                 UserWarning("Annotation %r not found for alert %s" % (a, alertname))
             )
+
+
+def _run_promtool(args, workdir):
+    args.insert(0, "promtool")
+    return subprocess.run(
+        args,
+        cwd=os.path.dirname(workdir),
+        capture_output=True,
+        encoding="utf8",
+        env={"PATH": os.environ.get("PATH", "")},
+    )
+
+
