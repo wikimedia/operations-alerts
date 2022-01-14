@@ -6,7 +6,7 @@
 groups:
   - name: rdf-streaming-updater
     rules:
-      - alert: WdqsStreamingUpdaterFlinkJobUnstable
+      - alert: RdfStreamingUpdaterFlinkJobUnstable
         # We try to detect crashloop, use the uptime of the job and take its max over a 10minute period.
         # Using resets() or repetive instant checks for 10m do not seem to work because:
         # - the series might differ if the k8s pod crashes making resets unable to detect the resets of the counter
@@ -14,7 +14,7 @@ groups:
         # max_over_time does seem to workaround these problems and will only fail if the series goes away for more than
         # 10 mins in which case the WdqsStreamingUpdaterFlinkJobNotRunning alert should have been triggered a long time ago
         expr: |
-          max by (job_name, kubernetes_namespace) (max_over_time(flink_jobmanager_job_uptime{job_name="WDQS_Streaming_Updater", kubernetes_namespace="rdf-streaming-updater"}[10m])) < 300000
+          max by (job_name, kubernetes_namespace) (max_over_time(flink_jobmanager_job_uptime{kubernetes_namespace="rdf-streaming-updater"}[10m])) < 300000
         for: 1m
         labels:
           team: search-platform
@@ -22,6 +22,17 @@ groups:
         annotations:
           summary: "{{$labels.job_name}} in {{$externalLabels.site}} ({{$externalLabels.prometheus}}) is unstable"
           description: "The flink job has an uptime below 5 minutes for the past 10 minutes, it is probably trying to start in vain"
+          runbook: https://wikitech.wikimedia.org/wiki/Wikidata_Query_Service/Streaming_Updater
+      - alert: RdfStreamingUpdaterFlinkProcessingLatencyIsHigh
+        expr: |
+          avg by (job_name, kubernetes_namespace) (avg_over_time(flink_taskmanager_job_task_operator_processing_latency_ms{kubernetes_namespace="rdf-streaming-updater"}[10m]) > 300000)
+        for: 1m
+        labels:
+          team: search-platform
+          severity: warning
+        annotations:
+          summary: "Processing latency of {{$labels.job_name}} in {{$externalLabels.site}} ({{$externalLabels.prometheus}}) is above 5 minutes"
+          description: "The flink job has a processing latency above 5 minutes"
           runbook: https://wikitech.wikimedia.org/wiki/Wikidata_Query_Service/Streaming_Updater
       - alert: WdqsStreamingUpdaterFlinkJobNotRunning
         expr: |
@@ -34,14 +45,14 @@ groups:
           summary: "{{$labels.job_name}} in {{$externalLabels.site}} ({{$externalLabels.prometheus}}) is not running"
           description: "The flink job is not running"
           runbook: https://wikitech.wikimedia.org/wiki/Wikidata_Query_Service/Streaming_Updater
-      - alert: WdqsStreamingUpdaterFlinkProcessingLatencyIsHigh
+      - alert: WcqsStreamingUpdaterFlinkJobNotRunning
         expr: |
-          avg by (job_name, kubernetes_namespace) (avg_over_time(flink_taskmanager_job_task_operator_processing_latency_ms{kubernetes_namespace="rdf-streaming-updater", job_name="WDQS_Streaming_Updater"}[10m]) > 300000)
-        for: 1m
+          absent(flink_jobmanager_job_uptime{kubernetes_namespace="rdf-streaming-updater", job_name="WCQS_Streaming_Updater"})
+        for: 5m
         labels:
           team: search-platform
-          severity: warning
+          severity: critical
         annotations:
-          summary: "Processing latency of {{$labels.job_name}} in {{$externalLabels.site}} ({{$externalLabels.prometheus}}) is above 5 minutes"
-          description: "The flink job has a processing latency above 5 minutes"
+          summary: "{{$labels.job_name}} in {{$externalLabels.site}} ({{$externalLabels.prometheus}}) is not running"
+          description: "The flink job is not running"
           runbook: https://wikitech.wikimedia.org/wiki/Wikidata_Query_Service/Streaming_Updater

@@ -10,13 +10,13 @@ tests:
         values: "2000000 0 60000 120000 180000 0 0 0 0 0 0 0"
       - series: 'flink_jobmanager_job_uptime{job_name="WDQS_Streaming_Updater", kubernetes_namespace="rdf-streaming-updater", pod="2"}'
         values: "0 0 0 0 0 0 60000 120000 180000 240000 0 60000"
-      - series: 'flink_taskmanager_job_task_operator_processing_latency_ms{kubernetes_namespace="rdf-streaming-updater", job_name="WDQS_Streaming_Updater"}'
+      - series: 'flink_taskmanager_job_task_operator_processing_latency_ms{kubernetes_namespace="rdf-streaming-updater", job_name="WCQS_Streaming_Updater"}'
         values: "500000"
     external_labels:
       site: codfw
       prometheus: k8s
     alert_rule_test:
-      - alertname: WdqsStreamingUpdaterFlinkJobUnstable
+      - alertname: RdfStreamingUpdaterFlinkJobUnstable
         eval_time: 12m
         exp_alerts:
           - exp_labels:
@@ -28,16 +28,16 @@ tests:
               summary: "WDQS_Streaming_Updater in codfw (k8s) is unstable"
               description: "The flink job has an uptime below 5 minutes for the past 10 minutes, it is probably trying to start in vain"
               runbook: https://wikitech.wikimedia.org/wiki/Wikidata_Query_Service/Streaming_Updater
-      - alertname: WdqsStreamingUpdaterFlinkProcessingLatencyIsHigh
+      - alertname: RdfStreamingUpdaterFlinkProcessingLatencyIsHigh
         eval_time: 1m
         exp_alerts:
           - exp_labels:
               severity: warning
               team: search-platform
               kubernetes_namespace: rdf-streaming-updater
-              job_name: "WDQS_Streaming_Updater"
+              job_name: "WCQS_Streaming_Updater"
             exp_annotations:
-              summary: "Processing latency of WDQS_Streaming_Updater in codfw (k8s) is above 5 minutes"
+              summary: "Processing latency of WCQS_Streaming_Updater in codfw (k8s) is above 5 minutes"
               description: "The flink job has a processing latency above 5 minutes"
               runbook: https://wikitech.wikimedia.org/wiki/Wikidata_Query_Service/Streaming_Updater
   - interval: 1m
@@ -58,5 +58,17 @@ tests:
               job_name: "WDQS_Streaming_Updater"
             exp_annotations:
               summary: "WDQS_Streaming_Updater in eqiad (k8s) is not running"
+              description: "The flink job is not running"
+              runbook: https://wikitech.wikimedia.org/wiki/Wikidata_Query_Service/Streaming_Updater
+      - alertname: WcqsStreamingUpdaterFlinkJobNotRunning
+        eval_time: 6m
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              team: search-platform
+              kubernetes_namespace: rdf-streaming-updater
+              job_name: "WCQS_Streaming_Updater"
+            exp_annotations:
+              summary: "WCQS_Streaming_Updater in eqiad (k8s) is not running"
               description: "The flink job is not running"
               runbook: https://wikitech.wikimedia.org/wiki/Wikidata_Query_Service/Streaming_Updater
