@@ -1,0 +1,25 @@
+rule_files:
+  - hardware.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    input_series:
+      - series: 'device_smart_healthy{cluster="alerting",instance="alert1001:9100",device="sda"}'
+        values: '0'
+    alert_rule_test:
+      - alertname: SmartNotHealthy
+        eval_time: 0m
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              team: sre
+              instance: alert1001:9100
+              cluster: alerting
+              device: sda
+            exp_annotations:
+              summary: "Disk not healthy"
+              description: >-
+                The disk SMART status is *not* healthy, this could be an early
+                warning before the disk fails.
+              dashboard: 'https://grafana.wikimedia.org/d/000000377/host-overview?orgId=1&var-server=alert1001'
+              runbook: https://wikitech.wikimedia.org/wiki/SMART#Alerts

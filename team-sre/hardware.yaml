@@ -1,0 +1,19 @@
+groups:
+  - name: hardware
+    rules:
+      - alert: SmartNotHealthy
+        expr: device_smart_healthy < 1
+        for: 0m
+        labels:
+          severity: warning
+          team: sre
+        annotations:
+          summary: "Disk not healthy"
+          description: >-
+            The disk SMART status is *not* healthy, this could be an early
+            warning before the disk fails.
+          # TODO: At present we do not have the hostname as a label in
+          # prometheus, once we do this dashboard can be updated to
+          # point drop the regex and use that label directly
+          dashboard: 'https://grafana.wikimedia.org/d/000000377/host-overview?orgId=1&var-server={{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}'
+          runbook: https://wikitech.wikimedia.org/wiki/SMART#Alerts
