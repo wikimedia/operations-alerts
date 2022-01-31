@@ -11,13 +11,13 @@ tests:
      prometheus: ops
    alert_rule_test:
     - alertname: IcingaOverload
-      eval_time: 10m
+      eval_time: 30m
       exp_alerts:
        - exp_labels:
            severity: critical
            team: o11y
            instance: foo:123
          exp_annotations:
-           description: Average latency for checks is elevated (200), check dashboard for signs of overload
+           description: Average latency for checks is elevated (6m 40s), check dashboard for signs of overload
            summary: Checks are taking long to execute on foo:123
            dashboard: https://grafana.wikimedia.org/d/rsCfQfuZz/icinga
