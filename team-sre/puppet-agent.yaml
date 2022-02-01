@@ -7,10 +7,10 @@ groups:
     - alert: PuppetFailure
       annotations:
         description: Puppet failure on {{$labels.instance}}
+        summary: Puppet has failed on alerting hosts
         dashboard: https://grafana.wikimedia.org/d/yOxVDGvWk/puppet
         runbook: https://puppetboard.wikimedia.org/nodes?status=failed
-        summary: Puppet has failed on alerting hosts
-      expr: puppet_agent_failed{cluster="alerting"} > 0
+      expr: puppet_agent_failed{cluster="alerting"} > 0 or puppet_agent_resources_total{cluster="alerting"} == 0
       for: 80m # At least two puppet runs
       labels:
         severity: critical
