@@ -1,0 +1,23 @@
+rule_files:
+  - watchrat.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    input_series:
+      - series: 'probe_http_status_code{instance="https://example.wikimedia.org", job="blackbox/watchrat", site="codfw"}'
+        values: '500'
+    alert_rule_test:
+    - alertname: ProbeHttpFailed
+      eval_time: 5m
+      exp_alerts:
+       - exp_labels:
+           severity: warning
+           team: sre
+           instance: https://example.wikimedia.org
+           job: "blackbox/watchrat"
+           site: "codfw"
+         exp_annotations:
+           summary: URL did not return HTTP 2xx or 3xx response (or probe/connection failed)
+           description:  Non-23xx HTTP response at https://example.wikimedia.org when checked from codfw
+           dashboard: https://grafana.wikimedia.org/d/GYciEga7z/watchrat
+           runbook: https://wikitech.wikimedia.org/wiki/Prometheus#Watchrat_Non-23xx_HTTP_response
