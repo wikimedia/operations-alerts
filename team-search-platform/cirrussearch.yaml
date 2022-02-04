@@ -2,7 +2,7 @@ groups:
  - name: cirrussearch
    rules:
     - alert: CirrusSearchJVMGCOldPoolFlatlined
-      expr: max_over_time(elasticsearch_jvm_memory_pool_used_bytes{exported_cluster=~"production-search-.*", pool="old"}[1d]) - on (name) min_over_time(elasticsearch_jvm_memory_pool_used_bytes{exported_cluster=~"production-search-.*", pool="old"}[1d]) < 100000000
+      expr: max_over_time(elasticsearch_jvm_memory_pool_max_bytes{exported_cluster=~"production-search-.*", pool="old"}[1d]) - on (name) min_over_time(elasticsearch_jvm_memory_pool_used_bytes{exported_cluster=~"production-search-.*", pool="old"}[1d]) < 100000000
       for: 1m
       labels:
         team: search-platform

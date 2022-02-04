@@ -6,8 +6,12 @@ evaluation_interval: 1m
 tests:
   - interval: 1m
     input_series:
+      - series: 'elasticsearch_jvm_memory_pool_max_bytes{exported_cluster="production-search-eqiad", pool="old", name="elastic1001-production-search-eqiad"}'
+        values: 2200000000 2200000000 2200000000 2200000000 2200000000 2200000000
       - series: 'elasticsearch_jvm_memory_pool_used_bytes{exported_cluster="production-search-eqiad", pool="old", name="elastic1001-production-search-eqiad"}'
         values: 2200000000 2100000000 2200000000 2000000000 2100000000 2200000000
+      - series: 'elasticsearch_jvm_memory_pool_max_bytes{exported_cluster="production-search-eqiad", pool="old", name="elastic1002-production-search-eqiad"}'
+        values: 2002000000 2002000000 2002000000 2002000000 2002000000 2002000000
       - series: 'elasticsearch_jvm_memory_pool_used_bytes{exported_cluster="production-search-eqiad", pool="old", name="elastic1002-production-search-eqiad"}'
         values: 2000000000 2001000000 2002000000 2000000000 2001000000 2002000000
     alert_rule_test:
