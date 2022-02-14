@@ -1,0 +1,13 @@
+groups:
+ - name: data_pipelines
+   rules:
+    - alert: MjolnirUpdateFailureRateExceedesThreshold
+      expr: (sum by(site) (irate(mjolnir_swift_action_total{result="failed"}[5m]))) / (sum by (site) (irate(mjolnir_swift_action_total[5m]))) > 0.005
+      for: 1m
+      labels:
+        team: search-platform
+        severity: warning
+      annotations:
+        summary: "Data shipping to CirrusSearch in {{$labels.site}} is experiencing abnormal failure rates"
+        description: "Updates shipped from analytics are either invalid or being lost and will need to be re-shipped."
+        dashboard: https://grafana.wikimedia.org/d/000000591/elasticsearch-mjolnir-bulk-updates

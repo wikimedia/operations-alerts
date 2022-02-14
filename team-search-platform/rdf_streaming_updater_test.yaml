@@ -28,6 +28,7 @@ tests:
               summary: "WDQS_Streaming_Updater in codfw (k8s) is unstable"
               description: "The flink job has an uptime below 5 minutes for the past 10 minutes, it is probably trying to start in vain"
               runbook: https://wikitech.wikimedia.org/wiki/Wikidata_Query_Service/Streaming_Updater
+              dashboard: https://grafana.wikimedia.org/d/gCFgfpG7k/flink-session-cluster
       - alertname: RdfStreamingUpdaterFlinkProcessingLatencyIsHigh
         eval_time: 1m
         exp_alerts:
@@ -40,6 +41,7 @@ tests:
               summary: "Processing latency of WCQS_Streaming_Updater in codfw (k8s) is above 5 minutes"
               description: "The flink job has a processing latency above 5 minutes"
               runbook: https://wikitech.wikimedia.org/wiki/Wikidata_Query_Service/Streaming_Updater
+              dashboard: https://grafana.wikimedia.org/d/fdU5Zx-Mk/wdqs-streaming-updater
   - interval: 1m
     input_series:
       - series: 'flink_jobmanager_job_uptime{job_name="Unrelated_Job", kubernetes_namespace="unrelated-ns"}'
@@ -60,6 +62,7 @@ tests:
               summary: "WDQS_Streaming_Updater in eqiad (k8s) is not running"
               description: "The flink job is not running"
               runbook: https://wikitech.wikimedia.org/wiki/Wikidata_Query_Service/Streaming_Updater
+              dashboard: https://grafana.wikimedia.org/d/gCFgfpG7k/flink-session-cluster
       - alertname: WcqsStreamingUpdaterFlinkJobNotRunning
         eval_time: 6m
         exp_alerts:
@@ -72,3 +75,21 @@ tests:
               summary: "WCQS_Streaming_Updater in eqiad (k8s) is not running"
               description: "The flink job is not running"
               runbook: https://wikitech.wikimedia.org/wiki/Wikidata_Query_Service/Streaming_Updater
+              dashboard: https://grafana.wikimedia.org/d/gCFgfpG7k/flink-session-cluster
+  - interval: 1m
+    input_series:
+      - series: 'wdqs_streaming_updater_kafka_stream_consumer_lag_Value{instance="wcqs2001:9101"}'
+        values: 1260000
+    alert_rule_test:
+      - alertname: RdfStreamingUpdaterHighConsumerUpdateLag
+        eval_time: 5m
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              team: search-platform
+              instance: wcqs2001:9101
+            exp_annotations:
+              summary: "wcqs2001:9101 has fallen behind applying updates from the RDF Streaming Updater"
+              description: "Instance is behind by 21m 0s. Stale data is being served"
+              runbook: https://wikitech.wikimedia.org/wiki/Wikidata_Query_Service/Streaming_Updater
+              dashboard: https://grafana.wikimedia.org/d/fdU5Zx-Mk/wdqs-streaming-updater

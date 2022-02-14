@@ -1,0 +1,21 @@
+rule_files:
+  - data_pipelines.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    input_series:
+      - series: 'mjolnir_swift_action_total{site="dc1", result="failed"}'
+        values: '0+10x300'
+    alert_rule_test:
+      - alertname: MjolnirUpdateFailureRateExceedesThreshold
+        eval_time: 10m
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              team: search-platform
+              site: dc1
+            exp_annotations:
+              summary: "Data shipping to CirrusSearch in dc1 is experiencing abnormal failure rates"
+              description: "Updates shipped from analytics are either invalid or being lost and will need to be re-shipped."
+              dashboard: https://grafana.wikimedia.org/d/000000591/elasticsearch-mjolnir-bulk-updates
+

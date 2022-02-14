@@ -22,3 +22,22 @@ tests:
               summary: "Blazegraph instance wdqs1010:9193 is burning free allocators at a very high rate"
               description: "Blazegraph is misbehaving and will rapidly corrupt its journal."
               runbook: https://wikitech.wikimedia.org/wiki/Wikidata_Query_Service/Runbook#Free_allocators_decrease_rapidly
+              dashboard: https://grafana.wikimedia.org/d/000000489/wikidata-query-service
+
+  - interval: 1m
+    input_series:
+      - series: 'blazegraph_free_allocators{instance="wdqs1001:9195"}'
+        values: '95000+0x10'
+    alert_rule_test:
+      - alertname: BlazegraphFreeAllocatorsRunningOut
+        eval_time: 10m
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              team: search-platform
+              instance: "wdqs1001:9195"
+            exp_annotations:
+              summary: "Blazegraph instance wdqs1001:9195 is running out of free allocators"
+              description: "Blazegraph will soon be unable to apply updates"
+              runbook: https://wikitech.wikimedia.org/wiki/Wikidata_Query_Service/Runbook
+              dashboard: https://grafana.wikimedia.org/d/000000489/wikidata-query-service

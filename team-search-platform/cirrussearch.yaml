@@ -11,3 +11,16 @@ groups:
         summary: "Elasticsearch instance {{$labels.name}} is showing memory pressure in the old pool"
         description: "Elasticsearch is out of memory and will have degraded latency"
         runbook: https://wikitech.wikimedia.org/wiki/Search#Stuck_in_old_GC_hell
+        dashboard: https://grafana.wikimedia.org/d/000000462/elasticsearch-memory
+
+    - alert: CirrusSearchHighOldGCFrequency
+      expr: increase(elasticsearch_jvm_gc_collection_seconds_count{gc="old"}[1h]) > 60
+      for: 5m
+      labels:
+        team: search-platform
+        severity: warning
+      annotations:
+        summary: "Elasticsearch instance {{$labels.name}} is running the old gc excessively"
+        description: "Elasticsearch is out of memory and will have degraded latency"
+        runbook: https://wikitech.wikimedia.org/wiki/Search#Stuck_in_old_GC_hell
+        dashboard: https://grafana.wikimedia.org/d/000000462/elasticsearch-memory

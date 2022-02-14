@@ -6,6 +6,35 @@
 groups:
   - name: rdf-streaming-updater
     rules:
+
+## RDF Streaming Updater Flink alerts
+      - alert: WdqsStreamingUpdaterFlinkJobNotRunning
+        expr: |
+          absent(flink_jobmanager_job_uptime{kubernetes_namespace="rdf-streaming-updater", job_name="WDQS_Streaming_Updater"})
+        for: 5m
+        labels:
+          team: search-platform
+          severity: critical
+        annotations:
+          summary: "{{$labels.job_name}} in {{$externalLabels.site}} ({{$externalLabels.prometheus}}) is not running"
+          description: "The flink job is not running"
+          runbook: https://wikitech.wikimedia.org/wiki/Wikidata_Query_Service/Streaming_Updater
+          dashboard: https://grafana.wikimedia.org/d/gCFgfpG7k/flink-session-cluster
+
+      - alert: WcqsStreamingUpdaterFlinkJobNotRunning
+        expr: |
+          absent(flink_jobmanager_job_uptime{kubernetes_namespace="rdf-streaming-updater", job_name="WCQS_Streaming_Updater"})
+        for: 5m
+        labels:
+          team: search-platform
+          severity: critical
+        annotations:
+          summary: "{{$labels.job_name}} in {{$externalLabels.site}} ({{$externalLabels.prometheus}}) is not running"
+          description: "The flink job is not running"
+          runbook: https://wikitech.wikimedia.org/wiki/Wikidata_Query_Service/Streaming_Updater
+          dashboard: https://grafana.wikimedia.org/d/gCFgfpG7k/flink-session-cluster
+
+## RDF Streaming Updater Producer alerts
       - alert: RdfStreamingUpdaterFlinkJobUnstable
         # We try to detect crashloop, use the uptime of the job and take its max over a 10minute period.
         # Using resets() or repetive instant checks for 10m do not seem to work because:
@@ -23,6 +52,8 @@ groups:
           summary: "{{$labels.job_name}} in {{$externalLabels.site}} ({{$externalLabels.prometheus}}) is unstable"
           description: "The flink job has an uptime below 5 minutes for the past 10 minutes, it is probably trying to start in vain"
           runbook: https://wikitech.wikimedia.org/wiki/Wikidata_Query_Service/Streaming_Updater
+          dashboard: https://grafana.wikimedia.org/d/gCFgfpG7k/flink-session-cluster
+
       - alert: RdfStreamingUpdaterFlinkProcessingLatencyIsHigh
         expr: |
           avg by (job_name, kubernetes_namespace) (avg_over_time(flink_taskmanager_job_task_operator_processing_latency_ms{kubernetes_namespace="rdf-streaming-updater"}[10m]) > 300000)
@@ -34,25 +65,17 @@ groups:
           summary: "Processing latency of {{$labels.job_name}} in {{$externalLabels.site}} ({{$externalLabels.prometheus}}) is above 5 minutes"
           description: "The flink job has a processing latency above 5 minutes"
           runbook: https://wikitech.wikimedia.org/wiki/Wikidata_Query_Service/Streaming_Updater
-      - alert: WdqsStreamingUpdaterFlinkJobNotRunning
-        expr: |
-          absent(flink_jobmanager_job_uptime{kubernetes_namespace="rdf-streaming-updater", job_name="WDQS_Streaming_Updater"})
+          dashboard: https://grafana.wikimedia.org/d/fdU5Zx-Mk/wdqs-streaming-updater
+
+## RDF Streaming Updater Consumer alerts
+      - alert: RdfStreamingUpdaterHighConsumerUpdateLag
+        expr: wdqs_streaming_updater_kafka_stream_consumer_lag_Value / 1000 > 600
         for: 5m
         labels:
           team: search-platform
-          severity: critical
+          severity: warning
         annotations:
-          summary: "{{$labels.job_name}} in {{$externalLabels.site}} ({{$externalLabels.prometheus}}) is not running"
-          description: "The flink job is not running"
+          summary: "{{$labels.instance}} has fallen behind applying updates from the RDF Streaming Updater"
+          description: "Instance is behind by {{ $value | humanizeDuration }}. Stale data is being served"
           runbook: https://wikitech.wikimedia.org/wiki/Wikidata_Query_Service/Streaming_Updater
-      - alert: WcqsStreamingUpdaterFlinkJobNotRunning
-        expr: |
-          absent(flink_jobmanager_job_uptime{kubernetes_namespace="rdf-streaming-updater", job_name="WCQS_Streaming_Updater"})
-        for: 5m
-        labels:
-          team: search-platform
-          severity: critical
-        annotations:
-          summary: "{{$labels.job_name}} in {{$externalLabels.site}} ({{$externalLabels.prometheus}}) is not running"
-          description: "The flink job is not running"
-          runbook: https://wikitech.wikimedia.org/wiki/Wikidata_Query_Service/Streaming_Updater
+          dashboard: https://grafana.wikimedia.org/d/fdU5Zx-Mk/wdqs-streaming-updater
