@@ -46,7 +46,7 @@ tests:
       values: '500'
    alert_rule_test:
     - alertname: LogstashIndexingFailures
-      eval_time: 5m
+      eval_time: 1m
       exp_alerts:
        - exp_labels:
            severity: critical

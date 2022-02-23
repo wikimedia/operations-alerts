@@ -44,7 +44,7 @@ groups:
         runbook: https://wikitech.wikimedia.org/wiki/Logstash#Indexing_errors
       # Gauge of total hits that minute.  total_hits/60 = events/sec
       expr: sum(log_dead_letters_hits) / 60 > 8
-      for: 5m
+      for: 1m
       labels:
         severity: critical
         team: o11y
