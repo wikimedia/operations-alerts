@@ -6,7 +6,7 @@ groups:
       annotations:
         description: 3 or more Yarn Nodemanagers on the {{$labels.hadoop_cluster}} cluster are in an unhealthy state.
         summary: 3 or more unhealthy Yarn Nodemanagers on {{$labels.hadoop_cluster}}.
-        dashboard: https://grafana.wikimedia.org/dashboard/db/hadoop?var-hadoop_cluster={{ $labels.hadoop_cluster }}&orgId=1&panelId=46&fullscreen
+        dashboard: https://grafana.wikimedia.org/d/000000585/hadoop?var-hadoop_cluster={{ $labels.hadoop_cluster }}&orgId=1&panelId=46&fullscreen
         runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#Unhealthy_Yarn_Nodemanagers
       expr: max by (hadoop_cluster) (Hadoop_ResourceManager_NumUnhealthyNMs) > 3
       for: 5m
@@ -18,7 +18,7 @@ groups:
       annotations:
         description: 1 or more Yarn Nodemanagers on the {{$labels.hadoop_cluster}} cluster are in an unhealthy state.
         summary: 1 or more unhealthy Yarn Nodemanagers on {{$labels.hadoop_cluster}}.
-        dashboard: https://grafana.wikimedia.org/dashboard/db/hadoop?var-hadoop_cluster={{ $labels.hadoop_cluster }}&orgId=1&panelId=46&fullscreen
+        dashboard: https://grafana.wikimedia.org/d/000000585/hadoop?var-hadoop_cluster={{ $labels.hadoop_cluster }}&orgId=1&panelId=46&fullscreen
         runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#Unhealthy_Yarn_Nodemanagers
       expr: max by (hadoop_cluster) (Hadoop_ResourceManager_NumUnhealthyNMs) > 1
       for: 5m

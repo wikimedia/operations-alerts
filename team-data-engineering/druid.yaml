@@ -7,7 +7,7 @@ groups:
       annotations:
         description: There have been zero wmf_netflow events received on the druid_analytics cluster over a 30 minutes period.
         summary: Zero wmf_netflow events received by druid_analytics over the last 30 minutes.
-        dashboard: https://grafana.wikimedia.org/dashboard/db/druid?refresh=1m&var-cluster=druid_analytics&panelId=41&fullscreen&orgId=1
+        dashboard: https://grafana.wikimedia.org/d/000000538/druid?refresh=1m&var-cluster=druid_analytics&panelId=41&fullscreen&orgId=1
         runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Druid/Alerts#Druid_Netlow_Supervisor
       expr: sum(sum_over_time(druid_realtime_ingest_events_processed_count{datasource="wmf_netflow"}[30m])) < 1
       for: 5m
@@ -19,7 +19,7 @@ groups:
       annotations:
         description: There have been fewer than 10 wmf_netflow events received on the druid_analytics cluster over a 30 minutes period.
         summary: Fewer than 10 wmf_netflow events received by druid_analytics over the last 30 minutes.
-        dashboard: https://grafana.wikimedia.org/dashboard/db/druid?refresh=1m&var-cluster=druid_analytics&panelId=41&fullscreen&orgId=1
+        dashboard: https://grafana.wikimedia.org/d/000000538/druid?refresh=1m&var-cluster=druid_analytics&panelId=41&fullscreen&orgId=1
         runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Druid/Alerts#Druid_Netlow_Supervisor
       expr: sum(sum_over_time(druid_realtime_ingest_events_processed_count{datasource="wmf_netflow"}[30m])) < 10
       for: 5m
@@ -32,7 +32,7 @@ groups:
       annotations:
         description: More than 10 segments of the {{ $labels.datasource }} datastource have been reported as being unavailable on the {{ $labels.cluster }} Druid cluster, over a 15 minutes period.
         summary: More than 10 segments have been unavailable for {{ $labels.datasource }} on the {{ $labels.cluster }} Druid cluster.
-        dashboard: https://grafana.wikimedia.org/dashboard/db/druid?refresh=1m&var-cluster={{ $labels.cluster }}&panelId=49&fullscreen&orgId=1
+        dashboard: https://grafana.wikimedia.org/d/000000538/druid?refresh=1m&var-cluster={{ $labels.cluster }}&panelId=49&fullscreen&orgId=1
         runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Druid/Alerts#Druid_Segments_Unavailable
       expr: max by (datasource, cluster) (avg_over_time(druid_coordinator_segment_unavailable_count[15m])) > 10
       for: 5m
@@ -44,7 +44,7 @@ groups:
       annotations:
         description: More than 5 segments of the {{ $labels.datasource }} datastource have been reported as being unavailable on the {{ $labels.cluster }} Druid cluster, over a 15 minutes period.
         summary: More than 5 segments have been unavailable for {{ $labels.datasource }} on the {{ $labels.cluster }} Druid cluster.
-        dashboard: https://grafana.wikimedia.org/dashboard/db/druid?refresh=1m&var-cluster={{ $labels.cluster }}&panelId=49&fullscreen&orgId=1
+        dashboard: https://grafana.wikimedia.org/d/000000538/druid?refresh=1m&var-cluster={{ $labels.cluster }}&panelId=49&fullscreen&orgId=1
         runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Druid/Alerts#Druid_Segments_Unavailable
       expr: max by (datasource, cluster) (avg_over_time(druid_coordinator_segment_unavailable_count[15m])) > 5
       for: 5m

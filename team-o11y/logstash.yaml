@@ -19,7 +19,7 @@ groups:
       annotations:
         description: Logstash is ingesting {{ $value }}% more than what it did this same time yesterday.  Check for a log producer generating a high volume of logs.
         summary: Logstash rate of ingestion percent change compared to yesterday
-        dashboard: https://grafana.wikimedia.org/dashboard/db/logstash?orgId=1&panelId=2&fullscreen
+        dashboard: https://grafana.wikimedia.org/d/000000561/logstash?orgId=1&panelId=2&fullscreen
         runbook: https://phabricator.wikimedia.org/T202307
       expr: |
         100 * (

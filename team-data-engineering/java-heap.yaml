@@ -7,7 +7,7 @@ groups:
       annotations:
         description: HDFS Namenode JVM Heap usage on {{ $labels.instance }} is above 95%.
         summary: Namenode heap usage on {{ $labels.instance }} is above 95%.
-        dashboard: https://grafana.wikimedia.org/dashboard/db/hadoop?var-hadoop_cluster={{ $labels.hadoop_cluster }}&panelId=4&fullscreen&orgId=1
+        dashboard: https://grafana.wikimedia.org/d/000000585/hadoop?var-hadoop_cluster={{ $labels.hadoop_cluster }}&panelId=4&fullscreen&orgId=1
         runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#HDFS_total_files_and_heap_size
       expr: avg_over_time(jvm_memory_bytes_used{job="jmx_hadoop", instance=~"an-(test-)?master.*:10080", area="heap"}[60m])/avg_over_time(jvm_memory_bytes_max{job="jmx_hadoop", instance=~"an-(test-)?master.*:10080", area="heap"}[60m]) > 0.95
       for: 5m
@@ -19,7 +19,7 @@ groups:
       annotations:
         description: HDFS Namenode JVM Heap usage on {{ $labels.instance }} is above 90%.
         summary: Namenode heap usage on {{ $labels.instance }} is above 90%.
-        dashboard: https://grafana.wikimedia.org/dashboard/db/hadoop?var-hadoop_cluster={{ $labels.hadoop_cluster }}&panelId=4&fullscreen&orgId=1
+        dashboard: https://grafana.wikimedia.org/d/000000585/hadoop?var-hadoop_cluster={{ $labels.hadoop_cluster }}&panelId=4&fullscreen&orgId=1
         runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#HDFS_total_files_and_heap_size
       expr: avg_over_time(jvm_memory_bytes_used{job="jmx_hadoop", instance=~"an-(test-)?master.*:10080", area="heap"}[60m])/avg_over_time(jvm_memory_bytes_max{job="jmx_hadoop", instance=~"an-(test-)?master.*:10080", area="heap"}[60m]) > 0.9
       for: 5m
@@ -32,7 +32,7 @@ groups:
       annotations:
         description: HDFS Datanode JVM Heap usage on {{ $labels.instance }} is above 95%.
         summary: Datanode heap usage on {{ $labels.instance }} is above 95%.
-        dashboard: https://grafana.wikimedia.org/dashboard/db/hadoop?var-hadoop_cluster={{ $labels.hadoop_cluster }}&panelId=1&fullscreen&orgId=1
+        dashboard: https://grafana.wikimedia.org/d/000000585/hadoop?var-hadoop_cluster={{ $labels.hadoop_cluster }}&panelId=1&fullscreen&orgId=1
         runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#HDFS_Datanode_JVM_Heap_Usage
       expr: avg_over_time(jvm_memory_bytes_used{job="jmx_hadoop", instance=~".*:51010", area="heap"}[60m])/avg_over_time(jvm_memory_bytes_max{job="jmx_hadoop", instance=~".*:51010", area="heap"}[60m]) > 0.95
       for: 5m
@@ -44,7 +44,7 @@ groups:
       annotations:
         description: HDFS Datanode JVM Heap usage on {{ $labels.instance }} is above 90%.
         summary: Datanode heap usage on {{ $labels.instance }} is above 90%.
-        dashboard: https://grafana.wikimedia.org/dashboard/db/hadoop?var-hadoop_cluster={{ $labels.hadoop_cluster }}&panelId=1&fullscreen&orgId=1
+        dashboard: https://grafana.wikimedia.org/d/000000585/hadoop?var-hadoop_cluster={{ $labels.hadoop_cluster }}&panelId=1&fullscreen&orgId=1
         runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#HDFS_Datanode_JVM_Heap_Usage
       expr: avg_over_time(jvm_memory_bytes_used{job="jmx_hadoop", instance=~".*:51010", area="heap"}[60m])/avg_over_time(jvm_memory_bytes_max{job="jmx_hadoop", instance=~".*:51010", area="heap"}[60m]) > 0.9
       for: 5m
@@ -57,7 +57,7 @@ groups:
       annotations:
         description: YARN Resource Manager JVM Heap usage is above 95% on {{ $labels.instance}}
         summary: YARN Heap usage is above 95% on {{ $labels.instance}}
-        dashboard: https://grafana.wikimedia.org/dashboard/db/hadoop?var-hadoop_cluster={{ $labels.hadoop_cluster }}&panelId=12&fullscreen&orgId=1"
+        dashboard: https://grafana.wikimedia.org/d/000000585/hadoop?var-hadoop_cluster={{ $labels.hadoop_cluster }}&panelId=12&fullscreen&orgId=1"
         runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#Yarn_Nodemanager_JVM_Heap_Usage
       expr: avg_over_time(jvm_memory_bytes_used{job="jmx_hadoop", instance=~".*:10083", area="heap"}[60m])/avg_over_time(jvm_memory_bytes_max{job="jmx_hadoop", instance=~".*:10083", area="heap"}[60m]) > 0.95
       for: 5m
@@ -69,7 +69,7 @@ groups:
       annotations:
         description: YARN Resource Manager JVM Heap usage is above 90% on {{ $labels.instance}}
         summary: YARN Heap usage is above 90% on {{ $labels.instance}}
-        dashboard: https://grafana.wikimedia.org/dashboard/db/hadoop?var-hadoop_cluster={{ $labels.hadoop_cluster }}&panelId=12&fullscreen&orgId=1"
+        dashboard: https://grafana.wikimedia.org/d/000000585/hadoop?var-hadoop_cluster={{ $labels.hadoop_cluster }}&panelId=12&fullscreen&orgId=1"
         runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#Yarn_Nodemanager_JVM_Heap_Usage
       expr: avg_over_time(jvm_memory_bytes_used{job="jmx_hadoop", instance=~".*:10083", area="heap"}[60m])/avg_over_time(jvm_memory_bytes_max{job="jmx_hadoop", instance=~".*:10083", area="heap"}[60m]) > 0.9
       for: 5m

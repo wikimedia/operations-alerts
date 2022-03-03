@@ -21,7 +21,7 @@ tests:
           exp_annotations:
             description: Free space on the analytics-hadoop HDFS cluster is below the paging threshold of 5%.
             summary: Dangerously low free space on the analytics-hadoop HDFS cluster.
-            dashboard: https://grafana.wikimedia.org/dashboard/db/hadoop?var-hadoop_cluster=analytics-hadoop&orgId=1&panelId=106&fullscreen
+            dashboard: https://grafana.wikimedia.org/d/000000585/hadoop?var-hadoop_cluster=analytics-hadoop&orgId=1&panelId=106&fullscreen
             runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#HDFS_Capacity_Remaining
         - exp_labels:
             severity: critical
@@ -30,7 +30,7 @@ tests:
           exp_annotations:
             description: Free space on the analytics-hadoop HDFS cluster is below the critical threshold of 10%.
             summary: Critically low free space on the analytics-hadoop HDFS cluster.
-            dashboard: https://grafana.wikimedia.org/dashboard/db/hadoop?var-hadoop_cluster=analytics-hadoop&orgId=1&panelId=106&fullscreen
+            dashboard: https://grafana.wikimedia.org/d/000000585/hadoop?var-hadoop_cluster=analytics-hadoop&orgId=1&panelId=106&fullscreen
             runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#HDFS_Capacity_Remaining
         - exp_labels:
             severity: warning
@@ -39,7 +39,7 @@ tests:
           exp_annotations:
             description: Free space on the analytics-hadoop HDFS cluster is below the warning threshold of 15%.
             summary: Alarmingly low free space on the analytics-hadoop HDFS cluster.
-            dashboard: https://grafana.wikimedia.org/dashboard/db/hadoop?var-hadoop_cluster=analytics-hadoop&orgId=1&panelId=106&fullscreen
+            dashboard: https://grafana.wikimedia.org/d/000000585/hadoop?var-hadoop_cluster=analytics-hadoop&orgId=1&panelId=106&fullscreen
             runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#HDFS_Capacity_Remaining
 
 ## HDFS Corrupt Blocks tests
@@ -58,7 +58,7 @@ tests:
           exp_annotations:
             description: More than 50 HDFS corrupt blocks detected on the analytics-hadoop HDFS cluster.
             summary: HDFS corrupt blocks detected on the analytics-hadoop HDFS cluster.
-            dashboard: https://grafana.wikimedia.org/dashboard/db/hadoop?var-hadoop_cluster=analytics-hadoop&orgId=1&panelId=39&fullscreen
+            dashboard: https://grafana.wikimedia.org/d/000000585/hadoop?var-hadoop_cluster=analytics-hadoop&orgId=1&panelId=39&fullscreen
             runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#HDFS_corrupt_blocks
         - exp_labels:
             severity: warning
@@ -67,7 +67,7 @@ tests:
           exp_annotations:
             description: More than 30 HDFS corrupt blocks detected on the analytics-hadoop HDFS cluster.
             summary: HDFS corrupt blocks detected on the analytics-hadoop HDFS cluster.
-            dashboard: https://grafana.wikimedia.org/dashboard/db/hadoop?var-hadoop_cluster=analytics-hadoop&orgId=1&panelId=39&fullscreen
+            dashboard: https://grafana.wikimedia.org/d/000000585/hadoop?var-hadoop_cluster=analytics-hadoop&orgId=1&panelId=39&fullscreen
             runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#HDFS_corrupt_blocks
 
 ## HDFS Missing Blocks tests
@@ -86,7 +86,7 @@ tests:
           exp_annotations:
             description: More than 5 HDFS missing blocks detected on the analytics-hadoop HDFS cluster.
             summary: HDFS missing blocks detected on the analytics-hadoop HDFS cluster.
-            dashboard: https://grafana.wikimedia.org/dashboard/db/hadoop?var-hadoop_cluster=analytics-hadoop&orgId=1&panelId=40&fullscreen
+            dashboard: https://grafana.wikimedia.org/d/000000585/hadoop?var-hadoop_cluster=analytics-hadoop&orgId=1&panelId=40&fullscreen
             runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#HDFS_missing_blocks
         - exp_labels:
             severity: warning
@@ -95,7 +95,7 @@ tests:
           exp_annotations:
             description: More than 2 HDFS missing blocks detected on the analytics-hadoop HDFS cluster.
             summary: HDFS missing blocks detected on the analytics-hadoop HDFS cluster.
-            dashboard: https://grafana.wikimedia.org/dashboard/db/hadoop?var-hadoop_cluster=analytics-hadoop&orgId=1&panelId=40&fullscreen
+            dashboard: https://grafana.wikimedia.org/d/000000585/hadoop?var-hadoop_cluster=analytics-hadoop&orgId=1&panelId=40&fullscreen
             runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#HDFS_missing_blocks
 
 ## HDFS Total Files tests
@@ -114,7 +114,7 @@ tests:
           exp_annotations:
             description: The total number of files on the analytics-hadoop HDFS cluster are more than the heap can support.
             summary: Total files on the analytics-hadoop HDFS cluster are more than the heap can support.
-            dashboard: https://grafana.wikimedia.org/dashboard/db/hadoop?var-hadoop_cluster=analytics-hadoop&orgId=1&panelId=28&fullscreen
+            dashboard: https://grafana.wikimedia.org/d/000000585/hadoop?var-hadoop_cluster=analytics-hadoop&orgId=1&panelId=28&fullscreen
             runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#HDFS_total_files_and_heap_size
         - exp_labels:
             severity: warning
@@ -123,7 +123,7 @@ tests:
           exp_annotations:
             description: The total number of files on the analytics-hadoop HDFS cluster are more than the heap can support.
             summary: Total files on the analytics-hadoop HDFS cluster are more than the heap can support.
-            dashboard: https://grafana.wikimedia.org/dashboard/db/hadoop?var-hadoop_cluster=analytics-hadoop&orgId=1&panelId=28&fullscreen
+            dashboard: https://grafana.wikimedia.org/d/000000585/hadoop?var-hadoop_cluster=analytics-hadoop&orgId=1&panelId=28&fullscreen
             runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#HDFS_total_files_and_heap_size
 
 ## HDFS Namenode RPC Call Queue Length tests
@@ -142,7 +142,7 @@ tests:
           exp_annotations:
             description: The HDFS Namenode RPC 8020 call queue length on the analytics-hadoop cluster is too high.
             summary: RPC call queue length on the analytics-hadoop cluster is too high.
-            dashboard: https://grafana.wikimedia.org/dashboard/db/hadoop?var-hadoop_cluster=analytics-hadoop&orgId=1&panelId=54&fullscreen
+            dashboard: https://grafana.wikimedia.org/d/000000585/hadoop?var-hadoop_cluster=analytics-hadoop&orgId=1&panelId=54&fullscreen
             runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#HDFS_Namenode_RPC_length_queue
         - exp_labels:
             severity: warning
@@ -151,5 +151,5 @@ tests:
           exp_annotations:
             description: The HDFS Namenode RPC 8020 call queue length on the analytics-hadoop cluster is too high.
             summary: RPC call queue length on the analytics-hadoop cluster is too high.
-            dashboard: https://grafana.wikimedia.org/dashboard/db/hadoop?var-hadoop_cluster=analytics-hadoop&orgId=1&panelId=54&fullscreen
+            dashboard: https://grafana.wikimedia.org/d/000000585/hadoop?var-hadoop_cluster=analytics-hadoop&orgId=1&panelId=54&fullscreen
             runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#HDFS_Namenode_RPC_length_queue
