@@ -24,6 +24,23 @@ groups:
        summary: 'Service {{ $labels.instance }} has failed probes ({{ $labels.module }})'
        dashboard: 'https://grafana.wikimedia.org/d/O0nHhdhnz/network-probes-overview?var-job={{ $labels.job }}&var-module=icmp'
 
+   - &cert_expired
+     alert: CertAlmostExpired
+     annotations:
+       description: 'The certificate presented by {{ $labels.instance }} is going to expire in {{ $value | humanizeDuration }}'
+       summary: 'Certificate for {{ $labels.instance }} is about to expire'
+     expr: probe_ssl_earliest_cert_expiry{job=~"^probes/.*"} - time() < (86400 * 20)
+     for: 5m
+     labels:
+       severity: warning
+       team: sre
+
+   - <<: *cert_expired
+     expr: probe_ssl_earliest_cert_expiry{job=~"^probes/.*"} - time() < (86400 * 10)
+     labels:
+       severity: critical
+       team: sre
+
    - alert: ProbeSlow
      annotations:
        description: '{{ $labels.instance }} took {{ $value | humanizeDuration }} to reply successfully to probe {{ $labels.module }}'
