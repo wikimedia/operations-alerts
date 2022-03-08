@@ -47,3 +47,20 @@ tests:
               description: "Elasticsearch is out of memory and will have degraded latency"
               runbook: https://wikitech.wikimedia.org/wiki/Search#Stuck_in_old_GC_hell
               dashboard: https://grafana.wikimedia.org/d/000000462/elasticsearch-memory
+
+  - interval: 1m
+    input_series:
+     - series: elasticsearch_indices_age_days{index="commonswiki_file", exported_cluster="alertmanager-test"}
+       values: 121
+    alert_rule_test:
+     - alertname: CirrusSearchIndexTooOld
+       eval_time: 1m
+       exp_alerts:
+        - exp_labels:
+            severity: task
+            team: search-platform
+            index: commonswiki_file
+            exported_cluster: alertmanager-test
+          exp_annotations:
+            summary: "commonswiki_file index in alertmanager-test is ready for reindexing"
+            description: "The reindexing process should be run to ensure multi-lingual analysis chain updates are applied"

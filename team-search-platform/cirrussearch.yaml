@@ -24,3 +24,13 @@ groups:
         description: "Elasticsearch is out of memory and will have degraded latency"
         runbook: https://wikitech.wikimedia.org/wiki/Search#Stuck_in_old_GC_hell
         dashboard: https://grafana.wikimedia.org/d/000000462/elasticsearch-memory
+
+    - alert: CirrusSearchIndexTooOld
+      expr: elasticsearch_indices_age_days{index=~"commonswiki_file|wikidatawiki_content"} > 120
+      for: 1m
+      labels:
+        team: search-platform
+        severity: task
+      annotations:
+        summary: "{{$labels.index}} index in {{$labels.exported_cluster}} is ready for reindexing"
+        description: "The reindexing process should be run to ensure multi-lingual analysis chain updates are applied"
