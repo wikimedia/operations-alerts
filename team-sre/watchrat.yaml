@@ -1,13 +1,14 @@
+# deploy-tag: global
 groups:
   - name: watchrat-http
     rules:
     - alert: ProbeHttpFailed
       annotations:
-        description: Non-23xx HTTP response at {{$labels.instance}} when checked from {{$labels.site}}
+        description: Non-23xx HTTP response from {{$labels.instance}}
         summary: URL did not return HTTP 2xx or 3xx response (or probe/connection failed)
         dashboard: https://grafana.wikimedia.org/d/GYciEga7z/watchrat
         runbook: https://wikitech.wikimedia.org/wiki/Prometheus#Watchrat_Non-23xx_HTTP_response
-      expr: probe_http_status_code{job="blackbox/watchrat"} >= 400 or probe_success{job="blackbox/watchrat"} == 0
+      expr: count by (instance) ( probe_http_status_code{job="blackbox/watchrat"} >= 400 or probe_success{job="blackbox/watchrat"} == 0 ) >= 3
       for: 5m
       labels:
         severity: warning
