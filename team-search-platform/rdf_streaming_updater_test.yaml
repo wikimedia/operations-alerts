@@ -11,7 +11,7 @@ tests:
       - series: 'flink_jobmanager_job_uptime{job_name="WDQS_Streaming_Updater", kubernetes_namespace="rdf-streaming-updater", pod="2"}'
         values: "0 0 0 0 0 0 60000 120000 180000 240000 0 60000"
       - series: 'flink_taskmanager_job_task_operator_processing_latency_ms{kubernetes_namespace="rdf-streaming-updater", job_name="WCQS_Streaming_Updater"}'
-        values: "500000"
+        values: "600001"
     external_labels:
       site: codfw
       prometheus: k8s
@@ -38,8 +38,8 @@ tests:
               kubernetes_namespace: rdf-streaming-updater
               job_name: "WCQS_Streaming_Updater"
             exp_annotations:
-              summary: "Processing latency of WCQS_Streaming_Updater in codfw (k8s) is above 5 minutes"
-              description: "The flink job has a processing latency above 5 minutes"
+              summary: "Processing latency of WCQS_Streaming_Updater in codfw (k8s) is above 10 minutes"
+              description: "The flink job has a processing latency above 10 minutes"
               runbook: https://wikitech.wikimedia.org/wiki/Wikidata_Query_Service/Streaming_Updater
               dashboard: https://grafana.wikimedia.org/d/fdU5Zx-Mk/wdqs-streaming-updater
   - interval: 1m

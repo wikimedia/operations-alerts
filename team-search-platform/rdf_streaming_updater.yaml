@@ -56,14 +56,14 @@ groups:
 
       - alert: RdfStreamingUpdaterFlinkProcessingLatencyIsHigh
         expr: |
-          avg by (job_name, kubernetes_namespace) (avg_over_time(flink_taskmanager_job_task_operator_processing_latency_ms{kubernetes_namespace="rdf-streaming-updater"}[10m]) > 300000)
+          avg by (job_name, kubernetes_namespace) (avg_over_time(flink_taskmanager_job_task_operator_processing_latency_ms{kubernetes_namespace="rdf-streaming-updater"}[5m]) > 600000)
         for: 1m
         labels:
           team: search-platform
           severity: warning
         annotations:
-          summary: "Processing latency of {{$labels.job_name}} in {{$externalLabels.site}} ({{$externalLabels.prometheus}}) is above 5 minutes"
-          description: "The flink job has a processing latency above 5 minutes"
+          summary: "Processing latency of {{$labels.job_name}} in {{$externalLabels.site}} ({{$externalLabels.prometheus}}) is above 10 minutes"
+          description: "The flink job has a processing latency above 10 minutes"
           runbook: https://wikitech.wikimedia.org/wiki/Wikidata_Query_Service/Streaming_Updater
           dashboard: https://grafana.wikimedia.org/d/fdU5Zx-Mk/wdqs-streaming-updater
 
