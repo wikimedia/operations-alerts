@@ -29,14 +29,14 @@ groups:
      annotations:
        description: 'The certificate presented by {{ $labels.instance }} is going to expire in {{ $value | humanizeDuration }}'
        summary: 'Certificate for {{ $labels.instance }} is about to expire'
-     expr: probe_ssl_earliest_cert_expiry{job=~"^probes/.*"} - time() < (86400 * 20)
+     expr: probe_ssl_earliest_cert_expiry{job=~"^probes/.*"} - time() < (86400 * 9)
      for: 5m
      labels:
        severity: warning
        team: sre
 
    - <<: *cert_expired
-     expr: probe_ssl_earliest_cert_expiry{job=~"^probes/.*"} - time() < (86400 * 10)
+     expr: probe_ssl_earliest_cert_expiry{job=~"^probes/.*"} - time() < (86400 * 7)
      labels:
        severity: critical
        team: sre
