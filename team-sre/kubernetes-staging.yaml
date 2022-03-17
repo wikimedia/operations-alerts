@@ -1,0 +1,14 @@
+# deploy-tag: k8s-staging
+groups:
+- name: certmanager
+  rules:
+  - alert: CertManagerCertExpirySoon
+    expr: certmanager_certificate_expiration_timestamp_seconds - time() < (7 * 3600)
+    for: 5m
+    labels:
+      team: sre
+      severity: warning
+    annotations:
+      summary: "Certificate {{ $labels.namespace }}/{{ $labels.name }} in is about to expire"
+      description: "The certificate {{ $labels.name }} in namespace {{ $labels.namespace }} is {{ $value | humanizeDuration }} from expiry. It should have been refreshed 8 hours before expiry"
+      runbook: https://wikitech.wikimedia.org/wiki/Kubernetes/cert-manager

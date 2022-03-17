@@ -1,0 +1,45 @@
+# https://prometheus.io/docs/prometheus/latest/configuration/unit_testing_rules/
+# Test locally using `promtool test rules kubernetes_prod.yaml`
+rule_files:
+- kubernetes-prod.yaml
+evaluation_interval: 1m
+tests:
+- interval: 1m
+  input_series:
+  # time() is from 0 in unit tests
+  - series: certmanager_certificate_expiration_timestamp_seconds{namespace="fakespace", name="fakename"}
+    values: "777600-60x6 604800-60x6"
+  alert_rule_test:
+  - alertname: CertManagerCertExpirySoon
+    eval_time: 6m
+    exp_alerts:
+    - exp_labels:
+        severity: warning
+        team: sre
+        namespace: fakespace
+        name: fakename
+      exp_annotations:
+        summary: "Certificate fakespace/fakename in is about to expire"
+        description: "The certificate fakename in namespace fakespace is 8d 23h 48m 0s from expiry. It should have been refreshed 9 days before expiry"
+        runbook: https://wikitech.wikimedia.org/wiki/Kubernetes/cert-manager
+  - alertname: CertManagerCertExpirySoon
+    eval_time: 12m
+    exp_alerts:
+    - exp_labels:
+        severity: warning
+        team: sre
+        namespace: fakespace
+        name: fakename
+      exp_annotations:
+        summary: "Certificate fakespace/fakename in is about to expire"
+        description: "The certificate fakename in namespace fakespace is 6d 23h 43m 0s from expiry. It should have been refreshed 9 days before expiry"
+        runbook: https://wikitech.wikimedia.org/wiki/Kubernetes/cert-manager
+    - exp_labels:
+        severity: critical
+        team: sre
+        namespace: fakespace
+        name: fakename
+      exp_annotations:
+        summary: "Certificate fakespace/fakename in is about to expire"
+        description: "The certificate fakename in namespace fakespace is 6d 23h 43m 0s from expiry. It should have been refreshed 9 days before expiry"
+        runbook: https://wikitech.wikimedia.org/wiki/Kubernetes/cert-manager

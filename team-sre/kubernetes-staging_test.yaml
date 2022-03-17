@@ -1,0 +1,24 @@
+# https://prometheus.io/docs/prometheus/latest/configuration/unit_testing_rules/
+# Test locally using `promtool test rules kubernetes_staging.yaml`
+rule_files:
+- kubernetes-staging.yaml
+evaluation_interval: 1m
+tests:
+- interval: 1m
+  input_series:
+  # time() is from 0 in unit tests
+  - series: certmanager_certificate_expiration_timestamp_seconds{namespace="fakespace", name="fakename"}
+    values: "25200-60x6"
+  alert_rule_test:
+  - alertname: CertManagerCertExpirySoon
+    eval_time: 6m
+    exp_alerts:
+    - exp_labels:
+        severity: warning
+        team: sre
+        namespace: fakespace
+        name: fakename
+      exp_annotations:
+        summary: "Certificate fakespace/fakename in is about to expire"
+        description: "The certificate fakename in namespace fakespace is 6h 48m 0s from expiry. It should have been refreshed 8 hours before expiry"
+        runbook: https://wikitech.wikimedia.org/wiki/Kubernetes/cert-manager
