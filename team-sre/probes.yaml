@@ -1,12 +1,12 @@
 groups:
  - name: probes
    rules:
-   - &http_probedown
-     alert: ProbeDown
+   - alert: ProbeDown
      annotations:
-       description: '{{ $labels.instance }} failed when probed by {{ $labels.module }} from {{ $externalLabels.site }}. Availability is {{ $value }}'
+       description: '{{ $labels.instance }} failed when probed by {{ $labels.module }} from {{ $externalLabels.site }}. Availability is {{ $value }}%.'
        summary: 'Service {{ $labels.instance }} has failed probes ({{ $labels.module }})'
        dashboard: 'https://grafana.wikimedia.org/d/O0nHhdhnz/network-probes-overview?var-job={{ $labels.job }}&var-module=http'
+       logs: 'https://logstash.wikimedia.org/app/dashboards#/view/f3e709c0-a5f8-11ec-bf8e-43f1807d5bc2?_g=(filters:!((query:(match_phrase:(service.name:{{ $labels.module }})))))'
      # Probes are sent out every 15s, allow at most two to fail in a minute
      # (i.e. one minute availability is less than 75%)
      expr: avg_over_time(probe_success{job=~"^probes/.*", module=~"^http.*"}[1m]) * 100 < 75
@@ -14,15 +14,6 @@ groups:
      labels:
        severity: warning
        team: sre
-
-   - <<: *http_probedown
-     # ICMP can get dropped and the service isn't necessarily impacted,
-     # therefore alert on lower availability
-     expr: avg_over_time(probe_success{job=~"^probes/.*", module=~"^icmp.*"}[1m]) * 100 < 10
-     annotations:
-       description: '{{ $labels.instance }} failed when probed by {{ $labels.module }} from {{ $externalLabels.site }}. Availability is {{ $value }}'
-       summary: 'Service {{ $labels.instance }} has failed probes ({{ $labels.module }})'
-       dashboard: 'https://grafana.wikimedia.org/d/O0nHhdhnz/network-probes-overview?var-job={{ $labels.job }}&var-module=icmp'
 
    - &cert_expired
      alert: CertAlmostExpired
@@ -45,6 +36,7 @@ groups:
      annotations:
        description: '{{ $labels.instance }} took {{ $value | humanizeDuration }} to reply successfully to probe {{ $labels.module }}'
        summary: 'Slow probes for service {{ $labels.instance }}'
+       dashboard: 'https://grafana.wikimedia.org/d/O0nHhdhnz/network-probes-overview?var-job={{ $labels.job }}&var-module={{ $labels.module }}'
      expr: probe_duration_seconds{job=~"^probes/.*", module=~"^http.*"} * probe_success > 1
      for: 2m
      labels:
