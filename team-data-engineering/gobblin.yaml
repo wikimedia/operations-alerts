@@ -1,0 +1,30 @@
+groups:
+- name: gobblin
+  rules:
+
+  - alert: GobblinLastSuccessfulRunTooLongAgo
+    expr: time() - gobblin_job_last_successful_run_epoch_seconds > 7200
+    for: 10m
+    labels:
+      severity: critical
+      team: data-engineering
+    annotations:
+      description: Last successful gobblin run of job {{ $labels.job }} was more than 2 hours ago.
+      summary: Last successful gobblin run of job {{ $labels.job }} was more than 2 hours ago.
+      dashboard: https://grafana.wikimedia.org/d/pAQaJwEnk/gobblin?orgId=1&var-gobblin_job_name={{ $labels.job }}
+      runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Gobblin
+
+  - alert: GobblinKafkaRecordsExtractedNotEqualRecordsExpected
+    expr: topk(1, (gobblin_kafka_extracted_records_expected_count - gobblin_kafka_extracted_records_actual_count) != 0)
+    for: 1m
+    labels:
+      severity: warning
+      team: data-engineering
+    annotations:
+      description: >
+        Gobblin job {{ $labels.job }} ingested Kafka topic {{ $labels.kafka_topic }} partition
+        {{ $labels.kafka_partition }} but did not ingest expected number of records.
+        NOTE: This alert only fires for the first Kafka topic partition for which this is true.
+      summary: Gobblin job {{ $labels.job }} ingested an unexpected number of records for a Kafka topic partition.
+      dashboard: https://grafana.wikimedia.org/d/pAQaJwEnk/gobblin?orgId=1&var-gobblin_job_name={{ $labels.job }}&var-kafka_topic={{ $labels.kafka_topic }}&viewPanel=4
+      runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Gobblin

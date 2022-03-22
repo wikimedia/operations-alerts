@@ -1,0 +1,57 @@
+rule_files:
+  - gobblin.yaml
+evaluation_interval: 1m
+
+tests:
+
+  - interval: 1m
+    input_series:
+      - series: gobblin_job_last_successful_run_epoch_seconds{job="gobblin_alert_test"}
+        # time() is used in GobblinLastSuccessfulRunTooLongAgo alert, which in
+        # promtool tests always returns the value of eval_time.
+        # The value of gobblin_job_last_successful_run_epoch_seconds is epoch seconds,
+        # so we specify only 60 seconds after the epoch as the value of the last run timestamp,
+        # and then set eval_time for the test GobblinLastSuccessfulRunTooLongAgo 3h after epoch time.
+        values: "60+0x200"
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: GobblinLastSuccessfulRunTooLongAgo
+        eval_time: 3h
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              team: data-engineering
+              job: gobblin_alert_test
+            exp_annotations:
+              description: Last successful gobblin run of job gobblin_alert_test was more than 2 hours ago.
+              summary: Last successful gobblin run of job gobblin_alert_test was more than 2 hours ago.
+              dashboard: https://grafana.wikimedia.org/d/pAQaJwEnk/gobblin?orgId=1&var-gobblin_job_name=gobblin_alert_test
+              runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Gobblin
+
+  - interval: 1m
+    input_series:
+      - series: gobblin_kafka_extracted_records_expected_count{job="gobblin_alert_test",kafka_topic="gobblin_alert_test_topic",kafka_partition="0"}
+        values: "100"
+      - series: gobblin_kafka_extracted_records_actual_count{job="gobblin_alert_test",kafka_topic="gobblin_alert_test_topic",kafka_partition="0"}
+        values: "90"
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: GobblinKafkaRecordsExtractedNotEqualRecordsExpected
+        eval_time: 1m
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              team: data-engineering
+              job: gobblin_alert_test
+              kafka_topic: gobblin_alert_test_topic
+              kafka_partition: "0"
+            exp_annotations:
+              description: >
+                Gobblin job gobblin_alert_test ingested Kafka topic gobblin_alert_test_topic partition
+                0 but did not ingest expected number of records.
+                NOTE: This alert only fires for the first Kafka topic partition for which this is true.
+              summary: Gobblin job gobblin_alert_test ingested an unexpected number of records for a Kafka topic partition.
+              dashboard: https://grafana.wikimedia.org/d/pAQaJwEnk/gobblin?orgId=1&var-gobblin_job_name=gobblin_alert_test&var-kafka_topic=gobblin_alert_test_topic&viewPanel=4
+              runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Gobblin
