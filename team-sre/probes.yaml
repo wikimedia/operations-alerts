@@ -1,12 +1,14 @@
 groups:
  - name: probes
    rules:
-   - alert: ProbeDown
+   - &probe_down
+     alert: ProbeDown
      annotations:
        description: '{{ $labels.instance }} failed when probed by {{ $labels.module }} from {{ $externalLabels.site }}. Availability is {{ $value }}%.'
        summary: 'Service {{ $labels.instance }} has failed probes ({{ $labels.module }})'
        dashboard: 'https://grafana.wikimedia.org/d/O0nHhdhnz/network-probes-overview?var-job={{ $labels.job }}&var-module=http'
        logs: 'https://logstash.wikimedia.org/app/dashboards#/view/f3e709c0-a5f8-11ec-bf8e-43f1807d5bc2?_g=(filters:!((query:(match_phrase:(service.name:{{ $labels.module }})))))'
+       runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#ProbeDown'
      # Probes are sent out every 15s, allow at most two to fail in a minute
      # (i.e. one minute availability is less than 75%)
      expr: avg_over_time(probe_success{job=~"^probes/.*", module=~"^http.*"}[1m]) * 100 < 75
@@ -15,11 +17,25 @@ groups:
        severity: warning
        team: sre
 
+   - <<: *probe_down
+     expr: (avg_over_time(probe_success{job=~"^probes/.*", module=~"^http.*"}[1m]) and on (instance) service_catalog_page == 1) * 100 < 75
+     for: 1m
+     labels:
+       severity: page
+       team: sre
+     annotations:
+       description: '{{ $labels.instance }} failed when probed by {{ $labels.module }} from {{ $externalLabels.site }}. Availability is {{ $value }}%.'
+       summary: 'Service {{ $labels.instance }} has failed probes ({{ $labels.module }}) #page'
+       dashboard: 'https://grafana.wikimedia.org/d/O0nHhdhnz/network-probes-overview?var-job={{ $labels.job }}&var-module=http'
+       logs: 'https://logstash.wikimedia.org/app/dashboards#/view/f3e709c0-a5f8-11ec-bf8e-43f1807d5bc2?_g=(filters:!((query:(match_phrase:(service.name:{{ $labels.module }})))))'
+       runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#ProbeDown'
+
    - &cert_expired
      alert: CertAlmostExpired
      annotations:
-       description: 'The certificate presented by {{ $labels.instance }} is going to expire in {{ $value | humanizeDuration }}'
-       summary: 'Certificate for {{ $labels.instance }} is about to expire'
+       description: 'The certificate presented by service {{ $labels.instance }} is going to expire in {{ $value | humanizeDuration }}'
+       summary: 'Certificate for service {{ $labels.instance }} is about to expire'
+       runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#CertAlmostExpired'
      expr: probe_ssl_earliest_cert_expiry{job=~"^probes/.*"} - time() < (86400 * 9)
      for: 5m
      labels:
@@ -37,6 +53,7 @@ groups:
        description: '{{ $labels.instance }} took {{ $value | humanizeDuration }} to reply successfully to probe {{ $labels.module }}'
        summary: 'Slow probes for service {{ $labels.instance }}'
        dashboard: 'https://grafana.wikimedia.org/d/O0nHhdhnz/network-probes-overview?var-job={{ $labels.job }}&var-module={{ $labels.module }}'
+       logs: 'https://logstash.wikimedia.org/app/dashboards#/view/f3e709c0-a5f8-11ec-bf8e-43f1807d5bc2?_g=(filters:!((query:(match_phrase:(service.name:{{ $labels.module }})))))'
      expr: probe_duration_seconds{job=~"^probes/.*", module=~"^http.*"} * probe_success > 1
      for: 2m
      labels:

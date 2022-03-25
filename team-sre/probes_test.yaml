@@ -2,6 +2,7 @@ rule_files:
   - probes.yaml
 evaluation_interval: 1m
 tests:
+  # base test for failing probe
   - interval: 1m
     input_series:
       - series: 'probe_success{job="probes/test", module="http_test", instance="fail:443"}'
@@ -26,3 +27,68 @@ tests:
            summary: Service fail:443 has failed probes (http_test)
            dashboard: 'https://grafana.wikimedia.org/d/O0nHhdhnz/network-probes-overview?var-job=probes/test&var-module=http'
            logs: 'https://logstash.wikimedia.org/app/dashboards#/view/f3e709c0-a5f8-11ec-bf8e-43f1807d5bc2?_g=(filters:!((query:(match_phrase:(service.name:http_test)))))'
+           runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#ProbeDown'
+
+  # paging service test (i.e. service_catalog_page metric set to 1)
+  - interval: 1m
+    input_series:
+      - series: 'probe_success{job="probes/test", module="http_test", instance="fail-page:443"}'
+        values: '1+0x5 0+0x20'
+      - series: 'probe_success{job="probes/test", module="http_test", instance="ok:443"}'
+        values: '1+0x30'
+      - series: 'service_catalog_page{instance="fail-page:443"}'
+        values: '1+0x30'
+      - series: 'service_catalog_page{instance="ok:443"}'
+        values: '0+0x30'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+    - alertname: ProbeDown
+      eval_time: 10m
+      exp_alerts:
+       - exp_labels:
+           job: probes/test
+           team: sre
+           severity: warning
+           instance: fail-page:443
+           module: http_test
+         exp_annotations:
+           description: fail-page:443 failed when probed by http_test from eqiad.
+             Availability is 0%.
+           summary: Service fail-page:443 has failed probes (http_test)
+           dashboard: 'https://grafana.wikimedia.org/d/O0nHhdhnz/network-probes-overview?var-job=probes/test&var-module=http'
+           logs: 'https://logstash.wikimedia.org/app/dashboards#/view/f3e709c0-a5f8-11ec-bf8e-43f1807d5bc2?_g=(filters:!((query:(match_phrase:(service.name:http_test)))))'
+           runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#ProbeDown'
+       - exp_labels:
+           job: probes/test
+           team: sre
+           severity: page
+           instance: fail-page:443
+           module: http_test
+         exp_annotations:
+           description: fail-page:443 failed when probed by http_test from eqiad.
+             Availability is 0%.
+           summary: 'Service fail-page:443 has failed probes (http_test) #page'
+           dashboard: 'https://grafana.wikimedia.org/d/O0nHhdhnz/network-probes-overview?var-job=probes/test&var-module=http'
+           logs: 'https://logstash.wikimedia.org/app/dashboards#/view/f3e709c0-a5f8-11ec-bf8e-43f1807d5bc2?_g=(filters:!((query:(match_phrase:(service.name:http_test)))))'
+           runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#ProbeDown'
+
+  - interval: 1m
+    input_series:
+      - series: 'probe_ssl_earliest_cert_expiry{job="probes/test", instance="service:443"}'
+        values: '777600-60x6 604800-60x6'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+    - alertname: CertAlmostExpired
+      eval_time: 10m
+      exp_alerts:
+       - exp_labels:
+           job: probes/test
+           team: sre
+           severity: warning
+           instance: service:443
+         exp_annotations:
+           description: The certificate presented by service service:443 is going to expire in 6d 23h 47m 0s
+           summary: Certificate for service service:443 is about to expire
+           runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#CertAlmostExpired'
