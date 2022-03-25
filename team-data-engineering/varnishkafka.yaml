@@ -1,0 +1,14 @@
+groups:
+  - name: varnishkafka
+    rules:
+      - alert: VarnishkafkaNoMessages
+        expr: sum by (source,instance,cluster) (rate(rdkafka_producer_topic_partition_msgs{ partition != "-1" }[5m])) * 60 == 0
+        for: 5m
+        labels:
+          team: data-engineering
+          severity: critical
+        annotations:
+          summary: "varnishkafka for instance {{ $labels.instance }} is not logging {{ $labels.cluster }} requests from {{ $labels.source }}"
+          description: "Prometheus has not received any data for cluster: {{ $labels.cluster }}, source: {{ $labels.source }} from varnishkafka running on {{ $labels.instance }}"
+          dashboard: "https://grafana.wikimedia.org/d/000000253/varnishkafka?orgId=1&var-datasource={{ $externalLabels.site }}%20prometheus/ops&var-source={{ $labels.source }}&var-cp_cluster={{ $labels.cluster }}&var-instance={{ $labels.instance }}&viewPanel=14"
+          runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Varnishkafka
