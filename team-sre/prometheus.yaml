@@ -2,12 +2,13 @@
 groups:
   - name: prometheus
     rules:
-    - alert: JobUnavailable
+    - &job_unavailable
+      alert: JobUnavailable
       annotations:
-        description: The Prometheus job {{ $labels.job }} has been unable to
-          scrape {{ $value | humanizePercentage }} of its targets. Check if the targets are
-          reachable and exporting metrics.
-        summary: Reduced availability for job {{ $labels.job }} in {{ $externalLabels.site }}
+        description: The Prometheus job {{ $labels.job }} running on {{ $externalLabels.prometheus }}@{{ $externalLabels.site }}
+          has been unable to scrape {{ $value | humanizePercentage }} of its targets.
+          Check if the targets are reachable and exporting metrics.
+        summary: Reduced availability for job {{ $labels.job }} in {{ $externalLabels.prometheus }}@{{ $externalLabels.site }}
         dashboard: 'https://grafana.wikimedia.org/d/NEJu05xZz/prometheus-targets'
         runbook: 'https://wikitech.wikimedia.org/wiki/Prometheus#Prometheus_job_unavailable'
       # See https://phabricator.wikimedia.org/T276749 for netbox_device_statistics
@@ -18,18 +19,8 @@ groups:
         severity: warning
         team: sre
 
-    - alert: JobUnavailable
-      annotations:
-        description: The Prometheus job {{ $labels.job }} has been unable to
-          scrape {{ $value | humanizePercentage }} of its targets. Check if the targets are
-          reachable and exporting metrics.
-        summary: Reduced availability for job {{ $labels.job }} in {{ $externalLabels.site }}
-        dashboard: 'https://grafana.wikimedia.org/d/NEJu05xZz/prometheus-targets'
-        runbook: 'https://wikitech.wikimedia.org/wiki/Prometheus#Prometheus_job_unavailable'
-      # See https://phabricator.wikimedia.org/T276749 for netbox_device_statistics
-      # 'rails' excluded until Alertmanager migration https://phabricator.wikimedia.org/T289454
+    - <<: *job_unavailable
       expr: 0.5 >= sum by (job) (up{job!~"(netbox_device_statistics|rails)"}) / count by (job) (up)
-      for: 5m
       labels:
         severity: critical
         team: sre
