@@ -33,6 +33,19 @@ groups:
           description: "The flink job is not running"
           runbook: https://wikitech.wikimedia.org/wiki/Wikidata_Query_Service/Streaming_Updater
           dashboard: https://grafana.wikimedia.org/d/gCFgfpG7k/flink-session-cluster
+      - alert: RdfStreamingUpdaterNotEnoughTaskSlots
+        # 24 = 3nodes * 4tm_slots * 2jobs
+        expr: |
+          flink_jobmanager_taskSlotsTotal{kubernetes_namespace="rdf-streaming-updater"} < 24
+        for: 5m
+        labels:
+          team: search-platform
+          severity: warning
+        annotations:
+          summary: "The flink session cluster {{$labels.kubernetes_namespace}} in {{$externalLabels.site}} ({{$externalLabels.prometheus}}) does not have enough task slots"
+          description: "The expected number of task slots is too low for the jobs to function properly"
+          runbook: https://wikitech.wikimedia.org/wiki/Wikidata_Query_Service/Streaming_Updater
+          dashboard: https://grafana.wikimedia.org/d/gCFgfpG7k/flink-session-cluster
 
 ## RDF Streaming Updater Producer alerts
       - alert: RdfStreamingUpdaterFlinkJobUnstable
