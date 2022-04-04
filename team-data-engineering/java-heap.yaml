@@ -9,7 +9,7 @@ groups:
         summary: Namenode heap usage on {{ $labels.instance }} is above 95%.
         dashboard: https://grafana.wikimedia.org/d/000000585/hadoop?var-hadoop_cluster={{ $labels.hadoop_cluster }}&panelId=4&fullscreen&orgId=1
         runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#HDFS_total_files_and_heap_size
-      expr: avg_over_time(jvm_memory_bytes_used{job="jmx_hadoop", instance=~"an-(test-)?master.*:10080", area="heap"}[60m])/avg_over_time(jvm_memory_bytes_max{job="jmx_hadoop", instance=~"an-(test-)?master.*:10080", area="heap"}[60m]) > 0.95
+      expr: avg_over_time(jvm_memory_bytes_used{job="jmx_hadoop", instance=~"an-master.*:10080", area="heap"}[60m])/avg_over_time(jvm_memory_bytes_max{job="jmx_hadoop", instance=~"an-master.*:10080", area="heap"}[60m]) > 0.95
       for: 5m
       labels:
         severity: critical
@@ -21,7 +21,7 @@ groups:
         summary: Namenode heap usage on {{ $labels.instance }} is above 90%.
         dashboard: https://grafana.wikimedia.org/d/000000585/hadoop?var-hadoop_cluster={{ $labels.hadoop_cluster }}&panelId=4&fullscreen&orgId=1
         runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#HDFS_total_files_and_heap_size
-      expr: avg_over_time(jvm_memory_bytes_used{job="jmx_hadoop", instance=~"an-(test-)?master.*:10080", area="heap"}[60m])/avg_over_time(jvm_memory_bytes_max{job="jmx_hadoop", instance=~"an-(test-)?master.*:10080", area="heap"}[60m]) > 0.9
+      expr: avg_over_time(jvm_memory_bytes_used{job="jmx_hadoop", instance=~"an-master.*:10080", area="heap"}[60m])/avg_over_time(jvm_memory_bytes_max{job="jmx_hadoop", instance=~"an-master.*:10080", area="heap"}[60m]) > 0.9
       for: 5m
       labels:
         severity: warning
@@ -84,7 +84,7 @@ groups:
         summary: Hive Metastore JVM Heap usage is above 90% on {{ $labels.instance}}
         dashboard: https://grafana.wikimedia.org/d/000000379/hive?panelId=2&fullscreen&orgId=1&var-instance={{ $labels.instance}}
         runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hive/Alerts#Hive_Metastore_Heap_Usage
-      expr: avg_over_time(jvm_memory_bytes_used{job="jmx_hive", instance=~"an-(test-)?coord.*:9183", area="heap"}[60m])/avg_over_time(jvm_memory_bytes_max{job="jmx_hive", instance=~"an-(test-)?coord.*:9183", area="heap"}[60m]) > 0.9
+      expr: avg_over_time(jvm_memory_bytes_used{job="jmx_hive", instance=~"an-coord.*:9183", area="heap"}[60m])/avg_over_time(jvm_memory_bytes_max{job="jmx_hive", instance=~"an-coord.*:9183", area="heap"}[60m]) > 0.9
       for: 5m
       labels:
         severity: critical
@@ -96,7 +96,7 @@ groups:
         summary: Hive Metastore JVM Heap usage is above 80% on {{ $labels.instance}}
         dashboard: https://grafana.wikimedia.org/d/000000379/hive?panelId=2&fullscreen&orgId=1&var-instance={{ $labels.instance}}
         runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hive/Alerts#Hive_Metastore_Heap_Usage
-      expr: avg_over_time(jvm_memory_bytes_used{job="jmx_hive", instance=~"an-(test-)?coord.*:9183", area="heap"}[60m])/avg_over_time(jvm_memory_bytes_max{job="jmx_hive", instance=~"an-(test-)?coord.*:9183", area="heap"}[60m]) > 0.8
+      expr: avg_over_time(jvm_memory_bytes_used{job="jmx_hive", instance=~"an-coord.*:9183", area="heap"}[60m])/avg_over_time(jvm_memory_bytes_max{job="jmx_hive", instance=~"an-coord.*:9183", area="heap"}[60m]) > 0.8
       for: 5m
       labels:
         severity: warning
@@ -109,7 +109,7 @@ groups:
         summary: Hive Server JVM Heap usage is above 90% on {{ $labels.instance}}
         dashboard: https://grafana.wikimedia.org/d/000000379/hive?panelId=7&fullscreen&orgId=1&var-instance={{ $labels.instance}}
         runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hive/Alerts#Hive_Server_Heap_Usage
-      expr: avg_over_time(jvm_memory_bytes_used{job="jmx_hive", instance=~"an-(test-)?coord.*:10100", area="heap"}[60m])/avg_over_time(jvm_memory_bytes_max{job="jmx_hive", instance=~"an-(test-)?coord.*:10100", area="heap"}[60m]) > 0.9
+      expr: avg_over_time(jvm_memory_bytes_used{job="jmx_hive", instance=~"an-coord.*:10100", area="heap"}[60m])/avg_over_time(jvm_memory_bytes_max{job="jmx_hive", instance=~"an-coord.*:10100", area="heap"}[60m]) > 0.9
       for: 5m
       labels:
         severity: critical
@@ -121,7 +121,7 @@ groups:
         summary: Hive Server JVM Heap usage is above 80% on {{ $labels.instance}}
         dashboard: https://grafana.wikimedia.org/d/000000379/hive?panelId=7&fullscreen&orgId=1&var-instance={{ $labels.instance}}
         runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hive/Alerts#Hive_Server_Heap_Usage
-      expr: avg_over_time(jvm_memory_bytes_used{job="jmx_hive", instance=~"an-(test-)?coord.*:10100", area="heap"}[60m])/avg_over_time(jvm_memory_bytes_max{job="jmx_hive", instance=~"an-(test-)?coord.*:10100", area="heap"}[60m]) > 0.8
+      expr: avg_over_time(jvm_memory_bytes_used{job="jmx_hive", instance=~"an-coord.*:10100", area="heap"}[60m])/avg_over_time(jvm_memory_bytes_max{job="jmx_hive", instance=~"an-coord.*:10100", area="heap"}[60m]) > 0.8
       for: 5m
       labels:
         severity: warning
