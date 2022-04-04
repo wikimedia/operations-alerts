@@ -16,6 +16,22 @@ groups:
           description: "Critical if requests percentage difference compared to 30 minutes ago is more than 70%"
           dashboard: "https://grafana.wikimedia.org/d/000000479/frontend-traffic?viewPanel=12&orgId=1&from=now-24h&to=now&var-site={{ $externalLabels.site }}&var-cache_type=text"
           runbook: https://wikitech.wikimedia.org/wiki/Monitoring/EdgeTrafficDrop
+      - alert: HAProxyEdgeTrafficDrop
+        expr: >
+          round(
+            (sum(cluster_code:haproxy_frontend_http_responses_total:rate5m{cluster="cache_text"}) by (site)) * 100 /
+            (sum(cluster_code:haproxy_frontend_http_responses_total:rate5m{cluster="cache_text"} offset 30m) by (site))
+          ) < 70
+        for: 1m
+        labels:
+          team: traffic
+          severity: critical
+        annotations:
+          summary: "{{ $value }}% request drop in text@{{ $externalLabels.site }} during the past 30 minutes"
+          description: "Critical if requests percentage difference compared to 30 minutes ago is more than 70%"
+          dashboard: "https://grafana.wikimedia.org/d/000000479/frontend-traffic?viewPanel=12&orgId=1&from=now-24h&to=now&var-site={{ $externalLabels.site }}&var-cache_type=text"
+          runbook: https://wikitech.wikimedia.org/wiki/Monitoring/EdgeTrafficDrop
+
 
       - alert: VarnishPrometheusExporterDown
         expr: up{instance=~"cp[0-9]{4}:9331"} == 0
