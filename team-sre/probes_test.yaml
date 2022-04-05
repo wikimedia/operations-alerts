@@ -62,7 +62,7 @@ tests:
        - exp_labels:
            job: probes/test
            team: sre
-           severity: page
+           severity: critical
            instance: fail-page:443
            module: http_test
          exp_annotations:

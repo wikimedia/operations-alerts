@@ -21,7 +21,7 @@ groups:
      expr: (avg_over_time(probe_success{job=~"^probes/.*", module=~"^http.*"}[1m]) and on (instance) service_catalog_page == 1) * 100 < 75
      for: 2m
      labels:
-       severity: page
+       severity: critical
        team: sre
      annotations:
        description: '{{ $labels.instance }} failed when probed by {{ $labels.module }} from {{ $externalLabels.site }}. Availability is {{ $value }}%.'
