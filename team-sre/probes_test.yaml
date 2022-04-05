@@ -68,7 +68,7 @@ tests:
          exp_annotations:
            description: fail-page:443 failed when probed by http_test from eqiad.
              Availability is 0%.
-           summary: 'Service fail-page:443 has failed probes (http_test) #page'
+           summary: 'Service fail-page:443 has failed probes (http_test)'
            dashboard: 'https://grafana.wikimedia.org/d/O0nHhdhnz/network-probes-overview?var-job=probes/test&var-module=http'
            logs: 'https://logstash.wikimedia.org/app/dashboards#/view/f3e709c0-a5f8-11ec-bf8e-43f1807d5bc2?_g=(filters:!((query:(match_phrase:(service.name:http_test)))))'
            runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#ProbeDown'
