@@ -19,7 +19,7 @@ groups:
 
    - <<: *probe_down
      expr: (avg_over_time(probe_success{job=~"^probes/.*", module=~"^http.*"}[1m]) and on (instance) service_catalog_page == 1) * 100 < 75
-     for: 1m
+     for: 2m
      labels:
        severity: page
        team: sre
