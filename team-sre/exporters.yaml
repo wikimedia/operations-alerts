@@ -1,0 +1,24 @@
+# deploy-tag: global
+
+# Alert on exporters not being able to scrape their underlying services.
+# Such condition happens when the exporter itself is up (therefore its "up" metric is 1 because
+# Prometheus can scrape metrics fine) but it can't contact the service it is exporting metrics for.
+
+# See also Thanos' recording rules for the definition of the exporter:up:avail metric
+groups:
+  - name: exporters
+    rules:
+    - &exporter_unavailable
+      alert: ExporterUnavailable
+      annotations:
+        description: The exporter {{ $labels.exporter }} for job {{ $labels.job }} running on {{ $labels.prometheus }}@{{ $labels.site }}
+          is reporting {{ $value | humanizePercentage }} availability for its targets.
+          Check if the exporter is able to talk to the underlying service.
+        summary: Reduced availability for exporter {{ $labels.exporter }} job {{ $labels.job }} in {{ $labels.prometheus }}@{{ $labels.site }}
+        dashboard: 'https://grafana.wikimedia.org/d/NEJu05xZz/prometheus-targets'
+        runbook: 'https://wikitech.wikimedia.org/wiki/Prometheus#Prometheus_exporters_"up"_metrics_unavailable'
+      expr: 0.6 >= exporter:up:avail
+      for: 5m
+      labels:
+        severity: warning
+        team: sre

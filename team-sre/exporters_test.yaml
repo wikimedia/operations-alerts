@@ -1,0 +1,28 @@
+rule_files:
+  - exporters.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    input_series:
+      - series: 'exporter:up:avail{exporter="mysql", job="mysql-misc", prometheus="ops", site="eqiad"}'
+        values: '0+0x90'
+      - series: 'exporter:up:avail{exporter="mysql", job="mysql-core", prometheus="ops", site="eqiad"}'
+        values: '1+0x90'
+    alert_rule_test:
+    - alertname: ExporterUnavailable
+      eval_time: 10m
+      exp_alerts:
+       - exp_labels:
+           job: mysql-misc
+           site: eqiad
+           prometheus: ops
+           exporter: mysql
+           team: sre
+           severity: warning
+         exp_annotations:
+           description: The exporter mysql for job mysql-misc running on ops@eqiad
+             is reporting 0% availability for its targets.
+             Check if the exporter is able to talk to the underlying service.
+           summary: Reduced availability for exporter mysql job mysql-misc in ops@eqiad
+           dashboard: 'https://grafana.wikimedia.org/d/NEJu05xZz/prometheus-targets'
+           runbook: 'https://wikitech.wikimedia.org/wiki/Prometheus#Prometheus_exporters_"up"_metrics_unavailable'
