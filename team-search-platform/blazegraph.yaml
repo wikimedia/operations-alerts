@@ -24,15 +24,3 @@ groups:
           description: "Blazegraph will soon be unable to apply updates"
           runbook: https://wikitech.wikimedia.org/wiki/Wikidata_Query_Service/Runbook
           dashboard: https://grafana.wikimedia.org/d/000000489/wikidata-query-service
-
-      - alert: BlazegraphJvmQuakeWarnGC
-        expr: jvmquake_wdqs_blazegraph_warn_gc > 0
-        for: 1m
-        labels:
-          team: search-platform
-          severity: warning
-        annotations:
-          summary: "Blazegraph instance {{$labels.instance}} is entering a GC death spiral"
-          description: "Blazegraph is unlikely to function properly"
-          runbook: https://wikitech.wikimedia.org/wiki/Wikidata_Query_Service/Runbook
-          dashboard: https://grafana.wikimedia.org/d/000000489/wikidata-query-service

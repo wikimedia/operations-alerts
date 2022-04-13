@@ -41,21 +41,3 @@ tests:
               description: "Blazegraph will soon be unable to apply updates"
               runbook: https://wikitech.wikimedia.org/wiki/Wikidata_Query_Service/Runbook
               dashboard: https://grafana.wikimedia.org/d/000000489/wikidata-query-service
-
-  - interval: 1m
-    input_series:
-      - series: 'jvmquake_wdqs_blazegraph_warn_gc{instance="wdqs1001:9195"}'
-        values: 1
-    alert_rule_test:
-      - alertname: BlazegraphJvmQuakeWarnGC
-        eval_time: 1m
-        exp_alerts:
-          - exp_labels:
-              severity: warning
-              team: search-platform
-              instance: "wdqs1001:9195"
-            exp_annotations:
-              summary: "Blazegraph instance wdqs1001:9195 is entering a GC death spiral"
-              description: "Blazegraph is unlikely to function properly"
-              runbook: https://wikitech.wikimedia.org/wiki/Wikidata_Query_Service/Runbook
-              dashboard: https://grafana.wikimedia.org/d/000000489/wikidata-query-service
