@@ -1,0 +1,44 @@
+rule_files:
+  - nel.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    input_series:
+      - series: 'log_w3c_networkerror_type_doc_count{type="tcp.timed_out",site="codfw"}'
+        values: '0+42x60'
+      - series: 'log_w3c_networkerror_type_doc_count{type="tcp.timed_out",site="eqiad"}'
+        values: '0+42x60'
+      - series: 'log_w3c_networkerror_type_doc_count{type="tcp.address_unreachable",site="eqiad"}'
+        values: '0+1x60'
+    alert_rule_test:
+    - alertname: NELHigh
+      eval_time: 10m
+      exp_alerts:
+       - exp_labels:
+           team: sre
+           severity: page
+           type: tcp.timed_out
+         exp_annotations:
+           description: 'Too high an incoming rate of browser-reported Network Error Logging events of type tcp.timed_out: 7/s'
+           summary: 'Elevated Network Error Logging events (tcp.timed_out) #page'
+           dashboard: 'https://logstash.wikimedia.org/goto/5c8f4ca1413eda33128e5c5a35da7e28'
+           runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#NEL_alerts'
+
+  - interval: 1m
+    input_series:
+      - series: 'dummy'
+        values: '0+42x60'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+    - alertname: NELNotReported
+      eval_time: 10m
+      exp_alerts:
+       - exp_labels:
+           team: sre
+           severity: critical
+         exp_annotations:
+           description: 'The metric log_w3c_networkerror_type_doc_count has disappeared, NEL alerting will not work'
+           summary: 'NEL metrics not reported'
+           dashboard: 'https://logstash.wikimedia.org/goto/5c8f4ca1413eda33128e5c5a35da7e28'
+           runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#NEL_alerts'
