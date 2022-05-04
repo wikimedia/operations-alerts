@@ -1,0 +1,42 @@
+rule_files:
+  - lvs.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    input_series:
+      - series: 'node_network_receive_bytes_total{cluster="lvs", device="eno1np0", instance="lvs1017:9100"}'
+        values: '2000000000000+3000000000000x58'
+    alert_rule_test:
+    - alertname: LVSHighRX
+      eval_time: 10m
+      exp_alerts:
+       - exp_labels:
+           cluster: lvs
+           device: eno1np0
+           instance: lvs1017:9100
+           severity: page
+           team: traffic
+         exp_annotations:
+           summary: 'Excessive RX traffic on lvs1017:9100 (eno1np0) #page'
+           description: "The host lvs1017:9100 is receiving 381469.7265625 megabits/s on interface eno1np0"
+           dashboard: https://grafana.wikimedia.org/d/000000377/host-overview?orgId=1&var-server=lvs1017
+           runbook: https://bit.ly/wmf-lvsrx
+
+  - interval: 1m
+    input_series:
+      - series: 'node_cpu_seconds_total{cluster="lvs", cpu="0", instance="lvs1017:9100", job="node", mode="softirq"}'
+        values: '2000000000000+3000000000000x58'
+    alert_rule_test:
+    - alertname: LVSHighCPU
+      eval_time: 10m
+      exp_alerts:
+       - exp_labels:
+           cpu: 0
+           instance: lvs1017:9100
+           severity: critical
+           team: traffic
+         exp_annotations:
+           summary: 'The host lvs1017:9100 has at least its CPU 0 saturated'
+           description: "At least one CPU core of lvs1017:9100 is saturated (5e+10 cores/s), packet drops are likely"
+           dashboard: https://grafana.wikimedia.org/d/000000377/host-overview?orgId=1&var-server=lvs1017
+           runbook: https://bit.ly/wmf-lvscpu
