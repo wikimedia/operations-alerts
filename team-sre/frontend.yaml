@@ -1,0 +1,32 @@
+# deploy-tag: global
+#
+# The rules below will be evaluated globally (via Thanos rule).
+
+groups:
+ - name: frontend
+   rules:
+   - alert: FrontendUnavailable
+     annotations:
+       description: '{{ $labels.job }} is operating at reduced availability ({{ $value | humanizePercentage }}). Investigate logs for errors.'
+       summary: '{{ $labels.job }} has reduced HTTP availability #page'
+       dashboard: 'https://grafana.wikimedia.org/d/000000479/frontend-traffic?viewPanel=3'
+       logs: 'https://logstash.wikimedia.org/goto/fe494e83d04fee66c8f0958bfc28451f'
+       runbook: 'https://wikitech.wikimedia.org/wiki/Varnish#Diagnosing_Varnish_alerts'
+     expr: (1 - global_job:varnish_requests:avail2m) < 0.99
+     for: 1m
+     labels:
+       severity: page
+       team: sre
+
+   - alert: FrontendUnavailable
+     annotations:
+       description: 'HAProxy for cluster {{ $labels.cluster }} is operating at reduced availability ({{ $value | humanizePercentage }}). Investigate logs for errors.'
+       summary: 'HAProxy ({{ $labels.cluster }}) has reduced HTTP availability #page'
+       dashboard: 'https://grafana.wikimedia.org/d/000000479/frontend-traffic?viewPanel=13'
+       logs: 'TODO'
+       runbook: 'TODO'
+     expr: (1 - global_job:haproxy_requests:avail2m{cluster=~"^cache_.*"}) < 0.99
+     for: 1m
+     labels:
+       severity: page
+       team: sre

@@ -1,0 +1,45 @@
+rule_files:
+  - frontend.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    input_series:
+      - series: 'global_job:varnish_requests:avail2m{job="varnish-text"}'
+        values: '0.004+0.002x60'
+      - series: 'global_job:varnish_requests:avail2m{job="varnish-upload"}'
+        values: '0.00001+0.000001x60'
+    alert_rule_test:
+    - alertname: FrontendUnavailable
+      eval_time: 10m
+      exp_alerts:
+       - exp_labels:
+           team: sre
+           severity: page
+           job: varnish-text
+         exp_annotations:
+           description: 'varnish-text is operating at reduced availability (97.6%). Investigate logs for errors.'
+           summary: 'varnish-text has reduced HTTP availability #page'
+           dashboard: 'https://grafana.wikimedia.org/d/000000479/frontend-traffic?viewPanel=3'
+           logs: 'https://logstash.wikimedia.org/goto/fe494e83d04fee66c8f0958bfc28451f'
+           runbook: 'https://wikitech.wikimedia.org/wiki/Varnish#Diagnosing_Varnish_alerts'
+
+  - interval: 1m
+    input_series:
+      - series: 'global_job:haproxy_requests:avail2m{cluster="cache_text"}'
+        values: '0.004+0.002x60'
+      - series: 'global_job:haproxy_requests:avail2m{cluster="cache_upload"}'
+        values: '0.00001+0.000001x60'
+    alert_rule_test:
+    - alertname: FrontendUnavailable
+      eval_time: 10m
+      exp_alerts:
+       - exp_labels:
+           team: sre
+           severity: page
+           cluster: cache_text
+         exp_annotations:
+           description: 'HAProxy for cluster cache_text is operating at reduced availability (97.6%). Investigate logs for errors.'
+           summary: 'HAProxy (cache_text) has reduced HTTP availability #page'
+           dashboard: 'https://grafana.wikimedia.org/d/000000479/frontend-traffic?viewPanel=13'
+           logs: 'TODO'
+           runbook: 'TODO'
