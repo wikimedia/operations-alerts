@@ -102,7 +102,7 @@ tests:
     - interval: 1m
       input_series:
         - series: Hadoop_NameNode_FilesTotal{hadoop_cluster="analytics-hadoop", instance="an-master1001:10080"}
-          values: '70000001'
+          values: '100000001'
       alert_rule_test:
       - alertname: HdfsTotalFilesHeap
         eval_time: 5m
