@@ -1,0 +1,25 @@
+rule_files:
+  - mediawiki.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    input_series:
+      - series: 'phpfpm_statustext_processes{cluster="api_appserver", state="active"}'
+        values: '0+42x60'
+      - series: 'phpfpm_statustext_processes{cluster="api_appserver", state="idle"}'
+        values: '0+1x60'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+    - alertname: PHPFPMTooBusy
+      eval_time: 10m
+      exp_alerts:
+       - exp_labels:
+           team: sre
+           severity: page
+           cluster: api_appserver
+         exp_annotations:
+           description: 'The MediaWiki cluster api_appserver in eqiad is experiencing saturation of PHP-FPM workers 2.326%'
+           summary: 'Not enough idle PHP-FPM workers for Mediawiki api_appserver at eqiad'
+           dashboard: 'https://grafana.wikimedia.org/d/RIA1lzDZk/application-servers-red-dashboard?panelId=54&fullscreen&orgId=1&from=now-3h&to=now&var-datasource=eqiad prometheus/ops&var-cluster=api_appserver'
+           runbook: 'https://bit.ly/wmf-fpmsat'
