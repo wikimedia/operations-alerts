@@ -1,0 +1,27 @@
+groups:
+ - name: exim
+   rules:
+   # monitor mail queue size (T133110)
+   - alert: MXQueueHigh
+     annotations:
+       description: 'The mail exchanger {{ $labels.instance }} has a lot of messages in its queues. Check the runbook for further troubleshooting.'
+       summary: 'MX host {{ $labels.instance }} has many queued messages: {{ $value }}'
+       dashboard: 'https://grafana.wikimedia.org/d/000000451/mail'
+       runbook: 'https://wikitech.wikimedia.org/wiki/Exim'
+     expr: exim_queue_length{instance=~"^mx.*"} >= 4000
+     for: 1h
+     labels:
+       severity: page
+       team: sre
+
+   - alert: MXQueueNoMetrics
+     annotations:
+       description: 'Metrics used for exim queue length cannot be found. Check the runbook for further troubleshooting.'
+       summary: 'Queue length metrics not found'
+       dashboard: 'https://grafana.wikimedia.org/d/000000451/mail'
+       runbook: 'https://wikitech.wikimedia.org/wiki/Exim'
+     expr: absent(exim_queue_length{instance=~"^mx.*"})
+     for: 1h
+     labels:
+       severity: critical
+       team: sre

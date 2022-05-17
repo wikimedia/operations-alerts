@@ -1,0 +1,39 @@
+rule_files:
+  - mail.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    input_series:
+      - series: 'exim_queue_length{cluster="misc", instance="mx1001:9100"}'
+        values: '0+512x90'
+    alert_rule_test:
+    - alertname: MXQueueHigh
+      eval_time: 70m
+      exp_alerts:
+       - exp_labels:
+           team: sre
+           severity: page
+           cluster: misc
+           instance: mx1001:9100
+         exp_annotations:
+           description: 'The mail exchanger mx1001:9100 has a lot of messages in its queues. Check the runbook for further troubleshooting.'
+           summary: 'MX host mx1001:9100 has many queued messages: 35840'
+           dashboard: 'https://grafana.wikimedia.org/d/000000451/mail'
+           runbook: 'https://wikitech.wikimedia.org/wiki/Exim'
+
+  - interval: 1m
+    input_series:
+      - series: 'dummy'
+        values: '0+512x90'
+    alert_rule_test:
+    - alertname: MXQueueNoMetrics
+      eval_time: 70m
+      exp_alerts:
+       - exp_labels:
+           team: sre
+           severity: critical
+         exp_annotations:
+           description: 'Metrics used for exim queue length cannot be found. Check the runbook for further troubleshooting.'
+           summary: 'Queue length metrics not found'
+           dashboard: 'https://grafana.wikimedia.org/d/000000451/mail'
+           runbook: 'https://wikitech.wikimedia.org/wiki/Exim'
