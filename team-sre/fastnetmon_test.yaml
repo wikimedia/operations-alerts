@@ -1,0 +1,43 @@
+rule_files:
+  - fastnetmon.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    input_series:
+      - series: 'node_files_total{path="/run/fastnetmon-actions", instance="netflow5002:9100", job="node"}'
+        values: '0+42x60'
+    external_labels:
+      site: eqsin
+    alert_rule_test:
+    - alertname: DDoSDetected
+      eval_time: 20m
+      exp_alerts:
+       - exp_labels:
+           team: sre
+           severity: page
+           instance: netflow5002:9100
+         exp_annotations:
+           description: 'FastNetMon on netflow5002:9100 has detected an attack and sent out 840 notifications. Consult the runbook and dashboard.'
+           summary: 'FastNetMon has detected an attack on eqsin #page'
+           dashboard: 'https://w.wiki/8oU'
+           runbook: 'https://bit.ly/wmf-fastnetmon'
+
+  - interval: 1m
+    input_series:
+      - series: 'dummy'
+        values: '0+42x60'
+    external_labels:
+      site: eqsin
+    alert_rule_test:
+    - alertname: FNMNotReported
+      eval_time: 20m
+      exp_alerts:
+       - exp_labels:
+           team: sre
+           severity: critical
+           path: /run/fastnetmon-actions
+         exp_annotations:
+           description: 'The metric node_files_total{path="/run/fastnetmon-actions"} has disappeared, FNM alerting will not work'
+           summary: 'FastNetMon metrics not reported'
+           dashboard: 'https://w.wiki/8oU'
+           runbook: 'https://wikitech.wikimedia.org/wiki/Fastnetmon'

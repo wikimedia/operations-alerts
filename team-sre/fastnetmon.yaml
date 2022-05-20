@@ -1,0 +1,31 @@
+# deploy-tag: ops
+
+# We're using absent() to alert when expected FNM metrics disappear, thus
+# deploy only to 'ops' instance where FNM data is expected to be present.
+
+groups:
+ - name: fastnetmon
+   rules:
+   - alert: DDoSDetected
+     annotations:
+       description: 'FastNetMon on {{ $labels.instance }} has detected an attack and sent out {{ $value }} notifications. Consult the runbook and dashboard.'
+       summary: 'FastNetMon has detected an attack on {{ $externalLabels.site }} #page'
+       dashboard: 'https://w.wiki/8oU'
+       runbook: 'https://bit.ly/wmf-fastnetmon'
+     expr: sum by (instance) (node_files_total{path="/run/fastnetmon-actions"}) > 0
+     for: 15m
+     labels:
+       severity: page
+       team: sre
+
+   - alert: FNMNotReported
+     annotations:
+       description: 'The metric node_files_total{path="/run/fastnetmon-actions"} has disappeared, FNM alerting will not work'
+       summary: 'FastNetMon metrics not reported'
+       dashboard: 'https://w.wiki/8oU'
+       runbook: 'https://wikitech.wikimedia.org/wiki/Fastnetmon'
+     expr: absent(node_files_total{path="/run/fastnetmon-actions"})
+     for: 15m
+     labels:
+       severity: critical
+       team: sre
