@@ -1,0 +1,27 @@
+rule_files:
+  - mw-on-k8s.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    input_series:
+      - series: 'phpfpm_processes_total{app="mediawiki", deployment="mw-debug", release="pinkunicorn", state="idle"}'
+        values: '0+1x60'
+      - series: 'phpfpm_processes_total{app="mediawiki", deployment="mw-debug", release="pinkunicorn", state="active"}'
+        values: '0+42x60'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: PHPFPMTooBusy
+        eval_time: 10m
+        exp_alerts:
+          - exp_labels:
+              team: sre
+              severity: critical
+              deployment: mw-debug
+              release: pinkunicorn
+            exp_annotations:
+              dashboard: 'https://grafana.wikimedia.org/d/U7JT--knk/mw-on-k8s?orgId=1&viewPanel=84&var-dc=eqiad%20prometheus/k8s&var-service=mediawiki&var-namespace=mw-debug&var-release=pinkunicorn&var-container_name=All'
+              description: 'The MediaWiki k8s deployment mw-debug (pinkunicorn) in eqiad is experiencing saturation of PHP-FPM workers 2.326%'
+              runbook: 'https://bit.ly/wmf-fpmsat'
+              summary: 'Not enough idle PHP-FPM workers for Mediawiki mw-debug (pinkunicorn) at eqiad'
+

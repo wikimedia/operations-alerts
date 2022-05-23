@@ -1,0 +1,56 @@
+# deploy-tag: k8s
+groups:
+  - name: mediawiki-on-k8s
+    rules:
+      - alert: PHPFPMTooBusy
+        annotations:
+          description: 'The MediaWiki k8s deployment {{ $labels.deployment }} ({{$labels.release}}) in {{ $externalLabels.site }} is experiencing saturation of PHP-FPM workers {{ $value | humanizePercentage }}'
+          summary: 'Not enough idle PHP-FPM workers for Mediawiki {{ $labels.deployment }} ({{$labels.release}}) at {{ $externalLabels.site }}'
+          dashboard: 'https://grafana.wikimedia.org/d/U7JT--knk/mw-on-k8s?orgId=1&viewPanel=84&var-dc={{ $externalLabels.site }}%20prometheus/k8s&var-service=mediawiki&var-namespace={{$labels.deployment}}&var-release={{$labels.release}}&var-container_name=All'
+          runbook: 'https://bit.ly/wmf-fpmsat'
+        expr: sum by (deployment,release) (phpfpm_processes_total{app="mediawiki", state="idle"}) / sum by (deployment,release) (phpfpm_processes_total{app="mediawiki"}) <= 0.3
+        for: 2m
+        labels:
+          severity: critical
+          team: sre
+      - alert: HttpdUnreachable
+        annotations:
+          description: 'httpd is unresponsive on {{ $value | humanizePercentage }} of MediaWiki k8s deployment {{ $labels.deployment }}.'
+          summary: 'httpd unavailable for cluster {{ $labels.cluster }} at {{ $externalLabels.site }}'
+          dashboard: 'https://grafana.wikimedia.org/d/U7JT--knk/mw-on-k8s?orgId=1&viewPanel=257&var-dc={{ $externalLabels.site }}%20prometheus/k8s&var-service=mediawiki&var-namespace={{ $labels.deployment }}'
+          runbook: 'https://wikitech.wikimedia.org/wiki/Application_servers'
+        expr: sum(apache_up{app="mediawiki"}) by (deployment)
+          /
+          count(apache_up{app="mediawiki"}) by (deployment)
+          <= 0.9
+        for: 4m
+        labels:
+          severity: critical
+          team: sre
+
+      # Latency alert:
+      # we alert on the 75th percentile of request time. We use p75 instead of p99 here to 
+      # avoid the effect of a few slow requests to cause false negatives.
+      # Limits are for now 800 ms and at least 30 rps (so about 8 rps slower than 800 ms)
+      # For now, we're using envoy's metrics so we can't differentiate by HTTP method or response code
+      - alert: MediaWikiLatencyExceeded
+        annotations:
+          description: 'The mediawiki k8s deployment {{ $labels.deployment }} in {{ $externalLabels.site }} is experiencing slowness. 95th percentile latency: {{ $value }}s'
+          summary: 'Average latency high: {{ $externalLabels.site }} {{ $labels.deployment }} (k8s)'
+          dashboard: 'https://grafana.wikimedia.org/d/U7JT--knk/mw-on-k8s?orgId=1&viewPanel=55&var-dc={{ $externalLabels.site }}%20prometheus/k8s&var-service=mediawiki&var-namespace={{ $labels.deployment }}'
+          runbook: 'https://wikitech.wikimedia.org/wiki/Application_servers/Runbook#Average_latency_exceeded'
+        expr: >
+          histogram_quantile(
+            0.75,
+            sum(
+              rate(envoy_cluster_upstream_rq_time_bucket{ app="mediawiki", envoy_cluster_name=~"local_service"}[2m])
+            ) by (le, deployment)
+          ) > 800
+          and sum(
+            rate(envoy_cluster_upstream_rq_time_count{app="mediawiki",envoy_cluster_name=~"local_service"}[2m])
+          ) by (deployment) > 30
+        for: 4m
+        labels:
+          severity: critical
+          team: sre
+
