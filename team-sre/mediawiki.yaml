@@ -1,33 +1,32 @@
 groups:
- - name: appservers
-   rules:
-   - alert: PHPFPMTooBusy
-     annotations:
-       description: 'The MediaWiki cluster {{ $labels.cluster }} in {{ $externalLabels.site }} is experiencing saturation of {{ $labels.service }} workers {{ $value | humanizePercentage }}'
-       summary: 'Not enough idle {{ $labels.service }} workers for Mediawiki {{ $labels.cluster }} at {{ $externalLabels.site }} #page'
-       dashboard: 'https://grafana.wikimedia.org/d/RIA1lzDZk/application-servers-red-dashboard?panelId=54&fullscreen&orgId=1&from=now-3h&to=now&var-datasource={{ $externalLabels.site }}%20prometheus/ops&var-cluster={{ $labels.cluster }}'
-       runbook: 'https://bit.ly/wmf-fpmsat'
-     expr:
-       sum by (cluster, service) (phpfpm_statustext_processes{cluster=~"(api_appserver|appserver|parsoid)", state="idle"})
-         /
-       sum by (cluster, service) (phpfpm_statustext_processes{cluster=~"(api_appserver|appserver|parsoid)"})
-         <= 0.3
-     for: 2m
-     labels:
-       severity: page
-       team: sre
-   - alert: JobrunnerPHPBusyWorkers
-     annotations:
-       description: 'Jobrunners in {{ $externalLabels.site }} is experiencing saturation of php-fpm workers: {{ $value | humanizePercentage }} for more than 10 minutes.'
-       summary: 'Not enough idle {{ $labels.service }} workers for Mediawiki {{ $labels.cluster }} at {{ $externalLabels.site }}'
-       dashboard: 'https://grafana.wikimedia.org/d/wqj6s-unk/jobrunners?panelId=54&fullscreen&orgId=1&from=now-3h&to=now&var-datasource={{ $externalLabels.site }}%20prometheus/ops'
-       runbook: 'https://bit.ly/wmf-fpmsat'
-     expr:
-       sum by (cluster, service) (phpfpm_statustext_processes{cluster="jobrunner", state="idle"})
-         /
-       sum by (cluster, service) (phpfpm_statustext_processes{cluster="jobrunner"})
-         <= 0.1
-     for: 10m
-     labels:
-       severity: critical
-       team: sre
+  - name: appservers
+    rules:
+      - alert: PHPFPMTooBusy
+        annotations:
+          description: 'The MediaWiki cluster {{ $labels.cluster }} in {{ $externalLabels.site }} is experiencing saturation of {{ $labels.service }} workers {{ $value | humanizePercentage }}'
+          summary: 'Not enough idle {{ $labels.service }} workers for Mediawiki {{ $labels.cluster }} at {{ $externalLabels.site }} #page'
+          dashboard: 'https://grafana.wikimedia.org/d/RIA1lzDZk/application-servers-red-dashboard?panelId=54&fullscreen&orgId=1&from=now-3h&to=now&var-datasource={{ $externalLabels.site }}%20prometheus/ops&var-cluster={{ $labels.cluster }}'
+          runbook: 'https://bit.ly/wmf-fpmsat'
+        expr:
+          sum by (cluster, service) (phpfpm_statustext_processes{cluster=~"(api_appserver|appserver|parsoid)", state="idle"})
+          /
+          sum by (cluster, service) (phpfpm_statustext_processes{cluster=~"(api_appserver|appserver|parsoid)"})
+          <= 0.3
+        for: 2m
+        labels:
+          severity: page
+          team: sre
+      - alert: JobrunnerPHPBusyWorkers
+        annotations:
+          description: 'Jobrunners in {{ $externalLabels.site }} is experiencing saturation of php-fpm workers: {{ $value | humanizePercentage }} for more than 10 minutes.'
+          summary: 'Not enough idle {{ $labels.service }} workers for Mediawiki {{ $labels.cluster }} at {{ $externalLabels.site }}'
+          dashboard: 'https://grafana.wikimedia.org/d/wqj6s-unk/jobrunners?panelId=54&fullscreen&orgId=1&from=now-3h&to=now&var-datasource={{ $externalLabels.site }}%20prometheus/ops'
+          runbook: 'https://bit.ly/wmf-fpmsat'
+        expr: sum by (cluster, service) (phpfpm_statustext_processes{cluster="jobrunner", state="idle"})
+          /
+          sum by (cluster, service) (phpfpm_statustext_processes{cluster="jobrunner"})
+          <= 0.1
+        for: 10m
+        labels:
+          severity: critical
+          team: sre
