@@ -16,6 +16,10 @@ On Debian systems the `promtool` binary is part of `prometheus` package, which w
     systemctl stop prometheus
     systemctl mask prometheus
 
+To also disable the timers for various node exporters, run:
+    systemctl list-timers prometheus* | perl -ne 'print "$1\n" if /(prometheus-.+\.timer)/' | \
+        xargs sudo systemctl disable
+
 
 Deploying
 ----
