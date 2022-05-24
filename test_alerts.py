@@ -52,7 +52,7 @@ def test_yml_extension():
         assert yml_files == set(), "use yaml extension not yml"
 
 
-@pytest.mark.parametrize("testfile", all_testfiles(SUBDIRS))
+@pytest.mark.parametrize("testfile", all_testfiles(SUBDIRS), ids=str)
 def test_alerts(testfile):
     """Run alert unit tests for testfile."""
     path = testfile.as_posix()
@@ -63,7 +63,7 @@ def test_alerts(testfile):
     )
 
 
-@pytest.mark.parametrize("rulefile", all_rulefiles(SUBDIRS))
+@pytest.mark.parametrize("rulefile", all_rulefiles(SUBDIRS), ids=str)
 def test_valid_rule(rulefile):
     """Validate rulefile with promtool"""
 
@@ -75,7 +75,7 @@ def test_valid_rule(rulefile):
     )
 
 
-@pytest.mark.parametrize("rulefile", all_rulefiles(SUBDIRS))
+@pytest.mark.parametrize("rulefile", all_rulefiles(SUBDIRS), ids=str)
 def test_rule_metadata(rulefile):
     """Ensure rulefile has all the expected labels/annotations"""
 
@@ -87,7 +87,7 @@ def test_rule_metadata(rulefile):
             _validate_rule(rule)
 
 
-@pytest.mark.parametrize("rulefile", all_rulefiles(SUBDIRS))
+@pytest.mark.parametrize("rulefile", all_rulefiles(SUBDIRS), ids=str)
 def test_deploy_metadata(rulefile):
     """Ensure the file 'deploy-tag' metadata is valid"""
 
