@@ -84,7 +84,7 @@ def test_rule_metadata(rulefile):
 
     for group in alerts["groups"]:
         for rule in group["rules"]:
-            _validate_rule(rule)
+            _validate_rule_metadata(rule)
 
 
 @pytest.mark.parametrize("rulefile", all_rulefiles(SUBDIRS), ids=str)
@@ -120,7 +120,7 @@ def _get_tag(fobj, name):
     return None
 
 
-def _validate_rule(rule):
+def _validate_rule_metadata(rule):
     required_labels = ("severity", "team")
     required_annotations = ("summary", "description")
     wanted_annotations = ("dashboard", "runbook")
@@ -134,6 +134,9 @@ def _validate_rule(rule):
 
     for a in required_annotations:
         assert a in annotations
+
+    if rule['labels']['severity'] == 'page':
+        assert '#page' in rule['annotations']['summary']
 
     for a in wanted_annotations:
         if a not in annotations:

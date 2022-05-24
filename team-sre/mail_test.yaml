@@ -17,7 +17,7 @@ tests:
            instance: mx1001:9100
          exp_annotations:
            description: 'The mail exchanger mx1001:9100 has a lot of messages in its queues. Check the runbook for further troubleshooting.'
-           summary: 'MX host mx1001:9100 has many queued messages: 35840'
+           summary: 'MX host mx1001:9100 has many queued messages: 35840 #page'
            dashboard: 'https://grafana.wikimedia.org/d/000000451/mail'
            runbook: 'https://wikitech.wikimedia.org/wiki/Exim'
 

@@ -20,6 +20,6 @@ tests:
            cluster: api_appserver
          exp_annotations:
            description: 'The MediaWiki cluster api_appserver in eqiad is experiencing saturation of PHP-FPM workers 2.326%'
-           summary: 'Not enough idle PHP-FPM workers for Mediawiki api_appserver at eqiad'
+           summary: 'Not enough idle PHP-FPM workers for Mediawiki api_appserver at eqiad #page'
            dashboard: 'https://grafana.wikimedia.org/d/RIA1lzDZk/application-servers-red-dashboard?panelId=54&fullscreen&orgId=1&from=now-3h&to=now&var-datasource=eqiad prometheus/ops&var-cluster=api_appserver'
            runbook: 'https://bit.ly/wmf-fpmsat'

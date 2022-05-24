@@ -4,7 +4,7 @@ groups:
    - alert: PHPFPMTooBusy
      annotations:
        description: 'The MediaWiki cluster {{ $labels.cluster }} in {{ $externalLabels.site }} is experiencing saturation of PHP-FPM workers {{ $value | humanizePercentage }}'
-       summary: 'Not enough idle PHP-FPM workers for Mediawiki {{ $labels.cluster }} at {{ $externalLabels.site }}'
+       summary: 'Not enough idle PHP-FPM workers for Mediawiki {{ $labels.cluster }} at {{ $externalLabels.site }} #page'
        dashboard: 'https://grafana.wikimedia.org/d/RIA1lzDZk/application-servers-red-dashboard?panelId=54&fullscreen&orgId=1&from=now-3h&to=now&var-datasource={{ $externalLabels.site }} prometheus/ops&var-cluster={{ $labels.cluster }}'
        runbook: 'https://bit.ly/wmf-fpmsat'
      expr:

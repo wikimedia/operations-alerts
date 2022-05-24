@@ -6,7 +6,7 @@ groups:
     - alert: HdfsCapacityRemainingPercent
       annotations:
         description: Free space on the analytics-hadoop HDFS cluster is below the paging threshold of 5%.
-        summary: Dangerously low free space on the analytics-hadoop HDFS cluster.
+        summary: 'Dangerously low free space on the analytics-hadoop HDFS cluster. #page'
         dashboard: https://grafana.wikimedia.org/d/000000585/hadoop?var-hadoop_cluster={{ $labels.hadoop_cluster }}&orgId=1&panelId=106&fullscreen
         runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#HDFS_Capacity_Remaining
       expr: max by (hadoop_cluster) (Hadoop_NameNode_CapacityRemainingGB{hadoop_cluster="analytics-hadoop"} / Hadoop_NameNode_CapacityTotalGB{hadoop_cluster="analytics-hadoop"} * 100)  < 5
