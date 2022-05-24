@@ -1,3 +1,9 @@
+# deploy-tag: ops
+# deploy-site: eqiad, codfw
+
+# Due to absent() usage below, we need to "pin" these alerts to sites and
+# Prometheus instances that do have exim_queue_length metrics
+
 groups:
  - name: exim
    rules:
