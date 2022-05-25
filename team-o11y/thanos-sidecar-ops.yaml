@@ -5,8 +5,8 @@ groups:
     rules:
     - alert: ThanosSidecarUploadFailure
       annotations:
-        description: Thanos Sidecar {{$labels.instance}} is not configured to upload blocks.
-        summary: Thanos Sidecar is not uploading blocks.
+        description: The Thanos metric thanos_shipper_upload_failures_total has disappeared.
+        summary: thanos_shipper_upload_failures_total not found
         dashboard: https://grafana.wikimedia.org/d/b19644bfbf0ec1e108027cce268d99f7/thanos-sidecar
         runbook: https://wikitech.wikimedia.org/wiki/Thanos#Alerts
       expr: absent(thanos_shipper_upload_failures_total)

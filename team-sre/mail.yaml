@@ -14,7 +14,7 @@ groups:
        summary: 'MX host {{ $labels.instance }} has many queued messages: {{ $value }} #page'
        dashboard: 'https://grafana.wikimedia.org/d/000000451/mail'
        runbook: 'https://wikitech.wikimedia.org/wiki/Exim'
-     expr: exim_queue_length{instance=~"^mx.*"} >= 4000
+     expr: exim_queue_length{instance=~"mx.*"} >= 4000
      for: 1h
      labels:
        severity: page
@@ -26,7 +26,7 @@ groups:
        summary: 'Queue length metrics not found'
        dashboard: 'https://grafana.wikimedia.org/d/000000451/mail'
        runbook: 'https://wikitech.wikimedia.org/wiki/Exim'
-     expr: absent(exim_queue_length{instance=~"^mx.*"})
+     expr: absent(exim_queue_length{instance=~"mx.*"})
      for: 1h
      labels:
        severity: critical

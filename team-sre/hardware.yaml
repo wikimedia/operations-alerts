@@ -3,7 +3,6 @@ groups:
     rules:
       - alert: SmartNotHealthy
         expr: device_smart_healthy < 1
-        for: 0m
         labels:
           severity: warning
           team: sre
