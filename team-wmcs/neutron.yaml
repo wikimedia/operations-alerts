@@ -1,0 +1,14 @@
+groups:
+  - name: neutron
+    rules:
+      - alert: NeutronAgentDown
+        expr: openstack_neutron_agent_state{adminState="up"} == 0
+        for: 1m
+        labels:
+          team: wmcs
+          severity: warning
+        annotations:
+          summary: "Neutron {{ $labels.service }} on {{ $labels.hostname }} is down"
+          description: "A Neutron agent is down, VMs will have connectivity issues"
+          runbook: https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Troubleshooting#Networking_failures
+          dashboard: https://grafana.wikimedia.org/d/wKnDJf97z/wmcs-neutron-eqiad1

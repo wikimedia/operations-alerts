@@ -1,0 +1,23 @@
+rule_files:
+  - neutron.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    input_series:
+      - series: 'openstack_neutron_agent_state{adminState="up",hostname="cloudnet1003",service="neutron-metadata-agent"}'
+        values: '1 1 0 0 0'
+    alert_rule_test:
+    - alertname: NeutronAgentDown
+      eval_time: 5m
+      exp_alerts:
+        - exp_labels:
+            severity: warning
+            team: wmcs
+            adminState: up
+            hostname: cloudnet1003
+            service: neutron-metadata-agent
+          exp_annotations:
+            summary: "Neutron neutron-metadata-agent on cloudnet1003 is down"
+            description: "A Neutron agent is down, VMs will have connectivity issues"
+            runbook: https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Troubleshooting#Networking_failures
+            dashboard: https://grafana.wikimedia.org/d/wKnDJf97z/wmcs-neutron-eqiad1
