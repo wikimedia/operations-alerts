@@ -42,3 +42,14 @@ groups:
         annotations:
           summary: "Varnish Exporter on instance {{ $labels.instance }} is unreachable"
           description: "Prometheus has been unable to fetch metrics from Varnish Exporter on host {{ $labels.instance }} job({{ $labels.job }}) for more than 5 minutes. Make sure the exporter is running on the host."
+
+      - alert: PyBalBGPUnstable
+        expr: pybal_bgp_session_established != 1 and ignoring (local_asn, peer) pybal_bgp_enabled == 1
+        for: 5m
+        labels:
+          team: traffic
+          severity: warning
+        annotations:
+          summary: 'PyBal BGP sessions on instance {{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }} are failing'
+          description: 'PyBal BGP session establishment with the peer {{ $labels.peer }} is unstable on host {{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}.'
+          dashboard: 'https://grafana.wikimedia.org/d/000000488/pybal-bgp?var-datasource={{ $externalLabels.site }} prometheus%2Fops&var-server={{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}'
