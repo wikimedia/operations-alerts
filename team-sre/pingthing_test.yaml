@@ -1,0 +1,31 @@
+rule_files:
+  - pingthing.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    input_series:
+      - series: 'probe_http_status_code{instance="https://example.wikimedia.org", job="blackbox/pingthing", site="eqiad"}'
+        values: '200'
+      - series: 'probe_http_status_code{instance="https://example.wikimedia.org", job="blackbox/pingthing", site="codfw"}'
+        values: '200'
+      - series: 'probe_http_status_code{instance="https://example.wikimedia.org", job="blackbox/pingthing", site="esams"}'
+        values: '200'
+      - series: 'probe_http_status_code{instance="https://example.wikimedia.org", job="blackbox/pingthing", site="ulsfo"}'
+        values: '500'
+      - series: 'probe_http_status_code{instance="https://example.wikimedia.org", job="blackbox/pingthing", site="eqsin"}'
+        values: '500'
+      - series: 'probe_http_status_code{instance="https://example.wikimedia.org", job="blackbox/pingthing", site="drmrs"}'
+        values: '500'
+    alert_rule_test:
+    - alertname: ProbeHttpFailed
+      eval_time: 5m
+      exp_alerts:
+       - exp_labels:
+           severity: warning
+           team: sre
+           instance: https://example.wikimedia.org
+         exp_annotations:
+           summary: URL did not return HTTP 2xx or 3xx response (or probe/connection failed)
+           description: Non-23xx HTTP response from https://example.wikimedia.org
+           dashboard: https://grafana.wikimedia.org/d/GYciEga7z/pingthing
+           runbook: https://wikitech.wikimedia.org/wiki/Prometheus#Pingthing_Non-23xx_HTTP_response
