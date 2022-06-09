@@ -1,0 +1,29 @@
+rule_files:
+  - smoke.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    input_series:
+      - series: 'probe_success{address="103.102.166.130", family="ip4", instance="cr2-eqsin:0", job="smoke/icmp", module="icmp_ip4", role="cr", target_site="eqsin"}'
+        values: '0+0x60'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+    - alertname: PingUnreachable
+      eval_time: 10m
+      exp_alerts:
+       - exp_labels:
+           severity: warning
+           team: sre
+           instance: cr2-eqsin:0
+           address: 103.102.166.130
+           family: ip4
+           job: smoke/icmp
+           module: icmp_ip4
+           role: cr
+           target_site: eqsin
+         exp_annotations:
+           summary: "Ping failed from eqiad to cr2-eqsin:0 (ip4)"
+           description: "The probes from eqiad to cr2-eqsin:0 in eqsin have failed (address family ip4)"
+           dashboard: https://grafana.wikimedia.org/d/m1LYjVjnz/network-icmp-probes
+           runbook: https://wikitech.wikimedia.org/wiki/Network_monitoring#PingUnreachable
