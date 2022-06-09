@@ -53,3 +53,14 @@ groups:
           summary: 'PyBal BGP sessions on instance {{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }} are failing'
           description: 'PyBal BGP session establishment with the peer {{ $labels.peer }} is unstable on host {{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}.'
           dashboard: 'https://grafana.wikimedia.org/d/000000488/pybal-bgp?var-datasource={{ $externalLabels.site }} prometheus%2Fops&var-server={{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}'
+
+      - alert: VarnishChildRestarted
+        expr: varnish_mgt_child_start{layer="frontend"} >= 2
+        labels:
+          team: traffic
+          severity: critical
+        annotations:
+          summary: '{{ $labels.job }} restarted on {{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}'
+          description: 'Varnish seems to be unstable on {{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}, specifically {{ $labels.job }}.'
+          dashboard: 'https://grafana.wikimedia.org/d/000000330/varnish-machine-stats?orgId=1&viewPanel=66&var-server={{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}&datasource={{ $externalLabels.site }} prometheus/ops'
+          runbook: "https://wikitech.wikimedia.org/wiki/Varnish"
