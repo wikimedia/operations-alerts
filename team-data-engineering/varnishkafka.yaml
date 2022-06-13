@@ -12,3 +12,24 @@ groups:
           description: "Prometheus has not received any data for cluster: {{ $labels.cluster }}, source: {{ $labels.source }} from varnishkafka running on {{ $labels.instance }}"
           dashboard: "https://grafana.wikimedia.org/d/000000253/varnishkafka?orgId=1&var-datasource={{ $externalLabels.site }}%20prometheus/ops&var-source={{ $labels.source }}&var-cp_cluster={{ $labels.cluster }}&var-instance={{ $labels.instance }}&viewPanel=14"
           runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Varnishkafka
+
+      # Let's get concerned when we average more than 1 error per second per
+      # caching method, instance, and datacenter.
+      - alert: VarnishKafkaDeliveryErrors
+        expr: sum by (cluster, instance, site) (irate(varnishkafka_delivery_errors_total[5m])) >= 1
+        labels:
+          team: data-engineering
+          severity: warning
+        annotations: &varnishkafka-annotations
+          summary: 'varnishkafka has {{ $labels.cluster }} errors on {{ $labels.instance }}'
+          description: 'varnishkafka is experiencing {{ $labels.cluster }} errors on the instance {{ $labels.instance }} in the {{ $externalLabels.site }} datacenter.'
+          dashboard: 'https://grafana.wikimedia.org/d/000000253/varnishkafka?panelId=20&fullscreen&orgId=1&var-datasource={{ $externalLabels.site }} prometheus/ops&var-cp_cluster={{ $labels.cluster }}&var-instance={{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}'
+          runbook: 'https://wikitech.wikimedia.org/wiki/Analytics/Systems/Varnishkafka'
+
+      # Yell a little louder when enough errors become a concern.
+      - alert: VarnishKafkaDeliveryErrors
+        expr: sum by (cluster, instance, site) (irate(varnishkafka_delivery_errors_total[5m])) > 5
+        labels:
+          team: data-engineering
+          severity: critical
+        annotations: *varnishkafka-annotations

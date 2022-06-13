@@ -23,3 +23,81 @@ tests:
             description: "Prometheus has not received any data for cluster: cache_text, source: webrequest from varnishkafka running on cp3050:9132"
             dashboard: "https://grafana.wikimedia.org/d/000000253/varnishkafka?orgId=1&var-datasource=esams%20prometheus/ops&var-source=webrequest&var-cp_cluster=cache_text&var-instance=cp3050:9132&viewPanel=14"
             runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Varnishkafka
+
+  - interval: 1m
+    external_labels:
+      site: eqiad
+    input_series:
+      # Should not trigger as it averages fewer than 1 per second
+      - series: 'varnishkafka_delivery_errors_total{cluster="cache_upload", instance="cp3050:9132", source="webrequest"}'
+        values: "0 30 60 90 120 150 180"
+      # Same instance as above but a different cluster; Should not trigger even
+      # though both combined would exceed warning threshold
+      - series: 'varnishkafka_delivery_errors_total{cluster="cache_text", instance="cp3050:9132", source="webrequest"}'
+        values: "0 30 60 90 120 150 180"
+      # Should not trigger by itself...
+      - series: 'varnishkafka_delivery_errors_total{cluster="cache_upload", instance="cp3051:9132", source="webrequest"}'
+        values: "0 30 60 90 120 150 180"
+      # ...but this one should add to the previous so it *does* trigger (we
+      # don't care about separating by source)!
+      - series: 'varnishkafka_delivery_errors_total{cluster="cache_upload", instance="cp3051:9132", source="eventlogging"}'
+        values: "0 30 60 90 120 150 180"
+      # Should trigger a warning
+      - series: 'varnishkafka_delivery_errors_total{cluster="cache_text", instance="cp3052:9132", source="webrequest"}'
+        values: "0 100 200 300 400 500 600"
+      # Should trigger a separate alert since it's a different cluster
+      - series: 'varnishkafka_delivery_errors_total{cluster="cache_upload", instance="cp3052:9132", source="webrequest"}'
+        values: "0 100 200 300 400 500 600"
+      # More errors to trigger critical alert variant of the same alert name
+      - series: 'varnishkafka_delivery_errors_total{cluster="cache_text", instance="cp3053:9132", source="webrequest"}'
+        values: "0 500 1000 1500 2000 2500 3000"
+    alert_rule_test:
+      - alertname: VarnishKafkaDeliveryErrors
+        eval_time: 1m
+        exp_alerts:
+          - exp_labels:
+              cluster: "cache_upload"
+              instance: "cp3051:9132"
+              severity: "warning"
+              team: "data-engineering"
+            exp_annotations:
+              summary: "varnishkafka has cache_upload errors on cp3051:9132"
+              description: "varnishkafka is experiencing cache_upload errors on the instance cp3051:9132 in the eqiad datacenter."
+              dashboard: "https://grafana.wikimedia.org/d/000000253/varnishkafka?panelId=20&fullscreen&orgId=1&var-datasource=eqiad prometheus/ops&var-cp_cluster=cache_upload&var-instance=cp3051"
+              runbook: &wt-varnishkafka "https://wikitech.wikimedia.org/wiki/Analytics/Systems/Varnishkafka"
+          - exp_labels:
+              cluster: "cache_text"
+              instance: "cp3052:9132"
+              severity: "warning"
+              team: "data-engineering"
+            exp_annotations:
+              summary: "varnishkafka has cache_text errors on cp3052:9132"
+              description: "varnishkafka is experiencing cache_text errors on the instance cp3052:9132 in the eqiad datacenter."
+              dashboard: "https://grafana.wikimedia.org/d/000000253/varnishkafka?panelId=20&fullscreen&orgId=1&var-datasource=eqiad prometheus/ops&var-cp_cluster=cache_text&var-instance=cp3052"
+              runbook: *wt-varnishkafka
+          - exp_labels:
+              cluster: "cache_upload"
+              instance: "cp3052:9132"
+              severity: "warning"
+              team: "data-engineering"
+            exp_annotations:
+              summary: "varnishkafka has cache_upload errors on cp3052:9132"
+              description: "varnishkafka is experiencing cache_upload errors on the instance cp3052:9132 in the eqiad datacenter."
+              dashboard: "https://grafana.wikimedia.org/d/000000253/varnishkafka?panelId=20&fullscreen&orgId=1&var-datasource=eqiad prometheus/ops&var-cp_cluster=cache_upload&var-instance=cp3052"
+              runbook: *wt-varnishkafka
+          - exp_labels:
+              cluster: "cache_text"
+              instance: "cp3053:9132"
+              severity: "warning"
+              team: "data-engineering"
+            exp_annotations: &varnishkafka-cp3053-annotation
+              summary: "varnishkafka has cache_text errors on cp3053:9132"
+              description: "varnishkafka is experiencing cache_text errors on the instance cp3053:9132 in the eqiad datacenter."
+              dashboard: "https://grafana.wikimedia.org/d/000000253/varnishkafka?panelId=20&fullscreen&orgId=1&var-datasource=eqiad prometheus/ops&var-cp_cluster=cache_text&var-instance=cp3053"
+              runbook: *wt-varnishkafka
+          - exp_labels:
+              cluster: "cache_text"
+              instance: "cp3053:9132"
+              severity: "critical"
+              team: "data-engineering"
+            exp_annotations: *varnishkafka-cp3053-annotation
