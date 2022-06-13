@@ -32,17 +32,6 @@ groups:
           dashboard: "https://grafana.wikimedia.org/d/000000479/frontend-traffic?viewPanel=12&orgId=1&from=now-24h&to=now&var-site={{ $externalLabels.site }}&var-cache_type=text"
           runbook: https://wikitech.wikimedia.org/wiki/Monitoring/EdgeTrafficDrop
 
-
-      - alert: VarnishPrometheusExporterDown
-        expr: up{instance=~"cp[0-9]{4}:9331"} == 0
-        for: 5m
-        labels:
-          team: traffic
-          severity: warning
-        annotations:
-          summary: "Varnish Exporter on instance {{ $labels.instance }} is unreachable"
-          description: "Prometheus has been unable to fetch metrics from Varnish Exporter on host {{ $labels.instance }} job({{ $labels.job }}) for more than 5 minutes. Make sure the exporter is running on the host."
-
       - alert: PyBalBGPUnstable
         expr: pybal_bgp_session_established != 1 and ignoring (local_asn, peer) pybal_bgp_enabled == 1
         for: 5m
@@ -53,14 +42,3 @@ groups:
           summary: 'PyBal BGP sessions on instance {{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }} are failing'
           description: 'PyBal BGP session establishment with the peer {{ $labels.peer }} is unstable on host {{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}.'
           dashboard: 'https://grafana.wikimedia.org/d/000000488/pybal-bgp?var-datasource={{ $externalLabels.site }} prometheus%2Fops&var-server={{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}'
-
-      - alert: VarnishChildRestarted
-        expr: varnish_mgt_child_start{layer="frontend"} >= 2
-        labels:
-          team: traffic
-          severity: critical
-        annotations:
-          summary: '{{ $labels.job }} restarted on {{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}'
-          description: 'Varnish seems to be unstable on {{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}, specifically {{ $labels.job }}.'
-          dashboard: 'https://grafana.wikimedia.org/d/000000330/varnish-machine-stats?orgId=1&viewPanel=66&var-server={{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}&datasource={{ $externalLabels.site }} prometheus/ops'
-          runbook: "https://wikitech.wikimedia.org/wiki/Varnish"

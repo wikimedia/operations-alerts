@@ -1,0 +1,23 @@
+groups:
+  - name: traffic_varnish
+    rules:
+      - alert: VarnishPrometheusExporterDown
+        expr: up{instance=~"cp[0-9]{4}:9331"} == 0
+        for: 5m
+        labels:
+          team: traffic
+          severity: warning
+        annotations:
+          summary: "Varnish Exporter on instance {{ $labels.instance }} is unreachable"
+          description: "Prometheus has been unable to fetch metrics from Varnish Exporter on host {{ $labels.instance }} job({{ $labels.job }}) for more than 5 minutes. Make sure the exporter is running on the host."
+
+      - alert: VarnishChildRestarted
+        expr: varnish_mgt_child_start{layer="frontend"} >= 2
+        labels:
+          team: traffic
+          severity: critical
+        annotations:
+          summary: '{{ $labels.job }} restarted on {{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}'
+          description: 'Varnish seems to be unstable on {{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}, specifically {{ $labels.job }}.'
+          dashboard: 'https://grafana.wikimedia.org/d/000000330/varnish-machine-stats?orgId=1&viewPanel=66&var-server={{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}&datasource={{ $externalLabels.site }} prometheus/ops'
+          runbook: "https://wikitech.wikimedia.org/wiki/Varnish"

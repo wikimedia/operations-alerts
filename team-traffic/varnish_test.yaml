@@ -1,0 +1,50 @@
+rule_files:
+  - varnish.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    input_series:
+      - series: 'up{instance="cp3030:9331", job="varnish-text"}'
+        values: '1 0 0 0 0 0 0'
+    alert_rule_test:
+    - alertname: VarnishPrometheusExporterDown
+      eval_time: 6m
+      exp_alerts:
+       - exp_labels:
+           severity: warning
+           team: traffic
+           instance: "cp3030:9331"
+           job: "varnish-text"
+         exp_annotations:
+           summary: "Varnish Exporter on instance cp3030:9331 is unreachable"
+           description: "Prometheus has been unable to fetch metrics from Varnish Exporter on host cp3030:9331 job(varnish-text) for more than 5 minutes. Make sure the exporter is running on the host."
+
+  - interval: 1m
+    external_labels:
+      site: eqiad
+    input_series:
+      # Should trigger an alert
+      - series: 'varnish_mgt_child_start{instance="cp1234:9331", job="varnish-text", layer="frontend"}'
+        values: "1 2 1 1 1 1 1"
+      # Should not trigger an alert
+      - series: 'varnish_mgt_child_start{instance="cp1235:9331", job="varnish-upload", layer="frontend"}'
+        values: "1 1 1 1 1 1 1"
+      # Should also not trigger an alert; This data would suggest that the
+      # service is disabled (and monitoring this would be for another alert)
+      - series: 'varnish_mgt_child_start{instance="cp1236:9331", job="varnish-upload", layer="frontend"}'
+        values: "0 0 0 0 0 0 0"
+    alert_rule_test:
+      - alertname: VarnishChildRestarted
+        eval_time: 1m
+        exp_alerts:
+          - exp_labels:
+              instance: "cp1234:9331"
+              job: "varnish-text"
+              layer: "frontend"
+              severity: "critical"
+              team: "traffic"
+            exp_annotations:
+              summary: "varnish-text restarted on cp1234"
+              description: "Varnish seems to be unstable on cp1234, specifically varnish-text."
+              dashboard: "https://grafana.wikimedia.org/d/000000330/varnish-machine-stats?orgId=1&viewPanel=66&var-server=cp1234&datasource=eqiad prometheus/ops"
+              runbook: "https://wikitech.wikimedia.org/wiki/Varnish"
