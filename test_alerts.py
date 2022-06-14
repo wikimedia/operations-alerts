@@ -9,6 +9,7 @@
 import os
 import pathlib
 import re
+import string
 import subprocess
 import warnings
 
@@ -135,8 +136,12 @@ def _validate_rule_metadata(rule):
     for a in required_annotations:
         assert a in annotations
 
-    if rule['labels']['severity'] == 'page':
-        assert '#page' in rule['annotations']['summary']
+    if rule["labels"]["severity"] == "page":
+        assert "#page" in rule["annotations"]["summary"]
+
+    assert string.whitespace not in alertname, (
+        "Alert names with spaces are hard to address and silence: %r" % alertname
+    )
 
     for a in wanted_annotations:
         if a not in annotations:
@@ -154,5 +159,3 @@ def _run_promtool(args, workdir):
         encoding="utf8",
         env={"PATH": os.environ.get("PATH", "")},
     )
-
-
