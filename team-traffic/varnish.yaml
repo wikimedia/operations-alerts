@@ -20,4 +20,23 @@ groups:
           summary: '{{ $labels.job }} restarted on {{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}'
           description: 'Varnish seems to be unstable on {{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}, specifically {{ $labels.job }}.'
           dashboard: 'https://grafana.wikimedia.org/d/000000330/varnish-machine-stats?orgId=1&viewPanel=66&var-server={{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}&datasource={{ $externalLabels.site }} prometheus/ops'
-          runbook: "https://wikitech.wikimedia.org/wiki/Varnish"
+          runbook: &wt-varnish "https://wikitech.wikimedia.org/wiki/Varnish"
+
+      - alert: VarnishHighMmapCount
+        expr: "round((varnishd_mmap_count / sysctl_vm_max_map_count) * 100) > 70"
+        for: 5m
+        labels:
+          team: traffic
+          severity: warning
+        annotations: &VarnishHighMmapCountAnn
+          summary: "Varnish's number of memory map areas are reaching the maximum limit"
+          description: 'Varnish on {{ $labels.instance }} ({{ $externalLabels.site }}) is at {{ $value }}% of the vm.max_map_count limit.'
+          dashboard: 'https://grafana.wikimedia.org/d/wiU3SdEWk/cache-host-drilldown?viewPanel=76&var-site={{ $externalLabels.site }}&var-instance={{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}'
+          runbook: *wt-varnish
+
+      - alert: VarnishHighMmapCount
+        expr: "round((varnishd_mmap_count / sysctl_vm_max_map_count) * 100) > 90"
+        labels:
+          team: traffic
+          severity: critical
+        annotations: *VarnishHighMmapCountAnn

@@ -48,3 +48,60 @@ tests:
               description: "Varnish seems to be unstable on cp1234, specifically varnish-text."
               dashboard: "https://grafana.wikimedia.org/d/000000330/varnish-machine-stats?orgId=1&viewPanel=66&var-server=cp1234&datasource=eqiad prometheus/ops"
               runbook: "https://wikitech.wikimedia.org/wiki/Varnish"
+
+  - interval: 1m
+    external_labels:
+      site: eqiad
+    input_series:
+      # Not quite enough for an alert but close
+      - series: 'varnishd_mmap_count{instance="cp1234:9100", cluster="cache_upload", site="eqiad"}'
+        values: '4000 5000 4000 5000 4000 5000 4000'
+      - series: 'sysctl_vm_max_map_count{instance="cp1234:9100", cluster="cache_upload", site="eqiad"}'
+        values: '6000 6000 6000 6000 6000 6000 6000'
+      # But this one is!
+      - series: 'varnishd_mmap_count{instance="cp1235:9100", cluster="cache_upload", site="eqiad"}'
+        values: '4000 5000 5000 5000 5000 5000 5000'
+      - series: 'sysctl_vm_max_map_count{instance="cp1235:9100", cluster="cache_upload", site="eqiad"}'
+        values: '6000 6000 6000 6000 6000 6000 6000'
+      # Critical limits
+      - series: 'varnishd_mmap_count{instance="cp1236:9100", cluster="cache_upload", site="eqiad"}'
+        values: '5000 5500 5500 5500 5500 5500 5500'
+      - series: 'sysctl_vm_max_map_count{instance="cp1236:9100", cluster="cache_upload", site="eqiad"}'
+        values: '6000 6000 6000 6000 6000 6000 6000'
+    alert_rule_test:
+      - alertname: VarnishHighMmapCount
+        eval_time: 6m
+        exp_alerts:
+         - exp_labels:
+             severity: warning
+             team: traffic
+             instance: "cp1235:9100"
+             cluster: "cache_upload"
+             site: eqiad
+           exp_annotations:
+             summary: "Varnish's number of memory map areas are reaching the maximum limit"
+             description: "Varnish on cp1235:9100 (eqiad) is at 83% of the vm.max_map_count limit."
+             dashboard: 'https://grafana.wikimedia.org/d/wiU3SdEWk/cache-host-drilldown?viewPanel=76&var-site=eqiad&var-instance=cp1235'
+             runbook: "https://wikitech.wikimedia.org/wiki/Varnish"
+         - exp_labels:
+             severity: warning
+             team: traffic
+             instance: "cp1236:9100"
+             cluster: "cache_upload"
+             site: eqiad
+           exp_annotations:
+             summary: "Varnish's number of memory map areas are reaching the maximum limit"
+             description: "Varnish on cp1236:9100 (eqiad) is at 92% of the vm.max_map_count limit."
+             dashboard: 'https://grafana.wikimedia.org/d/wiU3SdEWk/cache-host-drilldown?viewPanel=76&var-site=eqiad&var-instance=cp1236'
+             runbook: "https://wikitech.wikimedia.org/wiki/Varnish"
+         - exp_labels:
+             severity: critical
+             team: traffic
+             instance: "cp1236:9100"
+             cluster: "cache_upload"
+             site: eqiad
+           exp_annotations:
+             summary: "Varnish's number of memory map areas are reaching the maximum limit"
+             description: "Varnish on cp1236:9100 (eqiad) is at 92% of the vm.max_map_count limit."
+             dashboard: 'https://grafana.wikimedia.org/d/wiU3SdEWk/cache-host-drilldown?viewPanel=76&var-site=eqiad&var-instance=cp1236'
+             runbook: "https://wikitech.wikimedia.org/wiki/Varnish"
