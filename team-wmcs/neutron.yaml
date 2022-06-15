@@ -2,7 +2,7 @@ groups:
   - name: neutron
     rules:
       - alert: NeutronAgentDown
-        expr: openstack_neutron_agent_state{adminState="up"} == 0
+        expr: min_over_time(openstack_neutron_agent_state{adminState="up"}[20m]) == 0
         for: 1m
         labels:
           team: wmcs
