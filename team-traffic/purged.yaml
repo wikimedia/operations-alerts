@@ -1,0 +1,44 @@
+groups:
+  - name: traffic_purged
+    rules:
+      - alert: PurgedHighEventLag
+        # HACK: We take the minimum to work around scenarios where one
+        # EventGate datacenter is depooled and not actively sending messages.
+        expr: 'min by (instance) (purged_event_lag) / 1e6 > 3000'
+        for: 5m
+        labels:
+          team: traffic
+          severity: warning
+        annotations: &purgedeventlag-annotations
+          summary: 'High event process lag with purged on {{ $labels.instance }}'
+          description: "It's been a while since a Kafka event has been processed by purged ({{ $value }}ms, to be exact)"
+          runbook: 'https://wikitech.wikimedia.org/wiki/Purged#Alerts'
+          dashboard: 'https://grafana.wikimedia.org/d/RvscY1CZk/purged?var-datasource={{ $externalLabels.site }} prometheus/ops&var-instance={{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}'
+
+      - alert: PurgedHighEventLag
+        expr: 'min by (instance) (purged_event_lag) / 1e6 >= 5000'
+        for: 5m
+        labels:
+          team: traffic
+          severity: critical
+        annotations: *purgedeventlag-annotations
+
+      - alert: PurgedHighBacklogQueue
+        expr: 'sum by (instance) (purged_backlog) > 1000'
+        for: 5m
+        labels:
+          team: traffic
+          severity: warning
+        annotations: &purgedbacklog-annotations
+          summary: "Large backlog queue for purged on {{ $labels.instance }}"
+          description: "{{ $labels.instance }} (in {{ $externalLabels.site }}) has a purged backlog of {{ $value }}."
+          runbook: 'https://wikitech.wikimedia.org/wiki/Purged#Alerts'
+          dashboard: 'https://grafana.wikimedia.org/d/RvscY1CZk/purged?var-datasource={{ $externalLabels.site }} prometheus/ops&var-instance={{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}'
+
+      - alert: PurgedHighBacklogQueue
+        expr: 'sum by (instance) (purged_backlog) > 10000'
+        for: 5m
+        labels:
+          team: traffic
+          severity: critical
+        annotations: *purgedbacklog-annotations

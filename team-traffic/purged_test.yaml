@@ -1,0 +1,101 @@
+rule_files:
+  - purged.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    external_labels:
+      site: eqiad
+    input_series:
+      - series: 'purged_event_lag{cluster="cache_text", instance="cp1234:2112", site="codfw", topic="eqiad.resource-purge"}'
+        values: '4e9 4e9 4e9 4e9 4e9 4e9 4e9'
+      - series: 'purged_event_lag{cluster="cache_text", instance="cp1235:2112", site="codfw", topic="eqiad.resource-purge"}'
+        values: '6e9 6e9 6e9 6e9 6e9 6e9 6e9'
+      - series: 'purged_event_lag{cluster="cache_text", instance="cp1236:2112", site="codfw", topic="eqiad.resource-purge"}'
+        values: '1e9 1e9 6e9 1e9 6e9 1e9 1e9'
+    alert_rule_test:
+      - alertname: PurgedHighEventLag
+        eval_time: 6m
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              team: traffic
+              instance: "cp1234:2112"
+            exp_annotations:
+              summary: 'High event process lag with purged on cp1234:2112'
+              description: "It's been a while since a Kafka event has been processed by purged (4000ms, to be exact)"
+              runbook: &purged-runbook 'https://wikitech.wikimedia.org/wiki/Purged#Alerts'
+              dashboard: 'https://grafana.wikimedia.org/d/RvscY1CZk/purged?var-datasource=eqiad prometheus/ops&var-instance=cp1234'
+          # Since this will also trigger a critical the alert will be inhibited
+          # but we need to tell promtool to expect a warning as well.
+          - exp_labels:
+              severity: warning
+              team: traffic
+              instance: "cp1235:2112"
+            exp_annotations: &purged-cp1235-annotations
+              summary: 'High event process lag with purged on cp1235:2112'
+              description: "It's been a while since a Kafka event has been processed by purged (6000ms, to be exact)"
+              runbook: *purged-runbook
+              dashboard: 'https://grafana.wikimedia.org/d/RvscY1CZk/purged?var-datasource=eqiad prometheus/ops&var-instance=cp1235'
+          - exp_labels:
+              severity: critical
+              team: traffic
+              instance: "cp1235:2112"
+            exp_annotations: *purged-cp1235-annotations
+
+  - interval: 1m
+    external_labels:
+      site: eqiad
+    input_series:
+      # An acceptable amount of backlog per instance
+      - series: 'purged_backlog{cluster="cache_text", instance="cp1233:2112", site="codfw"}'
+        values: '0 600 600 600 600 600 600'
+      # Should not trigger a warning by itself...
+      - series: 'purged_backlog{cluster="cache_text", instance="cp1234:2112", site="codfw"}'
+        values: '0 600 600 600 600 600 600'
+      # ...but adding this to the above should!
+      - series: 'purged_backlog{cluster="cache_upload", instance="cp1234:2112", site="codfw"}'
+        values: '0 600 600 600 600 600 600'
+      - series: 'purged_backlog{cluster="cache_text", instance="cp1235:2112", site="codfw"}'
+        values: '11000 11000 11000 11000 11000 11000 11000'
+      # Not quite critical yet due to fluctuations, but we should at least get
+      # a warning.
+      - series: 'purged_backlog{cluster="cache_text", instance="cp1236:2112", site="codfw"}'
+        values: '12000 12000 8000 8000 12000 12000 12000'
+    alert_rule_test:
+      - alertname: PurgedHighBacklogQueue
+        eval_time: 6m
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              team: traffic
+              instance: "cp1234:2112"
+            exp_annotations:
+              summary: "Large backlog queue for purged on cp1234:2112"
+              description: "cp1234:2112 (in eqiad) has a purged backlog of 1200."
+              runbook: *purged-runbook
+              dashboard: 'https://grafana.wikimedia.org/d/RvscY1CZk/purged?var-datasource=eqiad prometheus/ops&var-instance=cp1234'
+          # Since this will also trigger a critical the alert will be inhibited
+          # but we need to tell promtool to expect a warning as well.
+          - exp_labels:
+              severity: warning
+              team: traffic
+              instance: "cp1235:2112"
+            exp_annotations: &purged-cp1235-annotations
+              summary: "Large backlog queue for purged on cp1235:2112"
+              description: "cp1235:2112 (in eqiad) has a purged backlog of 11000."
+              runbook: *purged-runbook
+              dashboard: 'https://grafana.wikimedia.org/d/RvscY1CZk/purged?var-datasource=eqiad prometheus/ops&var-instance=cp1235'
+          - exp_labels:
+              severity: critical
+              team: traffic
+              instance: "cp1235:2112"
+            exp_annotations: *purged-cp1235-annotations
+          - exp_labels:
+              severity: warning
+              team: traffic
+              instance: "cp1236:2112"
+            exp_annotations:
+              summary: "Large backlog queue for purged on cp1236:2112"
+              description: "cp1236:2112 (in eqiad) has a purged backlog of 12000."
+              runbook: *purged-runbook
+              dashboard: 'https://grafana.wikimedia.org/d/RvscY1CZk/purged?var-datasource=eqiad prometheus/ops&var-instance=cp1236'
