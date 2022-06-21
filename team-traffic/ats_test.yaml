@@ -1,0 +1,24 @@
+rule_files:
+  - ats.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    external_labels:
+      site: eqiad
+    input_series:
+      - series: 'trafficserver_restart_count{cluster="cache_text", instance="cp1234:9122", layer="backend"}'
+        values: '1 2 3 4 5 6 7'
+    alert_rule_test:
+      - alertname: TrafficServerRestarted
+        eval_time: 6m
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              team: traffic
+              instance: cp1234:9122
+              layer: backend
+            exp_annotations:
+              summary: 'ATS backend server restarted on cp1234:9122'
+              description: "The backend ATS cluster on cp1234:9122 (eqiad) has restarted."
+              dashboard: 'https://grafana.wikimedia.org/d/6uhkG6OZk/ats-instance-drilldown?orgId=1&var-site=eqiad&var-instance=cp1234&var-layer=backend'
+              runbook: 'https://wikitech.wikimedia.org/wiki/Apache_Traffic_Server'

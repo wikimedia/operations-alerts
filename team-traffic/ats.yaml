@@ -1,0 +1,14 @@
+groups:
+  - name: traffic_ats
+    rules:
+      - alert: TrafficServerRestarted
+        # In normal conditions, restart count is 1. Alert if it is >= 2.
+        expr: 'sum(trafficserver_restart_count) by (instance, layer) >= 2'
+        labels:
+          team: traffic
+          severity: critical
+        annotations:
+          summary: 'ATS {{ $labels.layer }} server restarted on {{ $labels.instance }}'
+          description: "The {{ $labels.layer }} ATS cluster on {{ $labels.instance }} ({{ $externalLabels.site }}) has restarted."
+          dashboard: 'https://grafana.wikimedia.org/d/6uhkG6OZk/ats-instance-drilldown?orgId=1&var-site={{ $externalLabels.site }}&var-instance={{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}&var-layer={{ $labels.layer }}'
+          runbook: 'https://wikitech.wikimedia.org/wiki/Apache_Traffic_Server'
