@@ -33,3 +33,17 @@ groups:
       summary: "Certificate {{ $labels.namespace }}/{{ $labels.name }} is not in a ready state"
       description: "The certificate {{ $labels.name }} in namespace {{ $labels.namespace }} is in a not ready state for at least 10min"
       runbook: https://wikitech.wikimedia.org/wiki/Kubernetes/cert-manager
+- name: helmrelease
+  rules:
+  - alert: HelmReleaseBadStatus
+    expr: helm_release_status{status!="deployed"} == 1
+    # Our usual wait time for helm releases is 10 minutes.
+    # So it's okay for releases to be in bad state for 10min
+    for: 11m
+    labels:
+      team: sre
+      severity: critical
+    annotations:
+      summary: "Helm release {{ $labels.release }}/{{ $labels.name }} on {{ $externalLabels.prometheus }}@{{ $externalLabels.site }} in state {{ $labels.state }}"
+      description: "The Helm release {{ $labels.release }}/{{ $labels.name }} on Kubernetes cluster {{ $externalLabels.prometheus }}@{{ $externalLabels.site }} is in state {{ $labels.state }} for more than 11min, you might need to roll back"
+      runbook: "https://wikitech.wikimedia.org/wiki/Kubernetes/Deployments#Rolling_back_in_an_emergency"
