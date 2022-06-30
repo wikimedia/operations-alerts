@@ -1,0 +1,13 @@
+groups:
+  - name: Keyholder
+    rules:
+      - alert: KeyholderUnarmed
+        expr: 'count(keyholder_armed == 0) by (instance) > 0'
+        for: 1m
+        annotations:
+          summary: '{{ $value }} unarmed Keyholder key(s) on {{ $labels.instance }}'
+          description: 'Host {{ $labels.instance }} needs to have its Keyholder keys armed.'
+          runbook: https://wikitech.wikimedia.org/wiki/Keyholder
+        labels:
+          severity: critical
+          team: sre

@@ -1,0 +1,24 @@
+rule_files:
+  - keyholder.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    input_series:
+      - series: 'keyholder_armed{instance="acmechief1001:9100",key="/etc/keyholder.d/authdns_acmechief.pub"}'
+        values: '1 1 1 1 1'
+      - series: 'keyholder_armed{instance="deploy1002:9100",key="/etc/keyholder.d/mwdeploy.pub"}'
+        values: '1 1 0 0 0'
+      - series: 'keyholder_armed{instance="deploy1002:9100",key="/etc/keyholder.d/deploy_zuul.pub"}'
+        values: '1 1 1 1 1'
+    alert_rule_test:
+      - alertname: KeyholderUnarmed
+        eval_time: 5m
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              team: sre
+              instance: deploy1002:9100
+            exp_annotations:
+              summary: "1 unarmed Keyholder key(s) on deploy1002:9100"
+              description: "Host deploy1002:9100 needs to have its Keyholder keys armed."
+              runbook: https://wikitech.wikimedia.org/wiki/Keyholder
