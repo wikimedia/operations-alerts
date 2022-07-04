@@ -1,0 +1,24 @@
+rule_files:
+  - etcd.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    input_series:
+      - series: 'etcdmirror_lag{cluster="etcd", instance="conf2005:8000", job="etcdmirror", prefix="/conftool", url="https://conf2005.codfw.wmnet:2379"}'
+        values: '0 0 0 1+30x90'
+    alert_rule_test:
+      - alertname: EtcdReplicationLag
+        eval_time: 25m
+        exp_alerts:
+          - exp_labels:
+              severity: page
+              cluster: etcd
+              instance: conf2005:8000
+              prefix: /conftool
+              team: sre
+              url: https://conf2005.codfw.wmnet:2379
+              job: etcdmirror
+            exp_annotations:
+              summary: 'etcd-mirror is lagging: 661 #page'
+              description: 'The etcd-mirror process on conf2005:8000 has detected lag for https://conf2005.codfw.wmnet:2379'
+              runbook: https://wikitech.wikimedia.org/wiki/Etcd

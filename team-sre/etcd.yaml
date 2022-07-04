@@ -1,0 +1,13 @@
+groups:
+  - name: etcd-mirror
+    rules:
+      - alert: EtcdReplicationLag
+        expr: 'etcdmirror_lag > 50'
+        for: 15m
+        annotations:
+          summary: 'etcd-mirror is lagging: {{ $value }} #page'
+          description: 'The etcd-mirror process on {{ $labels.instance }} has detected lag for {{ $labels.url }}'
+          runbook: 'https://wikitech.wikimedia.org/wiki/Etcd'
+        labels:
+          severity: page
+          team: sre
