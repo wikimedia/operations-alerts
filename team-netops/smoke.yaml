@@ -12,3 +12,15 @@ groups:
           description: "The probes from {{ $externalLabels.site }} to {{ $labels.instance }} in {{ $labels.target_site }} have failed (address family {{ $labels.family }})"
           dashboard: https://grafana.wikimedia.org/d/m1LYjVjnz/network-icmp-probes
           runbook: https://wikitech.wikimedia.org/wiki/Network_monitoring#PingUnreachable
+
+      - alert: DNSUnavailable
+        expr: avg_over_time(probe_success{job="smoke/dns"}[1m]) < 1
+        for: 2m
+        labels:
+          team: sre
+          severity: warning
+        annotations:
+          summary: "DNS failed from {{ $externalLabels.site }} to {{ $labels.instance }} ({{ $labels.module }})"
+          description: "The probes from {{ $externalLabels.site }} to {{ $labels.instance }} for {{ $labels.module }} have failed"
+          dashboard: https://grafana.wikimedia.org/d/XuqU5ve7z/network-dns-probes
+          runbook: https://wikitech.wikimedia.org/wiki/Network_monitoring#DNSUnavailable

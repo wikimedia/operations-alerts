@@ -27,3 +27,25 @@ tests:
            description: "The probes from eqiad to cr2-eqsin:0 in eqsin have failed (address family ip4)"
            dashboard: https://grafana.wikimedia.org/d/m1LYjVjnz/network-icmp-probes
            runbook: https://wikitech.wikimedia.org/wiki/Network_monitoring#PingUnreachable
+
+  - interval: 1m
+    input_series:
+      - series: 'probe_success{instance="ns0.wikimedia.org:53", job="smoke/dns", module="dns_wikipedia_a"}'
+        values: '0+0x60'
+    external_labels:
+      site: codfw
+    alert_rule_test:
+    - alertname: DNSUnavailable
+      eval_time: 10m
+      exp_alerts:
+       - exp_labels:
+           severity: warning
+           team: sre
+           instance: ns0.wikimedia.org:53
+           job: smoke/dns
+           module: dns_wikipedia_a
+         exp_annotations:
+           summary: "DNS failed from codfw to ns0.wikimedia.org:53 (dns_wikipedia_a)"
+           description: "The probes from codfw to ns0.wikimedia.org:53 for dns_wikipedia_a have failed"
+           dashboard: https://grafana.wikimedia.org/d/XuqU5ve7z/network-dns-probes
+           runbook: https://wikitech.wikimedia.org/wiki/Network_monitoring#DNSUnavailable
