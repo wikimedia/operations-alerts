@@ -1,3 +1,9 @@
+# Some of these alerts (probedown, ssl cert expiry) target all probes in jobs starting with probes/.
+# Similar alerts are also defined/deployed by Puppet via
+# prometheus::blackbox::check::http to allow users some customisation in terms of
+# severity/team directly in puppet.
+
+# When making changes remember to update modules/prometheus/manifests/blackbox/check/http.pp as well to keep alert definition in sync.
 groups:
  - name: probes
    rules:
