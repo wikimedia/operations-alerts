@@ -12,6 +12,7 @@ import re
 import string
 import subprocess
 import warnings
+from pathlib import Path
 
 import pytest
 import requests
@@ -119,6 +120,28 @@ def test_runbook_exists(rulefile):
             if runbook is not None:
                 response = requests.get(runbook)
                 assert response.status_code == 200 and response.text != ""
+
+
+@pytest.mark.parametrize(
+    "rulefile",
+    [
+        rulefile
+        for rulefile in all_rulefiles(SUBDIRS)
+        if "team-wmcs" == rulefile.parent.parent.name
+    ],
+    ids=str,
+)
+def test_wmcs_runbook_is_defined(rulefile):
+    """Make sure that there's at least one runbook define for all WMCS alerts."""
+    with open(rulefile, encoding="utf-8") as rulefile_fd:
+        groups = yaml.load(rulefile_fd, Loader=yaml.FullLoader)
+
+    for group in groups["groups"]:
+        for index, rule in enumerate(group["rules"]):
+            runbook = rule.get("annotations", {}).get("runbook", None)
+            assert (
+                runbook
+            ), f"Rule #{index} - alertname:{rule['alert']} has no runbook defined, please add one."
 
 
 def _get_tag(fobj, name):
