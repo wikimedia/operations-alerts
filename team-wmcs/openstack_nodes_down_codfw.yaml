@@ -1,0 +1,53 @@
+# deploy-tag: codfw
+# Alerts for too many openstack nodes being down
+# The split between eqiad/codfw is to be able to set different severities for the same alerts on different sites
+groups:
+  - name: openstack_nodes_down
+    rules:
+      - alert: TooManyCloudvirtsDown
+        annotations:
+          description: "{{ $value | humanizePercentage}} of the cloudvirt nodes at {{ $externalLabels.site }} are down."
+          summary: "Reduced availability for CloudVPS {{ $externalLabels.site }}"
+          runbook: "https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/TooManyCloudvirtsDown"
+        expr: 0.199 <= (1 - (sum(up{job="node", instance=~"cloudvirt.*"}) /count(up{job="node", instance=~"cloudvirt.*"})))
+        for: 5m
+        labels:
+          severity: warning
+          team: wmcs
+          service: openstack,cloudvps
+
+      - alert: TooManyCloudcontrolsDown
+        annotations:
+          description: "All the cloudcontrol nodes at {{ $externalLabels.site }} are down."
+          summary: "No availability for CloudVPS {{ $externalLabels.site }}"
+          runbook: "https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/TooManyCloudcontrolsDown"
+        expr: 3 <= count(up{job="node", instance=~"cloudcontrol.*"})
+        for: 5m
+        labels:
+          severity: warning
+          team: wmcs
+          service: openstack,cloudvps
+
+      - alert: TooManyCloudnetsDown
+        annotations:
+          description: "All the cloudnet nodes at {{ $externalLabels.site }} are down."
+          summary: "No availability for CloudVPS {{ $externalLabels.site }}"
+          runbook: "https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/TooManyCloudnetsDown"
+        expr: 2 <= count(up{job="node", instance=~"cloudnet.*"})
+        for: 5m
+        labels:
+          severity: warning
+          team: wmcs
+          service: openstack,cloudvps
+
+      - alert: TooManyCloudgwsDown
+        annotations:
+          description: "All the cloudgw nodes at {{ $externalLabels.site }} are down."
+          summary: "No availability for CloudVPS {{ $externalLabels.site }}"
+          runbook: "https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/TooManyCloudgwsDown"
+        expr: 2 <= count(up{job="node", instance=~"cloudgw.*"})
+        for: 5m
+        labels:
+          severity: warning
+          team: wmcs
+          service: openstack,cloudvps

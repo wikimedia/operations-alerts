@@ -1,0 +1,95 @@
+rule_files:
+  - openstack_nodes_down_codfw.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    input_series:
+      - series: 'up{job="node", instance="cloudvirt01"}'
+        values: "1 1 0+0x7"
+      - series: 'up{job="node", instance="cloudvirt02"}'
+        values: "1+0x9"
+      - series: 'up{job="node", instance="cloudvirt03"}'
+        values: "1+0x9"
+      - series: 'up{job="node", instance="cloudvirt04"}'
+        values: "1+0x9"
+      - series: 'up{job="node", instance="cloudvirt05"}'
+        values: "1+0x9"
+    external_labels:
+      site: codfw
+    alert_rule_test:
+      - alertname: TooManyCloudvirtsDown
+        eval_time: 7m
+        exp_alerts:
+          - exp_labels:
+              team: wmcs
+              severity: warning
+              service: openstack,cloudvps
+            exp_annotations:
+              description: 20% of the cloudvirt nodes at codfw are down.
+              summary: "Reduced availability for CloudVPS codfw"
+              runbook: "https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/TooManyCloudvirtsDown"
+
+  - interval: 1m
+    input_series:
+      - series: 'up{job="node", instance="cloudcontrol01"}'
+        values: "1 1 0+0x7"
+      - series: 'up{job="node", instance="cloudcontrol02"}'
+        values: "1 1 0+0x7"
+      - series: 'up{job="node", instance="cloudcontrol03"}'
+        values: "1+0x9"
+    external_labels:
+      site: codfw
+    alert_rule_test:
+      - alertname: TooManyCloudcontrolsDown
+        eval_time: 5m
+        exp_alerts:
+          - exp_labels:
+              team: wmcs
+              severity: warning
+              service: openstack,cloudvps
+            exp_annotations:
+              description: All the cloudcontrol nodes at codfw are down.
+              summary: "No availability for CloudVPS codfw"
+              runbook: "https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/TooManyCloudcontrolsDown"
+
+  - interval: 1m
+    input_series:
+      - series: 'up{job="node", instance="cloudnet01"}'
+        values: "1 1 0+0x7"
+      - series: 'up{job="node", instance="cloudnet02"}'
+        values: "1 1 0+0x7"
+    external_labels:
+      site: codfw
+    alert_rule_test:
+      - alertname: TooManyCloudnetsDown
+        eval_time: 5m
+        exp_alerts:
+          - exp_labels:
+              team: wmcs
+              severity: warning
+              service: openstack,cloudvps
+            exp_annotations:
+              description: All the cloudnet nodes at codfw are down.
+              summary: "No availability for CloudVPS codfw"
+              runbook: "https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/TooManyCloudnetsDown"
+
+  - interval: 1m
+    input_series:
+      - series: 'up{job="node", instance="cloudgw01"}'
+        values: "1 1 0+0x7"
+      - series: 'up{job="node", instance="cloudgw02"}'
+        values: "1 1 0+0x7"
+    external_labels:
+      site: codfw
+    alert_rule_test:
+      - alertname: TooManyCloudgwsDown
+        eval_time: 5m
+        exp_alerts:
+          - exp_labels:
+              team: wmcs
+              severity: warning
+              service: openstack,cloudvps
+            exp_annotations:
+              description: All the cloudgw nodes at codfw are down.
+              summary: "No availability for CloudVPS codfw"
+              runbook: "https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/TooManyCloudgwsDown"
