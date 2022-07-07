@@ -14,6 +14,7 @@ import subprocess
 import warnings
 
 import pytest
+import requests
 import yaml
 
 SUBDIRS = [
@@ -43,7 +44,8 @@ def all_rulefiles(paths):
         non_test_files = set(p.glob("**/*.yaml")) - set(p.glob("**/*_test.yaml"))
         files.extend(non_test_files)
 
-    return files
+    # this is to get a reproducible list
+    return sorted(files)
 
 
 def test_yml_extension():
@@ -102,6 +104,21 @@ def test_deploy_metadata(rulefile):
     if len(tags) > 1:
         for value in ("global", "local"):
             assert value not in tags, "%r not allowed with multiple tags" % value
+
+
+@pytest.mark.ci()
+@pytest.mark.parametrize("rulefile", all_rulefiles(SUBDIRS), ids=str)
+def test_runbook_exists(rulefile):
+    """Ensure that if the alert has a runbook, it actually exists"""
+    with open(rulefile, encoding="utf-8") as rulefile_fd:
+        groups = yaml.load(rulefile_fd, Loader=yaml.FullLoader)
+
+    for group in groups["groups"]:
+        for rule in group["rules"]:
+            runbook = rule.get("annotations", {}).get("runbook", None)
+            if runbook is not None:
+                response = requests.get(runbook)
+                assert response.status_code == 200 and response.text != ""
 
 
 def _get_tag(fobj, name):

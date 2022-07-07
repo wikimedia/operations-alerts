@@ -9,7 +9,7 @@ apt:
 variants:
   test:
     copies: [local]
-    entrypoint: [tox]
+    entrypoint: ["tox", "-e", "ALL"]
     # Required so tox can write to the container
     runs:
       insecurely: True

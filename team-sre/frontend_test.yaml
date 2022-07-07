@@ -42,4 +42,4 @@ tests:
            summary: 'HAProxy (cache_text) has reduced HTTP availability #page'
            dashboard: 'https://grafana.wikimedia.org/d/000000479/frontend-traffic?viewPanel=13'
            logs: 'TODO'
-           runbook: 'TODO'
+           #runbook: 'TODO'
