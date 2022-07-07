@@ -12,9 +12,9 @@ tests:
     values: "1 0 0 0 0 0"
   - series: 'certmanager_certificate_ready_status{namespace="fakespace", name="fakename", condition="False"}'
     values: "0 1 1 1 1 1 1 1 1 1 1"
-  - series: 'helm_release_status{release="pinkunicorn", name="main", state="pending-upgrade"}'
+  - series: 'helm_release_status{namespace="pinkunicorn", name="main", status="pending-upgrade"}'
     values: "0 1 1 1 1 1 1 1 1 1 1 1"
-  - series: 'helm_release_status{release="pinkunicorn", name="main", state="deployed"}'
+  - series: 'helm_release_status{namespace="pinkunicorn", name="main", status="deployed"}'
     values: "1 1 1 1 1 1 1 1 1 1 1 0"
   external_labels:
     site: moon
@@ -62,9 +62,9 @@ tests:
     - exp_labels:
         team: sre
         severity: critical
-        release: pinkunicorn
+        namespace: pinkunicorn
         name: main
-        state: pending-upgrade
+        status: pending-upgrade
       exp_annotations:
         summary: "Helm release pinkunicorn/main on eagle@moon in state pending-upgrade"
         description: "The Helm release pinkunicorn/main on Kubernetes cluster eagle@moon is in state pending-upgrade for more than 11min, you might need to roll back"
