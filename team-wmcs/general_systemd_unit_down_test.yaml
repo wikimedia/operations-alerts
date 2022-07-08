@@ -1,0 +1,48 @@
+rule_files:
+  - general_systemd_unit_down.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    input_series:
+      - series: node_systemd_unit_state{cluster="wmcs", state="failed", instance="dummynode1:9000", name="awesome.service"}
+        values: "0 0 1+0x7"
+    external_labels:
+      cluster: wmcs
+    alert_rule_test:
+      - alertname: SystemdUnitDown
+        eval_time: 7m
+        exp_alerts:
+          - exp_labels:
+              team: wmcs
+              severity: warning
+              instance: dummynode1:9000
+              cluster: wmcs
+              state: failed
+              name: awesome.service
+            exp_annotations:
+              description: "Unit awesome.service on node dummynode1 failed."
+              summary: "The service unit awesome.service is in failed status on host dummynode1."
+              dashboard: "https://grafana.wikimedia.org/d/000000377/host-overview?orgId=1&var-server=dummynode1"
+              runbook: "https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/SystemdUnitDown"
+  - interval: 1m
+    input_series:
+      - series: node_systemd_unit_state{cluster="wmcs", state="failed", instance="dummynode1:9000", name="awesome.service"}
+        values: "0 1+0x300"
+    external_labels:
+      cluster: wmcs
+    alert_rule_test:
+      - alertname: SystemdUnitDownForLong
+        eval_time: 2h1m
+        exp_alerts:
+          - exp_labels:
+              team: wmcs
+              severity: task
+              instance: dummynode1:9000
+              cluster: wmcs
+              state: failed
+              name: awesome.service
+            exp_annotations:
+              description: "Unit awesome.service on node dummynode1 has been down for long."
+              summary: "The systemd unit awesome.service on node dummynode1 has been failing for more than two hours."
+              dashboard: "https://grafana.wikimedia.org/d/000000377/host-overview?orgId=1&var-server=dummynode1"
+              runbook: "https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/SystemdUnitDownForLong"

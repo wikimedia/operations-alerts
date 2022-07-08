@@ -1,0 +1,26 @@
+# Alerts for generic systemd units being down
+groups:
+  - name: general_systemd_unit_down
+    rules:
+      - alert: SystemdUnitDown
+        annotations:
+          description: 'Unit {{ $labels.name }} on node {{  $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }} failed.'
+          summary: 'The service unit {{ $labels.name }} is in failed status on host {{  $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}.'
+          dashboard: 'https://grafana.wikimedia.org/d/000000377/host-overview?orgId=1&var-server={{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}'
+          runbook: "https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/SystemdUnitDown"
+        expr: node_systemd_unit_state{cluster="wmcs", state="failed"} == 1
+        for: 5m
+        labels:
+          severity: warning
+          team: wmcs
+      - alert: SystemdUnitDownForLong
+        annotations:
+          description: 'Unit {{ $labels.name }} on node {{  $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }} has been down for long.'
+          summary: 'The systemd unit {{ $labels.name }} on node {{  $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }} has been failing for more than two hours.'
+          dashboard: 'https://grafana.wikimedia.org/d/000000377/host-overview?orgId=1&var-server={{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}'
+          runbook: "https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/SystemdUnitDownForLong"
+        expr: node_systemd_unit_state{cluster="wmcs", state="failed"} == 1
+        for: 2h
+        labels:
+          severity: task
+          team: wmcs
