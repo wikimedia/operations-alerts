@@ -1,0 +1,26 @@
+# Alerts for generic nodes being down
+groups:
+  - name: general_nodes_down
+    rules:
+      - alert: NodeDown
+        annotations:
+          description: 'Node {{  $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }} is down.'
+          summary: 'The node {{  $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }} is unreachable.'
+          dashboard: 'https://grafana.wikimedia.org/d/000000377/host-overview?orgId=1&var-server={{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}'
+          runbook: "https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/NodeDown"
+        expr: up{job="node", cluster="wmcs"} == 0
+        for: 5m
+        labels:
+          severity: warning
+          team: wmcs
+      - alert: NodeDownForLong
+        annotations:
+          description: 'Node {{  $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }} has been down for long.'
+          summary: 'The node {{  $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }} has been unreachable for more than two hours.'
+          dashboard: 'https://grafana.wikimedia.org/d/000000377/host-overview?orgId=1&var-server={{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}'
+          runbook: "https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/NodeDownForLong"
+        expr: up{job="node", cluster="wmcs"} == 0
+        for: 2h
+        labels:
+          severity: task
+          team: wmcs

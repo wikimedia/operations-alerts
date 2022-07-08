@@ -1,0 +1,46 @@
+rule_files:
+  - general_nodes_down.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    input_series:
+      - series: 'up{job="node", instance="dummynode1:9000", cluster="wmcs"}'
+        values: "1 1 0+0x7"
+    external_labels:
+      cluster: wmcs
+    alert_rule_test:
+      - alertname: NodeDown
+        eval_time: 7m
+        exp_alerts:
+          - exp_labels:
+              team: wmcs
+              severity: warning
+              instance: dummynode1:9000
+              cluster: wmcs
+              job: node
+            exp_annotations:
+              description: "Node dummynode1 is down."
+              summary: "The node dummynode1 is unreachable."
+              dashboard: "https://grafana.wikimedia.org/d/000000377/host-overview?orgId=1&var-server=dummynode1"
+              runbook: "https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/NodeDown"
+  - interval: 1m
+    input_series:
+      - series: 'up{job="node", instance="dummynode1:9000", cluster="wmcs"}'
+        values: "1 0+0x300"
+    external_labels:
+      cluster: wmcs
+    alert_rule_test:
+      - alertname: NodeDownForLong
+        eval_time: 2h1m
+        exp_alerts:
+          - exp_labels:
+              team: wmcs
+              severity: task
+              instance: dummynode1:9000
+              cluster: wmcs
+              job: node
+            exp_annotations:
+              description: "Node dummynode1 has been down for long."
+              summary: "The node dummynode1 has been unreachable for more than two hours."
+              dashboard: "https://grafana.wikimedia.org/d/000000377/host-overview?orgId=1&var-server=dummynode1"
+              runbook: "https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/NodeDownForLong"
