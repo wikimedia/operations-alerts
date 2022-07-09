@@ -40,3 +40,38 @@ groups:
           team: traffic
           severity: critical
         annotations: *VarnishHighMmapCountAnn
+
+      - alert: VarnishTrafficDrop
+        # The 'and sum(...)' below enforces a minimum 15000rps that we must
+        # have dropped below before we are allowed to alert. A simple ratio is
+        # very sensitive to slight traffic variations when you have low
+        # absolute traffic.
+        # Only check varnish-text since varnish-upload traffic is more
+        # unpredictable.
+        expr: |
+          (
+            sum (job_method_status:varnish_requests:rate5m{job="varnish-text", method="GET", status="200"}) * 100 /
+            sum (job_method_status:varnish_requests:rate5m{job="varnish-text", method="GET", status="200"} offset 30m) and
+            sum (job_method_status:varnish_requests:rate5m{job="varnish-text", method="GET", status="200"} offset 30m) > 15000
+
+          ) <= 70
+        labels:
+          team: traffic
+          severity: warning
+        annotations: &VarnishTrafficDropAnn
+          summary: 'Varnish traffic in {{ $externalLabels.site }} has dropped {{ $value }}%'
+          description: 'Traffic has dropped {{ $value }}% in the past 30 minutes.'
+          dashboard: 'https://grafana.wikimedia.org/d/000000180/varnish-http-requests?viewPanel=6'
+          runbook: *wt-varnish
+
+      - alert: VarnishTrafficDrop
+        expr: |
+          (
+            sum (job_method_status:varnish_requests:rate5m{job="varnish-text", method="GET", status="200"}) * 100 /
+            sum (job_method_status:varnish_requests:rate5m{job="varnish-text", method="GET", status="200"} offset 30m) and
+            sum (job_method_status:varnish_requests:rate5m{job="varnish-text", method="GET", status="200"} offset 30m) > 15000
+          ) <= 60
+        labels:
+          team: traffic
+          severity: critical
+        annotations: *VarnishTrafficDropAnn
