@@ -1,0 +1,58 @@
+rule_files:
+  - swift.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    input_series:
+      - series: 'swift_dispersion_container_pct_found{cluster="swift", instance="ms-fe1009:9112", site="eqiad"}'
+        values: '100-1x100'
+      - series: 'swift_dispersion_object_pct_found{cluster="swift", instance="ms-fe1009:9112", site="eqiad"}'
+        values: '100-1x100'
+      - series: 'swift_container_stats_objects_total{class="originals", site="eqiad"}'
+        values: '100000+1000x120'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: SwiftLowContainerAvailability
+        eval_time: 15m
+        exp_alerts:
+          - exp_labels:
+              team: sre
+              severity: critical
+              instance: "ms-fe1009:9112"
+              cluster: swift
+              site: eqiad
+            exp_annotations:
+              summary: "Swift eqiad container availability low"
+              description: "A high percentage of Swift container copies in eqiad cannot be found (as reported by ms-fe1009:9112); availability is 85%"
+              dashboard: "https://grafana.wikimedia.org/d/OPgmB1Eiz/swift?panelId=8&fullscreen&orgId=1&var-DC=eqiad"
+              runbook: "https://wikitech.wikimedia.org/wiki/Swift/How_To"
+
+      - alertname: SwiftLowObjectAvailability
+        eval_time: 15m
+        exp_alerts:
+          - exp_labels:
+              team: sre
+              severity: critical
+              instance: "ms-fe1009:9112"
+              cluster: swift
+              site: eqiad
+            exp_annotations:
+              summary: "Swift eqiad object availability low"
+              description: "A high percentage of Swift object copies in eqiad cannot be found (as reported by ms-fe1009:9112); availability is 85%"
+              dashboard: "https://grafana.wikimedia.org/d/OPgmB1Eiz/swift?panelId=8&fullscreen&orgId=1&var-DC=eqiad"
+              runbook: "https://wikitech.wikimedia.org/wiki/Swift/How_To"
+
+      - alertname: SwiftTooManyMediaUploads
+        eval_time: 2h
+        exp_alerts:
+          - exp_labels:
+              team: sre
+              severity: critical
+              site: eqiad
+              class: originals
+            exp_annotations:
+              summary: "Too many eqiad mediawiki originals uploads"
+              description: "Too many MediaWiki media originals being uploaded (hourly) in eqiad; 60000 uploads during the last hour"
+              dashboard: "https://grafana.wikimedia.org/d/OPgmB1Eiz/swift?panelId=26&fullscreen&orgId=1&var-DC=eqiad"
+              runbook: "https://wikitech.wikimedia.org/wiki/Swift/How_To#mediawiki_originals_uploads"

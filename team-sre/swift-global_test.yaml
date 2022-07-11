@@ -1,0 +1,23 @@
+rule_files:
+  - swift-global.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    input_series:
+    - series: 'swift_container_stats_objects_total{account="mw-media", class="originals", cluster="swift", instance="ms-fe2009:9112", job="statsd_exporter", prometheus="ops", site="codfw"}'
+      values: '100+5x600'
+    - series: 'swift_container_stats_objects_total{account="mw-media", class="originals", cluster="swift", instance="ms-fe2009:9112", job="statsd_exporter", prometheus="ops", site="eqiad"}'
+      values: '200+3x600'
+    alert_rule_test:
+      - alertname: SwiftObjectCountSiteDisparity
+        eval_time: 9h
+        exp_alerts:
+          - exp_labels:
+              team: sre
+              severity: critical
+              class: originals
+            exp_annotations:
+              summary: "MediaWiki swift object counts site diffs"
+              description: "Large percentage difference between sites for class originals: inter data center synchronization may not be working correctly."
+              dashboard: "https://grafana.wikimedia.org/d/OPgmB1Eiz/swift"
+              runbook: "https://wikitech.wikimedia.org/wiki/Swift/How_To"

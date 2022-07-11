@@ -1,0 +1,25 @@
+# deploy-tag: global
+
+groups:
+- name: swift
+  rules:
+  - alert: SwiftObjectCountSiteDisparity
+    expr: >
+      swift_container_stats_objects_total{account="mw-media",site="eqiad", class !~ "(temp|thumb)"}
+         / on(class)
+      swift_container_stats_objects_total{account="mw-media",site="codfw"}
+        >= 1.0001
+      OR
+      swift_container_stats_objects_total{account="mw-media",site="eqiad", class !~ "(temp|thumb)"}
+         / on(class)
+      swift_container_stats_objects_total{account="mw-media",site="codfw"}
+        <= 0.999
+    for: 8h
+    labels:
+      severity: critical
+      team: sre
+    annotations:
+      summary: "MediaWiki swift object counts site diffs"
+      description: "Large percentage difference between sites for class {{ $labels.class }}: inter data center synchronization may not be working correctly."
+      dashboard: "https://grafana.wikimedia.org/d/OPgmB1Eiz/swift"
+      runbook: "https://wikitech.wikimedia.org/wiki/Swift/How_To"

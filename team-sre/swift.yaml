@@ -1,0 +1,41 @@
+# deploy-tag: ops
+# deploy-site: eqiad, codfw
+
+groups:
+- name: swift
+  rules:
+  - alert: SwiftLowContainerAvailability
+    expr: swift_dispersion_container_pct_found < 95
+    for: 5m
+    labels:
+      severity: critical
+      team: sre
+    annotations:
+      summary: "Swift {{ $externalLabels.site }} container availability low"
+      description: "A high percentage of Swift container copies in {{ $externalLabels.site }} cannot be found (as reported by {{ $labels.instance }}); availability is {{ $value }}%"
+      dashboard: "https://grafana.wikimedia.org/d/OPgmB1Eiz/swift?panelId=8&fullscreen&orgId=1&var-DC={{ $externalLabels.site }}"
+      runbook: "https://wikitech.wikimedia.org/wiki/Swift/How_To"
+
+  - alert: SwiftLowObjectAvailability
+    expr: swift_dispersion_object_pct_found < 95
+    for: 5m
+    labels:
+      severity: critical
+      team: sre
+    annotations:
+      summary: "Swift {{ $externalLabels.site }} object availability low"
+      description: "A high percentage of Swift object copies in {{ $externalLabels.site }} cannot be found (as reported by {{ $labels.instance }}); availability is {{ $value }}%"
+      dashboard: "https://grafana.wikimedia.org/d/OPgmB1Eiz/swift?panelId=8&fullscreen&orgId=1&var-DC={{ $externalLabels.site }}"
+      runbook: "https://wikitech.wikimedia.org/wiki/Swift/How_To"
+
+  - alert: SwiftTooManyMediaUploads
+    expr: 'increase(swift_container_stats_objects_total{class="originals"}[1h]) >= 6000'
+    for: 30m
+    labels:
+      severity: critical
+      team: sre
+    annotations:
+      summary: "Too many {{ $externalLabels.site }} mediawiki originals uploads"
+      description: "Too many MediaWiki media originals being uploaded (hourly) in {{ $externalLabels.site }}; {{ $value }} uploads during the last hour"
+      dashboard: "https://grafana.wikimedia.org/d/OPgmB1Eiz/swift?panelId=26&fullscreen&orgId=1&var-DC={{ $externalLabels.site }}"
+      runbook: "https://wikitech.wikimedia.org/wiki/Swift/How_To#mediawiki_originals_uploads"
