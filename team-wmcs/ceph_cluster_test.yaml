@@ -1,0 +1,69 @@
+rule_files:
+  - ceph_cluster.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    input_series:
+      - series: ceph_health_status{job="ceph_eqiad"}
+        values: "0 1 1 2+0x7"
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: CephClusterInError
+        eval_time: 8m
+        exp_alerts:
+          - exp_labels:
+              team: wmcs
+              severity: page
+              service: ceph,cloudvps
+              job: ceph_eqiad
+            exp_annotations:
+              description: "eqiad ceph cluster is in error status."
+              summary: "#page The ceph cluster in eqiad is in error status, that means that it's unable to serve traffic, all VMs could be unusable."
+              dashboard: "https://grafana.wikimedia.org/?orgId=1&tag=health&tag=ceph&search=open"
+              runbook: "https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/CephClusterInError"
+
+  - interval: 1m
+    input_series:
+      - series: ceph_health_status{job="ceph_eqiad"}
+        values: "0 1+0x9"
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: CephClusterInWarning
+        eval_time: 7m
+        exp_alerts:
+          - exp_labels:
+              team: wmcs
+              severity: warning
+              service: ceph,cloudvps
+              job: ceph_eqiad
+            exp_annotations:
+              description: "eqiad ceph cluster is in warning status."
+              summary: "The ceph cluster in eqiad is in warning status, that means that it's high availability is compromised, things should still be working as expected."
+              dashboard: "https://grafana.wikimedia.org/?orgId=1&tag=health&tag=ceph&search=open"
+              runbook: "https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/CephClusterInWarning"
+
+  - interval: 1m
+    input_series:
+      - series: ceph_mon_quorum_status{job="ceph_eqiad", ceph_daemon="mon.coludcephmon1001"}
+        values: "1 1 0x10"
+      - series: ceph_mon_quorum_status{job="ceph_eqiad", ceph_daemon="mon.coludcephmon1002"}
+        values: "1 0x10"
+      - series: ceph_mon_quorum_status{job="ceph_eqiad", ceph_daemon="mon.coludcephmon1003"}
+        values: "1 1 1 0x10"
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: CephClusterAllMonsDown
+        eval_time: 8m
+        exp_alerts:
+          - exp_labels:
+              team: wmcs
+              severity: page
+              service: ceph,cloudvps
+            exp_annotations:
+              description: "All monitor nodes for the ceph cluster in eqiad are down (quorum lost)."
+              summary: "#page All the monitor nodes for the cluster in eqiad have lost quorum, that means that the cluster is down."
+              dashboard: "https://grafana.wikimedia.org/?orgId=1&tag=health&tag=ceph&search=open"
+              runbook: "https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/CephClusterAllMonsDown"
