@@ -1,0 +1,29 @@
+# deploy-site: eqiad
+groups:
+  - name: novafullstack_sustained_failures
+    rules:
+      - alert: NovafullstackSustainedFailures
+        expr: cloudvps_novafullstack_puppet_events_success == 0
+        for: 5h
+        labels:
+          team: wmcs
+          severity: task
+          service: openstack,cloudvps,novafullstack
+        annotations:
+          summary: "Novafullstack tests have been failing for more than 5hours in {{ $externalLabels.site }}"
+          description: "The automated tests were unable to create, provision and decommission a VM in the last 5h"
+          runbook: https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/NovafullstackSustainedFailures
+          dashboard: https://grafana.wikimedia.org/d/ebJoA6VWz/wmcs-nova-fullstack?orgId=1
+
+      - alert: NovafullstackSustainedLeakedVMs
+        expr: cloudvps_novafullstack_instances_count > cloudvps_novafullstack_instances_max
+        for: 5h
+        labels:
+          team: wmcs
+          severity: task
+          service: openstack,cloudvps,novafullstack
+        annotations:
+          summary: "Novafullstack tests have been over the leaked VM limit for more than 5hours in {{ $externalLabels.site }}"
+          description: "The automated tests were unable to cleanup the leaked VMs for the last 5h"
+          runbook: https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/NovafullstackSustainedLeakedVMs
+          dashboard: https://grafana.wikimedia.org/d/ebJoA6VWz/wmcs-nova-fullstack?orgId=1

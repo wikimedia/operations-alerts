@@ -1,0 +1,45 @@
+rule_files:
+  - novafullstack.yaml
+evaluation_interval: 1h
+tests:
+  - interval: 1h
+    input_series:
+      - series: cloudvps_novafullstack_puppet_events_success
+        values: "1 1 0+0x7"
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: NovafullstackSustainedFailures
+        eval_time: 7h
+        exp_alerts:
+          - exp_labels:
+              team: wmcs
+              severity: task
+              service: openstack,cloudvps,novafullstack
+            exp_annotations:
+              summary: "Novafullstack tests have been failing for more than 5hours in eqiad"
+              description: "The automated tests were unable to create, provision and decommission a VM in the last 5h"
+              runbook: https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/NovafullstackSustainedFailures
+              dashboard: https://grafana.wikimedia.org/d/ebJoA6VWz/wmcs-nova-fullstack?orgId=1
+
+  - interval: 1h
+    input_series:
+      - series: cloudvps_novafullstack_instances_count
+        values: "1 1 12+0x7"
+      - series: cloudvps_novafullstack_instances_max
+        values: "11+0x9"
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: NovafullstackSustainedLeakedVMs
+        eval_time: 7h
+        exp_alerts:
+          - exp_labels:
+              team: wmcs
+              severity: task
+              service: openstack,cloudvps,novafullstack
+            exp_annotations:
+              summary: "Novafullstack tests have been over the leaked VM limit for more than 5hours in eqiad"
+              description: "The automated tests were unable to cleanup the leaked VMs for the last 5h"
+              runbook: https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/NovafullstackSustainedLeakedVMs
+              dashboard: https://grafana.wikimedia.org/d/ebJoA6VWz/wmcs-nova-fullstack?orgId=1
