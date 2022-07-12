@@ -110,7 +110,7 @@ tests:
           exp_annotations:
             description: YARN Resource Manager JVM Heap usage is above 95% on an-master1001:10083
             summary: YARN Heap usage is above 95% on an-master1001:10083
-            dashboard: https://grafana.wikimedia.org/d/000000585/hadoop?var-hadoop_cluster=analytics-hadoop&panelId=12&fullscreen&orgId=1"
+            dashboard: https://grafana.wikimedia.org/d/000000585/hadoop?var-hadoop_cluster=analytics-hadoop&panelId=12&fullscreen&orgId=1
             runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#Yarn_Nodemanager_JVM_Heap_Usage
         - exp_labels:
             severity: warning
@@ -125,7 +125,7 @@ tests:
           exp_annotations:
             description: YARN Resource Manager JVM Heap usage is above 90% on an-master1001:10083
             summary: YARN Heap usage is above 90% on an-master1001:10083
-            dashboard: https://grafana.wikimedia.org/d/000000585/hadoop?var-hadoop_cluster=analytics-hadoop&panelId=12&fullscreen&orgId=1"
+            dashboard: https://grafana.wikimedia.org/d/000000585/hadoop?var-hadoop_cluster=analytics-hadoop&panelId=12&fullscreen&orgId=1
             runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#Yarn_Nodemanager_JVM_Heap_Usage
 
 ## Hive Metastore Heap Usage tests

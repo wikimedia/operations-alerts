@@ -8,7 +8,7 @@ groups:
           the UDP incoming traffic. Check for clients sending a lot of traffic.
         summary: Elevated UDP receive errors for statsd
         # Naughty change of dashboard ID based on site
-        dashboard: https://grafana.wikimedia.org/d/{{ if eq $externalLabels.site "eqiad" }}000000020{{ else }}000000337{{ end }}/graphite-{{ $externalLabels.site }}?panelId=16&fullscreen"
+        dashboard: https://grafana.wikimedia.org/d/{{ if eq $externalLabels.site "eqiad" }}000000020{{ else }}000000337{{ end }}/graphite-{{ $externalLabels.site }}?panelId=16&fullscreen
         runbook: https://wikitech.wikimedia.org/wiki/Statsd
       expr: rate(node_netstat_Udp_InErrors{cluster="graphite"}[5m]) / rate(node_netstat_Udp_InDatagrams{cluster="graphite"}[5m]) > 2
       for: 5m

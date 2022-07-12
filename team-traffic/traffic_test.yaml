@@ -54,4 +54,4 @@ tests:
             exp_annotations:
               summary: "PyBal BGP sessions on instance lvs1234 are failing"
               description: "PyBal BGP session establishment with the peer 192.0.2.1 is unstable on host lvs1234."
-              dashboard: "https://grafana.wikimedia.org/d/000000488/pybal-bgp?var-datasource=eqiad prometheus%2Fops&var-server=lvs1234"
+              dashboard: "https://grafana.wikimedia.org/d/000000488/pybal-bgp?var-datasource=eqiad%20prometheus/ops&var-server=lvs1234"

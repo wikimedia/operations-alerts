@@ -46,7 +46,7 @@ tests:
             exp_annotations:
               summary: "varnish-text restarted on cp1234"
               description: "Varnish seems to be unstable on cp1234, specifically varnish-text."
-              dashboard: "https://grafana.wikimedia.org/d/000000330/varnish-machine-stats?orgId=1&viewPanel=66&var-server=cp1234&datasource=eqiad prometheus/ops"
+              dashboard: "https://grafana.wikimedia.org/d/000000330/varnish-machine-stats?orgId=1&viewPanel=66&var-server=cp1234&datasource=eqiad%20prometheus/ops"
               runbook: "https://wikitech.wikimedia.org/wiki/Varnish"
 
   - interval: 1m

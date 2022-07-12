@@ -7,7 +7,7 @@ groups:
         description: Rsyslog is unable to submit messages to the {{ $labels.action }}
           output.  The output target may be down or malfunctioning.
         summary: rsyslog is failing to deliver messages
-        dashboard: https://grafana.wikimedia.org/d/000000596/rsyslog?var-datasource={{ $externalLabels.site }} prometheus/ops
+        dashboard: https://grafana.wikimedia.org/d/000000596/rsyslog?var-datasource={{ $externalLabels.site }}%20prometheus/ops
         runbook: https://wikitech.wikimedia.org/wiki/Rsyslog
       expr: sum by (action) (rate(rsyslog_action_suspended[5m]) + rate(rsyslog_action_failed[5m])) > 5
       for: 2m

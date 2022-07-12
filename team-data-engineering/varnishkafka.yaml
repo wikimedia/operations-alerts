@@ -23,7 +23,7 @@ groups:
         annotations: &varnishkafka-annotations
           summary: 'varnishkafka has {{ $labels.cluster }} errors on {{ $labels.instance }}'
           description: 'varnishkafka is experiencing {{ $labels.cluster }} errors on the instance {{ $labels.instance }} in the {{ $externalLabels.site }} datacenter.'
-          dashboard: 'https://grafana.wikimedia.org/d/000000253/varnishkafka?panelId=20&fullscreen&orgId=1&var-datasource={{ $externalLabels.site }} prometheus/ops&var-cp_cluster={{ $labels.cluster }}&var-instance={{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}'
+          dashboard: 'https://grafana.wikimedia.org/d/000000253/varnishkafka?panelId=20&fullscreen&orgId=1&var-datasource={{ $externalLabels.site }}%20prometheus/ops&var-cp_cluster={{ $labels.cluster }}&var-instance={{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}'
           runbook: 'https://wikitech.wikimedia.org/wiki/Analytics/Systems/Varnishkafka'
 
       # Yell a little louder when enough errors become a concern.

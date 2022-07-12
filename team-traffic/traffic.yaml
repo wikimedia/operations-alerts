@@ -41,4 +41,4 @@ groups:
         annotations:
           summary: 'PyBal BGP sessions on instance {{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }} are failing'
           description: 'PyBal BGP session establishment with the peer {{ $labels.peer }} is unstable on host {{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}.'
-          dashboard: 'https://grafana.wikimedia.org/d/000000488/pybal-bgp?var-datasource={{ $externalLabels.site }} prometheus%2Fops&var-server={{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}'
+          dashboard: 'https://grafana.wikimedia.org/d/000000488/pybal-bgp?var-datasource={{ $externalLabels.site }}%20prometheus/ops&var-server={{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}'

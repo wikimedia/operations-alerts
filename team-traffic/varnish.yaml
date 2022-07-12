@@ -19,7 +19,7 @@ groups:
         annotations:
           summary: '{{ $labels.job }} restarted on {{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}'
           description: 'Varnish seems to be unstable on {{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}, specifically {{ $labels.job }}.'
-          dashboard: 'https://grafana.wikimedia.org/d/000000330/varnish-machine-stats?orgId=1&viewPanel=66&var-server={{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}&datasource={{ $externalLabels.site }} prometheus/ops'
+          dashboard: 'https://grafana.wikimedia.org/d/000000330/varnish-machine-stats?orgId=1&viewPanel=66&var-server={{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}&datasource={{ $externalLabels.site }}%20prometheus/ops'
           runbook: &wt-varnish "https://wikitech.wikimedia.org/wiki/Varnish"
 
       - alert: VarnishHighMmapCount

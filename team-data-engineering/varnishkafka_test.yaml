@@ -63,7 +63,7 @@ tests:
             exp_annotations:
               summary: "varnishkafka has cache_upload errors on cp3051:9132"
               description: "varnishkafka is experiencing cache_upload errors on the instance cp3051:9132 in the eqiad datacenter."
-              dashboard: "https://grafana.wikimedia.org/d/000000253/varnishkafka?panelId=20&fullscreen&orgId=1&var-datasource=eqiad prometheus/ops&var-cp_cluster=cache_upload&var-instance=cp3051"
+              dashboard: "https://grafana.wikimedia.org/d/000000253/varnishkafka?panelId=20&fullscreen&orgId=1&var-datasource=eqiad%20prometheus/ops&var-cp_cluster=cache_upload&var-instance=cp3051"
               runbook: &wt-varnishkafka "https://wikitech.wikimedia.org/wiki/Analytics/Systems/Varnishkafka"
           - exp_labels:
               cluster: "cache_text"
@@ -73,7 +73,7 @@ tests:
             exp_annotations:
               summary: "varnishkafka has cache_text errors on cp3052:9132"
               description: "varnishkafka is experiencing cache_text errors on the instance cp3052:9132 in the eqiad datacenter."
-              dashboard: "https://grafana.wikimedia.org/d/000000253/varnishkafka?panelId=20&fullscreen&orgId=1&var-datasource=eqiad prometheus/ops&var-cp_cluster=cache_text&var-instance=cp3052"
+              dashboard: "https://grafana.wikimedia.org/d/000000253/varnishkafka?panelId=20&fullscreen&orgId=1&var-datasource=eqiad%20prometheus/ops&var-cp_cluster=cache_text&var-instance=cp3052"
               runbook: *wt-varnishkafka
           - exp_labels:
               cluster: "cache_upload"
@@ -83,7 +83,7 @@ tests:
             exp_annotations:
               summary: "varnishkafka has cache_upload errors on cp3052:9132"
               description: "varnishkafka is experiencing cache_upload errors on the instance cp3052:9132 in the eqiad datacenter."
-              dashboard: "https://grafana.wikimedia.org/d/000000253/varnishkafka?panelId=20&fullscreen&orgId=1&var-datasource=eqiad prometheus/ops&var-cp_cluster=cache_upload&var-instance=cp3052"
+              dashboard: "https://grafana.wikimedia.org/d/000000253/varnishkafka?panelId=20&fullscreen&orgId=1&var-datasource=eqiad%20prometheus/ops&var-cp_cluster=cache_upload&var-instance=cp3052"
               runbook: *wt-varnishkafka
           - exp_labels:
               cluster: "cache_text"
@@ -93,7 +93,7 @@ tests:
             exp_annotations: &varnishkafka-cp3053-annotation
               summary: "varnishkafka has cache_text errors on cp3053:9132"
               description: "varnishkafka is experiencing cache_text errors on the instance cp3053:9132 in the eqiad datacenter."
-              dashboard: "https://grafana.wikimedia.org/d/000000253/varnishkafka?panelId=20&fullscreen&orgId=1&var-datasource=eqiad prometheus/ops&var-cp_cluster=cache_text&var-instance=cp3053"
+              dashboard: "https://grafana.wikimedia.org/d/000000253/varnishkafka?panelId=20&fullscreen&orgId=1&var-datasource=eqiad%20prometheus/ops&var-cp_cluster=cache_text&var-instance=cp3053"
               runbook: *wt-varnishkafka
           - exp_labels:
               cluster: "cache_text"

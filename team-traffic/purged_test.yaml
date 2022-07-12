@@ -24,7 +24,7 @@ tests:
               summary: 'High event process lag with purged on cp1234:2112'
               description: "It's been a while since a Kafka event has been processed by purged (4000ms, to be exact)"
               runbook: &purged-runbook 'https://wikitech.wikimedia.org/wiki/Purged#Alerts'
-              dashboard: 'https://grafana.wikimedia.org/d/RvscY1CZk/purged?var-datasource=eqiad prometheus/ops&var-instance=cp1234'
+              dashboard: 'https://grafana.wikimedia.org/d/RvscY1CZk/purged?var-datasource=eqiad%20prometheus/ops&var-instance=cp1234'
           # Since this will also trigger a critical the alert will be inhibited
           # but we need to tell promtool to expect a warning as well.
           - exp_labels:
@@ -35,7 +35,7 @@ tests:
               summary: 'High event process lag with purged on cp1235:2112'
               description: "It's been a while since a Kafka event has been processed by purged (6000ms, to be exact)"
               runbook: *purged-runbook
-              dashboard: 'https://grafana.wikimedia.org/d/RvscY1CZk/purged?var-datasource=eqiad prometheus/ops&var-instance=cp1235'
+              dashboard: 'https://grafana.wikimedia.org/d/RvscY1CZk/purged?var-datasource=eqiad%20prometheus/ops&var-instance=cp1235'
           - exp_labels:
               severity: critical
               team: traffic
@@ -73,7 +73,7 @@ tests:
               summary: "Large backlog queue for purged on cp1234:2112"
               description: "cp1234:2112 (in eqiad) has a purged backlog of 1200."
               runbook: *purged-runbook
-              dashboard: 'https://grafana.wikimedia.org/d/RvscY1CZk/purged?var-datasource=eqiad prometheus/ops&var-instance=cp1234'
+              dashboard: 'https://grafana.wikimedia.org/d/RvscY1CZk/purged?var-datasource=eqiad%20prometheus/ops&var-instance=cp1234'
           # Since this will also trigger a critical the alert will be inhibited
           # but we need to tell promtool to expect a warning as well.
           - exp_labels:
@@ -84,7 +84,7 @@ tests:
               summary: "Large backlog queue for purged on cp1235:2112"
               description: "cp1235:2112 (in eqiad) has a purged backlog of 11000."
               runbook: *purged-runbook
-              dashboard: 'https://grafana.wikimedia.org/d/RvscY1CZk/purged?var-datasource=eqiad prometheus/ops&var-instance=cp1235'
+              dashboard: 'https://grafana.wikimedia.org/d/RvscY1CZk/purged?var-datasource=eqiad%20prometheus/ops&var-instance=cp1235'
           - exp_labels:
               severity: critical
               team: traffic
@@ -98,4 +98,4 @@ tests:
               summary: "Large backlog queue for purged on cp1236:2112"
               description: "cp1236:2112 (in eqiad) has a purged backlog of 12000."
               runbook: *purged-runbook
-              dashboard: 'https://grafana.wikimedia.org/d/RvscY1CZk/purged?var-datasource=eqiad prometheus/ops&var-instance=cp1236'
+              dashboard: 'https://grafana.wikimedia.org/d/RvscY1CZk/purged?var-datasource=eqiad%20prometheus/ops&var-instance=cp1236'

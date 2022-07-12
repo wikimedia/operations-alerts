@@ -13,7 +13,7 @@ groups:
           summary: 'High event process lag with purged on {{ $labels.instance }}'
           description: "It's been a while since a Kafka event has been processed by purged ({{ $value }}ms, to be exact)"
           runbook: 'https://wikitech.wikimedia.org/wiki/Purged#Alerts'
-          dashboard: 'https://grafana.wikimedia.org/d/RvscY1CZk/purged?var-datasource={{ $externalLabels.site }} prometheus/ops&var-instance={{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}'
+          dashboard: 'https://grafana.wikimedia.org/d/RvscY1CZk/purged?var-datasource={{ $externalLabels.site }}%20prometheus/ops&var-instance={{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}'
 
       - alert: PurgedHighEventLag
         expr: 'min by (instance) (purged_event_lag) / 1e6 >= 5000'
@@ -33,7 +33,7 @@ groups:
           summary: "Large backlog queue for purged on {{ $labels.instance }}"
           description: "{{ $labels.instance }} (in {{ $externalLabels.site }}) has a purged backlog of {{ $value }}."
           runbook: 'https://wikitech.wikimedia.org/wiki/Purged#Alerts'
-          dashboard: 'https://grafana.wikimedia.org/d/RvscY1CZk/purged?var-datasource={{ $externalLabels.site }} prometheus/ops&var-instance={{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}'
+          dashboard: 'https://grafana.wikimedia.org/d/RvscY1CZk/purged?var-datasource={{ $externalLabels.site }}%20prometheus/ops&var-instance={{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}'
 
       - alert: PurgedHighBacklogQueue
         expr: 'sum by (instance) (purged_backlog) > 10000'
