@@ -3,7 +3,7 @@ groups:
   - name: novafullstack_sustained_failures
     rules:
       - alert: NovafullstackSustainedFailures
-        expr: cloudvps_novafullstack_puppet_events_success == 0
+        expr: cloudvps_novafullstack_verify_success == 0
         for: 5h
         labels:
           team: wmcs
