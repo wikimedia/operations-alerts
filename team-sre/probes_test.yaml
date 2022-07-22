@@ -27,7 +27,7 @@ tests:
            summary: Service fail:443 has failed probes (http_test)
            dashboard: 'https://grafana.wikimedia.org/d/O0nHhdhnz/network-probes-overview?var-job=probes/test&var-module=All'
            logs: 'https://logstash.wikimedia.org/app/dashboards#/view/f3e709c0-a5f8-11ec-bf8e-43f1807d5bc2?_g=(filters:!((query:(match_phrase:(service.name:http_test)))))'
-           runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#ProbeDown'
+           runbook: 'https://wikitech.wikimedia.org/wiki/Runbook#fail:443'
 
   # paging service test (i.e. service_catalog_page metric set to 1)
   - interval: 1m
@@ -58,7 +58,7 @@ tests:
            summary: Service fail-page:443 has failed probes (http_test)
            dashboard: 'https://grafana.wikimedia.org/d/O0nHhdhnz/network-probes-overview?var-job=probes/test&var-module=All'
            logs: 'https://logstash.wikimedia.org/app/dashboards#/view/f3e709c0-a5f8-11ec-bf8e-43f1807d5bc2?_g=(filters:!((query:(match_phrase:(service.name:http_test)))))'
-           runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#ProbeDown'
+           runbook: 'https://wikitech.wikimedia.org/wiki/Runbook#fail-page:443'
        - exp_labels:
            job: probes/test
            team: sre
@@ -71,7 +71,7 @@ tests:
            summary: 'Service fail-page:443 has failed probes (http_test)'
            dashboard: 'https://grafana.wikimedia.org/d/O0nHhdhnz/network-probes-overview?var-job=probes/test&var-module=All'
            logs: 'https://logstash.wikimedia.org/app/dashboards#/view/f3e709c0-a5f8-11ec-bf8e-43f1807d5bc2?_g=(filters:!((query:(match_phrase:(service.name:http_test)))))'
-           runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#ProbeDown'
+           runbook: 'https://wikitech.wikimedia.org/wiki/Runbook#fail-page:443'
        - exp_labels:
            job: probes/test
            team: sre
@@ -84,7 +84,7 @@ tests:
            summary: 'Service fail-page:443 has failed probes (http_test) #page'
            dashboard: 'https://grafana.wikimedia.org/d/O0nHhdhnz/network-probes-overview?var-job=probes/test&var-module=All'
            logs: 'https://logstash.wikimedia.org/app/dashboards#/view/f3e709c0-a5f8-11ec-bf8e-43f1807d5bc2?_g=(filters:!((query:(match_phrase:(service.name:http_test)))))'
-           runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#ProbeDown'
+           runbook: 'https://wikitech.wikimedia.org/wiki/Runbook#fail-page:443'
 
   - interval: 1m
     input_series:

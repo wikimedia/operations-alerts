@@ -14,7 +14,7 @@ groups:
        summary: 'Service {{ $labels.instance }} has failed probes ({{ $labels.module }})'
        dashboard: 'https://grafana.wikimedia.org/d/O0nHhdhnz/network-probes-overview?var-job={{ $labels.job }}&var-module=All'
        logs: 'https://logstash.wikimedia.org/app/dashboards#/view/f3e709c0-a5f8-11ec-bf8e-43f1807d5bc2?_g=(filters:!((query:(match_phrase:(service.name:{{ $labels.module }})))))'
-       runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#ProbeDown'
+       runbook: 'https://wikitech.wikimedia.org/wiki/Runbook#{{ $labels.instance }}'
      # Probes are sent out every 15s, allow at most two to fail in a minute
      # (i.e. one minute availability is less than 75%)
      expr: avg_over_time(probe_success{job=~"probes/.*", module=~"(http|tcp).*"}[1m]) * 100 < 75
@@ -33,7 +33,7 @@ groups:
        summary: 'Service {{ $labels.instance }} has failed probes ({{ $labels.module }})'
        dashboard: 'https://grafana.wikimedia.org/d/O0nHhdhnz/network-probes-overview?var-job={{ $labels.job }}&var-module=All'
        logs: 'https://logstash.wikimedia.org/app/dashboards#/view/f3e709c0-a5f8-11ec-bf8e-43f1807d5bc2?_g=(filters:!((query:(match_phrase:(service.name:{{ $labels.module }})))))'
-       runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#ProbeDown'
+       runbook: 'https://wikitech.wikimedia.org/wiki/Runbook#{{ $labels.instance }}'
 
    # paging alert: low availability (<10%) for one minute to avoid false positives and flaps
    - <<: *probe_down
@@ -47,7 +47,7 @@ groups:
        summary: 'Service {{ $labels.instance }} has failed probes ({{ $labels.module }}) #page'
        dashboard: 'https://grafana.wikimedia.org/d/O0nHhdhnz/network-probes-overview?var-job={{ $labels.job }}&var-module=All'
        logs: 'https://logstash.wikimedia.org/app/dashboards#/view/f3e709c0-a5f8-11ec-bf8e-43f1807d5bc2?_g=(filters:!((query:(match_phrase:(service.name:{{ $labels.module }})))))'
-       runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#ProbeDown'
+       runbook: 'https://wikitech.wikimedia.org/wiki/Runbook#{{ $labels.instance }}'
 
    - &cert_expired
      alert: CertAlmostExpired
