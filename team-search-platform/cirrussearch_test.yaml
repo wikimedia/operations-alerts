@@ -64,6 +64,7 @@ tests:
             description: "The reindexing process should be run to ensure multi-lingual analysis chain updates are applied"
             runbook: TODO
             dashboard: TODO
+
   - interval: 1m
     input_series:
       - series: cpjobqueue_normal_rule_processing_delay{rule="cirrusSearchElasticaWrite-cpjobqueue-partitioned-mediawiki-job-cirrusSearchElasticaWrite",quantile="0.5",service="cpjobqueue"}
@@ -88,6 +89,7 @@ tests:
               description: "CirrusSearch job lag is too high"
               runbook: TODO
               dashboard: "https://grafana.wikimedia.org/d/CbmStnlGk/jobqueue-job?orgId=1&var-dc=eqiad%20prometheus/k8s&var-job=cirrusSearchElasticaWrite"
+
   - interval: 1m
     input_series:
       - series: kafka_burrow_partition_lag{exported_cluster="main-eqiad",group="cpjobqueue-low_traffic_jobs", topic="eqiad.mediawiki.job.cirrusSearchOtherIndex",partition="0"}
@@ -115,3 +117,22 @@ tests:
               description: "CirrusSearch job backlog is too big"
               runbook: TODO
               dashboard: "https://grafana.wikimedia.org/d/CbmStnlGk/jobqueue-job?orgId=1&var-dc=eqiad%20prometheus/k8s&var-job=cirrusSearchOtherIndex"
+
+  - interval: 1m
+    input_series:
+      - series: elasticsearch_indices_indexing_index_total{exported_cluster="production-search-eqiad", index="", name="elastic1337-production-search-eqiad"}
+        values: 0+0x30
+    alert_rule_test:
+      - alertname: CirrusSearchNodeIndexingNotIncreasing
+        eval_time: 30m
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              team: search-platform
+              name: elastic1337-production-search-eqiad
+              exported_cluster: production-search-eqiad
+            exp_annotations:
+              summary: "Elasticsearch instance elastic1337-production-search-eqiad is not indexing"
+              description: "An Elasticsearch instance is not performing index work; find out why"
+              runbook: https://wikitech.wikimedia.org/wiki/Search#Indexing_hung_and_not_making_progress
+              dashboard: 'https://grafana.wikimedia.org/d/JLK3I_siz/elasticsearch-indexing?orgId=1&from=now-3d&to=now&viewPanel=57'

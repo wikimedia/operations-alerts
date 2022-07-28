@@ -75,3 +75,14 @@ groups:
         runbook: TODO
         dashboard: 'https://grafana.wikimedia.org/d/CbmStnlGk/jobqueue-job?orgId=1&var-dc={{ $externalLabels.site }}%20prometheus/k8s&var-job={{ $labels.topic | reReplaceAll ".*[.]([^.]*$)" "${1}"}}'
 
+    - alert: CirrusSearchNodeIndexingNotIncreasing
+      expr: increase(elasticsearch_indices_indexing_index_total{exported_cluster=~"production-search-(eqiad|codfw)", index=""}[30m]) == 0
+      for: 5m
+      labels:
+        team: search-platform
+        severity: warning
+      annotations:
+        summary: "Elasticsearch instance {{$labels.name}} is not indexing"
+        description: "An Elasticsearch instance is not performing index work; find out why"
+        runbook: https://wikitech.wikimedia.org/wiki/Search#Indexing_hung_and_not_making_progress
+        dashboard: 'https://grafana.wikimedia.org/d/JLK3I_siz/elasticsearch-indexing?orgId=1&from=now-3d&to=now&viewPanel=57'
