@@ -1,0 +1,84 @@
+rule_files:
+  - zookeeper.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    input_series:
+      - series: org_apache_ZooKeeperService_MaxClientCnxnsPerHost{cluster="analytics", instance="an-conf1001:12181", job="jmx_zookeeper", zookeeper_cluster="analytics-eqiad"}
+        values: 1024+0x60
+      - series: org_apache_ZooKeeperService_NumAliveConnections{cluster="analytics", instance="an-conf1001:12181", job="jmx_zookeeper", zookeeper_cluster="analytics-eqiad"}
+        values: 999+0x60
+    external_labels:
+      site: eqiad
+      prometheus: analytics
+    alert_rule_test:
+      - alertname: ZookeeperManyClients
+        eval_time: 4m
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              team: sre
+              cluster: analytics
+              instance: an-conf1001:12181
+              job: jmx_zookeeper
+              zookeeper_cluster: analytics-eqiad
+            exp_annotations:
+              summary: 'Zookeeper on an-conf1001:12181 (cluster analytics-eqiad) has too many clients (97.56%)'
+              description: 'The Zookeeper server running on an-conf1001:12181 could be running out of maximum client connections soon. Currently at 97.56%'
+              runbook: https://wikitech.wikimedia.org/wiki/Zookeeper
+              dashboard: https://grafana.wikimedia.org/d/000000261/zookeeper?orgId=1&viewPanel=6&var-datasource=eqiad%20prometheus/analytics&var-cluster=analytics-eqiad
+
+  - interval: 1m
+    input_series:
+      - series: up{cluster="etcd", instance="conf1007:12181", job="jmx_zookeeper", zookeeper_cluster="main-eqiad"}
+        values: 0+0x20
+    external_labels:
+      site: eqiad
+      prometheus: ops
+    alert_rule_test:
+      - alertname: ZookeeperServerDown
+        eval_time: 4m
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              team: sre
+              cluster: etcd
+              instance: conf1007:12181
+              job: jmx_zookeeper
+              zookeeper_cluster: main-eqiad
+            exp_annotations:
+              summary: 'Zookeeper on conf1007:12181 (cluster main-eqiad) is down'
+              description: 'Metrics cannot be fetched from conf1007:12181 check that the server is running.'
+              runbook: https://wikitech.wikimedia.org/wiki/Zookeeper
+              dashboard: https://grafana.wikimedia.org/d/000000261/zookeeper?orgId=1&var-datasource=eqiad%20prometheus/ops&var-cluster=main-eqiad
+
+  - interval: 1m
+    input_series:
+      - series: up{cluster="etcd", instance="conf1007:12181", job="jmx_zookeeper", zookeeper_cluster="main-eqiad"}
+        values: 0+0x20
+      - series: up{cluster="etcd", instance="conf1008:12181", job="jmx_zookeeper", zookeeper_cluster="main-eqiad"}
+        values: 1+0x20
+      - series: up{cluster="etcd", instance="conf1009:12181", job="jmx_zookeeper", zookeeper_cluster="main-eqiad"}
+        values: 0+0x20
+      - series: org_apache_ZooKeeperService_QuorumSize{cluster="etcd", instance="conf1007:12181", job="jmx_zookeeper", zookeeper_cluster="main-eqiad"}
+        values: 3+0x20
+      - series: org_apache_ZooKeeperService_QuorumSize{cluster="etcd", instance="conf1008:12181", job="jmx_zookeeper", zookeeper_cluster="main-eqiad"}
+        values: 3+0x20
+      - series: org_apache_ZooKeeperService_QuorumSize{cluster="etcd", instance="conf1009:12181", job="jmx_zookeeper", zookeeper_cluster="main-eqiad"}
+        values: 3+0x20
+    external_labels:
+      site: eqiad
+      prometheus: ops
+    alert_rule_test:
+      - alertname: ZookeeperQuorumLost
+        eval_time: 4m
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              team: sre
+              zookeeper_cluster: main-eqiad
+            exp_annotations:
+              summary: 'Zookeeper cluster main-eqiad has lost quorum'
+              description: 'The Zookeeper cluster main-eqiad has less than 50% of quorum available: 33.33%'
+              runbook: https://wikitech.wikimedia.org/wiki/Zookeeper
+              dashboard: https://grafana.wikimedia.org/d/000000261/zookeeper?orgId=1&var-datasource=eqiad%20prometheus/ops&var-cluster=main-eqiad

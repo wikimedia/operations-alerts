@@ -1,0 +1,42 @@
+groups:
+  - name: zookeeper
+    rules:
+      - alert: ZookeeperManyClients
+        expr: org_apache_ZooKeeperService_NumAliveConnections / org_apache_ZooKeeperService_MaxClientCnxnsPerHost > 0.6
+        for: 2m
+        annotations:
+          summary: 'Zookeeper on {{ $labels.instance }} (cluster {{ $labels.zookeeper_cluster }}) has too many clients ({{ $value | humanizePercentage }})'
+          description: 'The Zookeeper server running on {{ $labels.instance }} could be running out of maximum client connections soon. Currently at {{ $value | humanizePercentage }}'
+          runbook: https://wikitech.wikimedia.org/wiki/Zookeeper
+          dashboard: https://grafana.wikimedia.org/d/000000261/zookeeper?orgId=1&viewPanel=6&var-datasource={{ $externalLabels.site }}%20prometheus/{{ $externalLabels.prometheus }}&var-cluster={{ $labels.zookeeper_cluster }}
+        labels:
+          severity: critical
+          team: sre
+
+      - alert: ZookeeperServerDown
+        expr: up{job="jmx_zookeeper", zookeeper_cluster !~ "test.*"} == 0
+        for: 2m
+        annotations:
+          summary: 'Zookeeper on {{ $labels.instance }} (cluster {{ $labels.zookeeper_cluster }}) is down'
+          description: 'Metrics cannot be fetched from {{ $labels.instance }} check that the server is running.'
+          runbook: https://wikitech.wikimedia.org/wiki/Zookeeper
+          dashboard: https://grafana.wikimedia.org/d/000000261/zookeeper?orgId=1&var-datasource={{ $externalLabels.site }}%20prometheus/{{ $externalLabels.prometheus }}&var-cluster={{ $labels.zookeeper_cluster }}
+        labels:
+          severity: warning
+          team: sre
+
+      - alert: ZookeeperQuorumLost
+        expr:
+          sum by (zookeeper_cluster) (up {job="jmx_zookeeper"})
+            /
+          min by (zookeeper_cluster) (org_apache_ZooKeeperService_QuorumSize)
+            < 0.5
+        for: 2m
+        annotations:
+          summary: 'Zookeeper cluster {{ $labels.zookeeper_cluster }} has lost quorum'
+          description: 'The Zookeeper cluster {{ $labels.zookeeper_cluster }} has less than 50% of quorum available: {{ $value | humanizePercentage }}'
+          runbook: https://wikitech.wikimedia.org/wiki/Zookeeper
+          dashboard: https://grafana.wikimedia.org/d/000000261/zookeeper?orgId=1&var-datasource={{ $externalLabels.site }}%20prometheus/{{ $externalLabels.prometheus }}&var-cluster={{ $labels.zookeeper_cluster }}
+        labels:
+          severity: critical
+          team: sre
