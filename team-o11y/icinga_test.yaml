@@ -6,6 +6,8 @@ tests:
    input_series:
     - series: icinga_avg_check_latency{instance="foo:123"}
       values: '90 100 120+10x30'
+    - series: icinga_max_check_latency{instance="foo:123"}
+      values: '300 400 500+10x30'
    external_labels:
      site: eqiad
      prometheus: ops
@@ -21,3 +23,14 @@ tests:
            description: Average latency for checks is elevated (6m 40s), check dashboard for signs of overload
            summary: Checks are taking long to execute on foo:123
            dashboard: https://grafana.wikimedia.org/d/rsCfQfuZz/icinga
+           runbook: https://wikitech.wikimedia.org/wiki/Icinga#IcingaOverload
+
+       - exp_labels:
+           severity: critical
+           team: o11y
+           instance: foo:123
+         exp_annotations:
+           description: Max latency for checks is elevated (13m 0s), check dashboard for signs of overload
+           summary: Checks are taking long to execute on foo:123
+           dashboard: https://grafana.wikimedia.org/d/rsCfQfuZz/icinga
+           runbook: https://wikitech.wikimedia.org/wiki/Icinga#IcingaOverload

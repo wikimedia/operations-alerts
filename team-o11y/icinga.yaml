@@ -7,7 +7,20 @@ groups:
         description: Average latency for checks is elevated ({{ $value | humanizeDuration }}), check dashboard for signs of overload
         summary: Checks are taking long to execute on {{ $labels.instance }}
         dashboard: https://grafana.wikimedia.org/d/rsCfQfuZz/icinga
+        runbook: https://wikitech.wikimedia.org/wiki/Icinga#IcingaOverload
       expr: icinga_avg_check_latency >= 130
+      for: 25m
+      labels:
+        severity: critical
+        team: o11y
+
+    - alert: IcingaOverload
+      annotations:
+        description: Max latency for checks is elevated ({{ $value | humanizeDuration }}), check dashboard for signs of overload
+        summary: Checks are taking long to execute on {{ $labels.instance }}
+        dashboard: https://grafana.wikimedia.org/d/rsCfQfuZz/icinga
+        runbook: https://wikitech.wikimedia.org/wiki/Icinga#IcingaOverload
+      expr: icinga_max_check_latency >= 200
       for: 25m
       labels:
         severity: critical
