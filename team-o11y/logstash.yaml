@@ -6,7 +6,7 @@ groups:
       annotations:
         description: Logstash logs are not being indexed by Elasticsearch
         summary: Logstash logs are not being indexed by Elasticsearch
-        dashboard: https://grafana.wikimedia.org/d/000000561/logstash
+        dashboard: https://grafana.wikimedia.org/d/000000561/logstash?var-datasource={{ $externalLabels.site }}%20prometheus/ops
         runbook: https://wikitech.wikimedia.org/wiki/Logstash#No_logs_indexed
       expr: sum(irate(elasticsearch_indices_indexing_index_total{cluster="logstash"}[5m])) < 100
       for: 1m
@@ -19,7 +19,7 @@ groups:
       annotations:
         description: Logstash is ingesting {{ $value }}% more than what it did this same time yesterday.  Check for a log producer generating a high volume of logs.
         summary: Logstash rate of ingestion percent change compared to yesterday
-        dashboard: https://grafana.wikimedia.org/d/000000561/logstash?orgId=1&panelId=2&fullscreen
+        dashboard: https://grafana.wikimedia.org/d/000000561/logstash?orgId=1&panelId=2&var-datasource={{ $externalLabels.site }}%20prometheus/ops
         runbook: https://phabricator.wikimedia.org/T202307
       expr: |
         100 * (
@@ -40,7 +40,7 @@ groups:
         description: Increase in logs received by the Dead Letter Queue and not indexed properly
           due to log message mapping or parsing issues.  Check the DLQ saved search in Logstash for more details.
         summary: Logstash Elasticsearch indexing errors
-        dashboard: https://grafana.wikimedia.org/d/000000561/logstash?viewPanel=40
+        dashboard: https://grafana.wikimedia.org/d/000000561/logstash?viewPanel=40&var-datasource={{ $externalLabels.site }}%20prometheus/ops
         runbook: https://wikitech.wikimedia.org/wiki/Logstash#Indexing_errors
       # Gauge of total hits that minute.  total_hits/60 = events/sec
       expr: sum(log_dead_letters_hits) / 60 > 8
@@ -54,7 +54,7 @@ groups:
         description: Logstash consumers are not keeping up with the rate of log production.
           Either Logstash has reduced throughput capacity or log generators are producing too many logs.
         summary: Too many messages in kafka logging
-        dashboard: https://grafana.wikimedia.org/d/000000484/kafka-consumer-lag?var-cluster={{ $labels.exported_cluster }}
+        dashboard: https://grafana.wikimedia.org/d/000000484/kafka-consumer-lag?var-cluster={{ $labels.exported_cluster }}&var-datasource={{ $externalLabels.site }}%20prometheus/ops
         runbook: https://wikitech.wikimedia.org/wiki/Logstash#Kafka_consumer_lag
       expr: sum by (exported_cluster) (kafka_burrow_partition_lag{exported_cluster=~"logging-.*"}) > 1500
       for: 1m
@@ -67,7 +67,7 @@ groups:
         description: Logstash node is dropping more than 10% of its received UDP packets.
           Usually, this means Logstash needs a restart.
         summary: Packet loss ratio for UDP > 10% on {{ $labels.instance }}
-        dashboard: https://grafana.wikimedia.org/d/000000561/logstash?viewPanel=1
+        dashboard: https://grafana.wikimedia.org/d/000000561/logstash?viewPanel=1&var-datasource={{ $externalLabels.site }}%20prometheus/ops
         runbook: https://wikitech.wikimedia.org/wiki/Logstash#UDP_packet_loss
       # >10%
       expr: |

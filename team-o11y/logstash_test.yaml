@@ -7,7 +7,7 @@ tests:
     - series: 'elasticsearch_indices_indexing_index_total{cluster="logstash"}'
       values: '0x300'
    external_labels:
-     cluster: logstash
+     site: eqiad
    alert_rule_test:
     - alertname: LogstashNoLogsIndexed
       eval_time: 15m
@@ -18,7 +18,7 @@ tests:
          exp_annotations:
            description: Logstash logs are not being indexed by Elasticsearch
            summary: Logstash logs are not being indexed by Elasticsearch
-           dashboard: https://grafana.wikimedia.org/d/000000561/logstash
+           dashboard: https://grafana.wikimedia.org/d/000000561/logstash?var-datasource=eqiad%20prometheus/ops
            runbook: https://wikitech.wikimedia.org/wiki/Logstash#No_logs_indexed
 
  - interval: 1m
@@ -26,7 +26,7 @@ tests:
     - series: 'logstash_node_plugin_events_out_total{plugin_id="input/kafka"}'
       values: '1+1x1440 1441+3x1440'
    external_labels:
-     cluster: logstash
+     site: eqiad
    alert_rule_test:
     - alertname: LogstashIngestSpike
       eval_time: 1d20m
@@ -37,13 +37,15 @@ tests:
          exp_annotations:
            description: Logstash is ingesting 300% more than what it did this same time yesterday.  Check for a log producer generating a high volume of logs.
            summary: Logstash rate of ingestion percent change compared to yesterday
-           dashboard: https://grafana.wikimedia.org/d/000000561/logstash?orgId=1&panelId=2&fullscreen
+           dashboard: https://grafana.wikimedia.org/d/000000561/logstash?orgId=1&panelId=2&var-datasource=eqiad%20prometheus/ops
            runbook: https://phabricator.wikimedia.org/T202307
 
  - interval: 1m
    input_series:
     - series: 'log_dead_letters_hits'
       values: '500'
+   external_labels:
+     site: eqiad
    alert_rule_test:
     - alertname: LogstashIndexingFailures
       eval_time: 1m
@@ -55,13 +57,15 @@ tests:
           description: Increase in logs received by the Dead Letter Queue and not indexed properly
             due to log message mapping or parsing issues.  Check the DLQ saved search in Logstash for more details.
           summary: Logstash Elasticsearch indexing errors
-          dashboard: https://grafana.wikimedia.org/d/000000561/logstash?viewPanel=40
+          dashboard: https://grafana.wikimedia.org/d/000000561/logstash?viewPanel=40&var-datasource=eqiad%20prometheus/ops
           runbook: https://wikitech.wikimedia.org/wiki/Logstash#Indexing_errors
 
  - interval: 1m
    input_series:
     - series: 'kafka_burrow_partition_lag{exported_cluster="logging-eqiad"}'
       values: '5000'
+   external_labels:
+     site: eqiad
    alert_rule_test:
     - alertname: LogstashKafkaConsumerLag
       eval_time: 1m
@@ -74,7 +78,7 @@ tests:
           description: Logstash consumers are not keeping up with the rate of log production.
             Either Logstash has reduced throughput capacity or log generators are producing too many logs.
           summary: Too many messages in kafka logging
-          dashboard: https://grafana.wikimedia.org/d/000000484/kafka-consumer-lag?var-cluster=logging-eqiad
+          dashboard: https://grafana.wikimedia.org/d/000000484/kafka-consumer-lag?var-cluster=logging-eqiad&var-datasource=eqiad%20prometheus/ops
           runbook: https://wikitech.wikimedia.org/wiki/Logstash#Kafka_consumer_lag
 
  - interval: 1m
@@ -83,6 +87,8 @@ tests:
       values: '0 0 10+10x30'
     - series: 'node_netstat_Udp_InDatagrams{instance="logstash0000:1234"}'
       values: '9+3x30'
+   external_labels:
+     site: eqiad
    alert_rule_test:
     - alertname: LogstashUdpLoss
       eval_time: 3m
@@ -95,5 +101,5 @@ tests:
            description: Logstash node is dropping more than 10% of its received UDP packets.
              Usually, this means Logstash needs a restart.
            summary: Packet loss ratio for UDP > 10% on logstash0000:1234
-           dashboard: https://grafana.wikimedia.org/d/000000561/logstash?viewPanel=1
+           dashboard: https://grafana.wikimedia.org/d/000000561/logstash?viewPanel=1&var-datasource=eqiad%20prometheus/ops
            runbook: https://wikitech.wikimedia.org/wiki/Logstash#UDP_packet_loss
