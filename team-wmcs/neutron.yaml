@@ -12,3 +12,14 @@ groups:
           description: "A Neutron agent is down, VMs will have connectivity issues"
           runbook: https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Troubleshooting#Networking_failures
           dashboard: https://grafana.wikimedia.org/d/wKnDJf97z/wmcs-neutron-eqiad1
+      - alert: NeutronAgentDown
+        expr: min_over_time(openstack_neutron_agent_state{adminState="up"}[20m]) == 0
+        for: 2h
+        labels:
+          team: wmcs
+          severity: task
+        annotations:
+          summary: "Neutron {{ $labels.service }} on {{ $labels.hostname }} is down"
+          description: "A Neutron agent is down, VMs will have connectivity issues"
+          runbook: https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Troubleshooting#Networking_failures
+          dashboard: https://grafana.wikimedia.org/d/wKnDJf97z/wmcs-neutron-eqiad1
