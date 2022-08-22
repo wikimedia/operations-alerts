@@ -1,0 +1,21 @@
+rule_files:
+  - mysql-replication-lag.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    input_series:
+      - series: 'mysql_slave_status_seconds_behind_master{instance="db1099:13318"}'
+        values: '0 250+10x50'
+    alert_rule_test:
+    - alertname: MysqlReplicationLag
+      eval_time: 10m
+      exp_alerts:
+       - exp_labels:
+           severity: warning
+           team: data-persistence
+           instance: db1099:13318
+         exp_annotations:
+           summary: "MySQL instance db1099:13318 has too large replication lag (5m 40s)"
+           description: "Replica db1099:13318 is lagging behind more than 300 seconds, it probably needs depooling"
+           runbook: https://wikitech.wikimedia.org/wiki/MariaDB/troubleshooting#Depooling_a_replica
+           dashboard: https://grafana.wikimedia.org/d/000000273/mysql?orgId=1&refresh=1m&var-job=All&var-server=db1099&var-port=13318
