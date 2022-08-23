@@ -16,6 +16,7 @@ groups:
         labels:
           severity: page
           team: sre
+
       - alert: JobrunnerPHPBusyWorkers
         annotations:
           description: 'Jobrunners in {{ $externalLabels.site }} is experiencing saturation of php-fpm workers: {{ $value | humanizePercentage }} for more than 10 minutes.'
@@ -27,6 +28,22 @@ groups:
           sum by (cluster, service) (phpfpm_statustext_processes{cluster="jobrunner"})
           <= 0.1
         for: 10m
+        labels:
+          severity: critical
+          team: sre
+
+      - alert: AppserversUnreachable
+        annotations:
+          description: 'Prometheus in {{ $externalLabels.site }} is unable to scrape metrics for {{ $value | humanizePercentage }} of cluster {{ $labels.cluster }}.'
+          summary: 'Appserver unavailable for cluster {{ $labels.cluster }} at {{ $externalLabels.site }}'
+          dashboard: 'https://grafana.wikimedia.org/d/RIA1lzDZk/application-servers-red-dashboard?orgId=1&var-datasource={{ $externalLabels.site }}%20prometheus/ops&var-cluster={{ $labels.cluster }}'
+          runbook: 'https://wikitech.wikimedia.org/wiki/Application_servers'
+        expr:
+          sum(up{job="apache",cluster=~"(api_appserver|appserver|jobrunner|parsoid)"}) by (cluster)
+            /
+          count(up{job="apache",cluster=~"(api_appserver|appserver|jobrunner|parsoid)"}) by (cluster)
+            <= 0.9
+        for: 4m
         labels:
           severity: critical
           team: sre

@@ -24,6 +24,7 @@ tests:
               summary: 'Not enough idle php7.4-fpm.service workers for Mediawiki api_appserver at eqiad #page'
               dashboard: 'https://grafana.wikimedia.org/d/RIA1lzDZk/application-servers-red-dashboard?panelId=54&fullscreen&orgId=1&from=now-3h&to=now&var-datasource=eqiad%20prometheus/ops&var-cluster=api_appserver'
               runbook: 'https://bit.ly/wmf-fpmsat'
+
   - interval: 1m
     input_series:
       - series: 'phpfpm_statustext_processes{cluster="jobrunner", state="active", service="php7.2-fpm.service"}'
@@ -50,3 +51,29 @@ tests:
               description: 'Jobrunners in eqiad is experiencing saturation of php-fpm workers: 0.9901% for more than 10 minutes.'
               runbook: 'https://bit.ly/wmf-fpmsat'
               summary: 'Not enough idle php7.2-fpm.service workers for Mediawiki jobrunner at eqiad'
+
+  - interval: 1m
+    input_series:
+      - series: 'up{cluster="api_appserver", instance="mw1317:9117", job="apache"}'
+        values: '0+0x60'
+      - series: 'up{cluster="api_appserver", instance="mw1318:9117", job="apache"}'
+        values: '0+0x60'
+      - series: 'up{cluster="api_appserver", instance="mw1319:9117", job="apache"}'
+        values: '1+0x60'
+      - series: 'up{cluster="api_appserver", instance="mw1320:9117", job="apache"}'
+        values: '1+0x60'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: AppserversUnreachable
+        eval_time: 15m
+        exp_alerts:
+          - exp_labels:
+              team: sre
+              severity: critical
+              cluster: api_appserver
+            exp_annotations:
+              description: 'Prometheus in eqiad is unable to scrape metrics for 50% of cluster api_appserver.'
+              summary: 'Appserver unavailable for cluster api_appserver at eqiad'
+              dashboard: 'https://grafana.wikimedia.org/d/RIA1lzDZk/application-servers-red-dashboard?orgId=1&var-datasource=eqiad%20prometheus/ops&var-cluster=api_appserver'
+              runbook: 'https://wikitech.wikimedia.org/wiki/Application_servers'
