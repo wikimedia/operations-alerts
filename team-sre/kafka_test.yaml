@@ -25,24 +25,17 @@ tests:
   - interval: 1m
     input_series:
       - series: kafka_server_ReplicaManager_UnderReplicatedPartitions{cluster="kafka_jumbo", instance="kafka-jumbo1001:7800", job="jmx_kafka", kafka_cluster="jumbo-eqiad"}
-        values: '45+0x10'
+        values: '45+0x20'
+      - series: kafka_server_ReplicaManager_UnderReplicatedPartitions{cluster="kafka_jumbo", instance="kafka-jumbo1002:7800", job="jmx_kafka", kafka_cluster="jumbo-eqiad"}
+        values: '0+0x20'
     external_labels:
       site: eqiad
     alert_rule_test:
       - alertname: KafkaUnderReplicatedPartitions
-        eval_time: 5m
+        eval_time: 11m
         exp_alerts:
           - exp_labels:
               severity: critical
-              team: sre
-              kafka_cluster: jumbo-eqiad
-            exp_annotations:
-              summary: 'Under replicated partitions for Kafka cluster jumbo-eqiad in eqiad'
-              description: 'Kafka partitions are experiencing under-replication'
-              runbook: https://wikitech.wikimedia.org/wiki/Kafka/Administration
-              dashboard: https://grafana.wikimedia.org/d/000000027/kafka?orgId=1&var-datasource=eqiad%20prometheus/ops&var-kafka_cluster=jumbo-eqiad
-          - exp_labels:
-              severity: warning
               team: sre
               kafka_cluster: jumbo-eqiad
             exp_annotations:
