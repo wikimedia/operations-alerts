@@ -1,5 +1,5 @@
 # https://prometheus.io/docs/prometheus/latest/configuration/unit_testing_rules/
-# Test locally using `promtool test rules kubernetes_test.yaml`
+# Test locally using `promtool test rules kubernetes_generic_test.yaml`
 rule_files:
 - kubernetes-generic.yaml
 evaluation_interval: 1m
@@ -16,6 +16,10 @@ tests:
     values: "0 1 1 1 1 1 1 1 1 1 1 1"
   - series: 'helm_release_status{namespace="pinkunicorn", name="main", status="deployed"}'
     values: "1 1 1 1 1 1 1 1 1 1 1 0"
+  - series: 'kubelet_runtime_operations_duration_seconds_bucket{job="k8s-node", instance="kubefakenode:1234", operation_type="fakeop", le="+Inf"}'
+    values: "1+1x6"
+  - series: 'kubelet_runtime_operations_duration_seconds_bucket{job="k8s-node", instance="kubefakenode:1234", operation_type="fakeop", le="0.7"}'
+    values: "0+0x6"
   external_labels:
     site: moon
     prometheus: eagle
@@ -69,3 +73,17 @@ tests:
         summary: "Helm release pinkunicorn/main on eagle@moon in state pending-upgrade"
         description: "The Helm release pinkunicorn/main on Kubernetes cluster eagle@moon is in state pending-upgrade for more than 11min, you might need to roll back"
         runbook: "https://wikitech.wikimedia.org/wiki/Kubernetes/Deployments#Rolling_back_in_an_emergency"
+  - alertname: KubeletOperationalLatency
+    eval_time: 6m
+    exp_alerts:
+    - exp_labels:
+        team: sre
+        severity: warning
+        job: k8s-node
+        instance: kubefakenode:1234
+        operation_type: fakeop
+      exp_annotations:
+        summary: "High latency for kubelet fakeop operation on kubefakenode:1234"
+        description: "Kubelet fakeop operations on kubefakenode:1234 take 700ms in p99"
+        runbook: "https://wikitech.wikimedia.org/wiki/Kubernetes"
+        dashboard: "https://grafana.wikimedia.org/d/000000472/kubernetes-kubelets?var-cluster=moon prometheus/eagle"

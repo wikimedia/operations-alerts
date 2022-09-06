@@ -21,6 +21,17 @@ groups:
       summary: "rsyslog on {{ $labels.instance }} is missing kubernetes logs"
       description: "Rsyslog mmkubernetes plugin on {{ $labels.instance }} did not see any records in the last 5 minutes. This might mean that the plugin was terminated."
       runbook: https://wikitech.wikimedia.org/wiki/Kubernetes/Logging#Common_issues
+  - alert: KubeletOperationalLatency
+    expr: histogram_quantile(0.99, rate(kubelet_runtime_operations_duration_seconds_bucket{job="k8s-node"}[5m])) > 0.6
+    for: 5m
+    labels:
+      team: sre
+      severity: warning
+    annotations:
+      description: "Kubelet {{ $labels.operation_type }} operations on {{ $labels.instance }} take {{ $value | humanizeDuration }} in p99"
+      summary: "High latency for kubelet {{ $labels.operation_type }} operation on {{ $labels.instance }}"
+      runbook: "https://wikitech.wikimedia.org/wiki/Kubernetes"
+      dashboard: "https://grafana.wikimedia.org/d/000000472/kubernetes-kubelets?var-cluster={{ $externalLabels.site }} prometheus/{{ $externalLabels.prometheus }}"
 - name: certmanager
   rules:
   - alert: CertManagerCertNotReady
