@@ -31,7 +31,7 @@ tests:
               severity: warning
               team: traffic
               instance: "cp1235:2112"
-            exp_annotations: &purged-cp1235-annotations
+            exp_annotations: &purged-cp1235-annotations-lag
               summary: 'High event process lag with purged on cp1235:2112'
               description: "It's been a while since a Kafka event has been processed by purged (6000ms, to be exact)"
               runbook: *purged-runbook
@@ -40,7 +40,7 @@ tests:
               severity: critical
               team: traffic
               instance: "cp1235:2112"
-            exp_annotations: *purged-cp1235-annotations
+            exp_annotations: *purged-cp1235-annotations-lag
 
   - interval: 1m
     external_labels:
@@ -80,7 +80,7 @@ tests:
               severity: warning
               team: traffic
               instance: "cp1235:2112"
-            exp_annotations: &purged-cp1235-annotations
+            exp_annotations: &purged-cp1235-annotations-backlog
               summary: "Large backlog queue for purged on cp1235:2112"
               description: "cp1235:2112 (in eqiad) has a purged backlog of 11000."
               runbook: *purged-runbook
@@ -89,7 +89,7 @@ tests:
               severity: critical
               team: traffic
               instance: "cp1235:2112"
-            exp_annotations: *purged-cp1235-annotations
+            exp_annotations: *purged-cp1235-annotations-backlog
           - exp_labels:
               severity: warning
               team: traffic
