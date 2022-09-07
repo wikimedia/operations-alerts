@@ -32,7 +32,8 @@ groups:
           severity: critical
           team: sre
 
-      - alert: AppserversUnreachable
+      - &AppserversUnreachable
+        alert: AppserversUnreachable
         annotations:
           description: 'Prometheus in {{ $externalLabels.site }} is unable to scrape metrics for {{ $value | humanizePercentage }} of cluster {{ $labels.cluster }}.'
           summary: 'Appserver unavailable for cluster {{ $labels.cluster }} at {{ $externalLabels.site }}'
@@ -47,3 +48,12 @@ groups:
         labels:
           severity: critical
           team: sre
+
+      # Re-use the alert above and check that apache-exporter can actually talk
+      # to apache itself (i.e. apache_up == 1)
+      - <<: *AppserversUnreachable
+        expr:
+          sum(apache_up{job="apache",cluster=~"(api_appserver|appserver|jobrunner|parsoid)"}) by (cluster)
+            /
+          count(apache_up{job="apache",cluster=~"(api_appserver|appserver|jobrunner|parsoid)"}) by (cluster)
+            <= 0.9
