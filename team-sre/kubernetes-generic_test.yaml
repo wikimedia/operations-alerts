@@ -20,6 +20,12 @@ tests:
     values: "1+1x6"
   - series: 'kubelet_runtime_operations_duration_seconds_bucket{job="k8s-node", instance="kubefakenode:1234", operation_type="fakeop", le="0.7"}'
     values: "0+0x6"
+  - series: 'apiserver_request_count{job="k8s-api", code="200"}'
+    values: "100+1x6"
+  - series: 'apiserver_request_count{job="k8s-api", code="0"}'
+    values: "100+1x6"
+  - series: 'apiserver_request_count{job="k8s-api", code="500"}'
+    values: "1+5x6"
   external_labels:
     site: moon
     prometheus: eagle
@@ -87,3 +93,15 @@ tests:
         description: "Kubelet fakeop operations on kubefakenode:1234 take 700ms in p99"
         runbook: "https://wikitech.wikimedia.org/wiki/Kubernetes"
         dashboard: "https://grafana.wikimedia.org/d/000000472/kubernetes-kubelets?var-cluster=moon prometheus/eagle"
+  - alertname: KubernetesAPIErrorRate
+    eval_time: 6m
+    exp_alerts:
+    - exp_labels:
+        team: sre
+        severity: warning
+        code: 500
+      exp_annotations:
+        description: "Kubernetes API servers eagle@moon are responding with 71.43% HTTP 500s"
+        summary: "High rate of HTTP 500 responses from Kubernetes API eagle@moon"
+        runbook: "https://wikitech.wikimedia.org/wiki/Kubernetes"
+        dashboard: "https://grafana-rw.wikimedia.org/d/000000435/kubernetes-api?var-site=moon&var-cluster=eagle"

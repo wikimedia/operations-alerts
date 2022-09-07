@@ -32,6 +32,24 @@ groups:
       summary: "High latency for kubelet {{ $labels.operation_type }} operation on {{ $labels.instance }}"
       runbook: "https://wikitech.wikimedia.org/wiki/Kubernetes"
       dashboard: "https://grafana.wikimedia.org/d/000000472/kubernetes-kubelets?var-cluster={{ $externalLabels.site }} prometheus/{{ $externalLabels.prometheus }}"
+  # A continuous rate of non 4xx requests may be a pointer to some client/operation constantly failing or doing the wrong thing.
+  # So everything non 2xx|0 is defined as "error" here. The special code 0 is currently (k8s 1.16) used for WATCH requests
+  # but that might change[1]. For now we treat 0 as if it where 2xx.
+  # The threshold of 5.2% is chosen to account for a high rate of 409s currently seen on ml-serve@eqiad and is subject to change.
+  # [1] https://github.com/kubernetes/kubernetes/issues/107949
+  - alert: KubernetesAPIErrorRate
+    expr: sum by (code) (rate(apiserver_request_count{code!~"^2..|^0$", job="k8s-api"}[5m]))
+      / ignoring(code) group_left
+      sum (rate(apiserver_request_count{job="k8s-api"}[5m])) > 0.052
+    for: 5m
+    labels:
+      team: sre
+      severity: warning
+    annotations:
+      description: "Kubernetes API servers {{ $externalLabels.prometheus }}@{{ $externalLabels.site }} are responding with {{ $value | humanizePercentage }} HTTP {{ $labels.code }}s"
+      summary: "High rate of HTTP {{ $labels.code }} responses from Kubernetes API {{ $externalLabels.prometheus }}@{{ $externalLabels.site }}"
+      runbook: "https://wikitech.wikimedia.org/wiki/Kubernetes"
+      dashboard: "https://grafana-rw.wikimedia.org/d/000000435/kubernetes-api?var-site={{ $externalLabels.site }}&var-cluster={{ $externalLabels.prometheus }}"
 - name: certmanager
   rules:
   - alert: CertManagerCertNotReady
