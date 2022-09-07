@@ -26,6 +26,18 @@ tests:
     values: "100+1x6"
   - series: 'apiserver_request_count{job="k8s-api", code="500"}'
     values: "1+5x6"
+  - series: 'apiserver_request_duration_seconds_bucket{verb="GET", resource="shoes", le="+Inf"}'
+    values: "1+1x6"
+  - series: 'apiserver_request_duration_seconds_bucket{verb="GET", resource="shoes", le="+0.6"}'
+    values: "0+0x6"
+  - series: 'apiserver_request_duration_seconds_bucket{verb="GET", resource="secrets", le="+Inf"}'
+    values: "1+1x6"
+  - series: 'apiserver_request_duration_seconds_bucket{verb="GET", resource="secrets", le="+0.6"}'
+    values: "0+0x6"
+  - series: 'apiserver_request_duration_seconds_bucket{verb="LIST", resource="secrets", le="+Inf"}'
+    values: "1+1x6"
+  - series: 'apiserver_request_duration_seconds_bucket{verb="LIST", resource="secrets", le="+1.8"}'
+    values: "0+0x6"
   external_labels:
     site: moon
     prometheus: eagle
@@ -103,5 +115,44 @@ tests:
       exp_annotations:
         description: "Kubernetes API servers eagle@moon are responding with 71.43% HTTP 500s"
         summary: "High rate of HTTP 500 responses from Kubernetes API eagle@moon"
+        runbook: "https://wikitech.wikimedia.org/wiki/Kubernetes"
+        dashboard: "https://grafana-rw.wikimedia.org/d/000000435/kubernetes-api?var-site=moon&var-cluster=eagle"
+  - alertname: KubernetesAPILatency
+    eval_time: 6m
+    exp_alerts:
+    - exp_labels:
+        team: sre
+        severity: critical
+        verb: GET
+        resource: shoes
+      exp_annotations:
+        description: "Kubernetes API GET requests for shoes take 600ms in p99 on eagle@moon"
+        summary: "High Kubernetes API latency (GET shoes) on eagle@moon"
+        runbook: "https://wikitech.wikimedia.org/wiki/Kubernetes"
+        dashboard: "https://grafana-rw.wikimedia.org/d/000000435/kubernetes-api?var-site=moon&var-cluster=eagle"
+  - alertname: KubernetesAPILatencySecrets
+    eval_time: 6m
+    exp_alerts:
+    - exp_labels:
+        team: sre
+        severity: critical
+        verb: GET
+        resource: secrets
+      exp_annotations:
+        description: "Kubernetes API GET requests for secrets take 600ms in p99 on eagle@moon"
+        summary: "High Kubernetes API latency (GET secrets) on eagle@moon"
+        runbook: "https://wikitech.wikimedia.org/wiki/Kubernetes"
+        dashboard: "https://grafana-rw.wikimedia.org/d/000000435/kubernetes-api?var-site=moon&var-cluster=eagle"
+  - alertname: KubernetesAPILatencySecretsLIST
+    eval_time: 6m
+    exp_alerts:
+    - exp_labels:
+        team: sre
+        severity: critical
+        verb: LIST
+        resource: secrets
+      exp_annotations:
+        description: "Kubernetes API LIST requests for secrets take 1.8s in p99 on eagle@moon"
+        summary: "High Kubernetes API latency (LIST secrets) on eagle@moon"
         runbook: "https://wikitech.wikimedia.org/wiki/Kubernetes"
         dashboard: "https://grafana-rw.wikimedia.org/d/000000435/kubernetes-api?var-site=moon&var-cluster=eagle"

@@ -50,6 +50,39 @@ groups:
       summary: "High rate of HTTP {{ $labels.code }} responses from Kubernetes API {{ $externalLabels.prometheus }}@{{ $externalLabels.site }}"
       runbook: "https://wikitech.wikimedia.org/wiki/Kubernetes"
       dashboard: "https://grafana-rw.wikimedia.org/d/000000435/kubernetes-api?var-site={{ $externalLabels.site }}&var-cluster={{ $externalLabels.prometheus }}"
+  - alert: KubernetesAPILatency
+    expr: histogram_quantile(0.99, sum by (le, verb, resource) (rate(apiserver_request_duration_seconds_bucket{verb!~"^(?:CONNECT|WATCHLIST|WATCH|PROXY)$", resource!="secrets"}[5m]))) > 0.5
+    for: 5m
+    labels:
+      team: sre
+      severity: critical
+    annotations:
+      description: "Kubernetes API {{ $labels.verb }} requests for {{ $labels.resource }} take {{ $value | humanizeDuration }} in p99 on {{ $externalLabels.prometheus }}@{{ $externalLabels.site }}"
+      summary: "High Kubernetes API latency ({{ $labels.verb }} {{ $labels.resource }}) on {{ $externalLabels.prometheus }}@{{ $externalLabels.site }}"
+      runbook: "https://wikitech.wikimedia.org/wiki/Kubernetes"
+      dashboard: "https://grafana-rw.wikimedia.org/d/000000435/kubernetes-api?var-site={{ $externalLabels.site }}&var-cluster={{ $externalLabels.prometheus }}"
+  - alert: KubernetesAPILatencySecrets
+    expr: histogram_quantile(0.99, sum by (le, verb, resource) (rate(apiserver_request_duration_seconds_bucket{verb!~"^(?:CONNECT|WATCHLIST|WATCH|PROXY|LIST)$", resource="secrets"}[5m]))) > 0.5
+    for: 5m
+    labels:
+      team: sre
+      severity: critical
+    annotations:
+      description: "Kubernetes API {{ $labels.verb }} requests for {{ $labels.resource }} take {{ $value | humanizeDuration }} in p99 on {{ $externalLabels.prometheus }}@{{ $externalLabels.site }}"
+      summary: "High Kubernetes API latency ({{ $labels.verb }} {{ $labels.resource }}) on {{ $externalLabels.prometheus }}@{{ $externalLabels.site }}"
+      runbook: "https://wikitech.wikimedia.org/wiki/Kubernetes"
+      dashboard: "https://grafana-rw.wikimedia.org/d/000000435/kubernetes-api?var-site={{ $externalLabels.site }}&var-cluster={{ $externalLabels.prometheus }}"
+  - alert: KubernetesAPILatencySecretsLIST
+    expr: histogram_quantile(0.99, sum by (le, verb, resource) (rate(apiserver_request_duration_seconds_bucket{verb="LIST", resource="secrets"}[5m]))) > 1.7
+    for: 5m
+    labels:
+      team: sre
+      severity: critical
+    annotations:
+      description: "Kubernetes API {{ $labels.verb }} requests for {{ $labels.resource }} take {{ $value | humanizeDuration }} in p99 on {{ $externalLabels.prometheus }}@{{ $externalLabels.site }}"
+      summary: "High Kubernetes API latency ({{ $labels.verb }} {{ $labels.resource }}) on {{ $externalLabels.prometheus }}@{{ $externalLabels.site }}"
+      runbook: "https://wikitech.wikimedia.org/wiki/Kubernetes"
+      dashboard: "https://grafana-rw.wikimedia.org/d/000000435/kubernetes-api?var-site={{ $externalLabels.site }}&var-cluster={{ $externalLabels.prometheus }}"
 - name: certmanager
   rules:
   - alert: CertManagerCertNotReady
