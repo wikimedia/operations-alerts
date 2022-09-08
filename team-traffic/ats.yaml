@@ -12,3 +12,41 @@ groups:
           description: "The {{ $labels.layer }} ATS cluster on {{ $labels.instance }} ({{ $externalLabels.site }}) has restarted."
           dashboard: 'https://grafana.wikimedia.org/d/6uhkG6OZk/ats-instance-drilldown?orgId=1&var-site={{ $externalLabels.site }}&var-instance={{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}&var-layer={{ $labels.layer }}'
           runbook: 'https://wikitech.wikimedia.org/wiki/Apache_Traffic_Server'
+
+      - alert: HighATSConnections
+        expr: trafficserver_connections_used_percent >= 70
+        for: 5m
+        labels:
+          team: traffic
+          severity: warning
+        annotations: &atsconnections-annotations
+          summary: 'High number of ATS connections on {{ $labels.instance }}'
+          description: "{{ $value }}% of max connections are currently used on {{ $labels.instance }}."
+          dashboard: 'https://grafana.wikimedia.org/d/6uhkG6OZk/ats-instance-drilldown?orgId=1&viewPanel=56&var-site={{ $externalLabels.site }}&var-instance={{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}'
+          runbook: 'https://wikitech.wikimedia.org/wiki/Apache_Traffic_Server'
+
+      - alert: HighATSConnections
+        expr: trafficserver_connections_used_percent >= 90
+        labels:
+          team: traffic
+          severity: critical
+        annotations: *atsconnections-annotations
+
+      - alert: HighATSrequests
+        expr: trafficserver_requests_used_percent >= 70
+        for: 5m
+        labels:
+          team: traffic
+          severity: warning
+        annotations: &atsrequests-annotations
+          summary: 'High number of ATS requests on {{ $labels.instance }}'
+          description: "{{ $value }}% of max requests are currently used on {{ $labels.instance }}."
+          dashboard: 'https://grafana.wikimedia.org/d/6uhkG6OZk/ats-instance-drilldown?orgId=1&var-site={{ $externalLabels.site }}&var-instance={{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}'
+          runbook: 'https://wikitech.wikimedia.org/wiki/Apache_Traffic_Server'
+
+      - alert: HighATSrequests
+        expr: trafficserver_requests_used_percent >= 90
+        labels:
+          team: traffic
+          severity: critical
+        annotations: *atsrequests-annotations

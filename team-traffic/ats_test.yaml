@@ -22,3 +22,81 @@ tests:
               description: "The backend ATS cluster on cp1234:9122 (eqiad) has restarted."
               dashboard: 'https://grafana.wikimedia.org/d/6uhkG6OZk/ats-instance-drilldown?orgId=1&var-site=eqiad&var-instance=cp1234&var-layer=backend'
               runbook: 'https://wikitech.wikimedia.org/wiki/Apache_Traffic_Server'
+  - interval: 1m
+    external_labels:
+      site: eqiad
+    input_series:
+      - series: 'trafficserver_connections_used_percent{instance="cp1234:0"}'
+        values: '60 70 60 70 60 70'
+      - series: 'trafficserver_connections_used_percent{instance="cp1235:0"}'
+        values: '70 70 70 70 70 70'
+      - series: 'trafficserver_connections_used_percent{instance="cp1236:0"}'
+        values: '90 90 90 90 90 90'
+
+      - series: 'trafficserver_requests_used_percent{instance="cp1237:0"}'
+        values: '60 70 60 70 60 70'
+      - series: 'trafficserver_requests_used_percent{instance="cp1238:0"}'
+        values: '70 70 70 70 70 70'
+      - series: 'trafficserver_requests_used_percent{instance="cp1239:0"}'
+        values: '90 90 90 90 90 90'
+    alert_rule_test:
+      - alertname: HighATSConnections
+        eval_time: 6m
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              team: traffic
+              instance: cp1235:0
+            exp_annotations:
+              summary: 'High number of ATS connections on cp1235:0'
+              description: "70% of max connections are currently used on cp1235:0."
+              dashboard: 'https://grafana.wikimedia.org/d/6uhkG6OZk/ats-instance-drilldown?orgId=1&viewPanel=56&var-site=eqiad&var-instance=cp1235'
+              runbook: 'https://wikitech.wikimedia.org/wiki/Apache_Traffic_Server'
+          - exp_labels:
+              severity: warning
+              team: traffic
+              instance: cp1236:0
+            exp_annotations:
+              summary: 'High number of ATS connections on cp1236:0'
+              description: "90% of max connections are currently used on cp1236:0."
+              dashboard: 'https://grafana.wikimedia.org/d/6uhkG6OZk/ats-instance-drilldown?orgId=1&viewPanel=56&var-site=eqiad&var-instance=cp1236'
+              runbook: 'https://wikitech.wikimedia.org/wiki/Apache_Traffic_Server'
+          - exp_labels:
+              severity: critical
+              team: traffic
+              instance: cp1236:0
+            exp_annotations:
+              summary: 'High number of ATS connections on cp1236:0'
+              description: "90% of max connections are currently used on cp1236:0."
+              dashboard: 'https://grafana.wikimedia.org/d/6uhkG6OZk/ats-instance-drilldown?orgId=1&viewPanel=56&var-site=eqiad&var-instance=cp1236'
+              runbook: 'https://wikitech.wikimedia.org/wiki/Apache_Traffic_Server'
+      - alertname: HighATSrequests
+        eval_time: 6m
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              team: traffic
+              instance: cp1238:0
+            exp_annotations:
+              summary: 'High number of ATS requests on cp1238:0'
+              description: "70% of max requests are currently used on cp1238:0."
+              dashboard: 'https://grafana.wikimedia.org/d/6uhkG6OZk/ats-instance-drilldown?orgId=1&var-site=eqiad&var-instance=cp1238'
+              runbook: 'https://wikitech.wikimedia.org/wiki/Apache_Traffic_Server'
+          - exp_labels:
+              severity: warning
+              team: traffic
+              instance: cp1239:0
+            exp_annotations:
+              summary: 'High number of ATS requests on cp1239:0'
+              description: "90% of max requests are currently used on cp1239:0."
+              dashboard: 'https://grafana.wikimedia.org/d/6uhkG6OZk/ats-instance-drilldown?orgId=1&var-site=eqiad&var-instance=cp1239'
+              runbook: 'https://wikitech.wikimedia.org/wiki/Apache_Traffic_Server'
+          - exp_labels:
+              severity: critical
+              team: traffic
+              instance: cp1239:0
+            exp_annotations:
+              summary: 'High number of ATS requests on cp1239:0'
+              description: "90% of max requests are currently used on cp1239:0."
+              dashboard: 'https://grafana.wikimedia.org/d/6uhkG6OZk/ats-instance-drilldown?orgId=1&var-site=eqiad&var-instance=cp1239'
+              runbook: 'https://wikitech.wikimedia.org/wiki/Apache_Traffic_Server'
