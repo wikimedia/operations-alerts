@@ -11,3 +11,13 @@ groups:
         labels:
           severity: page
           team: sre
+      - alert: EtcdReplicationDown
+        expr: 'up{job="etcdmirror"} != 1'
+        for: 2m
+        annotations:
+          summary: 'etcd replication down on {{ $labels.instance }} #page'
+          description: 'The etcd-mirror instance on {{ $labels.instance }} is down or unresponsive'
+          runbook: 'https://wikitech.wikimedia.org/wiki/Etcd/Main_cluster#Replication'
+        labels:
+          severity: page
+          team: sre
