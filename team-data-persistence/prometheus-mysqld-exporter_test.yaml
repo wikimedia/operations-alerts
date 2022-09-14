@@ -18,3 +18,4 @@ tests:
            summary: "Prometheus-mysqld-exporter failed (db1099:13318)"
            description: "Prometheus mysqld exporter failed on db1099:13318, it probably needs restarting"
            dashboard: https://grafana.wikimedia.org/d/000000278/mysql-aggregated
+           runbook: TODO

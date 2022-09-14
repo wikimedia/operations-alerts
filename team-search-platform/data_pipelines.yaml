@@ -11,3 +11,4 @@ groups:
         summary: "Data shipping to CirrusSearch in {{$labels.site}} is experiencing abnormal failure rates"
         description: "Updates shipped from analytics are either invalid or being lost and will need to be re-shipped."
         dashboard: https://grafana.wikimedia.org/d/000000591/elasticsearch-mjolnir-bulk-updates
+        runbook: TODO

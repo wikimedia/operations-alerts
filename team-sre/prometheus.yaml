@@ -33,6 +33,8 @@ groups:
         description: Prometheus in {{ $externalLabels.site }} can't scrape node metrics for WMCS cluster.
           Make sure all Prometheus hosts can reach the target hosts. Most likely a firewall issue.
         summary: Prometheus in {{ $externalLabels.site }} can't scrape node metrics from WMCS.
+        runbook: TODO
+        dashboard: TODO
       expr: 0.2 >= sum (up{job="node",cluster="wmcs"}) / count (up{job="node",cluster="wmcs"})
       for: 5m
       labels:

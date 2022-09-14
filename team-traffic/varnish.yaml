@@ -10,6 +10,8 @@ groups:
         annotations:
           summary: "Varnish Exporter on instance {{ $labels.instance }} is unreachable"
           description: "Prometheus has been unable to fetch metrics from Varnish Exporter on host {{ $labels.instance }} job({{ $labels.job }}) for more than 5 minutes. Make sure the exporter is running on the host."
+          dashboard: TODO
+          runbook: TODO
 
       - alert: VarnishChildRestarted
         expr: varnish_mgt_child_start{layer="frontend"} >= 2

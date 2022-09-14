@@ -12,3 +12,4 @@ groups:
       summary: "Certificate {{ $labels.namespace }}/{{ $labels.name }} in is about to expire"
       description: "The certificate {{ $labels.name }} in namespace {{ $labels.namespace }} is {{ $value | humanizeDuration }} from expiry. It should have been refreshed 8 hours before expiry"
       runbook: https://wikitech.wikimedia.org/wiki/Kubernetes/cert-manager
+      dashboard: TODO

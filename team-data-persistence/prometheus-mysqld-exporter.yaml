@@ -5,6 +5,7 @@ groups:
       annotations:
         description: Prometheus mysqld exporter failed on {{$labels.instance}}, it probably needs restarting
         dashboard: https://grafana.wikimedia.org/d/000000278/mysql-aggregated
+        runbook: TODO
         summary: Prometheus-mysqld-exporter failed ({{$labels.instance}})
       expr: mysql_exporter_last_scrape_error > 0
       for: 30m

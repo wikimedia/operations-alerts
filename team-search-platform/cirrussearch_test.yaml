@@ -64,3 +64,5 @@ tests:
           exp_annotations:
             summary: "commonswiki_file index in alertmanager-test is ready for reindexing"
             description: "The reindexing process should be run to ensure multi-lingual analysis chain updates are applied"
+            runbook: TODO
+            dashboard: TODO

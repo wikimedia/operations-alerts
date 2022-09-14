@@ -9,6 +9,7 @@ groups:
           description: "{{ $value | humanizePercentage}} of the cloudvirt nodes at {{ $externalLabels.site }} are down."
           summary: "Reduced availability for CloudVPS {{ $externalLabels.site }}"
           runbook: "https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/TooManyCloudvirtsDown"
+          dashboard: TODO
         expr: 0.199 <= (1 - (sum(up{job="node", instance=~"cloudvirt.*"}) /count(up{job="node", instance=~"cloudvirt.*"})))
         for: 5m
         labels:
@@ -21,6 +22,7 @@ groups:
           description: "All the cloudcontrol nodes at {{ $externalLabels.site }} are down."
           summary: "No availability for CloudVPS {{ $externalLabels.site }}"
           runbook: "https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/TooManyCloudcontrolsDown"
+          dashboard: TODO
         expr: 3 <= count(up{job="node", instance=~"cloudcontrol.*"})
         for: 5m
         labels:
@@ -33,6 +35,7 @@ groups:
           description: "All the cloudnet nodes at {{ $externalLabels.site }} are down."
           summary: "No availability for CloudVPS {{ $externalLabels.site }}"
           runbook: "https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/TooManyCloudnetsDown"
+          dashboard: TODO
         expr: 2 <= count(up{job="node", instance=~"cloudnet.*"})
         for: 5m
         labels:
@@ -45,6 +48,7 @@ groups:
           description: "All the cloudgw nodes at {{ $externalLabels.site }} are down."
           summary: "No availability for CloudVPS {{ $externalLabels.site }}"
           runbook: "https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/TooManyCloudgwsDown"
+          dashboard: TODO
         expr: 2 <= count(up{job="node", instance=~"cloudgw.*"})
         for: 5m
         labels:

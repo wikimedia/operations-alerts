@@ -18,6 +18,8 @@ tests:
          exp_annotations:
            summary: "Varnish Exporter on instance cp3030:9331 is unreachable"
            description: "Prometheus has been unable to fetch metrics from Varnish Exporter on host cp3030:9331 job(varnish-text) for more than 5 minutes. Make sure the exporter is running on the host."
+           dashboard: TODO
+           runbook: TODO
 
   - interval: 1m
     external_labels:

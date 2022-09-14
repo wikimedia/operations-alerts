@@ -28,6 +28,7 @@ tests:
               description: 20% of the cloudvirt nodes at codfw are down.
               summary: "Reduced availability for CloudVPS codfw"
               runbook: "https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/TooManyCloudvirtsDown"
+              dashboard: TODO
 
   - interval: 1m
     input_series:
@@ -51,6 +52,7 @@ tests:
               description: All the cloudcontrol nodes at codfw are down.
               summary: "No availability for CloudVPS codfw"
               runbook: "https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/TooManyCloudcontrolsDown"
+              dashboard: TODO
 
   - interval: 1m
     input_series:
@@ -72,6 +74,7 @@ tests:
               description: All the cloudnet nodes at codfw are down.
               summary: "No availability for CloudVPS codfw"
               runbook: "https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/TooManyCloudnetsDown"
+              dashboard: TODO
 
   - interval: 1m
     input_series:
@@ -93,3 +96,4 @@ tests:
               description: All the cloudgw nodes at codfw are down.
               summary: "No availability for CloudVPS codfw"
               runbook: "https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/TooManyCloudgwsDown"
+              dashboard: TODO

@@ -22,6 +22,8 @@ tests:
         summary: "Certificate fakespace/fakename in is about to expire"
         description: "The certificate fakename in namespace fakespace is 8d 23h 48m 0s from expiry. It should have been refreshed 9 days before expiry"
         runbook: https://wikitech.wikimedia.org/wiki/Kubernetes/cert-manager
+        dashboard: TODO
+
   - alertname: CertManagerCertExpirySoon
     eval_time: 12m
     exp_alerts:
@@ -34,6 +36,7 @@ tests:
         summary: "Certificate fakespace/fakename in is about to expire"
         description: "The certificate fakename in namespace fakespace is 6d 23h 43m 0s from expiry. It should have been refreshed 9 days before expiry"
         runbook: https://wikitech.wikimedia.org/wiki/Kubernetes/cert-manager
+        dashboard: TODO
     - exp_labels:
         severity: critical
         team: sre
@@ -43,3 +46,4 @@ tests:
         summary: "Certificate fakespace/fakename in is about to expire"
         description: "The certificate fakename in namespace fakespace is 6d 23h 43m 0s from expiry. It should have been refreshed 9 days before expiry"
         runbook: https://wikitech.wikimedia.org/wiki/Kubernetes/cert-manager
+        dashboard: TODO

@@ -22,6 +22,8 @@ tests:
               summary: 'etcd-mirror is lagging: 661 #page'
               description: 'The etcd-mirror process on conf2005:8000 has detected lag for https://conf2005.codfw.wmnet:2379'
               runbook: https://wikitech.wikimedia.org/wiki/Etcd
+              dashboard: TODO
+
   - interval: 1m
     input_series:
       - series: 'up{job="etcdmirror", instance="conf2005:8000", cluster="etcd"}'
@@ -40,3 +42,4 @@ tests:
               summary: 'etcd replication down on conf2005:8000 #page'
               description: 'The etcd-mirror instance on conf2005:8000 is down or unresponsive'
               runbook: https://wikitech.wikimedia.org/wiki/Etcd/Main_cluster#Replication
+              dashboard: TODO

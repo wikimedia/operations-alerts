@@ -55,6 +55,7 @@ groups:
        description: 'The certificate presented by service {{ $labels.instance }} is going to expire in {{ $value | humanizeDuration }}'
        summary: 'Certificate for service {{ $labels.instance }} is about to expire'
        runbook: 'https://wikitech.wikimedia.org/wiki/TLS/Runbook#{{ $labels.instance }}'
+       dashboard: TODO
      expr: probe_ssl_earliest_cert_expiry{job=~"probes/.*"} - time() < (86400 * 9)
      for: 5m
      labels:
@@ -73,6 +74,7 @@ groups:
        summary: 'Slow probes for service {{ $labels.instance }}'
        dashboard: 'https://grafana.wikimedia.org/d/O0nHhdhnz/network-probes-overview?var-job={{ $labels.job }}&var-module={{ $labels.module }}'
        logs: 'https://logstash.wikimedia.org/app/dashboards#/view/f3e709c0-a5f8-11ec-bf8e-43f1807d5bc2?_g=(filters:!((query:(match_phrase:(service.name:{{ $labels.module }})))))'
+       runbook: TODO
      expr: probe_duration_seconds{job=~"probes/.*", module=~"(http|tcp).*"} * probe_success > 1
      for: 2m
      labels:

@@ -34,3 +34,5 @@ groups:
       annotations:
         summary: "{{$labels.index}} index in {{$labels.exported_cluster}} is ready for reindexing"
         description: "The reindexing process should be run to ensure multi-lingual analysis chain updates are applied"
+        runbook: TODO
+        dashboard: TODO
