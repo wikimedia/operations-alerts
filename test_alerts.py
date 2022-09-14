@@ -168,8 +168,7 @@ def _get_tag(fobj, name):
 
 def _validate_rule_metadata(rule):
     required_labels = ("severity", "team")
-    required_annotations = ("summary", "description")
-    wanted_annotations = ("dashboard", "runbook")
+    required_annotations = ("summary", "description", "dashboard", "runbook")
 
     labels = rule["labels"]
     annotations = rule["annotations"]
@@ -179,7 +178,10 @@ def _validate_rule_metadata(rule):
         assert l in labels
 
     for a in required_annotations:
-        assert a in annotations
+        assert a in annotations, (
+            "Annotation %r not found for alert %r.  Consider adding a string/URL or TODO."
+            % (a, alertname)
+        )
 
     if rule["labels"]["severity"] == "page":
         assert "#page" in rule["annotations"]["summary"]
@@ -192,12 +194,6 @@ def _validate_rule_metadata(rule):
         if a in annotations:
             assert _url_is_quoted(annotations[a]), (
                 "URL in %s contains unquoted characters, check warnings for details" % a
-            )
-
-    for a in wanted_annotations:
-        if a not in annotations:
-            warnings.warn(
-                UserWarning("Annotation %r not found for alert %s" % (a, alertname))
             )
 
 
