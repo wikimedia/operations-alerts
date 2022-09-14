@@ -119,7 +119,7 @@ def test_runbook_exists(rulefile):
     for group in groups["groups"]:
         for rule in group["rules"]:
             runbook = rule.get("annotations", {}).get("runbook", None)
-            if runbook is not None:
+            if runbook is not None and runbook != "TODO":
                 response = requests.get(runbook)
                 assert response.status_code == 200 and response.text != "", (
                     f"Unable to fetch runbook {runbook}, please make sure that it exists and "
