@@ -15,7 +15,7 @@ groups:
 
       - &KafkaUnderReplicatedPartitions
         alert: KafkaUnderReplicatedPartitions
-        expr: max(kafka_server_ReplicaManager_UnderReplicatedPartitions) by (kafka_cluster) >= 0
+        expr: max(kafka_server_ReplicaManager_UnderReplicatedPartitions) by (kafka_cluster) > 0
         for: 10m
         annotations:
           summary: 'Under replicated partitions for Kafka cluster {{ $labels.kafka_cluster }} in {{ $externalLabels.site }}'
