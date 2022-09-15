@@ -9,6 +9,9 @@ tests:
   # time() is from 0 in unit tests
   - series: certmanager_certificate_expiration_timestamp_seconds{namespace="fakespace", name="fakename"}
     values: "777600-60x6 604800-60x6"
+  external_labels:
+    site: moon
+    prometheus: eagle
   alert_rule_test:
   - alertname: CertManagerCertExpirySoon
     eval_time: 6m
@@ -19,10 +22,10 @@ tests:
         namespace: fakespace
         name: fakename
       exp_annotations:
-        summary: "Certificate fakespace/fakename in is about to expire"
-        description: "The certificate fakename in namespace fakespace is 8d 23h 48m 0s from expiry. It should have been refreshed 9 days before expiry"
+        summary: "Certificate fakespace/fakename in is about to expire (eagle@moon)"
+        description: "The certificate fakename in namespace fakespace is 8d 23h 48m 0s from expiry (eagle@moon). It should have been refreshed 9 days before expiry"
         runbook: https://wikitech.wikimedia.org/wiki/Kubernetes/cert-manager
-        dashboard: TODO
+        dashboard: https://grafana.wikimedia.org/d/vo5tiJTnz?var-site=moon&var-cluster=eagle&var-namespace=fakespace
 
   - alertname: CertManagerCertExpirySoon
     eval_time: 12m
@@ -33,17 +36,17 @@ tests:
         namespace: fakespace
         name: fakename
       exp_annotations:
-        summary: "Certificate fakespace/fakename in is about to expire"
-        description: "The certificate fakename in namespace fakespace is 6d 23h 43m 0s from expiry. It should have been refreshed 9 days before expiry"
+        summary: "Certificate fakespace/fakename in is about to expire (eagle@moon)"
+        description: "The certificate fakename in namespace fakespace is 6d 23h 43m 0s from expiry (eagle@moon). It should have been refreshed 9 days before expiry"
         runbook: https://wikitech.wikimedia.org/wiki/Kubernetes/cert-manager
-        dashboard: TODO
+        dashboard: https://grafana.wikimedia.org/d/vo5tiJTnz?var-site=moon&var-cluster=eagle&var-namespace=fakespace
     - exp_labels:
         severity: critical
         team: sre
         namespace: fakespace
         name: fakename
       exp_annotations:
-        summary: "Certificate fakespace/fakename in is about to expire"
-        description: "The certificate fakename in namespace fakespace is 6d 23h 43m 0s from expiry. It should have been refreshed 9 days before expiry"
+        summary: "Certificate fakespace/fakename in is about to expire (eagle@moon)"
+        description: "The certificate fakename in namespace fakespace is 6d 23h 43m 0s from expiry (eagle@moon). It should have been refreshed 9 days before expiry"
         runbook: https://wikitech.wikimedia.org/wiki/Kubernetes/cert-manager
-        dashboard: TODO
+        dashboard: https://grafana.wikimedia.org/d/vo5tiJTnz?var-site=moon&var-cluster=eagle&var-namespace=fakespace

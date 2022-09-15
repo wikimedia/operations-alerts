@@ -11,7 +11,7 @@ groups:
       summary: "{{ $labels.instance }} is not running calico-node Pod"
       description: "Prometheus has been unable to scrape metrics from calico on host {{ $labels.instance }} job({{ $labels.job }}) for more than 5 minutes. Make sure the calico-node Pod is running on that node."
       runbook: https://wikitech.wikimedia.org/wiki/Calico#Operations
-      dashboard: TODO
+      dashboard: https://grafana.wikimedia.org/d/G8zPL7-Wz/?var-dc={{ $externalLabels.site }}%20prometheus%2F{{ $externalLabels.prometheus }}&var-instance={{ reReplaceAll "([^:]+).*" "$1" $labels.instance }}
 
   - alert: KubernetesRsyslogDown
     expr: increase(rsyslog_kubernetes_record_seen_total[5m]) == 0
@@ -23,7 +23,7 @@ groups:
       summary: "rsyslog on {{ $labels.instance }} is missing kubernetes logs"
       description: "Rsyslog mmkubernetes plugin on {{ $labels.instance }} did not see any records in the last 5 minutes. This might mean that the plugin was terminated."
       runbook: https://wikitech.wikimedia.org/wiki/Kubernetes/Logging#Common_issues
-      dashboard: TODO
+      dashboard: https://grafana.wikimedia.org/d/OagQjQmnk?var-server={{ reReplaceAll "([^.:]+)([.:].*)?" "$1" $labels.instance }}
 
   - alert: KubeletOperationalLatency
     expr: histogram_quantile(0.99, rate(kubelet_runtime_operations_duration_seconds_bucket{job="k8s-node"}[5m])) > 0.6
@@ -35,7 +35,7 @@ groups:
       description: "Kubelet {{ $labels.operation_type }} operations on {{ $labels.instance }} take {{ $value | humanizeDuration }} in p99"
       summary: "High latency for kubelet {{ $labels.operation_type }} operation on {{ $labels.instance }}"
       runbook: "https://wikitech.wikimedia.org/wiki/Kubernetes"
-      dashboard: "https://grafana.wikimedia.org/d/000000472/kubernetes-kubelets?var-cluster={{ $externalLabels.site }} prometheus/{{ $externalLabels.prometheus }}"
+      dashboard: "https://grafana.wikimedia.org/d/000000472?var-cluster={{ $externalLabels.site }} prometheus/{{ $externalLabels.prometheus }}"
 
   # A continuous rate of non 4xx requests may be a pointer to some client/operation constantly failing or doing the wrong thing.
   # So everything non 2xx|0 is defined as "error" here. The special code 0 is currently (k8s 1.16) used for WATCH requests
@@ -54,7 +54,7 @@ groups:
       description: "Kubernetes API servers {{ $externalLabels.prometheus }}@{{ $externalLabels.site }} are responding with {{ $value | humanizePercentage }} HTTP {{ $labels.code }}s"
       summary: "High rate of HTTP {{ $labels.code }} responses from Kubernetes API {{ $externalLabels.prometheus }}@{{ $externalLabels.site }}"
       runbook: "https://wikitech.wikimedia.org/wiki/Kubernetes"
-      dashboard: "https://grafana-rw.wikimedia.org/d/000000435/kubernetes-api?var-site={{ $externalLabels.site }}&var-cluster={{ $externalLabels.prometheus }}"
+      dashboard: "https://grafana.wikimedia.org/d/000000435?var-site={{ $externalLabels.site }}&var-cluster={{ $externalLabels.prometheus }}"
 
   # This alert excludes secrets. LIST calls for all secrets are done regularly by helm-state-metics
   # and take quite some time because the objects itself are huge (T303184).
@@ -69,7 +69,7 @@ groups:
       description: "Kubernetes API {{ $labels.verb }} requests for {{ $labels.resource }} take {{ $value | humanizeDuration }} in p99 on {{ $externalLabels.prometheus }}@{{ $externalLabels.site }}"
       summary: "High Kubernetes API latency ({{ $labels.verb }} {{ $labels.resource }}) on {{ $externalLabels.prometheus }}@{{ $externalLabels.site }}"
       runbook: "https://wikitech.wikimedia.org/wiki/Kubernetes"
-      dashboard: "https://grafana-rw.wikimedia.org/d/000000435/kubernetes-api?var-site={{ $externalLabels.site }}&var-cluster={{ $externalLabels.prometheus }}"
+      dashboard: "https://grafana.wikimedia.org/d/000000435?var-site={{ $externalLabels.site }}&var-cluster={{ $externalLabels.prometheus }}"
   # This alerts for all verbs excluding LIST for only secret objects, same threshold as above.
   - <<: *KubernetesAPILatency
     expr: histogram_quantile(0.99, sum by (le, verb, resource) (rate(apiserver_request_duration_seconds_bucket{verb!~"^(?:CONNECT|WATCHLIST|WATCH|PROXY|LIST)$", resource="secrets"}[5m]))) > 0.5
@@ -87,10 +87,10 @@ groups:
       team: sre
       severity: critical
     annotations:
-      summary: "Certificate {{ $labels.namespace }}/{{ $labels.name }} is not in a ready state"
-      description: "The certificate {{ $labels.name }} in namespace {{ $labels.namespace }} is in a not ready state for at least 10min"
+      summary: "Certificate {{ $labels.namespace }}/{{ $labels.name }} is not in a ready state ({{ $externalLabels.prometheus }}@{{ $externalLabels.site }})"
+      description: "The certificate {{ $labels.name }} in namespace {{ $labels.namespace }} is in a not ready state for at least 10min ({{ $externalLabels.prometheus }}@{{ $externalLabels.site }})"
       runbook: https://wikitech.wikimedia.org/wiki/Kubernetes/cert-manager
-      dashboard: TODO
+      dashboard: https://grafana.wikimedia.org/d/vo5tiJTnz?var-site={{ $externalLabels.site }}&var-cluster={{ $externalLabels.prometheus }}&var-namespace={{ $labels.namespace }}
 
 - name: helmrelease
   rules:
@@ -106,4 +106,4 @@ groups:
       summary: "Helm release {{ $labels.namespace }}/{{ $labels.name }} on {{ $externalLabels.prometheus }}@{{ $externalLabels.site }} in state {{ $labels.status }}"
       description: "The Helm release {{ $labels.namespace }}/{{ $labels.name }} on Kubernetes cluster {{ $externalLabels.prometheus }}@{{ $externalLabels.site }} is in state {{ $labels.status }} for more than 11min, you might need to roll back"
       runbook: "https://wikitech.wikimedia.org/wiki/Kubernetes/Deployments#Rolling_back_in_an_emergency"
-      dashboard: TODO
+      dashboard: https://grafana.wikimedia.org/d/UT4GtK3nz?var-site={{ $externalLabels.site }}&var-cluster={{ $externalLabels.prometheus }}&var-namespace={{ $labels.namespace }}

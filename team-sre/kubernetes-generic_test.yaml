@@ -6,7 +6,7 @@ evaluation_interval: 1m
 tests:
 - interval: 1m
   input_series:
-  - series: 'up{instance="kubefake1001:9091", job="calico-felix"}'
+  - series: 'up{instance="kubefake1001.foo.bar:9091", job="calico-felix"}'
     values: "1 0 0 0 0 0 0"
   - series: 'rsyslog_kubernetes_record_seen_total{instance="kubefake1001:9105"}'
     values: "1 0 0 0 0 0"
@@ -48,13 +48,13 @@ tests:
     - exp_labels:
         severity: critical
         team: sre
-        instance: "kubefake1001:9091"
+        instance: "kubefake1001.foo.bar:9091"
         job: "calico-felix"
       exp_annotations:
-        summary: "kubefake1001:9091 is not running calico-node Pod"
-        description: "Prometheus has been unable to scrape metrics from calico on host kubefake1001:9091 job(calico-felix) for more than 5 minutes. Make sure the calico-node Pod is running on that node."
+        summary: "kubefake1001.foo.bar:9091 is not running calico-node Pod"
+        description: "Prometheus has been unable to scrape metrics from calico on host kubefake1001.foo.bar:9091 job(calico-felix) for more than 5 minutes. Make sure the calico-node Pod is running on that node."
         runbook: https://wikitech.wikimedia.org/wiki/Calico#Operations
-        dashboard: TODO
+        dashboard: https://grafana.wikimedia.org/d/G8zPL7-Wz/?var-dc=moon%20prometheus%2Feagle&var-instance=kubefake1001.foo.bar
 
   - alertname: KubernetesRsyslogDown
     eval_time: 6m
@@ -67,7 +67,7 @@ tests:
         summary: "rsyslog on kubefake1001:9105 is missing kubernetes logs"
         description: "Rsyslog mmkubernetes plugin on kubefake1001:9105 did not see any records in the last 5 minutes. This might mean that the plugin was terminated."
         runbook: https://wikitech.wikimedia.org/wiki/Kubernetes/Logging#Common_issues
-        dashboard: TODO
+        dashboard: "https://grafana.wikimedia.org/d/OagQjQmnk?var-server=kubefake1001"
 
   - alertname: CertManagerCertNotReady
     eval_time: 11m
@@ -79,10 +79,10 @@ tests:
         name: fakename
         condition: "False"
       exp_annotations:
-        summary: "Certificate fakespace/fakename is not in a ready state"
-        description: "The certificate fakename in namespace fakespace is in a not ready state for at least 10min"
+        summary: "Certificate fakespace/fakename is not in a ready state (eagle@moon)"
+        description: "The certificate fakename in namespace fakespace is in a not ready state for at least 10min (eagle@moon)"
         runbook: https://wikitech.wikimedia.org/wiki/Kubernetes/cert-manager
-        dashboard: TODO
+        dashboard: https://grafana.wikimedia.org/d/vo5tiJTnz?var-site=moon&var-cluster=eagle&var-namespace=fakespace
 
   - alertname: HelmReleaseBadStatus
     eval_time: 12m
@@ -97,7 +97,7 @@ tests:
         summary: "Helm release pinkunicorn/main on eagle@moon in state pending-upgrade"
         description: "The Helm release pinkunicorn/main on Kubernetes cluster eagle@moon is in state pending-upgrade for more than 11min, you might need to roll back"
         runbook: "https://wikitech.wikimedia.org/wiki/Kubernetes/Deployments#Rolling_back_in_an_emergency"
-        dashboard: TODO
+        dashboard: https://grafana.wikimedia.org/d/UT4GtK3nz?var-site=moon&var-cluster=eagle&var-namespace=pinkunicorn
 
   - alertname: KubeletOperationalLatency
     eval_time: 6m
@@ -112,7 +112,7 @@ tests:
         summary: "High latency for kubelet fakeop operation on kubefakenode:1234"
         description: "Kubelet fakeop operations on kubefakenode:1234 take 700ms in p99"
         runbook: "https://wikitech.wikimedia.org/wiki/Kubernetes"
-        dashboard: "https://grafana.wikimedia.org/d/000000472/kubernetes-kubelets?var-cluster=moon prometheus/eagle"
+        dashboard: "https://grafana.wikimedia.org/d/000000472?var-cluster=moon prometheus/eagle"
 
   - alertname: KubernetesAPIErrorRate
     eval_time: 6m
@@ -125,7 +125,7 @@ tests:
         description: "Kubernetes API servers eagle@moon are responding with 71.43% HTTP 500s"
         summary: "High rate of HTTP 500 responses from Kubernetes API eagle@moon"
         runbook: "https://wikitech.wikimedia.org/wiki/Kubernetes"
-        dashboard: "https://grafana-rw.wikimedia.org/d/000000435/kubernetes-api?var-site=moon&var-cluster=eagle"
+        dashboard: "https://grafana.wikimedia.org/d/000000435?var-site=moon&var-cluster=eagle"
 
   - alertname: KubernetesAPILatency
     eval_time: 11m
@@ -139,7 +139,7 @@ tests:
         description: "Kubernetes API GET requests for shoes take 600ms in p99 on eagle@moon"
         summary: "High Kubernetes API latency (GET shoes) on eagle@moon"
         runbook: "https://wikitech.wikimedia.org/wiki/Kubernetes"
-        dashboard: "https://grafana-rw.wikimedia.org/d/000000435/kubernetes-api?var-site=moon&var-cluster=eagle"
+        dashboard: "https://grafana.wikimedia.org/d/000000435?var-site=moon&var-cluster=eagle"
     - exp_labels:
         team: sre
         severity: critical
@@ -149,7 +149,7 @@ tests:
         description: "Kubernetes API GET requests for secrets take 600ms in p99 on eagle@moon"
         summary: "High Kubernetes API latency (GET secrets) on eagle@moon"
         runbook: "https://wikitech.wikimedia.org/wiki/Kubernetes"
-        dashboard: "https://grafana-rw.wikimedia.org/d/000000435/kubernetes-api?var-site=moon&var-cluster=eagle"
+        dashboard: "https://grafana.wikimedia.org/d/000000435?var-site=moon&var-cluster=eagle"
     - exp_labels:
         team: sre
         severity: critical
@@ -159,4 +159,4 @@ tests:
         description: "Kubernetes API LIST requests for secrets take 1.9s in p99 on eagle@moon"
         summary: "High Kubernetes API latency (LIST secrets) on eagle@moon"
         runbook: "https://wikitech.wikimedia.org/wiki/Kubernetes"
-        dashboard: "https://grafana-rw.wikimedia.org/d/000000435/kubernetes-api?var-site=moon&var-cluster=eagle"
+        dashboard: "https://grafana.wikimedia.org/d/000000435?var-site=moon&var-cluster=eagle"

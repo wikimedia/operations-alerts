@@ -9,7 +9,7 @@ groups:
       team: sre
       severity: warning
     annotations:
-      summary: "Certificate {{ $labels.namespace }}/{{ $labels.name }} in is about to expire"
-      description: "The certificate {{ $labels.name }} in namespace {{ $labels.namespace }} is {{ $value | humanizeDuration }} from expiry. It should have been refreshed 8 hours before expiry"
+      summary: "Certificate {{ $labels.namespace }}/{{ $labels.name }} in is about to expire ({{ $externalLabels.prometheus }}@{{ $externalLabels.site }})"
+      description: "The certificate {{ $labels.name }} in namespace {{ $labels.namespace }} is {{ $value | humanizeDuration }} from expiry ({{ $externalLabels.prometheus }}@{{ $externalLabels.site }}). It should have been refreshed 8 hours before expiry"
       runbook: https://wikitech.wikimedia.org/wiki/Kubernetes/cert-manager
-      dashboard: TODO
+      dashboard: https://grafana.wikimedia.org/d/vo5tiJTnz?var-site={{ $externalLabels.site }}&var-cluster={{ $externalLabels.prometheus }}&var-namespace={{ $labels.namespace }}
