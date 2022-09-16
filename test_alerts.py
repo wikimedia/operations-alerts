@@ -196,6 +196,10 @@ def _validate_rule_metadata(rule):
                 "URL in %s contains unquoted characters, check warnings for details" % a
             )
 
+    assert (
+        "grafana-rw.wikimedia.org" not in rule["annotations"]["dashboard"]
+    ), "Link to public dashboards on grafana.w.org, not grafana-rw.w.org"
+
 
 def _untemplate(string):
     """Return string without golang text/template markers."""
