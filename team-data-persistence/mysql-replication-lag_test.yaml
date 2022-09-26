@@ -4,7 +4,7 @@ evaluation_interval: 1m
 tests:
   - interval: 1m
     input_series:
-      - series: 'mysql_slave_status_seconds_behind_master{instance="db1099:13318"}'
+      - series: 'mysql_slave_status_seconds_behind_master{instance="db1099:13318",job="mysql-core"}'
         values: '0 250+10x50'
     alert_rule_test:
     - alertname: MysqlReplicationLag
@@ -13,6 +13,7 @@ tests:
        - exp_labels:
            severity: warning
            team: data-persistence
+           job: mysql-core
            instance: db1099:13318
          exp_annotations:
            summary: "MySQL instance db1099:13318 has too large replication lag (5m 40s)"
