@@ -136,7 +136,7 @@ tests:
         verb: GET
         resource: shoes
       exp_annotations:
-        description: "Kubernetes API GET requests for shoes take 600ms in p99 on eagle@moon"
+        description: "Kubernetes API GET requests for shoes take 600ms in p95 on eagle@moon"
         summary: "High Kubernetes API latency (GET shoes) on eagle@moon"
         runbook: "https://wikitech.wikimedia.org/wiki/Kubernetes"
         dashboard: "https://grafana.wikimedia.org/d/000000435?var-site=moon&var-cluster=eagle"
@@ -146,7 +146,7 @@ tests:
         verb: GET
         resource: secrets
       exp_annotations:
-        description: "Kubernetes API GET requests for secrets take 600ms in p99 on eagle@moon"
+        description: "Kubernetes API GET requests for secrets take 600ms in p95 on eagle@moon"
         summary: "High Kubernetes API latency (GET secrets) on eagle@moon"
         runbook: "https://wikitech.wikimedia.org/wiki/Kubernetes"
         dashboard: "https://grafana.wikimedia.org/d/000000435?var-site=moon&var-cluster=eagle"
@@ -156,7 +156,7 @@ tests:
         verb: LIST
         resource: secrets
       exp_annotations:
-        description: "Kubernetes API LIST requests for secrets take 1.9s in p99 on eagle@moon"
+        description: "Kubernetes API LIST requests for secrets take 1.9s in p95 on eagle@moon"
         summary: "High Kubernetes API latency (LIST secrets) on eagle@moon"
         runbook: "https://wikitech.wikimedia.org/wiki/Kubernetes"
         dashboard: "https://grafana.wikimedia.org/d/000000435?var-site=moon&var-cluster=eagle"
