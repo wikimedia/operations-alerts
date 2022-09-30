@@ -6,25 +6,23 @@ evaluation_interval: 1m
 tests:
   - interval: 1m
     input_series:
-      - series: 'elasticsearch_jvm_memory_pool_max_bytes{exported_cluster="production-search-eqiad", pool="old", name="elastic1001-production-search-eqiad"}'
-        values: 2200000000 2200000000 2200000000 2200000000 2200000000 2200000000
-      - series: 'elasticsearch_jvm_memory_pool_used_bytes{exported_cluster="production-search-eqiad", pool="old", name="elastic1001-production-search-eqiad"}'
-        values: 2200000000 2100000000 2200000000 2000000000 2100000000 2200000000
-      - series: 'elasticsearch_jvm_memory_pool_max_bytes{exported_cluster="production-search-eqiad", pool="old", name="elastic1002-production-search-eqiad"}'
-        values: 2002000000 2002000000 2002000000 2002000000 2002000000 2002000000
-      - series: 'elasticsearch_jvm_memory_pool_used_bytes{exported_cluster="production-search-eqiad", pool="old", name="elastic1002-production-search-eqiad"}'
-        values: 2000000000 2001000000 2002000000 2000000000 2001000000 2002000000
+      - series: 'elasticsearch_jvm_memory_pool_used_bytes{exported_cluster="production-search-eqiad", pool="young", name="elastic1001-production-search-eqiad"}'
+        values: 1000000000+0x10
+      - series: 'elasticsearch_jvm_memory_pool_used_bytes{exported_cluster="production-search-eqiad", pool="young", name="elastic1002-production-search-eqiad"}'
+        values: 0+0x10
     alert_rule_test:
-      - alertname: CirrusSearchJVMGCOldPoolFlatlined
+      - alertname: CirrusSearchJVMGCYoungPoolInsufficient
         eval_time: 10m
         exp_alerts:
           - exp_labels:
               severity: warning
               team: search-platform
+              exported_cluster: production-search-eqiad
+              pool: young
               name: elastic1002-production-search-eqiad
             exp_annotations:
-              summary: "Elasticsearch instance elastic1002-production-search-eqiad is showing memory pressure in the old pool"
-              description: "Elasticsearch is out of memory and will have degraded latency"
+              summary: "Elasticsearch instance elastic1002-production-search-eqiad is showing memory pressure in the young pool"
+              description: "Elasticsearch is out of memory and will have degraded latency, reject requests, and could OOM"
               runbook: https://wikitech.wikimedia.org/wiki/Search#Stuck_in_old_GC_hell
               dashboard: https://grafana.wikimedia.org/d/000000462/elasticsearch-memory
 
