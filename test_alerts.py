@@ -90,6 +90,9 @@ def test_rule_metadata(rulefile):
 
     for group in alerts["groups"]:
         for rule in group["rules"]:
+            # Consider only alerting rules, not recording rules
+            if "alert" not in rule:
+                continue
             _validate_rule_metadata(rule)
 
 
