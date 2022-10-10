@@ -36,7 +36,7 @@ tests:
     values: "0+0x11"
   - series: 'apiserver_request_duration_seconds_bucket{verb="LIST", resource="secrets", le="+Inf"}'
     values: "1+1x11"
-  - series: 'apiserver_request_duration_seconds_bucket{verb="LIST", resource="secrets", le="+1.9"}'
+  - series: 'apiserver_request_duration_seconds_bucket{verb="LIST", resource="secrets", le="+2.1"}'
     values: "0+0x11"
   external_labels:
     site: moon
@@ -156,7 +156,7 @@ tests:
         verb: LIST
         resource: secrets
       exp_annotations:
-        description: "Kubernetes API LIST requests for secrets take 1.9s in p95 on eagle@moon"
+        description: "Kubernetes API LIST requests for secrets take 2.1s in p95 on eagle@moon"
         summary: "High Kubernetes API latency (LIST secrets) on eagle@moon"
         runbook: "https://wikitech.wikimedia.org/wiki/Kubernetes"
         dashboard: "https://grafana.wikimedia.org/d/000000435?var-site=moon&var-cluster=eagle"
