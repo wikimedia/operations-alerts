@@ -1,0 +1,18 @@
+groups:
+  - name: confd
+    rules:
+      - alert: ConfdResourceFailed
+        expr: |
+          sum by (name) (confd_resource_healthy)
+            /
+          count by (name) (confd_resource_healthy)
+            < 1
+        for: 5m
+        annotations:
+          summary: 'confd resource {{ $labels.name }} has errors'
+          description: 'The confd file /etc/confd/conf.d/{{ $labels.name }} is experiencing errors: success is {{ $value | humanizePercentage }}.'
+          runbook: https://wikitech.wikimedia.org/wiki/Confd#Monitoring
+          dashboard: https://grafana.wikimedia.org/d/OUJF1VI4k/confd
+        labels:
+          severity: critical
+          team: sre

@@ -1,0 +1,23 @@
+rule_files:
+  - confd.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    input_series:
+      - series: 'confd_resource_healthy{cluster="alerting", instance="alert1001:9100", job="node", name="_etc_dsh_group_api_appserver.toml"}'
+        values: '1 1+0x10'
+      - series: 'confd_resource_healthy{cluster="alerting", instance="alert1001:9100", job="node", name="_etc_dsh_group_appserver.toml"}'
+        values: '1 1 0+0x10'
+    alert_rule_test:
+      - alertname: ConfdResourceFailed
+        eval_time: 7m
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              team: sre
+              name: _etc_dsh_group_appserver.toml
+            exp_annotations:
+              summary: "confd resource _etc_dsh_group_appserver.toml has errors"
+              description: "The confd file /etc/confd/conf.d/_etc_dsh_group_appserver.toml is experiencing errors: success is 0%."
+              runbook: https://wikitech.wikimedia.org/wiki/Confd#Monitoring
+              dashboard: https://grafana.wikimedia.org/d/OUJF1VI4k/confd
