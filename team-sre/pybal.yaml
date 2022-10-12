@@ -1,0 +1,20 @@
+groups:
+  - name: pybal
+    rules:
+      - alert: PybalBackendDown
+        # pybal uses 'host' label for the backend fqdn, replace it with
+        # 'instance' (and trim to an hostname) so host-based silences work as expected.
+        expr: |
+          label_replace(
+            sum by (host, service) (pybal_monitor_status == 0),
+            "instance", "$1:0", "host", "([^.]+).*"
+          )
+        for: 12h
+        annotations:
+          summary: 'Pybal backend {{ $labels.instance }} is down ({{ $labels.service }})'
+          description: 'Pybal has been failing health checks for {{ $labels.instance }} for a long time.'
+          runbook: TODO
+          dashboard: TODO
+        labels:
+          severity: warning
+          team: sre
