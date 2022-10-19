@@ -17,7 +17,6 @@ tests:
               team: sre
               instance: aqs1010:0
               service: aqs_7232
-              host: aqs1010.eqiad.wmnet
             exp_annotations:
               summary: 'Pybal backend aqs1010:0 is down (aqs_7232)'
               description: 'Pybal has been failing health checks for aqs1010:0 for a long time.'
