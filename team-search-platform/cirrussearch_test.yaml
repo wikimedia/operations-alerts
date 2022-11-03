@@ -64,3 +64,54 @@ tests:
             description: "The reindexing process should be run to ensure multi-lingual analysis chain updates are applied"
             runbook: TODO
             dashboard: TODO
+  - interval: 1m
+    input_series:
+      - series: cpjobqueue_normal_rule_processing_delay{rule="cirrusSearchElasticaWrite-cpjobqueue-partitioned-mediawiki-job-cirrusSearchElasticaWrite",quantile="0.5",service="cpjobqueue"}
+        values: 22000
+      - series: cpjobqueue_normal_rule_processing_delay{rule="cirrusSearchElasticaWrite-cpjobqueue-partitioned-mediawiki-job-cirrusSearchLinksUpdate",quantile="0.5",service="cpjobqueue"}
+        values: 2200
+      - series: cpjobqueue_normal_rule_processing_delay{rule="cirrusSearchElasticaWrite-cpjobqueue-partitioned-mediawiki-job-cirrusSearchUnrelated",quantile="0.5",service="cpjobqueue"}
+        values: 220000
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: CirrusSearchJobQueueLagTooHigh
+        eval_time: 1m
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              team: search-platform
+              rule: cirrusSearchElasticaWrite-cpjobqueue-partitioned-mediawiki-job-cirrusSearchElasticaWrite
+              site: eqiad
+            exp_annotations:
+              summary: "CirrusSearch job cirrusSearchElasticaWrite lag is too high: 6h 6m 40s"
+              description: "CirrusSearch job lag is too high"
+              runbook: TODO
+              dashboard: "https://grafana.wikimedia.org/d/CbmStnlGk/jobqueue-job?orgId=1&var-dc=eqiad%20prometheus/k8s&var-job=cirrusSearchElasticaWrite"
+  - interval: 1m
+    input_series:
+      - series: kafka_burrow_partition_lag{exported_cluster="main-eqiad",group="cpjobqueue-low_traffic_jobs", topic="eqiad.mediawiki.job.cirrusSearchOtherIndex",partition="0"}
+        values: 210000
+      - series: kafka_burrow_partition_lag{exported_cluster="main-eqiad",group="cpjobqueue-cirrusSearchLinksUpdate", topic="eqiad.mediawiki.job.cirrusSearchLinksUpdate",partition="0"}
+        values: 21000
+      - series: kafka_burrow_partition_lag{exported_cluster="main-eqiad",group="cpjobqueue-cirrusSearchElasticaWrite_partitioner", topic="eqiad.mediawiki.job.cirrusSearchElasticaWrite",partition="0"}
+        values: 220000
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: CirrusSearchJobQueueBacklogTooBig
+        eval_time: 1m
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              team: search-platform
+              group: cpjobqueue-low_traffic_jobs
+              partition: 0
+              topic: eqiad.mediawiki.job.cirrusSearchOtherIndex
+              exported_cluster: main-eqiad
+              site: eqiad
+            exp_annotations:
+              summary: "CirrusSearch job topic eqiad.mediawiki.job.cirrusSearchOtherIndex is heavily backlogged with 210k messages"
+              description: "CirrusSearch job backlog is too big"
+              runbook: TODO
+              dashboard: "https://grafana.wikimedia.org/d/CbmStnlGk/jobqueue-job?orgId=1&var-dc=eqiad%20prometheus/k8s&var-job=cirrusSearchOtherIndex"

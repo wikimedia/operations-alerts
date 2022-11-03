@@ -36,3 +36,42 @@ groups:
         description: "The reindexing process should be run to ensure multi-lingual analysis chain updates are applied"
         runbook: TODO
         dashboard: TODO
+
+    - alert: CirrusSearchJobQueueLagTooHigh
+      expr: >
+        max(avg_over_time(cpjobqueue_normal_rule_processing_delay{
+          rule=~".*cirrusSearch(DeleteArchive|DeletePages|ElasticaWrite|LinksUpdate*|OtherIndex)",
+          rule!~".*-partitioner-mediawiki-job-.*",
+          quantile="0.5",
+          service="cpjobqueue"
+        }[15m])) by (rule) > 6*60*60
+      for: 1m
+      labels:
+        team: search-platform
+        severity: warning
+        site: eqiad
+      annotations:
+        summary: 'CirrusSearch job {{$labels.rule | reReplaceAll ".*-([^-]*$)" "${1}"}} lag is too high: {{ $value | humanizeDuration }}'
+        description: "CirrusSearch job lag is too high"
+        runbook: TODO
+        dashboard: 'https://grafana.wikimedia.org/d/CbmStnlGk/jobqueue-job?orgId=1&var-dc={{ $externalLabels.site }}%20prometheus/k8s&var-job={{ $labels.rule | reReplaceAll ".*-([^-]*$)" "${1}" }}'
+
+    - alert: CirrusSearchJobQueueBacklogTooBig
+      expr: >
+        kafka_burrow_partition_lag{
+          exported_cluster=~"main-.*",
+          group=~"cpjobqueue.*",
+          topic=~".*cirrusSearch(DeleteArchive|DeletePages|ElasticaWrite|LinksUpdate*|OtherIndex)",
+          topic!~".*retry.*",
+          group!~".*partitioner.*"} > 200000
+      for: 1m
+      labels:
+        team: search-platform
+        severity: warning
+        site: eqiad
+      annotations:
+        summary: 'CirrusSearch job topic {{$labels.topic}} is heavily backlogged with {{ $value | humanize }} messages'
+        description: "CirrusSearch job backlog is too big"
+        runbook: TODO
+        dashboard: 'https://grafana.wikimedia.org/d/CbmStnlGk/jobqueue-job?orgId=1&var-dc={{ $externalLabels.site }}%20prometheus/k8s&var-job={{ $labels.topic | reReplaceAll ".*[.]([^.]*$)" "${1}"}}'
+
