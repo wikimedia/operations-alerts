@@ -112,7 +112,7 @@ tests:
         summary: "High latency for kubelet fakeop operation on kubefakenode:1234"
         description: "Kubelet fakeop operations on kubefakenode:1234 take 700ms in p99"
         runbook: "https://wikitech.wikimedia.org/wiki/Kubernetes"
-        dashboard: "https://grafana.wikimedia.org/d/000000472?var-cluster=moon prometheus/eagle"
+        dashboard: "https://grafana.wikimedia.org/d/000000472?var-cluster=moon%20prometheus/eagle"
 
   - alertname: KubernetesAPIErrorRate
     eval_time: 6m

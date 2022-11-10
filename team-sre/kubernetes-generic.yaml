@@ -35,7 +35,7 @@ groups:
       description: "Kubelet {{ $labels.operation_type }} operations on {{ $labels.instance }} take {{ $value | humanizeDuration }} in p99"
       summary: "High latency for kubelet {{ $labels.operation_type }} operation on {{ $labels.instance }}"
       runbook: "https://wikitech.wikimedia.org/wiki/Kubernetes"
-      dashboard: "https://grafana.wikimedia.org/d/000000472?var-cluster={{ $externalLabels.site }} prometheus/{{ $externalLabels.prometheus }}"
+      dashboard: "https://grafana.wikimedia.org/d/000000472?var-cluster={{ $externalLabels.site }}%20prometheus/{{ $externalLabels.prometheus }}"
 
   # A continuous rate of non 4xx requests may be a pointer to some client/operation constantly failing or doing the wrong thing.
   # So everything non 2xx|0 is defined as "error" here. The special code 0 is currently (k8s 1.16) used for WATCH requests
