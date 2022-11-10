@@ -1,0 +1,24 @@
+rule_files:
+  - mgmt.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    input_series:
+      - series: 'probe_success{instance="bast5001.mgmt:22", job="probes/mgmt", module="ssh_banner", rack="603"}'
+        values: "0 0+0x2048"
+    alert_rule_test:
+      - alertname: ManagementSSHDown
+        eval_time: 13h
+        exp_alerts:
+          - exp_labels:
+              team: dcops
+              severity: info
+              instance: bast5001.mgmt:22
+              module: ssh_banner
+              rack: 603
+              job: probes/mgmt
+            exp_annotations:
+              description: "The management interface at bast5001.mgmt:22 has been unresponsive for multiple hours."
+              summary: "Unresponsive management for bast5001.mgmt:22"
+              dashboard: TODO
+              runbook: TODO
