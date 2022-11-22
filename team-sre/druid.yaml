@@ -1,0 +1,28 @@
+groups:
+  - name: druid
+    rules:
+
+## Druid Realtime Ingestion alerts
+    - alert: DruidWebrequestSampledNoEvents
+      annotations:
+        description: There have been zero webrequest_sampled events received on the druid_analytics cluster over a 30 minutes period.
+        summary: Zero webrequest_sampled events received by druid_analytics over the last 30 minutes.
+        dashboard: https://grafana.wikimedia.org/d/000000538/druid?refresh=1m&var-cluster=druid_analytics&panelId=41&fullscreen&orgId=1&var-druid_datasource=webrequest_sampled_live
+        runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Druid/Alerts#Druid_webrequest_sampled_live_Supervisor
+      expr: sum(sum_over_time(druid_realtime_ingest_events_processed_count{datasource="webrequest_sampled_live"}[30m])) < 1
+      for: 5m
+      labels:
+        severity: critical
+        team: sre
+
+    - alert: DruidWebrequestSampledNoEvents
+      annotations:
+        description: There have been fewer than 10 webrequest_sampled events received on the druid_analytics cluster over a 30 minutes period.
+        summary: Fewer than 10 webrequest_sampled events received by druid_analytics over the last 30 minutes.
+        dashboard: https://grafana.wikimedia.org/d/000000538/druid?refresh=1m&var-cluster=druid_analytics&panelId=41&fullscreen&orgId=1&var-druid_datasource=webrequest_sampled_live
+        runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Druid/Alerts#Druid_webrequest_sampled_live_Supervisor
+      expr: sum(sum_over_time(druid_realtime_ingest_events_processed_count{datasource="webrequest_sampled_live"}[30m])) < 10
+      for: 5m
+      labels:
+        severity: warning
+        team: sre
