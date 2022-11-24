@@ -63,12 +63,12 @@ tests:
  - interval: 1m
    input_series:
     - series: 'kafka_burrow_partition_lag{exported_cluster="logging-eqiad"}'
-      values: '5000'
+      values: '5000+0x20'
    external_labels:
      site: eqiad
    alert_rule_test:
     - alertname: LogstashKafkaConsumerLag
-      eval_time: 1m
+      eval_time: 12m
       exp_alerts:
        - exp_labels:
            severity: critical

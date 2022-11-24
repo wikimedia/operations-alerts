@@ -49,7 +49,8 @@ groups:
         severity: critical
         team: o11y
 
-    - alert: LogstashKafkaConsumerLag
+    - &logstash_kafka_lag
+      alert: LogstashKafkaConsumerLag
       annotations:
         description: Logstash consumers are not keeping up with the rate of log production.
           Either Logstash has reduced throughput capacity or log generators are producing too many logs.
@@ -57,10 +58,14 @@ groups:
         dashboard: https://grafana.wikimedia.org/d/000000484/kafka-consumer-lag?var-cluster={{ $labels.exported_cluster }}&var-datasource={{ $externalLabels.site }}%20prometheus/ops
         runbook: https://wikitech.wikimedia.org/wiki/Logstash#Kafka_consumer_lag
       expr: sum by (exported_cluster) (kafka_burrow_partition_lag{exported_cluster=~"logging-.*"}) > 1500
-      for: 1m
+      for: 10m
       labels:
         severity: critical
         team: o11y
+
+    - <<: *logstash_kafka_lag
+      expr: sum by (exported_cluster) (kafka_burrow_partition_lag{exported_cluster=~"logging-.*"}) > 50000
+      for: 2m
 
     - alert: LogstashUdpLoss
       annotations:
