@@ -12,7 +12,7 @@ tests:
         exp_alerts:
           - exp_labels:
               team: dcops
-              severity: info
+              severity: task
               instance: bast5001.mgmt:22
               module: ssh_banner
               rack: 603
@@ -21,4 +21,4 @@ tests:
               description: "The management interface at bast5001.mgmt:22 has been unresponsive for multiple hours."
               summary: "Unresponsive management for bast5001.mgmt:22"
               dashboard: TODO
-              runbook: TODO
+              runbook: https://wikitech.wikimedia.org/wiki/Dc-operations/Hardware_Troubleshooting_Runbook
