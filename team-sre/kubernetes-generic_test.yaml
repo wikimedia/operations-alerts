@@ -30,14 +30,6 @@ tests:
     values: "1+1x11"
   - series: 'apiserver_request_duration_seconds_bucket{verb="GET", resource="shoes", le="+0.6"}'
     values: "0+0x11"
-  - series: 'apiserver_request_duration_seconds_bucket{verb="GET", resource="secrets", le="+Inf"}'
-    values: "1+1x11"
-  - series: 'apiserver_request_duration_seconds_bucket{verb="GET", resource="secrets", le="+0.6"}'
-    values: "0+0x11"
-  - series: 'apiserver_request_duration_seconds_bucket{verb="LIST", resource="secrets", le="+Inf"}'
-    values: "1+1x11"
-  - series: 'apiserver_request_duration_seconds_bucket{verb="LIST", resource="secrets", le="+2.1"}'
-    values: "0+0x11"
   external_labels:
     site: moon
     prometheus: eagle
@@ -138,25 +130,5 @@ tests:
       exp_annotations:
         description: "Kubernetes API GET requests for shoes take 600ms in p95 on eagle@moon"
         summary: "High Kubernetes API latency (GET shoes) on eagle@moon"
-        runbook: "https://wikitech.wikimedia.org/wiki/Kubernetes"
-        dashboard: "https://grafana.wikimedia.org/d/000000435?var-site=moon&var-cluster=eagle"
-    - exp_labels:
-        team: sre
-        severity: critical
-        verb: GET
-        resource: secrets
-      exp_annotations:
-        description: "Kubernetes API GET requests for secrets take 600ms in p95 on eagle@moon"
-        summary: "High Kubernetes API latency (GET secrets) on eagle@moon"
-        runbook: "https://wikitech.wikimedia.org/wiki/Kubernetes"
-        dashboard: "https://grafana.wikimedia.org/d/000000435?var-site=moon&var-cluster=eagle"
-    - exp_labels:
-        team: sre
-        severity: critical
-        verb: LIST
-        resource: secrets
-      exp_annotations:
-        description: "Kubernetes API LIST requests for secrets take 2.1s in p95 on eagle@moon"
-        summary: "High Kubernetes API latency (LIST secrets) on eagle@moon"
         runbook: "https://wikitech.wikimedia.org/wiki/Kubernetes"
         dashboard: "https://grafana.wikimedia.org/d/000000435?var-site=moon&var-cluster=eagle"
