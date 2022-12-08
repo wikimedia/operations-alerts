@@ -2,7 +2,12 @@ groups:
   - name: node_exporter
     rules:
       - alert: NodeTextfileStale
-        expr: 'time() - node_textfile_mtime_seconds{file!~"^(atlas_metadata|trafficserver_config_.+)\\.prom$"} >= 4 * (60*60*24)'
+        expr: |
+          time() -
+            node_textfile_mtime_seconds{
+              file!~"^(confd-reload-vcl|atlas_metadata|trafficserver_config_.+)\\.prom$"
+            }
+          >= 4 * (60*60*24)
         for: 1h
         labels:
           team: sre
