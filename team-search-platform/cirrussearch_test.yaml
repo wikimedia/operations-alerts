@@ -93,7 +93,7 @@ tests:
   - interval: 1m
     input_series:
       - series: kafka_burrow_partition_lag{exported_cluster="main-eqiad",group="cpjobqueue-low_traffic_jobs", topic="eqiad.mediawiki.job.cirrusSearchOtherIndex",partition="0"}
-        values: 210000
+        values: '210000+0x10'
       - series: kafka_burrow_partition_lag{exported_cluster="main-eqiad",group="cpjobqueue-cirrusSearchLinksUpdate", topic="eqiad.mediawiki.job.cirrusSearchLinksUpdate",partition="0"}
         values: 21000
       - series: kafka_burrow_partition_lag{exported_cluster="main-eqiad",group="cpjobqueue-cirrusSearchElasticaWrite_partitioner", topic="eqiad.mediawiki.job.cirrusSearchElasticaWrite",partition="0"}
@@ -102,7 +102,7 @@ tests:
       site: eqiad
     alert_rule_test:
       - alertname: CirrusSearchJobQueueBacklogTooBig
-        eval_time: 1m
+        eval_time: 10m
         exp_alerts:
           - exp_labels:
               severity: warning

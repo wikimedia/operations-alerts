@@ -64,7 +64,7 @@ groups:
           topic=~".*cirrusSearch(DeleteArchive|DeletePages|ElasticaWrite|LinksUpdate*|OtherIndex)",
           topic!~".*retry.*",
           group!~".*partitioner.*"} > 200000
-      for: 1m
+      for: 10m
       labels:
         team: search-platform
         severity: warning
