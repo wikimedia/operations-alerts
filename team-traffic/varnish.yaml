@@ -42,3 +42,21 @@ groups:
           team: traffic
           severity: critical
         annotations: *VarnishHighMmapCountAnn
+
+      - alert: VarnishHighThreadCount
+        expr: varnish_main_threads_used_percent >= 70
+        labels:
+          team: traffic
+          severity: warning
+        annotations: &VarnishHighThreadCountAnn
+          summary: "Varnish's thread count is high"
+          description: "Varnish on {{ $labels.instance }} ({{ $externalLabels.site }}) is at {{ $value }}% of the maximum limit."
+          dashboard: 'https://grafana.wikimedia.org/d/wiU3SdEWk/cache-host-drilldown?viewPanel=99&var-site={{ $externalLabels.site }}&var-instance={{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}'
+          runbook: *wt-varnish
+
+      - alert: VarnishHighThreadCount
+        expr: varnish_main_threads_used_percent >= 80
+        labels:
+          team: traffic
+          severity: critical
+        annotations: *VarnishHighThreadCountAnn
