@@ -87,24 +87,6 @@ tests:
            runbook: https://wikitech.wikimedia.org/wiki/Performance/Runbook/Webperf-processor_services
  - interval: 1m
    input_series:
-    - series: 'webperf_firstinputtiming_invalid_events'
-      values: '0+600x20'
-   alert_rule_test:
-    - alertname: FirstinputtimingInvalidsHigh
-      eval_time: 7m
-    - alertname: FirstinputtimingInvalidsHigh
-      eval_time: 8m
-      exp_alerts:
-       - exp_labels:
-           severity: warning
-           team: perf
-         exp_annotations:
-           summary: 'Firstinputtiming elevated invalid events: 10/s'
-           description: "This metric counts discarded messages.  A discard rate under 0.5 events/sec is normal."
-           dashboard: https://grafana.wikimedia.org/d/9zeb91jWk/first-input-delay
-           runbook: https://wikitech.wikimedia.org/wiki/Performance/Runbook/Webperf-processor_services
- - interval: 1m
-   input_series:
     - series: 'webperf_savetiming_invalid_events'
       values: '0+600x20'
    alert_rule_test:
