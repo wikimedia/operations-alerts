@@ -39,11 +39,10 @@ groups:
           summary: 'Appserver unavailable for cluster {{ $labels.cluster }} at {{ $externalLabels.site }}'
           dashboard: 'https://grafana.wikimedia.org/d/RIA1lzDZk/application-servers-red-dashboard?orgId=1&var-datasource={{ $externalLabels.site }}%20prometheus/ops&var-cluster={{ $labels.cluster }}'
           runbook: 'https://wikitech.wikimedia.org/wiki/Application_servers'
-        expr:
-          sum(up{job="apache",cluster=~"(api_appserver|appserver|jobrunner|parsoid)"}) by (cluster)
-            /
+        expr: sum(up{job="apache",cluster=~"(api_appserver|appserver|jobrunner|parsoid)"}) by (cluster)
+          /
           count(up{job="apache",cluster=~"(api_appserver|appserver|jobrunner|parsoid)"}) by (cluster)
-            <= 0.9
+          <= 0.9
         for: 4m
         labels:
           severity: critical
@@ -52,8 +51,65 @@ groups:
       # Re-use the alert above and check that apache-exporter can actually talk
       # to apache itself (i.e. apache_up == 1)
       - <<: *AppserversUnreachable
-        expr:
-          sum(apache_up{job="apache",cluster=~"(api_appserver|appserver|jobrunner|parsoid)"}) by (cluster)
-            /
+        expr: sum(apache_up{job="apache",cluster=~"(api_appserver|appserver|jobrunner|parsoid)"}) by (cluster)
+          /
           count(apache_up{job="apache",cluster=~"(api_appserver|appserver|jobrunner|parsoid)"}) by (cluster)
-            <= 0.9
+          <= 0.9
+      # Latency alerts:
+      # we alert on the average request time
+      # Case 1: appserver GET: 0.4s threshold and 100 rps
+      - &MediaWikiLatencyExceeded
+        alert: MediaWikiLatencyExceeded
+        annotations:
+          description: 'The mediawiki cluster {{ $labels.cluster }} in {{ $externalLabels.site }} is experiencing slowness. The average latency for {{ $labels.method }}/{{ $labels.code }}: {{ $value }}s'
+          summary: 'Average latency high: {{ $externalLabels.site }} {{ $labels.cluster }} {{ $labels.method }}/{{ $labels.code }}'
+          dashboard: 'https://grafana.wikimedia.org/d/RIA1lzDZk/application-servers-red-dashboard?panelId=9&fullscreen&orgId=1&from=now-3h&to=now&var-datasource={{ $externalLabels.site }}%20prometheus/ops&var-cluster={{ $labels.cluster }}&var-method={{ $labels.method }}'
+          runbook: 'https://wikitech.wikimedia.org/wiki/Application_servers/Runbook#Average_latency_exceeded'
+        expr: >
+          sum(
+            cluster_code_method_handler:mediawiki_http_requests_duration:avg2m{cluster="appserver",method="GET", handler=~"proxy:unix:.*"}
+          ) by (code,cluster,handler,method) > 0.4
+          and sum(
+            rate(mediawiki_http_requests_duration_count{cluster="appserver",method="GET", handler=~"proxy:unix:.*"}[2m])
+          ) by (code,cluster,handler,method) > 100
+        for: 4m
+        labels:
+          severity: critical
+          team: sre
+      # Case 2: api GET: 0.2s threshold and 100 rps
+      - <<: *MediaWikiLatencyExceeded
+        expr: >
+          sum(
+            cluster_code_method_handler:mediawiki_http_requests_duration:avg2m{cluster="api_appserver",method="GET", handler=~"proxy:unix:.*"}
+          ) by (code,cluster,handler,method) > 0.2
+          and sum(
+            rate(mediawiki_http_requests_duration_count{cluster="api_appserver",method="GET", handler=~"proxy:unix:.*"}[2m])
+          ) by (code,cluster,handler,method) > 100
+      # Case 3: parsoid GET: 2s threshold and 20 rps
+      - <<: *MediaWikiLatencyExceeded
+        expr: >
+          sum(
+            cluster_code_method_handler:mediawiki_http_requests_duration:avg2m{cluster="parsoid",method="GET", handler=~"proxy:unix:.*"}
+          ) by (code,cluster,handler,method) > 2.0
+          and sum(
+            rate(mediawiki_http_requests_duration_count{cluster="parsoid",method="GET", handler=~"proxy:unix:.*"}[2m])
+          ) by (code,cluster,handler,method) > 20
+      # Case 4: appserver POST: 2s threshold of 5 rps
+      - <<: *MediaWikiLatencyExceeded
+        expr: >
+          sum(
+            cluster_code_method_handler:mediawiki_http_requests_duration:avg2m{cluster="appserver",method="POST", handler=~"proxy:unix:.*"}
+          ) by (code,cluster,handler,method) > 2.0
+          and sum(
+            rate(mediawiki_http_requests_duration_count{cluster="appserver",method="POST", handler=~"proxy:unix:.*"}[2m])
+          ) by (code,cluster,handler,method) > 5
+      # Case 5: api POST: 0.4s, 20 rps
+      - <<: *MediaWikiLatencyExceeded
+        expr: >
+          sum(
+            cluster_code_method_handler:mediawiki_http_requests_duration:avg2m{cluster="api_appserver",method="POST", handler=~"proxy:unix:.*"}
+          ) by (code,cluster,handler,method) > 0.4
+          and sum(
+            rate(mediawiki_http_requests_duration_count{cluster="api_appserver",method="POST", handler=~"proxy:unix:.*"}[2m])
+          ) by (code,cluster,handler,method) > 20
+      # We don't have parsoid POST alerts because those should not happen.
