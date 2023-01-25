@@ -42,10 +42,14 @@ groups:
   # but that might change[1]. For now we treat 0 as if it where 2xx.
   # The threshold of 5.2% is chosen to account for a high rate of 409s currently seen on ml-serve@eqiad and is subject to change.
   # [1] https://github.com/kubernetes/kubernetes/issues/107949
+  # TODO: remove Kubernetes v1.16 metric expression T322919
   - alert: KubernetesAPIErrorRate
-    expr: sum by (code) (rate(apiserver_request_count{code!~"^2..|^0$", job="k8s-api"}[5m]))
+    expr: (sum by (code) (rate(apiserver_request_count{code!~"^2..|^0$", job="k8s-api"}[5m]))
       / ignoring(code) group_left
-      sum (rate(apiserver_request_count{job="k8s-api"}[5m])) > 0.052
+      sum (rate(apiserver_request_count{job="k8s-api"}[5m])) > 0.052) or
+      (sum by (code) (rate(apiserver_request_total{code!~"^2..|^0$", job="k8s-api"}[5m]))
+      / ignoring(code) group_left
+      sum (rate(apiserver_request_total{job="k8s-api"}[5m])) > 0.052)
     for: 5m
     labels:
       team: sre
