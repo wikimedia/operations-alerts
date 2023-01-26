@@ -104,3 +104,46 @@ tests:
               summary: 'Average latency high: eqiad appserver GET/200'
               dashboard: 'https://grafana.wikimedia.org/d/RIA1lzDZk/application-servers-red-dashboard?panelId=9&fullscreen&orgId=1&from=now-3h&to=now&var-datasource=eqiad%20prometheus/ops&var-cluster=appserver&var-method=GET'
               runbook: 'https://wikitech.wikimedia.org/wiki/Application_servers/Runbook#Average_latency_exceeded'
+  # Test case for memcached errors
+  - interval: 1m
+    input_series:
+      - series: 'log_mediawiki_servergroup_level_channel_doc_count{channel="memcached",cluster="logstash",instance="logstash2:9206",job="es_exporter",level="ERROR",servergroup="parsoid",site="codfw"}'
+        values: '2000+1x10'
+      - series: 'log_mediawiki_servergroup_level_channel_doc_count{channel="memcached",cluster="logstash",instance="logstash2:9206",job="es_exporter",level="ERROR",servergroup="appserver",site="codfw"}'
+        values: '3400+1x10'
+    external_labels:
+      site: codfw
+    alert_rule_test:
+      - alertname: MediaWikiMemcachedHighErrorRate
+        eval_time: 10m
+        exp_alerts:
+          - exp_labels:
+              team: sre
+              severity: critical
+            exp_annotations:
+              description: 'Elevated global rate of errors connecting to memcached from MediaWiki: 5420 errors/min'
+              summary: 'MediaWiki memcached error rate is elevated globally'
+              dashboard: 'https://grafana.wikimedia.org/d/000000438/mediawiki-exceptions-alerts?var-datasource=codfw%20prometheus/ops&viewPanel=19'
+              runbook: 'https://wikitech.wikimedia.org/wiki/Application_servers/Runbook'
+  # test case for mediawiki fatals/errors
+  - interval: 1m
+    input_series:
+      - series: 'log_mediawiki_servergroup_level_channel_doc_count{channel="fatal",cluster="logstash",instance="logstash2:9206",job="es_exporter",level="ERROR",servergroup="appserver",site="codfw"}'
+        values: '20+1x10'
+      - series: 'log_mediawiki_servergroup_level_channel_doc_count{channel="exception",cluster="logstash",instance="logstash2:9206",job="es_exporter",level="ERROR",servergroup="appserver",site="codfw"}'
+        values: '85+1x10'
+    external_labels:
+      site: codfw
+    alert_rule_test:
+      - alertname: MediaWikiHighErrorRate
+        eval_time: 10m
+        exp_alerts:
+          - exp_labels:
+              team: sre
+              severity: critical
+              servergroup: appserver
+            exp_annotations:
+              description: 'Elevated global rate of errors and fatals from MediaWiki in server group appserver: 125/min'
+              summary: 'Elevated rate of MediaWiki errors'
+              dashboard: 'https://grafana.wikimedia.org/d/000000438/mediawiki-exceptions-alerts?panelId=18&fullscreen&orgId=1&var-datasource=codfw%20prometheus/ops'
+              runbook: 'https://wikitech.wikimedia.org/wiki/Application_servers/Runbook'

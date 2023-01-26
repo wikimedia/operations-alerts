@@ -113,3 +113,30 @@ groups:
             rate(mediawiki_http_requests_duration_count{cluster="api_appserver",method="POST", handler=~"proxy:unix:.*"}[2m])
           ) by (code,cluster,handler,method) > 20
       # We don't have parsoid POST alerts because those should not happen.
+
+      # Mediawiki error channels related alerts
+      # TODO: set to paging?
+      - alert: MediaWikiMemcachedHighErrorRate
+        annotations:
+          description: 'Elevated global rate of errors connecting to memcached from MediaWiki: {{ $value }} errors/min'
+          summary: 'MediaWiki memcached error rate is elevated globally'
+          dashboard: 'https://grafana.wikimedia.org/d/000000438/mediawiki-exceptions-alerts?var-datasource={{ $externalLabels.site }}%20prometheus/ops&viewPanel=19'
+          runbook: 'https://wikitech.wikimedia.org/wiki/Application_servers/Runbook'
+        labels:
+          severity: critical
+          team: sre
+        for: 2m
+        expr: sum(log_mediawiki_servergroup_level_channel_doc_count{channel="memcached", level="ERROR"}) > 5000
+
+      # Mediawiki fatals and exceptions per MediaWiki cluster.
+      - alert: MediaWikiHighErrorRate
+        annotations:
+          description: 'Elevated global rate of errors and fatals from MediaWiki in server group {{ $labels.servergroup }}: {{$value}}/min'
+          summary: 'Elevated rate of MediaWiki errors'
+          dashboard: 'https://grafana.wikimedia.org/d/000000438/mediawiki-exceptions-alerts?panelId=18&fullscreen&orgId=1&var-datasource={{ $externalLabels.site }}%20prometheus/ops'
+          runbook: 'https://wikitech.wikimedia.org/wiki/Application_servers/Runbook'
+        labels:
+          severity: critical
+          team: sre
+        for: 2m
+        expr: 'sum(log_mediawiki_servergroup_level_channel_doc_count{channel=~"(fatal|exception)", level="ERROR"}) by (servergroup) > 100'
