@@ -1,0 +1,17 @@
+# deploy-tag: ops
+groups:
+  - name: ats
+    rules:
+      - alert: ATSBackendErrorsHigh
+        annotations:
+          description: 'High number of 5xx responses from {{ $labels.backend }} to ATS in {{ $externalLabels.site }}'
+          summary: 'ATS: elevated 5xx errors from {{ $labels.backend }} #page'
+          dashboard: 'https://grafana.wikimedia.org/d/1T_4O08Wk/ats-backends-origin-servers-overview?orgId=1&viewPanel=12&var-datasource={{ $externalLabels.site }}%20prometheus/ops&var-cluster={{ $labels.cluster | reReplaceAll "cache_" ""}}&var-origin={{ $labels.backend }}&editPanel=12'
+          runbook: 'https://wikitech.wikimedia.org/wiki/Apache_Traffic_Server#Debugging'
+        # Historically only real outages would've triggered this alert by keeping errors over 3 per second per backend for over 15 minutes.
+        # I looked back at 90 days of data in prometheus for this alert and only found occurences for more than 15 minutes due to swift and wdqs outages:
+        expr: sum(rate(trafficserver_backend_requests_seconds_count{status=~"5[0-9][0-9]", backend!~"localhost|127.0.0.1"}[2m])) by (backend, cluster) > 3
+        for: 15m
+        labels:
+          severity: page
+          team: sre
