@@ -23,25 +23,6 @@ tests:
 
  - interval: 1m
    input_series:
-    - series: 'logstash_node_plugin_events_out_total{plugin_id="input/kafka"}'
-      values: '1+1x1440 1441+3x1440'
-   external_labels:
-     site: eqiad
-   alert_rule_test:
-    - alertname: LogstashIngestSpike
-      eval_time: 1d20m
-      exp_alerts:
-       - exp_labels:
-           severity: critical
-           team: o11y
-         exp_annotations:
-           description: Logstash is ingesting 300% more than what it did this same time yesterday.  Check for a log producer generating a high volume of logs.
-           summary: Logstash rate of ingestion percent change compared to yesterday
-           dashboard: https://grafana.wikimedia.org/d/000000561/logstash?orgId=1&panelId=2&var-datasource=eqiad%20prometheus/ops
-           runbook: https://phabricator.wikimedia.org/T202307
-
- - interval: 1m
-   input_series:
     - series: 'log_dead_letters_hits'
       values: '500'
    external_labels:

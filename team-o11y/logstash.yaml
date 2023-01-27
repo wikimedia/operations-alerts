@@ -14,26 +14,6 @@ groups:
         severity: critical
         team: o11y
 
-#   Alert on unusual day-over-day logstash ingestion rate change - T202307
-    - alert: LogstashIngestSpike
-      annotations:
-        description: Logstash is ingesting {{ $value }}% more than what it did this same time yesterday.  Check for a log producer generating a high volume of logs.
-        summary: Logstash rate of ingestion percent change compared to yesterday
-        dashboard: https://grafana.wikimedia.org/d/000000561/logstash?orgId=1&panelId=2&var-datasource={{ $externalLabels.site }}%20prometheus/ops
-        runbook: https://phabricator.wikimedia.org/T202307
-      expr: |
-        100 * (
-          sum(
-            rate(logstash_node_plugin_events_out_total{plugin_id=~"input/.*"}[5m])
-          ) / sum(
-            rate(logstash_node_plugin_events_out_total{plugin_id=~"input/.*"}[5m] offset 1d)
-          )
-        ) > 210
-      for: 10m
-      labels:
-        severity: critical
-        team: o11y
-
 # Logstash Elasticsearch indexing failures - T236343 T240667
     - alert: LogstashIndexingFailures
       annotations:
