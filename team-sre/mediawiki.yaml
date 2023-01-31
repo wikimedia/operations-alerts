@@ -55,6 +55,7 @@ groups:
           /
           count(apache_up{job="apache",cluster=~"(api_appserver|appserver|jobrunner|parsoid)"}) by (cluster)
           <= 0.9
+
       # Latency alerts:
       # we alert on the average request time
       # Case 1: appserver GET: 0.4s threshold and 100 rps
@@ -76,6 +77,7 @@ groups:
         labels:
           severity: critical
           team: sre
+
       # Case 2: api GET: 0.2s threshold and 100 rps
       - <<: *MediaWikiLatencyExceeded
         expr: >
@@ -85,6 +87,7 @@ groups:
           and sum(
             rate(mediawiki_http_requests_duration_count{cluster="api_appserver",method="GET", handler=~"proxy:unix:.*"}[2m])
           ) by (code,cluster,handler,method) > 100
+
       # Case 3: parsoid GET: 2s threshold and 20 rps
       - <<: *MediaWikiLatencyExceeded
         expr: >
@@ -94,6 +97,7 @@ groups:
           and sum(
             rate(mediawiki_http_requests_duration_count{cluster="parsoid",method="GET", handler=~"proxy:unix:.*"}[2m])
           ) by (code,cluster,handler,method) > 20
+
       # Case 4: appserver POST: 2s threshold of 5 rps
       - <<: *MediaWikiLatencyExceeded
         expr: >
@@ -103,6 +107,7 @@ groups:
           and sum(
             rate(mediawiki_http_requests_duration_count{cluster="appserver",method="POST", handler=~"proxy:unix:.*"}[2m])
           ) by (code,cluster,handler,method) > 5
+
       # Case 5: api POST: 0.4s, 20 rps
       - <<: *MediaWikiLatencyExceeded
         expr: >
