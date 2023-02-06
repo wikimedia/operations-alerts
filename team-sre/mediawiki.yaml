@@ -137,7 +137,7 @@ groups:
       - alert: MediaWikiHighErrorRate
         annotations:
           description: 'Elevated global rate of errors and fatals from MediaWiki in server group {{ $labels.servergroup }}: {{$value}}/min'
-          summary: 'Elevated rate of MediaWiki errors'
+          summary: 'Elevated rate of MediaWiki errors - {{ $labels.servergroup }}'
           dashboard: 'https://grafana.wikimedia.org/d/000000438/mediawiki-exceptions-alerts?panelId=18&fullscreen&orgId=1&var-datasource={{ $externalLabels.site }}%20prometheus/ops'
           runbook: 'https://wikitech.wikimedia.org/wiki/Application_servers/Runbook'
         labels:

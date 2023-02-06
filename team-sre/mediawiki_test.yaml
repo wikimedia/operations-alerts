@@ -145,6 +145,6 @@ tests:
               servergroup: appserver
             exp_annotations:
               description: 'Elevated global rate of errors and fatals from MediaWiki in server group appserver: 125/min'
-              summary: 'Elevated rate of MediaWiki errors'
+              summary: 'Elevated rate of MediaWiki errors - appserver'
               dashboard: 'https://grafana.wikimedia.org/d/000000438/mediawiki-exceptions-alerts?panelId=18&fullscreen&orgId=1&var-datasource=codfw%20prometheus/ops'
               runbook: 'https://wikitech.wikimedia.org/wiki/Application_servers/Runbook'
