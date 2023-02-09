@@ -4,26 +4,31 @@ evaluation_interval: 1m
 tests:
   - interval: 1m
     input_series:
-      # This should fire a warning because varnishkafka is relaying incoming requests at a rate of 15% of their incoming rate (20 ps / 3 ps)
+      # This should fire a warning because varnishkafka is relaying incoming requests at a rate of 15% of their incoming rate (20 ps / 3 ps) for at least 5 min
       - series: varnish_requests{instance="cp3050:3903", cluster="cache_text"}
-        values: '0 20 40 80'
+        values: '0+20x11'
       - series: rdkafka_producer_topic_partition_msgs{instance="cp3050:9132", cluster="cache_text"}
-        values: '0 3 6 9'
-      # This should fire both a warning and a critical alert because varnishkafka is relaying incoming requests at a rate of only 5% of their incoming rate (20 ps / 1 ps)
+        values: '0+3x8 200+20x2'
+      # This should fire both a warning and a critical alert because varnishkafka is relaying incoming requests at a rate of only 5% of their incoming rate (20 ps / 1 ps) for at least 5 min
       - series: varnish_requests{instance="cp3051:3903", cluster="cache_text"}
-        values: '0 20 40 80'
+        values: '0+20x11'
       - series: rdkafka_producer_topic_partition_msgs{instance="cp3051:9132", cluster="cache_text"}
-        values: '0 1 2 3'
+        values: '0+1x10 240'
       # This should not fire an alert because it simulates a depooled server, where varnish requests and varnishkafka messages both drop to zero
       - series: varnish_requests{instance="cp3052:3903", cluster="cache_text"}
-        values: '0 0 0 0'
+        values: '0x11'
       - series: rdkafka_producer_topic_partition_msgs{instance="cp3052:9132", cluster="cache_text"}
-        values: '0 0 0 0'
+        values: '0x11'
+      # This should not fire an alert because the rate has been below 20% for at least 5 min
+      - series: varnish_requests{instance="cp3053:3903", cluster="cache_text"}
+        values: '0+20x8'
+      - series: rdkafka_producer_topic_partition_msgs{instance="cp3053:9132", cluster="cache_text"}
+        values: '0+1x7 180'
     external_labels:
       site: esams
     alert_rule_test:
     - alertname: VarnishkafkaNoMessages
-      eval_time: 1m
+      eval_time: 8m
       exp_alerts:
         - exp_labels:
             severity: warning
@@ -31,8 +36,8 @@ tests:
             hostname: "cp3050"
             cluster: "cache_text"
           exp_annotations:
-            summary: "varnishkafka on cp3050 is not sending enough cache_text requests"
-            description: "Varnish on cp3050 is receiving requests, but Varnishkafka is not sending enough cache_text requests"
+            summary: "[WARNING] - varnishkafka on cp3050 is not sending enough cache_text requests"
+            description: "[WARNING] - Varnish on cp3050 is receiving requests, but Varnishkafka is not sending enough cache_text requests"
             dashboard: "https://grafana.wikimedia.org/d/000000253/varnishkafka?orgId=1&var-datasource=esams%20prometheus/ops&var-cp_cluster=cache_text&var-instance=cp3050%3A9132&viewPanel=14"
             runbook: &varnishkafka-nomessage-test-runbook "https://wikitech.wikimedia.org/wiki/Analytics/Systems/Varnishkafka"
         - exp_labels:
@@ -40,9 +45,9 @@ tests:
             team: data-engineering
             hostname: "cp3051"
             cluster: "cache_text"
-          exp_annotations: &varnishkafka-nomessages-test-cp3051-annotations
-            summary: "varnishkafka on cp3051 is not sending enough cache_text requests"
-            description: "Varnish on cp3051 is receiving requests, but Varnishkafka is not sending enough cache_text requests"
+          exp_annotations:
+            summary: "[WARNING] - varnishkafka on cp3051 is not sending enough cache_text requests"
+            description: "[WARNING] - Varnish on cp3051 is receiving requests, but Varnishkafka is not sending enough cache_text requests"
             dashboard: "https://grafana.wikimedia.org/d/000000253/varnishkafka?orgId=1&var-datasource=esams%20prometheus/ops&var-cp_cluster=cache_text&var-instance=cp3051%3A9132&viewPanel=14"
             runbook: *varnishkafka-nomessage-test-runbook
         - exp_labels:
@@ -50,7 +55,11 @@ tests:
             team: data-engineering
             hostname: "cp3051"
             cluster: "cache_text"
-          exp_annotations: *varnishkafka-nomessages-test-cp3051-annotations
+          exp_annotations:
+            summary: "[CRITICAL] - varnishkafka on cp3051 is not sending enough cache_text requests"
+            description: "[CRITICAL] - Varnish on cp3051 is receiving requests, but Varnishkafka is not sending enough cache_text requests"
+            dashboard: "https://grafana.wikimedia.org/d/000000253/varnishkafka?orgId=1&var-datasource=esams%20prometheus/ops&var-cp_cluster=cache_text&var-instance=cp3051%3A9132&viewPanel=14"
+            runbook: *varnishkafka-nomessage-test-runbook
 
   - interval: 1m
     external_labels:

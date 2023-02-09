@@ -7,22 +7,27 @@ groups:
       # The label_replace function is used to generate hostnames from instance, so that we can match the two series from different exporters.
       - alert: VarnishkafkaNoMessages
         expr: sum by (hostname,cluster) (label_replace (rate(rdkafka_producer_topic_partition_msgs[5m]), "hostname", "$1", "instance", "(.*):.*")) / sum by (cluster,hostname) (label_replace (rate(varnish_requests{ method!~"PURGE"}[5m]), "hostname", "$1", "instance", "(.*):.*")) < 0.2
+        for: 5m
         labels:
           team: data-engineering
           severity: warning
         annotations: &varnishkafka-nomessages-annotations
-          summary: 'varnishkafka on {{ $labels.hostname }} is not sending enough {{ $labels.cluster }} requests'
-          description: 'Varnish on {{ $labels.hostname }} is receiving requests, but Varnishkafka is not sending enough {{ $labels.cluster }} requests'
+          summary: '[WARNING] - varnishkafka on {{ $labels.hostname }} is not sending enough {{ $labels.cluster }} requests'
+          description: '[WARNING] - Varnish on {{ $labels.hostname }} is receiving requests, but Varnishkafka is not sending enough {{ $labels.cluster }} requests'
           dashboard: 'https://grafana.wikimedia.org/d/000000253/varnishkafka?orgId=1&var-datasource={{ $externalLabels.site }}%20prometheus/ops&var-cp_cluster={{ $labels.cluster }}&var-instance={{ $labels.hostname }}%3A9132&viewPanel=14'
           runbook: 'https://wikitech.wikimedia.org/wiki/Analytics/Systems/Varnishkafka'
 
       # Fire a critical alert if fewer than 10% of the requests are logged to kafka over the same 5 minutes window.
       - alert: VarnishkafkaNoMessages
         expr: sum by (hostname,cluster) (label_replace (rate(rdkafka_producer_topic_partition_msgs[5m]), "hostname", "$1", "instance", "(.*):.*")) / sum by (cluster,hostname) (label_replace (rate(varnish_requests{ method!~"PURGE"}[5m]), "hostname", "$1", "instance", "(.*):.*")) < 0.1
+        for: 5m
         labels:
           team: data-engineering
           severity: critical
-        annotations: *varnishkafka-nomessages-annotations
+        annotations:
+          <<: *varnishkafka-nomessages-annotations
+          summary: '[CRITICAL] - varnishkafka on {{ $labels.hostname }} is not sending enough {{ $labels.cluster }} requests'
+          description: '[CRITICAL] - Varnish on {{ $labels.hostname }} is receiving requests, but Varnishkafka is not sending enough {{ $labels.cluster }} requests'
 
       # Let's get concerned when we average more than 1 error per second per
       # caching method, instance, and datacenter.
