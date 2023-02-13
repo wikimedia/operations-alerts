@@ -1,0 +1,52 @@
+rule_files:
+  - puppet-ca.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    input_series:
+      - series: 'puppet_ca_cert_expiry{cluster="puppet", instance="puppetmaster1001:9100", job="node", subject="cumin1001.eqiad.wmnet"}'
+        values: '1209600-60x10'
+      - series: 'puppet_ca_cert_expiry{cluster="puppet", instance="puppetmaster1001:9100", job="node", subject="cumin1002.eqiad.wmnet"}'
+        values: '518400-60x10'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+    - alertname: PuppetCertificateAboutToExpire
+      eval_time: 5m
+      exp_alerts:
+       - exp_labels:
+           cluster: puppet
+           team: sre
+           severity: warning
+           instance: puppetmaster1001:9100
+           subject: cumin1001.eqiad.wmnet
+           job: node
+         exp_annotations:
+           description: Puppet CA certificate cumin1001.eqiad.wmnet will expire in 13d 23h 50m 0s
+           summary: Puppet CA certificate cumin1001.eqiad.wmnet is about to expire
+           runbook: 'https://wikitech.wikimedia.org/wiki/Puppet#Renew_agent_certificate'
+           dashboard: TODO
+       - exp_labels:
+           cluster: puppet
+           team: sre
+           severity: warning
+           instance: puppetmaster1001:9100
+           subject: cumin1002.eqiad.wmnet
+           job: node
+         exp_annotations:
+           description: Puppet CA certificate cumin1002.eqiad.wmnet will expire in 5d 23h 50m 0s
+           summary: Puppet CA certificate cumin1002.eqiad.wmnet is about to expire
+           runbook: 'https://wikitech.wikimedia.org/wiki/Puppet#Renew_agent_certificate'
+           dashboard: TODO
+       - exp_labels:
+           cluster: puppet
+           team: sre
+           severity: critical
+           instance: puppetmaster1001:9100
+           subject: cumin1002.eqiad.wmnet
+           job: node
+         exp_annotations:
+           description: Puppet CA certificate cumin1002.eqiad.wmnet will expire in 5d 23h 50m 0s
+           summary: Puppet CA certificate cumin1002.eqiad.wmnet is about to expire
+           runbook: 'https://wikitech.wikimedia.org/wiki/Puppet#Renew_agent_certificate'
+           dashboard: TODO
