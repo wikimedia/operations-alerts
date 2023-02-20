@@ -26,7 +26,7 @@ groups:
       dashboard: https://grafana.wikimedia.org/d/OagQjQmnk?var-server={{ reReplaceAll "([^.:]+)([.:].*)?" "$1" $labels.instance }}
 
   - alert: KubeletOperationalLatency
-    expr: histogram_quantile(0.99, rate(kubelet_runtime_operations_duration_seconds_bucket{job="k8s-node"}[5m])) > 0.6
+    expr: histogram_quantile(0.99, rate(kubelet_runtime_operations_duration_seconds_bucket{job="k8s-node"}[5m])) > 1.0
     for: 5m
     labels:
       team: sre

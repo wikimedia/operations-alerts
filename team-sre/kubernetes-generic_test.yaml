@@ -18,7 +18,7 @@ tests:
     values: "1 1 1 1 1 1 1 1 1 1 1 0"
   - series: 'kubelet_runtime_operations_duration_seconds_bucket{job="k8s-node", instance="kubefakenode:1234", operation_type="fakeop", le="+Inf"}'
     values: "1+1x6"
-  - series: 'kubelet_runtime_operations_duration_seconds_bucket{job="k8s-node", instance="kubefakenode:1234", operation_type="fakeop", le="0.7"}'
+  - series: 'kubelet_runtime_operations_duration_seconds_bucket{job="k8s-node", instance="kubefakenode:1234", operation_type="fakeop", le="1.1"}'
     values: "0+0x6"
     # TODO: remove Kubernetes v1.16 metric T322919
   - series: 'apiserver_request_count{job="k8s-api", code="200"}'
@@ -111,7 +111,7 @@ tests:
         operation_type: fakeop
       exp_annotations:
         summary: "High latency for kubelet fakeop operation on kubefakenode:1234"
-        description: "Kubelet fakeop operations on kubefakenode:1234 take 700ms in p99"
+        description: "Kubelet fakeop operations on kubefakenode:1234 take 1.1s in p99"
         runbook: "https://wikitech.wikimedia.org/wiki/Kubernetes"
         dashboard: "https://grafana.wikimedia.org/d/000000472?var-cluster=moon%20prometheus/eagle"
 
