@@ -5,7 +5,7 @@
 groups:
  - name: frontend
    rules:
-   - alert: FrontendUnavailable
+   - alert: VarnishUnavailable
      annotations:
        description: '{{ $labels.job }} is operating at reduced availability ({{ $value | humanizePercentage }}). Investigate logs for errors.'
        summary: '{{ $labels.job }} has reduced HTTP availability #page'
@@ -17,8 +17,9 @@ groups:
      labels:
        severity: page
        team: sre
+       scope: global
 
-   - alert: FrontendUnavailable
+   - alert: HaproxyUnavailable
      annotations:
        description: 'HAProxy for cluster {{ $labels.cluster }} is operating at reduced availability ({{ $value | humanizePercentage }}). Investigate logs for errors.'
        summary: 'HAProxy ({{ $labels.cluster }}) has reduced HTTP availability #page'
@@ -30,3 +31,4 @@ groups:
      labels:
        severity: page
        team: sre
+       scope: global

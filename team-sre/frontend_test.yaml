@@ -9,12 +9,13 @@ tests:
       - series: 'global_job:varnish_requests:avail2m{job="varnish-upload"}'
         values: '0.00001+0.000001x60'
     alert_rule_test:
-    - alertname: FrontendUnavailable
+    - alertname: VarnishUnavailable
       eval_time: 10m
       exp_alerts:
        - exp_labels:
            team: sre
            severity: page
+           scope: global
            job: varnish-text
          exp_annotations:
            description: 'varnish-text is operating at reduced availability (97.6%). Investigate logs for errors.'
@@ -30,12 +31,13 @@ tests:
       - series: 'global_job:haproxy_requests:avail2m{cluster="cache_upload"}'
         values: '0.00001+0.000001x60'
     alert_rule_test:
-    - alertname: FrontendUnavailable
+    - alertname: HaproxyUnavailable
       eval_time: 10m
       exp_alerts:
        - exp_labels:
            team: sre
            severity: page
+           scope: global
            cluster: cache_text
          exp_annotations:
            description: 'HAProxy for cluster cache_text is operating at reduced availability (97.6%). Investigate logs for errors.'
