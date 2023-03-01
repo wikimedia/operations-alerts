@@ -16,7 +16,7 @@ groups:
       - alert: HttpdUnreachable
         annotations:
           description: 'httpd is unresponsive on {{ $value | humanizePercentage }} of MediaWiki k8s deployment {{ $labels.deployment }}.'
-          summary: 'httpd unavailable for cluster {{ $labels.cluster }} at {{ $externalLabels.site }}'
+          summary: 'httpd unavailable for deployment {{ $labels.deployment }} at {{ $externalLabels.site }}'
           dashboard: 'https://grafana.wikimedia.org/d/U7JT--knk/mw-on-k8s?orgId=1&viewPanel=257&var-dc={{ $externalLabels.site }}%20prometheus/k8s&var-service=mediawiki&var-namespace={{ $labels.deployment }}'
           runbook: 'https://wikitech.wikimedia.org/wiki/Application_servers'
         expr: sum(apache_up{app="mediawiki"}) by (deployment)
@@ -43,11 +43,11 @@ groups:
           histogram_quantile(
             0.75,
             sum(
-              rate(envoy_cluster_upstream_rq_time_bucket{ app="mediawiki", envoy_cluster_name=~"local_service"}[2m])
+              rate(envoy_cluster_upstream_rq_time_bucket{ app="mediawiki", envoy_cluster_name="local_service"}[2m])
             ) by (le, deployment)
           ) > 800
           and sum(
-            rate(envoy_cluster_upstream_rq_time_count{app="mediawiki",envoy_cluster_name=~"local_service"}[2m])
+            rate(envoy_cluster_upstream_rq_time_count{app="mediawiki",envoy_cluster_name="local_service"}[2m])
           ) by (deployment) > 30
         for: 4m
         labels:
