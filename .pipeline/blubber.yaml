@@ -3,6 +3,8 @@ base: docker-registry.wikimedia.org/bullseye:latest
 
 apt:
   packages:
+    - opensysusers # for systemd-sysusers
+    - pint
     - prometheus
     - tox
 

@@ -82,6 +82,27 @@ def test_valid_rule(rulefile):
 
 
 @pytest.mark.parametrize("rulefile", all_rulefiles(SUBDIRS), ids=str)
+def test_lint_rule(rulefile):
+    """Lint rulefile with pint"""
+
+    path = rulefile.as_posix()
+    p = subprocess.run(["pint", "lint", path], capture_output=True, encoding="utf8")
+
+    # Severe problem found, abort
+    assert p.returncode == 0, "pint lint failed: %s\n%s" % (
+        p.stdout,
+        p.stderr,
+    )
+
+    # Report less severe problems (with a filename:linenumber: prefix) as
+    # warnings
+    warn_line_re = re.compile(r"^.+:\d+: ")
+    for line in p.stderr.splitlines():
+        if warn_line_re.match(line):
+            warnings.warn(UserWarning(line))
+
+
+@pytest.mark.parametrize("rulefile", all_rulefiles(SUBDIRS), ids=str)
 def test_rule_metadata(rulefile):
     """Ensure rulefile has all the expected labels/annotations"""
 
