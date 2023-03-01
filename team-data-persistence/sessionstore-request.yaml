@@ -1,0 +1,27 @@
+# deploy-tag: k8s
+groups:
+  - name: sessionstore-request
+    rules:
+    - alert: SessionStoreErrorRateHigh
+      annotations:
+        description: Session storage error rates (status 5xx) are elevated
+        dashboard: https://grafana.wikimedia.org/d/000001590/sessionstore?orgId=1&var-site={{ $externalLabels.site }}
+        summary: Session storage error rates (5xx) in {{ $externalLabels.site}} are elevated
+        runbook: TODO
+      expr: sum (rate(http_request_duration_seconds_count{code=~"5..", kubernetes_namespace="sessionstore"}[5m])) > 1
+      for: 5m
+      labels:
+        severity: warning
+        team: data-persistence
+
+    - alert: SessionStoreErrorRateHigh
+      annotations:
+        description: Session storage error rates (status 5xx) are elevated
+        dashboard: https://grafana.wikimedia.org/d/000001590/sessionstore?orgId=1&var-site={{ $externalLabels.site }}
+        summary: "Session storage error rates (5xx) in {{ $externalLabels.site}} are elevated #page"
+        runbook: TODO
+      expr: sum (rate(http_request_duration_seconds_count{code=~"5..", kubernetes_namespace="sessionstore"}[5m])) > 5
+      for: 5m
+      labels:
+        severity: page
+        team: data-persistence

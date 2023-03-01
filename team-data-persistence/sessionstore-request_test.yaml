@@ -1,0 +1,49 @@
+rule_files:
+  - sessionstore-request.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    input_series:
+      - series: 'http_request_duration_seconds_count{code="500",kubernetes_namespace="sessionstore"}'
+        values: '0+350x10'
+    external_labels:
+      site: codfw
+    alert_rule_test:
+      - alertname: SessionStoreErrorRateHigh
+        eval_time: 6m
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              team: data-persistence
+            exp_annotations:
+              summary: Session storage error rates (5xx) in codfw are elevated
+              description: Session storage error rates (status 5xx) are elevated
+              dashboard: https://grafana.wikimedia.org/d/000001590/sessionstore?orgId=1&var-site=codfw
+              runbook: TODO
+  - interval: 1m
+    input_series:
+      - series: 'http_request_duration_seconds_count{code="500",kubernetes_namespace="sessionstore"}'
+        values: '0+1550x10'
+    external_labels:
+      site: codfw
+    alert_rule_test:
+      - alertname: SessionStoreErrorRateHigh
+        eval_time: 6m
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              team: data-persistence
+            exp_annotations:
+              summary: Session storage error rates (5xx) in codfw are elevated
+              description: Session storage error rates (status 5xx) are elevated
+              dashboard: https://grafana.wikimedia.org/d/000001590/sessionstore?orgId=1&var-site=codfw
+              runbook: TODO
+          - exp_labels:
+              severity: page
+              team: data-persistence
+            exp_annotations:
+              summary: "Session storage error rates (5xx) in codfw are elevated #page"
+              description: Session storage error rates (status 5xx) are elevated
+              dashboard: https://grafana.wikimedia.org/d/000001590/sessionstore?orgId=1&var-site=codfw
+              runbook: TODO
+
