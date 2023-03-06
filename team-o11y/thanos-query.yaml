@@ -1,3 +1,5 @@
+# deploy-tag: ops
+
 # Taken from upstream https://github.com/thanos-io/thanos/blob/main/examples/alerts/alerts.md#query
 groups:
   - name: thanos-query

@@ -1,3 +1,5 @@
+# deploy-tag: ops
+
 # Taken from upstream https://github.com/thanos-io/thanos/blob/main/examples/alerts/alerts.md#store-gateway
 groups:
   - name: thanos-store
