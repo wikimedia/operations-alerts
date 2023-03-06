@@ -1,0 +1,40 @@
+rule_files:
+  - rdf_streaming_updater_ops.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    input_series:
+      - series: 'wdqs_streaming_updater_kafka_stream_consumer_lag_Value{instance="wcqs2001:9101"}'
+        values: 1260000
+    alert_rule_test:
+      - alertname: RdfStreamingUpdaterHighConsumerUpdateLag
+        eval_time: 5m
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              team: search-platform
+              instance: wcqs2001:9101
+            exp_annotations:
+              summary: "wcqs2001:9101 has fallen behind applying updates from the RDF Streaming Updater"
+              description: "Instance is behind by 21m 0s. Stale data is being served"
+              runbook: https://wikitech.wikimedia.org/wiki/Wikidata_Query_Service/Streaming_Updater
+              dashboard: https://grafana.wikimedia.org/d/fdU5Zx-Mk/wdqs-streaming-updater
+
+  - interval: 1m
+    input_series:
+      - series: 'swift_account_stats_bytes_total{account="AUTH_wdqs"}'
+        values: 1099511627777
+    alert_rule_test:
+      - alertname: RdfStreamingUpdaterSpaceUsageTooHigh
+        eval_time: 1m
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              team: search-platform
+              account: AUTH_wdqs
+            exp_annotations:
+              summary: "The RDF Streaming Updater is using more than 1TiB of storage"
+              description: "The containers owned by AUTH_wdqs are using 1Ti, this is more than expected."
+              runbook: https://wikitech.wikimedia.org/wiki/Wikidata_Query_Service/Streaming_Updater
+              dashboard: https://grafana.wikimedia.org/d/fdU5Zx-Mk/wdqs-streaming-updater
+
