@@ -45,3 +45,30 @@ tests:
              be, etc.
            dashboard: https://grafana.wikimedia.org/d/GWvEXWDZk/prometheus-server?var-datasource=eqiad%20prometheus%2Fops
            runbook: https://wikitech.wikimedia.org/wiki/Prometheus#Prometheus_was_restarted
+ - interval: 1m
+   input_series:
+    - series: 'prometheus_notifications_alertmanagers_discovered'
+      values: '0+0x40'
+   external_labels:
+     site: eqiad
+     prometheus: ops
+   alert_rule_test:
+    - alertname: PrometheusNotConnectedToAM
+      eval_time: 7m
+      exp_alerts:
+       - exp_labels:
+           severity: warning
+           team: o11y
+         exp_annotations:
+           description: Prometheus is failing to connect to AlertManager
+           summary: Prometheus is failing to connect to AlertManager
+           dashboard: https://grafana.wikimedia.org/d/eea-9_sik/alertmanager
+           runbook: https://wikitech.wikimedia.org/wiki/Alertmanager#Alerts
+       - exp_labels:
+           severity: critical
+           team: o11y
+         exp_annotations:
+           description: Prometheus is failing to connect to AlertManager
+           summary: Prometheus is failing to connect to AlertManager
+           dashboard: https://grafana.wikimedia.org/d/eea-9_sik/alertmanager
+           runbook: https://wikitech.wikimedia.org/wiki/Alertmanager#Alerts

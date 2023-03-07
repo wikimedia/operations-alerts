@@ -1,4 +1,5 @@
-# deploy-tag: ops
+# deploy-tag: global
+# Thanos compact is only active in a site at a time, thus deploy globally
 
 # Taken from upstream https://github.com/thanos-io/thanos/blob/main/examples/alerts/alerts.md#compaction
 groups:

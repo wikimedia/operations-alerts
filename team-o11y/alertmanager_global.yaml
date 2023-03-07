@@ -1,0 +1,18 @@
+# deploy-tag: global
+
+# alertmanager-irc-relay is only active in a site at a time, thus deploy
+# globally
+groups:
+  - name: alertmanager
+    rules:
+      - alert: AlertManagerIRCNotConnected
+        annotations:
+          description: AlertManager IRC relay is not connected, check the logs
+          summary: AlertManager IRC relay is not connected
+          dashboard: https://grafana.wikimedia.org/d/eea-9_sik/alertmanager
+          runbook: https://wikitech.wikimedia.org/wiki/Alertmanager#Alerts
+        expr: irc_connected{job="alertmanager"} == 0
+        for: 5m
+        labels:
+          severity: warning
+          team: o11y

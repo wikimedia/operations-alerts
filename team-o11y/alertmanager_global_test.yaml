@@ -1,0 +1,26 @@
+rule_files:
+  - alertmanager_global.yaml
+evaluation_interval: 1m
+tests:
+ - interval: 1m
+   input_series:
+    - series: 'irc_connected{job="alertmanager"}'
+      values: '0+0x40'
+   external_labels:
+     site: eqiad
+     prometheus: ops
+   alert_rule_test:
+    - alertname: AlertManagerIRCNotConnected
+      eval_time: 7m
+      exp_alerts:
+       - exp_labels:
+           severity: warning
+           team: o11y
+           job: alertmanager
+         exp_annotations:
+           description: AlertManager IRC relay is not connected, check the logs
+           summary: AlertManager IRC relay is not connected
+           dashboard: https://grafana.wikimedia.org/d/eea-9_sik/alertmanager
+           runbook: https://wikitech.wikimedia.org/wiki/Alertmanager#Alerts
+
+
