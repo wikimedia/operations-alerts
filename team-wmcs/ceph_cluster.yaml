@@ -8,7 +8,7 @@ groups:
         annotations:
           description: "{{ $externalLabels.site }} ceph cluster is in error status."
           summary: "#page The ceph cluster in {{ $externalLabels.site }} is in error status, that means that it's unable to serve traffic, all VMs could be unusable."
-          dashboard: "https://grafana.wikimedia.org/?orgId=1&tag=health&tag=ceph&search=open"
+          dashboard: "https://grafana.wikimedia.org/d/P1tFnn3Mk/wmcs-ceph-eqiad-health?orgId=1&search=open&tag=ceph&tag=health&tag=WMCS"
           runbook: "https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/CephClusterInError"
         expr: ceph_health_status{job="ceph_eqiad"} == 2
         for: 5m
@@ -21,7 +21,7 @@ groups:
         annotations:
           description: "{{ $externalLabels.site }} ceph cluster is in warning status."
           summary: "The ceph cluster in {{ $externalLabels.site }} is in warning status, that means that it's high availability is compromised, things should still be working as expected."
-          dashboard: "https://grafana.wikimedia.org/?orgId=1&tag=health&tag=ceph&search=open"
+          dashboard: "https://grafana.wikimedia.org/d/P1tFnn3Mk/wmcs-ceph-eqiad-health?orgId=1&search=open&tag=ceph&tag=health&tag=WMCS"
           runbook: "https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/CephClusterInWarning"
         expr: ceph_health_status{job="ceph_eqiad"} == 1
         for: 5m
@@ -35,7 +35,7 @@ groups:
         annotations:
           description: "All monitor nodes for the ceph cluster in {{ $externalLabels.site }} are down (quorum lost)."
           summary: "#page All the monitor nodes for the cluster in {{ $externalLabels.site }} have lost quorum, that means that the cluster is down."
-          dashboard: "https://grafana.wikimedia.org/?orgId=1&tag=health&tag=ceph&search=open"
+          dashboard: "https://grafana.wikimedia.org/d/P1tFnn3Mk/wmcs-ceph-eqiad-health?orgId=1&search=open&tag=ceph&tag=health&tag=WMCS"
           runbook: "https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/CephClusterAllMonsDown"
         expr: sum(ceph_mon_quorum_status{job="ceph_eqiad"}) == 0
         for: 5m

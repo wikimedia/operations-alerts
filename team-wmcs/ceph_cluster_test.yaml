@@ -20,7 +20,7 @@ tests:
             exp_annotations:
               description: "eqiad ceph cluster is in error status."
               summary: "#page The ceph cluster in eqiad is in error status, that means that it's unable to serve traffic, all VMs could be unusable."
-              dashboard: "https://grafana.wikimedia.org/?orgId=1&tag=health&tag=ceph&search=open"
+              dashboard: "https://grafana.wikimedia.org/d/P1tFnn3Mk/wmcs-ceph-eqiad-health?orgId=1&search=open&tag=ceph&tag=health&tag=WMCS"
               runbook: "https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/CephClusterInError"
 
   - interval: 1m
@@ -41,7 +41,7 @@ tests:
             exp_annotations:
               description: "eqiad ceph cluster is in warning status."
               summary: "The ceph cluster in eqiad is in warning status, that means that it's high availability is compromised, things should still be working as expected."
-              dashboard: "https://grafana.wikimedia.org/?orgId=1&tag=health&tag=ceph&search=open"
+              dashboard: "https://grafana.wikimedia.org/d/P1tFnn3Mk/wmcs-ceph-eqiad-health?orgId=1&search=open&tag=ceph&tag=health&tag=WMCS"
               runbook: "https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/CephClusterInWarning"
 
   - interval: 1m
@@ -65,5 +65,5 @@ tests:
             exp_annotations:
               description: "All monitor nodes for the ceph cluster in eqiad are down (quorum lost)."
               summary: "#page All the monitor nodes for the cluster in eqiad have lost quorum, that means that the cluster is down."
-              dashboard: "https://grafana.wikimedia.org/?orgId=1&tag=health&tag=ceph&search=open"
+              dashboard: "https://grafana.wikimedia.org/d/P1tFnn3Mk/wmcs-ceph-eqiad-health?orgId=1&search=open&tag=ceph&tag=health&tag=WMCS"
               runbook: "https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/CephClusterAllMonsDown"
