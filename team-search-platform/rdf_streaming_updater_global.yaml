@@ -1,7 +1,4 @@
-# deploy-tag: ops
-# deploy-site: eqiad, codfw
-
-# Alerts with metrics from 'ops' Prometheus
+# deploy-tag: global
 
 groups:
   - name: rdf-streaming-updater
@@ -21,6 +18,7 @@ groups:
           dashboard: https://grafana.wikimedia.org/d/fdU5Zx-Mk/wdqs-streaming-updater
 
 ## Swift usage alerts, alert if > 1TB is used
+## the metric is pushed only in a site at a time, hence 'global' deployment
       - alert: RdfStreamingUpdaterSpaceUsageTooHigh
         expr: swift_account_stats_bytes_total{account="AUTH_wdqs"} > 1099511627776
         for: 1m
