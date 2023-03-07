@@ -68,11 +68,13 @@ groups:
         summary: Thanos Query is failing to send requests.
         dashboard: https://grafana.wikimedia.org/d/af36c91291a603f1d9fbdabdd127ac4a/thanos-query
         runbook: https://wikitech.wikimedia.org/wiki/Thanos#Alerts
+      # Exclude Exemplars queries since we're not supporting those yet, and
+      # Grafana issues Exemplars queries.
       expr: |
         (
-          sum by (job) (rate(grpc_client_handled_total{grpc_code!="OK", job=~".*thanos-query.*"}[5m]))
+          sum by (job) (rate(grpc_client_handled_total{grpc_code!="OK", grpc_method!="Exemplars", job=~".*thanos-query.*"}[5m]))
         /
-          sum by (job) (rate(grpc_client_started_total{job=~".*thanos-query.*"}[5m]))
+          sum by (job) (rate(grpc_client_started_total{grpc_method!="Exemplars", job=~".*thanos-query.*"}[5m]))
         ) * 100 > 5
       for: 5m
       labels:
