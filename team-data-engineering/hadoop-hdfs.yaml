@@ -138,3 +138,28 @@ groups:
       labels:
         severity: warning
         team: data-engineering
+
+## HDFS Namenode FSImage Age
+    - alert: HdfsFSImageAge
+      annotations:
+        description: The HDFS FSImage on {{ $labels.hadoop_cluster }}:{{ $labels.instance }} is too old.
+        summary: The HDFS FSImage on {{ $labels.hadoop_cluster }}:{{ $labels.instance }} is too old.
+        dashboard: https://grafana.wikimedia.org/d/000000585/hadoop?var-hadoop_cluster={{ $labels.hadoop_cluster }}&viewPanel=129&fullscreen
+        runbook: https://wikitech.wikimedia.org/wiki/Analytics/Cluster/Hadoop/Alerts#HDFS_FSImage_too_old
+      expr: (timestamp(Hadoop_NameNode_LastCheckpointTime) - (Hadoop_NameNode_LastCheckpointTime/1000)) > 7200
+      for: 5m
+      labels:
+        severity: critical
+        team: data-engineering
+
+    - alert: HdfsFSImageAge
+      annotations:
+        description: The HDFS FSImage on {{ $labels.hadoop_cluster }}:{{ $labels.instance }} is too old.
+        summary: The HDFS FSImage on {{ $labels.hadoop_cluster }}:{{ $labels.instance }} is too old.
+        dashboard: https://grafana.wikimedia.org/d/000000585/hadoop?var-hadoop_cluster={{ $labels.hadoop_cluster }}&viewPanel=129&fullscreen
+        runbook: https://wikitech.wikimedia.org/wiki/Analytics/Cluster/Hadoop/Alerts#HDFS_FSImage_too_old
+      expr: (timestamp(Hadoop_NameNode_LastCheckpointTime) - (Hadoop_NameNode_LastCheckpointTime/1000)) > 5400
+      for: 5m
+      labels:
+        severity: warning
+        team: data-engineering

@@ -153,3 +153,39 @@ tests:
             summary: RPC call queue length on the analytics-hadoop cluster is too high.
             dashboard: https://grafana.wikimedia.org/d/000000585/hadoop?var-hadoop_cluster=analytics-hadoop&orgId=1&panelId=54&fullscreen
             runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#HDFS_Namenode_RPC_length_queue
+
+## HDFS Namenode FSImage Age
+    - interval: 1m
+      input_series:
+        - series: Hadoop_NameNode_LastCheckpointTime{hadoop_cluster="analytics-hadoop", job="jmx_hadoop", name="FSNamesystem", instance="an-master1001:10080"}
+          # timestamp for metrics start at 0 (https://github.com/prometheus/prometheus/blob/main/cmd/promtool/unittest.go#L179)
+          # Keep our epoch checkpoint time at 0 for 120m (7200s) + 6m (5m duration for alert)
+          values: '0x126'
+      alert_rule_test:
+      - alertname: HdfsFSImageAge
+        eval_time: 126m
+        exp_alerts:
+        - exp_labels:
+            severity: critical
+            team: data-engineering
+            hadoop_cluster: analytics-hadoop
+            instance: an-master1001:10080
+            job: jmx_hadoop
+            name: FSNamesystem
+          exp_annotations:
+            description: The HDFS FSImage on analytics-hadoop:an-master1001:10080 is too old.
+            summary: The HDFS FSImage on analytics-hadoop:an-master1001:10080 is too old.
+            dashboard: https://grafana.wikimedia.org/d/000000585/hadoop?var-hadoop_cluster=analytics-hadoop&viewPanel=129&fullscreen
+            runbook: https://wikitech.wikimedia.org/wiki/Analytics/Cluster/Hadoop/Alerts#HDFS_FSImage_too_old
+        - exp_labels:
+            severity: warning
+            team: data-engineering
+            hadoop_cluster: analytics-hadoop
+            instance: an-master1001:10080
+            job: jmx_hadoop
+            name: FSNamesystem
+          exp_annotations:
+            description: The HDFS FSImage on analytics-hadoop:an-master1001:10080 is too old.
+            summary: The HDFS FSImage on analytics-hadoop:an-master1001:10080 is too old.
+            dashboard: https://grafana.wikimedia.org/d/000000585/hadoop?var-hadoop_cluster=analytics-hadoop&viewPanel=129&fullscreen
+            runbook: https://wikitech.wikimedia.org/wiki/Analytics/Cluster/Hadoop/Alerts#HDFS_FSImage_too_old
