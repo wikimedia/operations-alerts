@@ -1,3 +1,5 @@
+# deploy-tag: ops
+
 groups:
   - name: data_pipelines
     rules:
