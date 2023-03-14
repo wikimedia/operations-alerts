@@ -1,8 +1,10 @@
+# deploy-tag: ops
+
 groups:
   - name: netops
     rules:
       - alert: PingOffloadMissingIP
-        expr: rate(node_netstat_Ip_InAddrErrors{instance=~"ping[1-9]00[1-9]:9100"}[5m]) > 0
+        expr: rate(node_netstat_Ip_InAddrErrors{instance=~"ping[1-9].*"}[5m]) > 0
         for: 1m
         labels:
           team: sre
@@ -12,6 +14,7 @@ groups:
           description: "The server is receiving packets for an unknown IP"
           dashboard: https://grafana.wikimedia.org/d/000000513/ping-offload
           runbook: https://wikitech.wikimedia.org/wiki/Ping_offload#InAddrErrors_alert
+
       - alert: RoutinatorRsyncErrors
         expr: count(routinator_rsync_status > 0) / count(routinator_rsync_status) > 0.5
         for: 30m
@@ -23,6 +26,7 @@ groups:
           description: "rsync error to 50% of targets"
           dashboard: https://grafana.wikimedia.org/d/UwUa77GZk/rpki
           runbook: https://wikitech.wikimedia.org/wiki/RPKI#RSYNC_status
+
       - alert: RoutinatorRRDPErrors
         expr: count(routinator_rrdp_status != 200 and routinator_rrdp_status != 304) / count(routinator_rrdp_status) > 0.5
         for: 30m
@@ -34,6 +38,7 @@ groups:
           description: "RRDP error to 50% of targets"
           dashboard: https://grafana.wikimedia.org/d/UwUa77GZk/rpki
           runbook: https://wikitech.wikimedia.org/wiki/RPKI#RRDP_status
+
       - alert: RoutinatorValidROAs
         expr: sum(routinator_valid_roas) by (instance) < 30000
         for: 1m
@@ -45,6 +50,7 @@ groups:
           description: "Currently at {{ $value }}"
           dashboard: https://grafana.wikimedia.org/d/UwUa77GZk/rpki
           runbook: https://wikitech.wikimedia.org/wiki/RPKI#Valid_ROAs_decreasing
+
       - alert: RoutinatorRTRConnections
         expr: routinator_rtr_current_connections < 7
         for: 1m
