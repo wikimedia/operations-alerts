@@ -2,7 +2,6 @@ groups:
   - name: data_pipelines
     rules:
       - alert: ImageSuggestionsCountLargeChange
-        for: 0w
         expr: abs(
             sum(image_suggestions_elasticsearch_hasrecommendation_total)
             - sum(image_suggestions_elasticsearch_hasrecommendation_total offset 1w)
@@ -16,6 +15,7 @@ groups:
           description: "Total count of image suggestions (based on hasrecommendation:image in elasticsearch) across sample wikis is >10% different to last week. Something may be wrong."
           runbook: TODO
           dashboard: TODO
+
       - alert: ImageSuggestionsPushFailure
         for: 15m
         expr: push_failure_time_seconds{job="image_suggestions_pipeline"} != 0
@@ -27,8 +27,8 @@ groups:
           description: "Prometheus is reporting a failure to push image suggestions metrics for 15m"
           runbook: TODO
           dashboard: TODO
+
       - alert: ImageSuggestionsTooLongSinceLastPush
-        for: 0s
         expr: time() - push_time_seconds{job="image_suggestions_pipeline"} > 864000 # 10 days
         labels:
           team: structured-data
