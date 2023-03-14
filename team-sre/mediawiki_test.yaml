@@ -22,7 +22,7 @@ tests:
             exp_annotations:
               description: 'The MediaWiki cluster api_appserver in eqiad is experiencing saturation of php7.4-fpm.service workers 2.326%'
               summary: 'Not enough idle php7.4-fpm.service workers for Mediawiki api_appserver at eqiad #page'
-              dashboard: 'https://grafana.wikimedia.org/d/RIA1lzDZk/application-servers-red-dashboard?panelId=54&fullscreen&orgId=1&from=now-3h&to=now&var-datasource=eqiad%20prometheus/ops&var-cluster=api_appserver'
+              dashboard: 'https://grafana.wikimedia.org/d/RIA1lzDZk/application-servers-red-dashboard?from=now-3h&orgId=1&to=now&var-cluster=api_appserver&var-datasource=eqiad%20prometheus/ops&viewPanel=64'
               runbook: 'https://bit.ly/wmf-fpmsat'
 
   - interval: 1m
@@ -47,7 +47,7 @@ tests:
               cluster: jobrunner
               service: php7.2-fpm.service
             exp_annotations:
-              dashboard: 'https://grafana.wikimedia.org/d/wqj6s-unk/jobrunners?panelId=54&fullscreen&orgId=1&from=now-3h&to=now&var-datasource=eqiad%20prometheus/ops'
+              dashboard: 'https://grafana.wikimedia.org/d/wqj6s-unk/jobrunners?fullscreen&orgId=1&from=now-3h&to=now&var-datasource=eqiad%20prometheus/ops&viewPanel=54'
               description: 'Jobrunners in eqiad is experiencing saturation of php-fpm workers: 0.9901% for more than 10 minutes.'
               runbook: 'https://bit.ly/wmf-fpmsat'
               summary: 'Not enough idle php7.2-fpm.service workers for Mediawiki jobrunner at eqiad'
