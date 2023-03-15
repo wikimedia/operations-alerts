@@ -30,7 +30,7 @@ groups:
           runbook: https://wikitech.wikimedia.org/wiki/Performance/Runbook/Webperf-processor_services
 
       - alert: NavtimingErrorsHigh
-        expr: rate(webperf_errors[5m]) > 1
+        expr: rate(webperf_errors_total[5m]) > 1
         for: 5m
         labels:
           severity: critical
@@ -42,7 +42,7 @@ groups:
           runbook: https://wikitech.wikimedia.org/wiki/Performance/Runbook/Webperf-processor_services
 
       - alert: NavtimingInvalidsHigh
-        expr: sum(rate(webperf_navtiming_invalid_events[5m])) > 5
+        expr: sum(rate(webperf_navigationtiming_invalid_events_total[5m])) > 5
         for: 5m
         labels:
           severity: warning
@@ -54,7 +54,7 @@ groups:
           runbook: https://wikitech.wikimedia.org/wiki/Performance/Runbook/Webperf-processor_services
 
       - alert: PainttimingInvalidsHigh
-        expr: sum(rate(webperf_painttiming_invalid_events[5m])) > 5
+        expr: sum(rate(webperf_painttiming_invalid_events_total[5m])) > 5
         for: 5m
         labels:
           severity: warning
@@ -66,7 +66,7 @@ groups:
           runbook: https://wikitech.wikimedia.org/wiki/Performance/Runbook/Webperf-processor_services
 
       - alert: SavetimingInvalidsHigh
-        expr: sum(rate(webperf_savetiming_invalid_events[5m])) > 5
+        expr: sum(rate(webperf_savetiming_invalid_events_total[5m])) > 5
         for: 5m
         labels:
           severity: warning
