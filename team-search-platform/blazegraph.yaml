@@ -1,4 +1,5 @@
 # deploy-tag: ops
+# deploy-site: eqiad, codfw
 
 groups:
   - name: blazegraph
