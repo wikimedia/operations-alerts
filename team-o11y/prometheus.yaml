@@ -1,3 +1,6 @@
+# deploy-tag: local
+# i.e. deploy to all Prometheus instances
+
 groups:
   - name: prometheus
     rules:
