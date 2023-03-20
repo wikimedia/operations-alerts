@@ -1,0 +1,26 @@
+groups:
+  - name: poolcounter
+    rules:
+      - alert: PoolcounterConnectErrors
+        annotations:
+          description: 'The poolcounter instance {{ $labels.instance }} in {{ $externalLabels.site }} has connection errors'
+          summary: 'Connection errors for {{ $labels.instance }} poolcounter #page'
+          dashboard: 'https://grafana.wikimedia.org/d/aIcYxuxZk/poolcounter?orgId=1&viewPanel=2&from=now-1h&to=now&var-dc={{ $externalLabels.site }}%20prometheus/ops'
+          runbook: 'https://www.mediawiki.org/wiki/PoolCounter#Request_tracing_in_production'
+        expr: rate(poolcounter_connect_errors{job="poolcounter_exporter"}[2m]) > 0
+        for: 2m
+        labels:
+          severity: page
+          team: sre
+
+      - alert: PoolcounterFullQueues
+        annotations:
+          description: 'The poolcounter instance {{ $labels.instance }} in {{ $externalLabels.site }} has too many full queues'
+          summary: 'Full queues for {{ $labels.instance }} poolcounter'
+          dashboard: 'https://grafana.wikimedia.org/d/aIcYxuxZk/poolcounter?orgId=1&viewPanel=6&from=now-1h&to=now&var-dc={{ $externalLabels.site }}%20prometheus/ops'
+          runbook: 'https://www.mediawiki.org/wiki/PoolCounter#Request_tracing_in_production'
+        expr: rate(poolcounter_full_queues{job="poolcounter_exporter"}[5m]) > 200
+        for: 2m
+        labels:
+          severity: critical
+          team: sre

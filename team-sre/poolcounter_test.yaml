@@ -1,0 +1,49 @@
+rule_files:
+  - poolcounter.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    input_series:
+      - series: 'poolcounter_connect_errors{job="poolcounter_exporter", instance="pool1:9106", cluster="test"}'
+        values: '0+1x60'
+
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: PoolcounterConnectErrors
+        eval_time: 10m
+        exp_alerts:
+          - exp_labels:
+              team: sre
+              severity: page
+              cluster: test
+              instance: 'pool1:9106'
+              job: poolcounter_exporter
+            exp_annotations:
+              description: 'The poolcounter instance pool1:9106 in eqiad has connection errors'
+              summary: 'Connection errors for pool1:9106 poolcounter #page'
+              dashboard: 'https://grafana.wikimedia.org/d/aIcYxuxZk/poolcounter?orgId=1&viewPanel=2&from=now-1h&to=now&var-dc=eqiad%20prometheus/ops'
+              runbook: 'https://www.mediawiki.org/wiki/PoolCounter#Request_tracing_in_production'
+
+  - interval: 1m
+    input_series:
+      - series: 'poolcounter_full_queues{job="poolcounter_exporter", instance="pool1:9106", cluster="test"}'
+        values: '0+20000x20'
+
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: PoolcounterFullQueues
+        eval_time: 10m
+        exp_alerts:
+          - exp_labels:
+              team: sre
+              severity: critical
+              cluster: test
+              instance: 'pool1:9106'
+              job: poolcounter_exporter
+            exp_annotations:
+              description: 'The poolcounter instance pool1:9106 in eqiad has too many full queues'
+              summary: 'Full queues for pool1:9106 poolcounter'
+              dashboard: 'https://grafana.wikimedia.org/d/aIcYxuxZk/poolcounter?orgId=1&viewPanel=6&from=now-1h&to=now&var-dc=eqiad%20prometheus/ops'
+              runbook: 'https://www.mediawiki.org/wiki/PoolCounter#Request_tracing_in_production'
