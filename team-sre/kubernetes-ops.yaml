@@ -1,0 +1,17 @@
+# deploy-tag: ops
+# deploy-site: eqiad, codfw
+
+groups:
+- name: kubernetes-ops
+  rules:
+  - alert: KubernetesRsyslogDown
+    expr: increase(rsyslog_kubernetes_record_seen_total[5m]) == 0
+    for: 5m
+    labels:
+      team: sre
+      severity: critical
+    annotations:
+      summary: "rsyslog on {{ $labels.instance }} is missing kubernetes logs"
+      description: "Rsyslog mmkubernetes plugin on {{ $labels.instance }} did not see any records in the last 5 minutes. This might mean that the plugin was terminated."
+      runbook: https://wikitech.wikimedia.org/wiki/Kubernetes/Logging#Common_issues
+      dashboard: https://grafana.wikimedia.org/d/OagQjQmnk?var-server={{ reReplaceAll "([^.:]+)([.:].*)?" "$1" $labels.instance }}
