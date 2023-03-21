@@ -1,0 +1,14 @@
+groups:
+- name: maps
+  rules:
+  - alert: OsmSynchronisationLag
+    expr: time() - osm_sync_timestamp{cluster="maps"} > 3 * 24 * 3600
+    for: 1d
+    labels:
+      severity: critical
+      team: sre
+    annotations:
+      summary: "Maps - OSM synchronization lag - {{ $externalLabels.site }}"
+      description: "OSM Synchronisation is behind {{ $value | humanizeDuration }}"
+      dashboard: https://grafana.wikimedia.org/d/000000305/maps-performances
+      runbook: https://wikitech.wikimedia.org/wiki/Maps/Runbook
