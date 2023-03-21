@@ -1,0 +1,23 @@
+rule_files:
+  - irc-echo.yaml
+tests:
+  - interval: 1m
+    input_series:
+      - series: 'udpmxircecho_messages_relayed_total{channel="#aa.wikibooks", cluster="misc", instance="irc2001:9221", job="udpmxircecho"}'
+        values: '0+0x10'
+    external_labels:
+      site: codfw
+    alert_rule_test:
+      - alertname: UdpMxIrcEchoThroughput
+        eval_time: 6m
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              team: sre
+              instance: "irc2001:9221"
+            exp_annotations:
+              summary: "irc2001:9221 has relayed less than 100 messages over past 5 minutes }}"
+              description: "irc2001:9221 has relayed less than 100 messages for the irc.wikimedia.org service over past 5 minutes }}"
+              dashboard: https://grafana.wikimedia.org/d/XyXn_CPMz/ircecho
+              runbook: https://wikitech.wikimedia.org/wiki/Irc.wikimedia.org
+
