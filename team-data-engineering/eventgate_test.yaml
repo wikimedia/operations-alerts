@@ -107,3 +107,24 @@ tests:
                 summary: Eventgate-logging-external stream mediawiki.client.error validation errors detected in past 15 min
                 dashboard: https://grafana.wikimedia.org/d/ZB39Izmnz/eventgate?orgId=1&refresh=1m&var-service=eventgate-logging-external&var-stream=All&var-kafka_broker=All&var-kafka_producer_type=All&var-dc=thanos
                 runbook: https://wikitech.wikimedia.org/wiki/Event_Platform/EventGate
+## Eventgate Logging Errors tests
+    - interval: 1m
+      input_series:
+        - series: express_router_request_duration_seconds_count{service="eventgate-logging-external",status="501"}
+          values: '100+100x60'
+      external_labels:
+            site: eqiad
+      alert_rule_test:
+      - alertname: EventgateLoggingExternalErrors
+        eval_time: 15m
+        exp_alerts:
+        - exp_labels:
+            severity: critical
+            team: data-engineering
+            service: eventgate-logging-external
+            status: 501
+          exp_annotations:
+            description: Elevated errors on eventgate-logging-external in eqiad.
+            summary: Elevated errors on eventgate-logging-external in eqiad.
+            dashboard: https://grafana.wikimedia.org/d/ZB39Izmnz/eventgate?orgId=1&refresh=1m&var-dc=eqiad%2Bprometheus/k8s&var-service=eventgate-logging-external
+            runbook: https://wikitech.wikimedia.org/wiki/Event_Platform/EventGate

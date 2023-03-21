@@ -40,6 +40,17 @@ groups:
       labels:
         severity: critical
         team: data-engineering
+    - alert: EventgateLoggingExternalErrors
+      annotations:
+        description: Elevated errors on eventgate-logging-external in {{ $externalLabels.site }}.
+        summary: Elevated errors on eventgate-logging-external in {{ $externalLabels.site }}.
+        dashboard: https://grafana.wikimedia.org/d/ZB39Izmnz/eventgate?orgId=1&refresh=1m&var-dc={{ $externalLabels.site }}%2Bprometheus/k8s&var-service=eventgate-logging-external
+        runbook: https://wikitech.wikimedia.org/wiki/Event_Platform/EventGate
+      expr: rate(express_router_request_duration_seconds_count{service="eventgate-logging-external",status=~"5.."}[5m]) > 1
+      for: 5m
+      labels:
+        severity: critical
+        team: data-engineering
 
     # No stats for this metric when checked, but adding to mirror Icinga config
     - alert: EventgateValidationErrors
