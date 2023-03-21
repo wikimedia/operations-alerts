@@ -1,0 +1,14 @@
+groups:
+  - name: redis
+    rules:
+      - alert: RedisMemoryFull
+        annotations:
+          description: 'The redis instance at {{ $labels.instance }} has filled all of its RAM space'
+          summary: 'Redis memory full on {{ $labels.instance }}'
+          dashboard: 'https://grafana.wikimedia.org/d/000000174/redis?orgId=1&var-datasource={{ $externalLabels.site }}%20prometheus/ops&var-job={{ $labels.job }}&var-instance={{ $labels.instance }}&viewPanel=16'
+          runbook: 'https://wikitech.wikimedia.org/wiki/Redis#Cluster_{{ $labels.job }}'
+        expr: redis_memory_used_bytes / redis_memory_max_bytes > 0.98
+        for: 5m
+        labels:
+          severity: critical
+          team: sre
