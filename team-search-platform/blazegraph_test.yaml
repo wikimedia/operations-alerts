@@ -10,6 +10,8 @@ tests:
         values: "200000 199990 199980 199970 199960 199950 199940 199930 199920 199910 199900"
       - series: 'blazegraph_free_allocators{instance="wdqs1011:9193"}'
         values: "200000 200000 200000 199999 199999 199999 199998 199998 199998 199997 199996"
+      - series: 'blazegraph_free_allocators{instance="unrelated:9194"}'
+        values: "200000 199990 199980 199970 199960 199950 199940 199930 199920 199910 199900"
     alert_rule_test:
       - alertname: BlazegraphFreeAllocatorsDecreasingRapidly
         eval_time: 10m

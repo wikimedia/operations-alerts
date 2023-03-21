@@ -5,7 +5,7 @@ groups:
   - name: blazegraph
     rules:
       - alert: BlazegraphFreeAllocatorsDecreasingRapidly
-        expr: deriv(blazegraph_free_allocators[10m]) < -0.03
+        expr: deriv(blazegraph_free_allocators{instance=~".*:919[35]"}[10m]) < -0.03
         for: 5m
         labels:
           team: search-platform
