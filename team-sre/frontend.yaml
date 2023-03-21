@@ -25,7 +25,7 @@ groups:
        summary: 'HAProxy ({{ $labels.cluster }}) has reduced HTTP availability #page'
        dashboard: 'https://grafana.wikimedia.org/d/000000479/frontend-traffic?viewPanel=13'
        logs: 'TODO'
-       runbook: 'TODO'
+       runbook: 'https://wikitech.wikimedia.org/wiki/HAProxy#HAProxy_for_edge_caching'
      expr: (1 - global_job:haproxy_requests:avail2m{cluster=~"cache_.*"}) < 0.99
      for: 1m
      labels:
