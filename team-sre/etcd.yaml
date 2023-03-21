@@ -24,3 +24,15 @@ groups:
         labels:
           severity: page
           team: sre
+
+      - alert: EtcdTrafficHigh
+        expr: 'sum(rate(etcd_http_received_total{cluster="etcd", method=~".?GET"}[5m])) by (instance) > 1000'
+        for: 5m
+        annotations:
+          summary: 'Excessive traffic on etcd {{ $labels.instance }} #page'
+          description: 'The etcd instance on {{ $labels.instance }} is receiving excessive read traffic'
+          runbook: 'https://wikitech.wikimedia.org/wiki/Etcd/Main_cluster'
+          dashboard: 'https://grafana.wikimedia.org/d/tTE9nvdMk/etcd?orgId=1&viewPanel=4&var-datasource=thanos&var-site={{ $externalLabels.site }}&var-cluster=etcd'
+        labels:
+          severity: page
+          team: sre

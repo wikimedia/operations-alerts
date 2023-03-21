@@ -43,3 +43,25 @@ tests:
               description: 'The etcd-mirror instance on conf2005:8000 is down or unresponsive'
               runbook: https://wikitech.wikimedia.org/wiki/Etcd/Main_cluster#Replication
               dashboard: TODO
+
+  - interval: 1m
+    input_series:
+      - series: 'etcd_http_received_total{job="etcd", cluster="etcd", instance="conf2005:2371", method="GET"}'
+        values: '0+100000x60'
+      - series: 'etcd_http_received_total{job="etcd", cluster="etcd", instance="conf2006:2371", method="PUT"}'
+        values: '0+100000x60'
+    external_labels:
+      site: codfw
+    alert_rule_test:
+      - alertname: EtcdTrafficHigh
+        eval_time: 10m
+        exp_alerts:
+          - exp_labels:
+              severity: page
+              instance: conf2005:2371
+              team: sre
+            exp_annotations:
+              summary: 'Excessive traffic on etcd conf2005:2371 #page'
+              description: 'The etcd instance on conf2005:2371 is receiving excessive read traffic'
+              runbook: https://wikitech.wikimedia.org/wiki/Etcd/Main_cluster
+              dashboard: 'https://grafana.wikimedia.org/d/tTE9nvdMk/etcd?orgId=1&viewPanel=4&var-datasource=thanos&var-site=codfw&var-cluster=etcd'
