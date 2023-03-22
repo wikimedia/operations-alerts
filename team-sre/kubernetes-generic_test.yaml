@@ -20,15 +20,6 @@ tests:
     values: "1+1x6"
   - series: 'kubelet_runtime_operations_duration_seconds_bucket{job="k8s-node", instance="kubefakenode:1234", operation_type="fakeop", le="1.1"}'
     values: "0+0x6"
-    # TODO: remove Kubernetes v1.16 metric T322919
-  - series: 'apiserver_request_count{job="k8s-api", code="200"}'
-    values: "100+1x6"
-    # TODO: remove Kubernetes v1.16 metric T322919
-  - series: 'apiserver_request_count{job="k8s-api", code="0"}'
-    values: "100+1x6"
-    # TODO: remove Kubernetes v1.16 metric T322919
-  - series: 'apiserver_request_count{job="k8s-api", code="500"}'
-    values: "1+5x6"
   - series: 'apiserver_request_total{job="k8s-api", code="200"}'
     values: "100+1x6"
   - series: 'apiserver_request_total{job="k8s-api", code="0"}'
