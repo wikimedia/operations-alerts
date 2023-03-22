@@ -1,0 +1,30 @@
+rule_files:
+  - maps.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    input_series:
+      # time() will return eval_time in seconds, not UNIX epoch
+      # thus eval far enough in the future to have data for the ">" threshold
+      # and "for" clause
+      # https://github.com/prometheus/prometheus/issues/4817#issuecomment-514765285
+      - series: 'osm_sync_timestamp{cluster="maps"}'
+        values: '0+0x9600'
+    external_labels:
+      site: colax
+    alert_rule_test:
+      - alertname: OsmSynchronisationLag
+        eval_time: 10m
+        exp_alerts: []
+      - alertname: OsmSynchronisationLag
+        eval_time: 5d
+        exp_alerts:
+          - exp_labels:
+              team: sre
+              severity: critical
+              cluster: maps
+            exp_annotations:
+              summary: 'Maps - OSM synchronization lag - colax'
+              description: 'OSM Synchronisation is behind 5d 0h 0m 0s'
+              dashboard: 'https://grafana.wikimedia.org/d/000000305/maps-performances'
+              runbook: 'https://wikitech.wikimedia.org/wiki/Maps/Runbook'
