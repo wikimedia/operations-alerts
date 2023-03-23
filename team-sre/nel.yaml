@@ -21,6 +21,22 @@ groups:
        severity: page
        team: sre
 
+   - alert: NELByCountryHigh
+     # Non-paging for now
+     annotations:
+       description: 'Too high an incoming rate of browser-reported Network Error Logging events of type {{ $labels.type }} for country {{ $labels.country }}: {{ $value }}/s'
+       summary: 'Elevated Network Error Logging events ({{ $labels.type }} from {{ $labels.country }})'
+       dashboard: 'https://logstash.wikimedia.org/goto/5c8f4ca1413eda33128e5c5a35da7e28'
+       runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#NEL_alerts'
+     # We restrict to two types we believe to best correlate with actionable issues that aren't caught
+     # by other monitoring.
+     # This computes a per-second rate.
+     expr: max by (country,type) (log_w3c_networkerror_by_country_type_country_doc_count{type=~"tcp.(address_unreachable|timed_out)"}) / 60 > 1
+     for: 5m
+     labels:
+       severity: critical
+       team: sre
+
    - alert: NELNotReported
      annotations:
        description: 'The metric log_w3c_networkerror_type_doc_count has disappeared, NEL alerting will not work'
@@ -28,6 +44,18 @@ groups:
        dashboard: 'https://logstash.wikimedia.org/goto/5c8f4ca1413eda33128e5c5a35da7e28'
        runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#NEL_alerts'
      expr: absent(log_w3c_networkerror_type_doc_count)
+     for: 1m
+     labels:
+       severity: critical
+       team: sre
+
+   - alert: NELByCountryNotReported
+     annotations:
+       description: 'The metric log_w3c_networkerror_by_country_type_country_doc_count has disappeared, NEL alerting will not work'
+       summary: 'NEL metrics by country not reported'
+       dashboard: 'https://logstash.wikimedia.org/goto/5c8f4ca1413eda33128e5c5a35da7e28'
+       runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#NEL_alerts'
+     expr: absent(log_w3c_networkerror_by_country_type_country_doc_count)
      for: 1m
      labels:
        severity: critical

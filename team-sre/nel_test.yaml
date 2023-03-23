@@ -26,6 +26,29 @@ tests:
 
   - interval: 1m
     input_series:
+      - series: 'log_w3c_networkerror_by_country_type_country_doc_count{type="tcp.timed_out",site="codfw",country="US"}'
+        values: '0+42x60'
+      - series: 'log_w3c_networkerror_by_country_type_country_doc_count{type="tcp.timed_out",site="eqiad",country="GB"}'
+        values: '0+1x60'
+      - series: 'log_w3c_networkerror_by_country_type_country_doc_count{type="tcp.address_unreachable",site="eqiad",country="US"}'
+        values: '0+1x60'
+    alert_rule_test:
+    - alertname: NELByCountryHigh
+      eval_time: 10m
+      exp_alerts:
+       - exp_labels:
+           team: sre
+           severity: critical
+           type: tcp.timed_out
+           country: US
+         exp_annotations:
+           description: 'Too high an incoming rate of browser-reported Network Error Logging events of type tcp.timed_out for country US: 7/s'
+           summary: 'Elevated Network Error Logging events (tcp.timed_out from US)'
+           dashboard: 'https://logstash.wikimedia.org/goto/5c8f4ca1413eda33128e5c5a35da7e28'
+           runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#NEL_alerts'
+
+  - interval: 1m
+    input_series:
       - series: 'dummy'
         values: '0+42x60'
     external_labels:
@@ -40,5 +63,24 @@ tests:
          exp_annotations:
            description: 'The metric log_w3c_networkerror_type_doc_count has disappeared, NEL alerting will not work'
            summary: 'NEL metrics not reported'
+           dashboard: 'https://logstash.wikimedia.org/goto/5c8f4ca1413eda33128e5c5a35da7e28'
+           runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#NEL_alerts'
+
+  - interval: 1m
+    input_series:
+      - series: 'dummy'
+        values: '0+42x60'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+    - alertname: NELByCountryNotReported
+      eval_time: 10m
+      exp_alerts:
+       - exp_labels:
+           team: sre
+           severity: critical
+         exp_annotations:
+           description: 'The metric log_w3c_networkerror_by_country_type_country_doc_count has disappeared, NEL alerting will not work'
+           summary: 'NEL metrics by country not reported'
            dashboard: 'https://logstash.wikimedia.org/goto/5c8f4ca1413eda33128e5c5a35da7e28'
            runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#NEL_alerts'
