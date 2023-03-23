@@ -1,0 +1,23 @@
+rule_files:
+  - haproxy.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    external_labels:
+      site: eqiad
+    input_series:
+      - series: 'node_systemd_service_restart_total{instance="cp1234:9100", name="haproxy.service"}'
+        values: '0 1 2 3 4 5 6 7'
+    alert_rule_test:
+      - alertname: HAProxyRestarted
+        eval_time: 7m
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              team: traffic
+              instance: cp1234:9100
+            exp_annotations:
+              summary: 'HAProxy server restarted on cp1234:9100'
+              description: "HAProxy on cp1234:9100 (eqiad) has restarted unexpectedly."
+              dashboard: 'https://grafana.wikimedia.org/d/gQblbjtnk/haproxy-drilldown?orgId=1&var-site=eqiad&var-instance=cp1234&viewPanel=10'
+              runbook: 'https://wikitech.wikimedia.org/wiki/HAProxy#HAProxy_for_edge_caching'

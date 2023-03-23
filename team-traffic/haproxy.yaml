@@ -1,0 +1,16 @@
+# deploy-tag: ops
+
+groups:
+  - name: traffic_haproxy
+    rules:
+      - alert: HAProxyRestarted
+        # In normal conditions, restart count is 0. Alert if it is >= 1.
+        expr: 'sum(node_systemd_service_restart_total{name="haproxy.service"}) by (instance) >= 1'
+        labels:
+          team: traffic
+          severity: critical
+        annotations:
+          summary: 'HAProxy server restarted on {{ $labels.instance }}'
+          description: "HAProxy on {{ $labels.instance }} ({{ $externalLabels.site }}) has restarted unexpectedly."
+          dashboard: 'https://grafana.wikimedia.org/d/gQblbjtnk/haproxy-drilldown?orgId=1&var-site={{ $externalLabels.site }}&var-instance={{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}&viewPanel=10'
+          runbook: 'https://wikitech.wikimedia.org/wiki/HAProxy#HAProxy_for_edge_caching'
