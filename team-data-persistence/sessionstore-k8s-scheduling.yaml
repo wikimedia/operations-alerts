@@ -8,7 +8,7 @@ groups:
         description: Sessionstore k8s pods are running on hosts that don't have the 'kask' taint
         dashboard: TODO
         runbook: TODO
-      expr: sum by (service, instance) (rate(container_cpu_user_seconds_total{namespace="sessionstore", prometheus="k8s", dedicated!="kask"}[5m])) > 0
+      expr: sum by (service, instance) (rate(container_cpu_user_seconds_total{namespace="sessionstore", dedicated!="kask"}[5m])) > 0
       for: 5m
       labels:
         severity: critical
