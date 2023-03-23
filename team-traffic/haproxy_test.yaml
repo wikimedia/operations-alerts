@@ -19,5 +19,5 @@ tests:
             exp_annotations:
               summary: 'HAProxy server restarted on cp1234:9100'
               description: "HAProxy on cp1234:9100 (eqiad) has restarted unexpectedly."
-              dashboard: 'https://grafana.wikimedia.org/d/gQblbjtnk/haproxy-drilldown?orgId=1&var-site=eqiad&var-instance=cp1234&viewPanel=10'
+              dashboard: 'https://grafana.wikimedia.org/d/gQblbjtnk/haproxy-drilldown?orgId=1&var-site=eqiad%20prometheus/ops&var-instance=cp1234&viewPanel=10'
               runbook: 'https://wikitech.wikimedia.org/wiki/HAProxy#HAProxy_for_edge_caching'

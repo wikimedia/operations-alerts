@@ -12,5 +12,5 @@ groups:
         annotations:
           summary: 'HAProxy server restarted on {{ $labels.instance }}'
           description: "HAProxy on {{ $labels.instance }} ({{ $externalLabels.site }}) has restarted unexpectedly."
-          dashboard: 'https://grafana.wikimedia.org/d/gQblbjtnk/haproxy-drilldown?orgId=1&var-site={{ $externalLabels.site }}&var-instance={{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}&viewPanel=10'
+          dashboard: 'https://grafana.wikimedia.org/d/gQblbjtnk/haproxy-drilldown?orgId=1&var-site={{ $externalLabels.site }}%20prometheus/ops&var-instance={{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}&viewPanel=10'
           runbook: 'https://wikitech.wikimedia.org/wiki/HAProxy#HAProxy_for_edge_caching'
