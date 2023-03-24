@@ -144,6 +144,7 @@ def test_deploy_metadata(rulefile):
 
     tag = _get_tag(rulefile.read_text(), "deploy-tag")
     if tag is None:
+        warnings.warn(UserWarning("Missing deploy-tag in %r." % rulefile.as_posix()))
         return
 
     tags = re.split(r",\s*", tag)
