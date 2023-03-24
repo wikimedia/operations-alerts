@@ -69,6 +69,27 @@ def test_alerts(testfile):
     )
 
 
+@pytest.mark.parametrize("testfile", all_testfiles(SUBDIRS), ids=str)
+def test_rule_test_file_references(testfile):
+    """Test if rule test reference existing files, and they are valid."""
+    test_yaml = yaml.load(testfile.read_text(), Loader=yaml.FullLoader)
+
+    assert "rule_files" in test_yaml, (
+        "'rule_files' not found in %s" % testfile.as_posix()
+    )
+    assert len(test_yaml["rule_files"]) == 1, (
+        "Multiple rule_files not allowed in %s" % testfile.as_posix()
+    )
+    rule_file = testfile.parent / test_yaml["rule_files"][0]
+    assert rule_file.exists(), "%s references non existing rule %s" % (
+        testfile.as_posix(),
+        rule_file.as_posix(),
+    )
+    assert (
+        f"{rule_file.stem}_test.yaml" == testfile.name
+    ), "test files must be named after the rule file they are testing"
+
+
 @pytest.mark.parametrize("rulefile", all_rulefiles(SUBDIRS), ids=str)
 def test_valid_rule(rulefile):
     """Validate rulefile with promtool"""
