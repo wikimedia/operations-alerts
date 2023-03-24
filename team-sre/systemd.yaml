@@ -1,0 +1,15 @@
+groups:
+  - name: systemd
+    rules:
+      - alert: SystemdUnitFailed
+        expr: |
+          instance_name:node_systemd_unit_state_failed:count1
+          * on (instance) group_left(team) role_owner
+        labels:
+          severity: critical
+          team: "{{$labels.team}}"
+        annotations:
+          summary: "{{$labels.name}} Failed on {{$labels.instance}}"
+          description: "{{$labels.name}} Failed on {{$labels.instance}}"
+          dashboard: 'https://grafana.wikimedia.org/d/g-AaZRFWk/systemd-status?orgId=1&forceLogin&editPanel=13'
+          runbook: https://wikitech.wikimedia.org/wiki/Monitoring/check_systemd_state
