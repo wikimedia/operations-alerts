@@ -25,6 +25,7 @@ SUBDIRS = [
     for x in os.listdir(os.environ.get("ALERTSDIR", "."))
     if os.path.isdir(x) and not x.startswith(".")
 ]
+EXT_LABELS_RE = re.compile(r"{.*(prometheus|site)\s*[=!~]")
 
 
 def all_testfiles(paths):
@@ -150,6 +151,34 @@ def test_deploy_metadata(rulefile):
     if len(tags) > 1:
         for value in ("global", "local"):
             assert value not in tags, "%r not allowed with multiple tags" % value
+
+
+@pytest.mark.parametrize("rulefile", all_rulefiles(SUBDIRS), ids=str)
+def test_local_labels_references(rulefile):
+    """Ensure non-global alerts don't reference external labels.
+
+    In this case the alert will never fire because external labels don't show up
+    when evaluating non-global (i.e Prometheus, not Thanos) alerts.
+    """
+
+    tag = _get_tag(rulefile.read_text(), "deploy-tag")
+    if tag is None or tag == "global":
+        return
+
+    alerts = yaml.load(rulefile.read_text(), Loader=yaml.SafeLoader)
+    for group in alerts["groups"]:
+        for rule in group["rules"]:
+            # Consider only alerting rules, not recording rules
+            if "alert" not in rule:
+                continue
+            m = EXT_LABELS_RE.search(rule["expr"])
+            assert m is None, (
+                "Alert %s is not going to fire: external label reference in non-global alert (%s)"
+                % (
+                    rule["alert"],
+                    rulefile.as_posix(),
+                )
+            )
 
 
 @pytest.mark.ci()
