@@ -16,6 +16,7 @@ groups:
           # point drop the regex and use that label directly
           dashboard: 'https://grafana.wikimedia.org/d/000000377/host-overview?orgId=1&var-server={{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}'
           runbook: https://wikitech.wikimedia.org/wiki/SMART#Alerts
+
       - alert: SelLogCount
         expr: rate(ipmi_sel_logs_count[1h]) >= 1
         labels:
@@ -28,3 +29,25 @@ groups:
             required to determine severity
           dashboard: 'https://grafana.wikimedia.org/d/000000377/host-overview?orgId=1&var-server={{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}'
           runbook: https://wikitech.wikimedia.org/wiki/Sel#Alerts
+
+      - alert: Temperature
+        expr: ipmi_temperature_state > 0
+        labels:
+          severity: critical
+          team: sre
+        annotations:
+          summary: "{{$labels.name}} issue on {{$labels.instance}}"
+          description: "{{$labels.name}} issue on {{$labels.instance}}"
+          dashboard: 'https://grafana.wikimedia.org/d/ZA1I-IB4z/ipmi-sensor-state?orgId=1&viewPanel=92&var-server={{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}'
+          runbook: https://wikitech.wikimedia.org/wiki/Dc-operations/Hardware_Troubleshooting_Runbook
+
+      - alert: PowerSupply
+        expr: ipmi_sensor_state{type="Power Supply"} > 0
+        labels:
+          severity: critical
+          team: sre
+        annotations:
+          summary: "Power Supply - {{$labels.name}} - issue on {{$labels.instance}}"
+          description: "Power Supply - {{$labels.name}} - issue on {{$labels.instance}}"
+          dashboard: 'https://grafana.wikimedia.org/d/ZA1I-IB4z/ipmi-sensor-state?orgId=1&var-Sensor=Power%20Supply&var-server={{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}'
+          runbook: https://wikitech.wikimedia.org/wiki/Dc-operations/Hardware_Troubleshooting_Runbook#Power_Supply_Failures
