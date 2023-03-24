@@ -127,8 +127,7 @@ def test_lint_rule(rulefile):
 def test_rule_metadata(rulefile):
     """Ensure rulefile has all the expected labels/annotations"""
 
-    with open(rulefile) as f:
-        alerts = yaml.load(f, Loader=yaml.FullLoader)
+    alerts = yaml.load(rulefile.read_text(), Loader=yaml.FullLoader)
 
     for group in alerts["groups"]:
         for rule in group["rules"]:
@@ -142,10 +141,9 @@ def test_rule_metadata(rulefile):
 def test_deploy_metadata(rulefile):
     """Ensure the file 'deploy-tag' metadata is valid"""
 
-    with open(rulefile) as f:
-        tag = _get_tag(f, "deploy-tag")
-        if tag is None:
-            return
+    tag = _get_tag(rulefile.read_text(), "deploy-tag")
+    if tag is None:
+        return
 
     tags = re.split(r",\s*", tag)
 
@@ -158,8 +156,7 @@ def test_deploy_metadata(rulefile):
 @pytest.mark.parametrize("rulefile", all_rulefiles(SUBDIRS), ids=str)
 def test_runbook_exists(rulefile):
     """Ensure that if the alert has a runbook, it actually exists"""
-    with open(rulefile, encoding="utf-8") as rulefile_fd:
-        groups = yaml.load(rulefile_fd, Loader=yaml.FullLoader)
+    groups = yaml.load(rulefile.read_text(), Loader=yaml.FullLoader)
 
     for group in groups["groups"]:
         for rule in group["rules"]:
@@ -183,8 +180,7 @@ def test_runbook_exists(rulefile):
 )
 def test_wmcs_runbook_is_defined(rulefile):
     """Make sure that there's at least one runbook define for all WMCS alerts."""
-    with open(rulefile, encoding="utf-8") as rulefile_fd:
-        groups = yaml.load(rulefile_fd, Loader=yaml.FullLoader)
+    groups = yaml.load(rulefile.read_text(), Loader=yaml.FullLoader)
 
     for group in groups["groups"]:
         for index, rule in enumerate(group["rules"]):
@@ -194,14 +190,14 @@ def test_wmcs_runbook_is_defined(rulefile):
             ), f"Rule #{index} - alertname:{rule['alert']} has no runbook defined, please add one."
 
 
-def _get_tag(fobj, name):
-    """Read tag 'name' from fobj "header". The header ends when a non-comment or non-empty line, the
+def _get_tag(text, name):
+    """Read tag 'name' from text's "header". The header ends when a non-comment or non-empty line, the
     rest is ignored. Return None on tag not found."""
 
     # FIXME Use format strings
     tag_re = re.compile("^# *{name}: *(.+)$".format(name=name))
 
-    for line in fobj:
+    for line in text.splitlines():
         m = tag_re.match(line)
         if m:
             return m.group(1)
