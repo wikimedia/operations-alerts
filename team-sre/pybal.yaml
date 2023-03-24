@@ -7,7 +7,12 @@ groups:
         expr: |
           sum without (host) (
             label_replace(
-              sum by (host, service) (pybal_monitor_status == 0),
+              sum by (host, service) (
+                 pybal_monitor_status == 0
+                   and
+                 # Also verify that "monitor down" results are coming in
+                 increase(pybal_monitor_down_results_total[5m]) > 0
+              ),
               "instance", "$1:0", "host", "([^.]+).*"
             )
           )

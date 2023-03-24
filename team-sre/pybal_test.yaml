@@ -8,6 +8,8 @@ tests:
         values: '1 0+0x1000'
       - series: 'pybal_monitor_status{cluster="lvs", host="cloudelastic1002.wikimedia.org", instance="lvs1020:9090", job="pybal", monitor="IdleConnection", service="cloudelasticlb_8243"}'
         values: '1 1+0x1000'
+      - series: 'pybal_monitor_down_results_total{cluster="lvs",host="aqs1010.eqiad.wmnet",instance="lvs1019:9090",job="pybal",monitor="IdleConnection",service="aqs_7232"}'
+        values: '1 1+1x1000'
     alert_rule_test:
       - alertname: PybalBackendDown
         eval_time: 13h
