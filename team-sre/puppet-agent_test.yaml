@@ -69,3 +69,23 @@ tests:
            description: 'Puppet failure on alert1001:9100'
            dashboard: https://grafana.wikimedia.org/d/yOxVDGvWk/puppet
            runbook: https://puppetboard.wikimedia.org/nodes?status=failed
+  - interval: 1m
+    input_series:
+      - series: 'role_owner{instance="alert1001:9100",team="observability"}'
+        values: '1x10081'
+      - series: 'puppet_agent_enabled{cluster="alerting",instance="alert1001:9100"}'
+        values: '0x10081'
+    alert_rule_test:
+    - alertname: PuppetDisabled
+      eval_time: 1w
+      exp_alerts:
+       - exp_labels:
+           severity: critical
+           instance: alert1001:9100
+           cluster: alerting
+           team: observability
+         exp_annotations:
+           summary: Puppet disabled on alert1001:9100
+           description: Puppet disabled on alert1001:9100
+           dashboard: https://grafana.wikimedia.org/d/yOxVDGvWk/puppet?var-cluster=alerting&viewPanel=14
+           runbook: https://wikitech.wikimedia.org/wiki/Puppet/Runbooks#Puppet_Disabled
