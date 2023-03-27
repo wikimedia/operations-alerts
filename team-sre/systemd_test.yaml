@@ -1,0 +1,23 @@
+rule_files:
+  - systemd.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    input_series:
+      - series: 'role_owner{instance="sretest1001:9100",team="infrastructure-foundations"}'
+        values: '1'
+      - series: 'instance_name:node_systemd_unit_state_failed:count1{instance="sretest1001:9100",name="example.service"}'
+        values: '1'
+    alert_rule_test:
+      - alertname: SystemdUnitFailed
+        exp_alerts:
+        - exp_labels:
+            severity: critical
+            team: infrastructure-foundations
+            instance: sretest1001:9100
+            name: example.service
+          exp_annotations:
+            summary: "example.service Failed on sretest1001:9100"
+            description: "example.service Failed on sretest1001:9100"
+            dashboard: 'https://grafana.wikimedia.org/d/g-AaZRFWk/systemd-status?orgId=1&forceLogin&editPanel=13'
+            runbook: https://wikitech.wikimedia.org/wiki/Monitoring/check_systemd_state
