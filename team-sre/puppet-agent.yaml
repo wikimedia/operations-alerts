@@ -1,4 +1,16 @@
 groups:
+  - name: widespread-puppet-agent-fail
+    rules:
+    - alert: WidespreadPuppetFailure
+      annotations:
+        description: Widespread puppet agent failure on {{$labels.cluster}}
+        summary: Puppet has failed on {{$labels.cluster}} cluster
+        dashboard: https://grafana.wikimedia.org/d/yOxVDGvWk/puppet?orgId=1&viewPanel=3&var-cluster={{$labels.cluster}}
+        runbook: https://puppetboard.wikimedia.org/nodes?status=failed
+      expr: 'cluster:puppet_agent_failed:sum / cluster:puppet_agent_failed:count >= 0.1'
+      labels:
+        severity: critical
+        team: sre
   - name: puppet-agent-fail
     rules:
     # This alert is a crutch on 'alerting' cluster only, until puppet failure
@@ -15,3 +27,4 @@ groups:
       labels:
         severity: critical
         team: sre
+
