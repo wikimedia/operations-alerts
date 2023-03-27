@@ -1,0 +1,20 @@
+groups:
+  - name: resource
+    rules:
+      - alert: DiskSpace
+        expr: |
+          (node_filesystem_avail_bytes{
+            fstype!~"(tmpfs|rpc_pipefs|debugfs|tracefs|fuse|docker|kubelet)",
+            mountpoint!~"/srv/(sd[a-b][1-3]|nvme[0-9]n[0-9]p[0-9])"
+          }
+          / node_filesystem_size_bytes)
+          * on (instance) group_left(team) role_owner < 0.06
+        for: 5m
+        labels:
+          severity: warning
+          team: "{{$labels.team}}"
+        annotations:
+          summary: "Disk space {{$labels.instance}}:{{$labels.mountpoint}} {{ $value | humanizePercentage }} free"
+          description: "Disk space {{$labels.instance}}:{{$labels.mountpoint}} ({{$labels.fstype}})"
+          dashboard: 'https://grafana.wikimedia.org/d/000000377/host-overview?orgId=1&viewPanel=12&var-server={{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}'
+          runbook: https://wikitech.wikimedia.org/wiki/Monitoring/Disk_space
