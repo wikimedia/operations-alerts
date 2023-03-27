@@ -16,3 +16,15 @@ groups:
           # point drop the regex and use that label directly
           dashboard: 'https://grafana.wikimedia.org/d/000000377/host-overview?orgId=1&var-server={{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}'
           runbook: https://wikitech.wikimedia.org/wiki/SMART#Alerts
+      - alert: SelLogCount
+        expr: rate(ipmi_sel_logs_count[1h]) >= 1
+        labels:
+          severity: warning
+          team: sre
+        annotations:
+          summary: "Sel Event detect"
+          description: >-
+            A system Event log entry has been create further investigations is
+            required to determine severity
+          dashboard: 'https://grafana.wikimedia.org/d/000000377/host-overview?orgId=1&var-server={{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}'
+          runbook: https://wikitech.wikimedia.org/wiki/Sel#Alerts
