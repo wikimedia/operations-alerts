@@ -1,26 +1,37 @@
 groups:
   - name: puppet-agent
     rules:
+
+    # Critical on site-wide puppet failures (either agent failure, or no resources reported)
     - alert: WidespreadPuppetFailure
       annotations:
-        description: Widespread puppet agent failure on {{$labels.cluster}}
-        summary: Puppet has failed on {{$labels.cluster}} cluster
-        dashboard: https://grafana.wikimedia.org/d/yOxVDGvWk/puppet?orgId=1&viewPanel=3&var-cluster={{$labels.cluster}}
+        description: Widespread puppet agent failure in {{ $externalLabels.site }}
+        summary: Puppet has failed in {{ $externalLabels.site }}
+        dashboard: https://grafana.wikimedia.org/d/yOxVDGvWk/puppet?orgId=1&viewPanel=6
         runbook: https://puppetboard.wikimedia.org/nodes?status=failed
-      expr: 'cluster:puppet_agent_failed:sum / cluster:puppet_agent_failed:count >= 0.1'
+      expr: |
+        sum(puppet_agent_failed) / count(puppet_agent_failed) >= 0.1
+           or
+        sum(puppet_agent_resources_total == 0) / count(puppet_agent_resources_total == 0) >= 0.1
       labels:
         severity: critical
         team: sre
 
+    # Warning if a given cluster has been failing puppet for at least two
+    # puppet runs
     - alert: WidespreadPuppetFailure
       annotations:
-        description: Widespread puppet agent failure on {{$labels.cluster}} no resources reported
-        summary: Puppet has failed on {{$labels.cluster}} cluster no resources reported
+        description: Widespread puppet agent failure on {{ $labels.cluster }} cluster
+        summary: Puppet has failed on {{ $labels.cluster }} cluster
         dashboard: https://grafana.wikimedia.org/d/yOxVDGvWk/puppet?orgId=1&viewPanel=3&var-cluster={{$labels.cluster}}
         runbook: https://puppetboard.wikimedia.org/nodes?status=failed
-      expr: 'cluster:puppet_agent_resources_total:count0 / cluster:puppet_agent_resources_total:count >= 0.1'
+      expr: |
+        cluster:puppet_agent_failed:sum / cluster:puppet_agent_failed:count >= 0.1
+          or
+        cluster:puppet_agent_resources_total:count0 / cluster:puppet_agent_resources_total:count >= 0.1
+      for: 80m # At least two puppet runs
       labels:
-        severity: critical
+        severity: warning
         team: sre
 
   - name: puppet-agent-fail
@@ -39,4 +50,3 @@ groups:
       labels:
         severity: critical
         team: sre
-

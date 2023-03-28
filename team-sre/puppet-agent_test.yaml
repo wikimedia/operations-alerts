@@ -4,10 +4,16 @@ evaluation_interval: 1m
 tests:
   - interval: 1m
     input_series:
-      - series: 'cluster:puppet_agent_failed:sum{cluster="misc"}'
-        values: '10'
-      - series: 'cluster:puppet_agent_failed:count{cluster="misc"}'
-        values: '100'
+      - series: 'puppet_agent_failed{cluster="misc"}'
+        values: '10+0x666'
+      - series: 'puppet_agent_failed{cluster="misc"}'
+        values: '100+0x666'
+      - series: 'cluster:puppet_agent_resources_total:count0{cluster="misc"}'
+        values: '10+0x666'
+      - series: 'cluster:puppet_agent_resources_total:count{cluster="misc"}'
+        values: '100+0x666'
+    external_labels:
+      site: eqiad
     alert_rule_test:
     - alertname: WidespreadPuppetFailure
       eval_time: 1m
@@ -15,30 +21,33 @@ tests:
        - exp_labels:
            severity: critical
            team: sre
-           cluster: misc
          exp_annotations:
-           summary: 'Puppet has failed on misc cluster'
-           description: 'Widespread puppet agent failure on misc'
-           dashboard: 'https://grafana.wikimedia.org/d/yOxVDGvWk/puppet?orgId=1&viewPanel=3&var-cluster=misc'
+           description: 'Widespread puppet agent failure in eqiad'
+           summary: 'Puppet has failed in eqiad'
+           dashboard: 'https://grafana.wikimedia.org/d/yOxVDGvWk/puppet?orgId=1&viewPanel=6'
            runbook: https://puppetboard.wikimedia.org/nodes?status=failed
 
   - interval: 1m
     input_series:
+      - series: 'cluster:puppet_agent_failed:sum{cluster="misc"}'
+        values: '10+0x666'
+      - series: 'cluster:puppet_agent_failed:count{cluster="misc"}'
+        values: '100+0x666'
       - series: 'cluster:puppet_agent_resources_total:count0{cluster="misc"}'
-        values: '10'
+        values: '10+0x666'
       - series: 'cluster:puppet_agent_resources_total:count{cluster="misc"}'
-        values: '100'
+        values: '100+0x666'
     alert_rule_test:
     - alertname: WidespreadPuppetFailure
-      eval_time: 1m
+      eval_time: 100m
       exp_alerts:
        - exp_labels:
-           severity: critical
+           severity: warning
            team: sre
            cluster: misc
          exp_annotations:
-           summary: 'Puppet has failed on misc cluster no resources reported'
-           description: 'Widespread puppet agent failure on misc no resources reported'
+           description: 'Widespread puppet agent failure on misc cluster'
+           summary: 'Puppet has failed on misc cluster'
            dashboard: 'https://grafana.wikimedia.org/d/yOxVDGvWk/puppet?orgId=1&viewPanel=3&var-cluster=misc'
            runbook: https://puppetboard.wikimedia.org/nodes?status=failed
 
