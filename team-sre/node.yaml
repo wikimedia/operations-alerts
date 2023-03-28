@@ -5,7 +5,7 @@ groups:
         expr: |
           time() -
             node_textfile_mtime_seconds{
-              file!~"(confd-reload-vcl|atlas_metadata|trafficserver_config_.+|varnish_params)\\.prom"
+              file!~"(confd-reload-vcl|atlas_metadata|trafficserver_config_.+|varnish_params|role_owner)\\.prom"
             }
           >= 4 * (60*60*24)
         for: 1h
