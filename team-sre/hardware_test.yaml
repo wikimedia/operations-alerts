@@ -23,6 +23,7 @@ tests:
                 warning before the disk fails.
               dashboard: 'https://grafana.wikimedia.org/d/000000377/host-overview?orgId=1&var-server=alert1001'
               runbook: https://wikitech.wikimedia.org/wiki/SMART#Alerts
+
   - interval: 1m
     input_series:
       - series: 'ipmi_temperature_state{instance="alert1001:9290",name="Temp"}'
@@ -40,12 +41,14 @@ tests:
               description: "Temp issue on alert1001:9290"
               dashboard: "https://grafana.wikimedia.org/d/ZA1I-IB4z/ipmi-sensor-state?orgId=1&viewPanel=92&var-server=alert1001"
               runbook: https://wikitech.wikimedia.org/wiki/Dc-operations/Hardware_Troubleshooting_Runbook
+
   - interval: 1m
     input_series:
       - series: 'ipmi_sensor_state{instance="alert1001:9290",name="PS Redundancy",type="Power Supply"}'
-        values: '1'
+        values: '1+0x600'
     alert_rule_test:
       - alertname: PowerSupply
+        eval_time: 3h
         exp_alerts:
           - exp_labels:
               severity: critical
