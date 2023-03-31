@@ -6,10 +6,10 @@ groups:
     rules:
       - alert: KafkaBrokerUnavailable
         expr: min(kafka_server_KafkaServer_BrokerState{kafka_cluster!~"test.*"}) by (kafka_cluster) < 3
-        for: 2m
+        for: 5m
         annotations:
-          summary: 'Kafka broker unavailable for cluster {{ $labels.kafka_cluster }} in {{ $externalLabels.site }}'
-          description: 'The available kafka brokers for cluster {{ $labels.kafka_cluster }} in {{ $externalLabels.site }} are less than 3'
+          summary: 'One or more Kafka brokers unavailable for cluster {{ $labels.kafka_cluster }} in {{ $externalLabels.site }}'
+          description: 'One or more Kafka brokers for cluster {{ $labels.kafka_cluster }} in {{ $externalLabels.site }} are not in running state'
           runbook: https://wikitech.wikimedia.org/wiki/Kafka/Administration
           dashboard: https://grafana.wikimedia.org/d/000000027/kafka?orgId=1&var-datasource={{ $externalLabels.site }}%20prometheus/ops&var-kafka_cluster={{ $labels.kafka_cluster }}
         labels:

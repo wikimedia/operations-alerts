@@ -5,20 +5,20 @@ tests:
   - interval: 1m
     input_series:
       - series: kafka_server_KafkaServer_BrokerState{cluster="kafka_jumbo", instance="kafka-jumbo1001:7800", job="jmx_kafka", kafka_cluster="jumbo-eqiad"}
-        values: 3 3 2 2 2 2 2 2
+        values: 3 3 2 2 2 2 2 2 2 2
     external_labels:
       site: eqiad
     alert_rule_test:
       - alertname: KafkaBrokerUnavailable
-        eval_time: 4m
+        eval_time: 10m
         exp_alerts:
           - exp_labels:
               severity: critical
               team: sre
               kafka_cluster: jumbo-eqiad
             exp_annotations:
-              summary: 'Kafka broker unavailable for cluster jumbo-eqiad in eqiad'
-              description: 'The available kafka brokers for cluster jumbo-eqiad in eqiad are less than 3'
+              summary: 'One or more Kafka brokers unavailable for cluster jumbo-eqiad in eqiad'
+              description: 'One or more Kafka brokers for cluster jumbo-eqiad in eqiad are not in running state'
               runbook: https://wikitech.wikimedia.org/wiki/Kafka/Administration
               dashboard: https://grafana.wikimedia.org/d/000000027/kafka?orgId=1&var-datasource=eqiad%20prometheus/ops&var-kafka_cluster=jumbo-eqiad
 
