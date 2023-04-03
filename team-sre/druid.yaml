@@ -1,3 +1,6 @@
+# deploy-tag: analytics
+# deploy-site: eqiad
+
 groups:
   - name: druid
     rules:
