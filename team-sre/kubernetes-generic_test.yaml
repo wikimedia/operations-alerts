@@ -1,5 +1,3 @@
-# https://prometheus.io/docs/prometheus/latest/configuration/unit_testing_rules/
-# Test locally using `promtool test rules kubernetes_generic_test.yaml`
 rule_files:
 - kubernetes-generic.yaml
 evaluation_interval: 1m
@@ -8,8 +6,6 @@ tests:
   input_series:
   - series: 'up{instance="kubefake1001.foo.bar:9091", job="calico-felix"}'
     values: "1 0 0 0 0 0 0"
-  - series: 'rsyslog_kubernetes_record_seen_total{instance="kubefake1001:9105"}'
-    values: "1 0 0 0 0 0"
   - series: 'certmanager_certificate_ready_status{namespace="fakespace", name="fakename", condition="False"}'
     values: "0 1 1 1 1 1 1 1 1 1 1"
   - series: 'helm_release_status{namespace="pinkunicorn", name="main", status="pending-upgrade"}'
@@ -47,19 +43,6 @@ tests:
         description: "Prometheus has been unable to scrape metrics from calico on host kubefake1001.foo.bar:9091 job(calico-felix) for more than 5 minutes. Make sure the calico-node Pod is running on that node."
         runbook: https://wikitech.wikimedia.org/wiki/Calico#Operations
         dashboard: https://grafana.wikimedia.org/d/G8zPL7-Wz/?var-dc=moon%20prometheus%2Feagle&var-instance=kubefake1001.foo.bar
-
-  - alertname: KubernetesRsyslogDown
-    eval_time: 6m
-    exp_alerts:
-    - exp_labels:
-        severity: critical
-        team: sre
-        instance: "kubefake1001:9105"
-      exp_annotations:
-        summary: "rsyslog on kubefake1001:9105 is missing kubernetes logs"
-        description: "Rsyslog mmkubernetes plugin on kubefake1001:9105 did not see any records in the last 5 minutes. This might mean that the plugin was terminated."
-        runbook: https://wikitech.wikimedia.org/wiki/Kubernetes/Logging#Common_issues
-        dashboard: "https://grafana.wikimedia.org/d/OagQjQmnk?var-server=kubefake1001"
 
   - alertname: CertManagerCertNotReady
     eval_time: 11m

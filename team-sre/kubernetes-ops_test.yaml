@@ -1,0 +1,22 @@
+rule_files:
+- kubernetes-ops.yaml
+evaluation_interval: 1m
+tests:
+- interval: 1m
+  input_series:
+  - series: 'rsyslog_kubernetes_record_seen_total{instance="kubefake1001:9105"}'
+    values: "1 0 0 0 0 0"
+  alert_rule_test:
+  - alertname: KubernetesRsyslogDown
+    eval_time: 6m
+    exp_alerts:
+    - exp_labels:
+        severity: critical
+        team: sre
+        instance: "kubefake1001:9105"
+      exp_annotations:
+        summary: "rsyslog on kubefake1001:9105 is missing kubernetes logs"
+        description: "Rsyslog mmkubernetes plugin on kubefake1001:9105 did not see any records in the last 5 minutes. This might mean that the plugin was terminated."
+        runbook: https://wikitech.wikimedia.org/wiki/Kubernetes/Logging#Common_issues
+        dashboard: "https://grafana.wikimedia.org/d/OagQjQmnk?var-server=kubefake1001"
+
