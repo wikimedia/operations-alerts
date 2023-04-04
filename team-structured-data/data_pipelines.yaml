@@ -4,6 +4,36 @@
 groups:
   - name: data_pipelines
     rules:
+      - alert: ImageSuggestionsArticleCountLargeChange
+        expr: abs(
+            sum(image_suggestions_elasticsearch_hasrecommendation_for_article_total)
+            - sum(image_suggestions_elasticsearch_hasrecommendation_for_article_total offset 1w)
+          ) / sum(image_suggestions_elasticsearch_hasrecommendation_for_article_total)
+          > 0.1
+        labels:
+          team: structured-data
+          severity: warning
+        annotations:
+          summary: "Larger-than-expected change in the number of article-level image suggestions compared to last week"
+          description: "Total count of image suggestions (based on hasrecommendation:image in elasticsearch) across sample wikis is >10% different to last week. Something may be wrong."
+          runbook: TODO
+          dashboard: TODO
+
+      - alert: ImageSuggestionsSectionCountLargeChange
+        expr: abs(
+          sum(image_suggestions_elasticsearch_hasrecommendation_for_section_total)
+          - sum(image_suggestions_elasticsearch_hasrecommendation_for_section_total offset 1w)
+          ) / sum(image_suggestions_elasticsearch_hasrecommendation_for_section_total)
+          > 0.1
+        labels:
+          team: structured-data
+          severity: warning
+        annotations:
+          summary: "Larger-than-expected change in the number of section-level image suggestions compared to last week"
+          description: "Total count of image suggestions (based on hasrecommendation:image_section in elasticsearch) across sample wikis is >10% different to last week. Something may be wrong."
+          runbook: TODO
+          dashboard: TODO
+
       - alert: ImageSuggestionsPushFailure
         for: 15m
         expr: push_failure_time_seconds{job="image_suggestions_pipeline"} != 0
