@@ -42,3 +42,21 @@ groups:
         labels:
           severity: page
           team: wmcs
+
+  - name: wmcs-prometheus
+    rules:
+    # Catch WMCS scrape failures specifically. Since the Prometheus -> WMCS
+    # path is behind a firewall on core routers, unlike the rest of production.
+    # See also https://phabricator.wikimedia.org/T301376
+    - alert: ScrapeFailure
+      annotations:
+        description: Prometheus in {{ $externalLabels.site }} can't scrape node metrics for WMCS cluster.
+          Make sure all Prometheus hosts can reach the target hosts. Most likely a firewall issue.
+        summary: Prometheus in {{ $externalLabels.site }} can't scrape node metrics from WMCS.
+        runbook: TODO
+        dashboard: TODO
+      expr: 0.2 >= sum (up{job="node",cluster="wmcs"}) / count (up{job="node",cluster="wmcs"})
+      for: 5m
+      labels:
+        severity: warning
+        team: sre
