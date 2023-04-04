@@ -1,3 +1,6 @@
+# deploy-tag: ops
+# deploy-site: eqiad, codfw
+
 groups:
   - name: prometheus-mysqld-exporter
     rules:
