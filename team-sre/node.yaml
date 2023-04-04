@@ -1,3 +1,5 @@
+# deploy-tag: ops
+
 groups:
   - name: node_exporter
     rules:
