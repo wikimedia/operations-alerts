@@ -1,4 +1,4 @@
-# deploy-tag: ops
+# deploy-tag: labs
 
 groups:
   - name: novafullstack_sustained_failures
