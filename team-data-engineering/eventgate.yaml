@@ -46,6 +46,9 @@ groups:
         summary: Elevated errors on eventgate-logging-external in {{ $externalLabels.site }}.
         dashboard: https://grafana.wikimedia.org/d/ZB39Izmnz/eventgate?orgId=1&refresh=1m&var-dc={{ $externalLabels.site }}%2Bprometheus/k8s&var-service=eventgate-logging-external
         runbook: https://wikitech.wikimedia.org/wiki/Event_Platform/EventGate
+      # There might not be 5xx all the time, thus ignore matching 'status'
+      # label. https://cloudflare.github.io/pint/checks/promql/series.html#ignorelabel-value
+      # pint rule/set promql/series(express_router_request_duration_seconds_count) ignore/label-value status
       expr: rate(express_router_request_duration_seconds_count{service="eventgate-logging-external",status=~"5.."}[5m]) > 1
       for: 5m
       labels:
