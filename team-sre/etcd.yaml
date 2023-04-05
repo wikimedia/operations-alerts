@@ -1,10 +1,14 @@
 # deploy-tag: ops
 # deploy-site: eqiad, codfw
 
+# etcdmirror is only running in one site at a time, therefore the other
+# site won't have the metrics. Disable pint checks in such cases to avoid false
+# positives.
 groups:
   - name: etcd-mirror
     rules:
       - alert: EtcdReplicationLag
+        # pint disable promql/series
         expr: 'etcdmirror_lag > 50'
         for: 15m
         annotations:
@@ -17,6 +21,7 @@ groups:
           team: sre
 
       - alert: EtcdReplicationDown
+        # pint disable promql/series
         expr: 'up{job="etcdmirror"} != 1'
         for: 2m
         annotations:
