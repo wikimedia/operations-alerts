@@ -19,5 +19,5 @@ tests:
           exp_annotations:
             summary: "example.service Failed on sretest1001:9100"
             description: "example.service Failed on sretest1001:9100"
-            dashboard: 'https://grafana.wikimedia.org/d/g-AaZRFWk/systemd-status?orgId=1&forceLogin&editPanel=13'
+            dashboard: 'https://grafana.wikimedia.org/d/g-AaZRFWk/systemd-status'
             runbook: https://wikitech.wikimedia.org/wiki/Monitoring/check_systemd_state
