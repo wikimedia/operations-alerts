@@ -7,22 +7,22 @@ tests:
       # This should fire a warning because varnishkafka is relaying incoming requests at a rate of 15% of their incoming rate (20 ps / 3 ps) for at least 5 min
       - series: varnish_requests{instance="cp3050:3903", cluster="cache_text"}
         values: '0+20x11'
-      - series: rdkafka_producer_topic_partition_msgs{instance="cp3050:9132", cluster="cache_text"}
+      - series: rdkafka_producer_topic_partition_msgs_total{instance="cp3050:9132", cluster="cache_text"}
         values: '0+3x8 200+20x2'
       # This should fire both a warning and a critical alert because varnishkafka is relaying incoming requests at a rate of only 5% of their incoming rate (20 ps / 1 ps) for at least 5 min
       - series: varnish_requests{instance="cp3051:3903", cluster="cache_text"}
         values: '0+20x11'
-      - series: rdkafka_producer_topic_partition_msgs{instance="cp3051:9132", cluster="cache_text"}
+      - series: rdkafka_producer_topic_partition_msgs_total{instance="cp3051:9132", cluster="cache_text"}
         values: '0+1x10 240'
       # This should not fire an alert because it simulates a depooled server, where varnish requests and varnishkafka messages both drop to zero
       - series: varnish_requests{instance="cp3052:3903", cluster="cache_text"}
         values: '0x11'
-      - series: rdkafka_producer_topic_partition_msgs{instance="cp3052:9132", cluster="cache_text"}
+      - series: rdkafka_producer_topic_partition_msgs_total{instance="cp3052:9132", cluster="cache_text"}
         values: '0x11'
       # This should not fire an alert because the rate has been below 20% for at least 5 min
       - series: varnish_requests{instance="cp3053:3903", cluster="cache_text"}
         values: '0+20x8'
-      - series: rdkafka_producer_topic_partition_msgs{instance="cp3053:9132", cluster="cache_text"}
+      - series: rdkafka_producer_topic_partition_msgs_total{instance="cp3053:9132", cluster="cache_text"}
         values: '0+1x7 180'
     external_labels:
       site: esams

@@ -1,5 +1,4 @@
 # deploy-tag: ops
-# deploy-site: eqiad
 
 groups:
   - name: varnishkafka
@@ -9,7 +8,7 @@ groups:
       # These values have been chosen in order to avoid false alerts from stop/start events.
       # The label_replace function is used to generate hostnames from instance, so that we can match the two series from different exporters.
       - alert: VarnishkafkaNoMessages
-        expr: sum by (hostname,cluster) (label_replace (rate(rdkafka_producer_topic_partition_msgs[5m]), "hostname", "$1", "instance", "(.*):.*")) / sum by (cluster,hostname) (label_replace (rate(varnish_requests{ method!="PURGE" }[5m]), "hostname", "$1", "instance", "(.*):.*")) < 0.2
+        expr: sum by (hostname,cluster) (label_replace (rate(rdkafka_producer_topic_partition_msgs_total[5m]), "hostname", "$1", "instance", "(.*):.*")) / sum by (cluster,hostname) (label_replace (rate(varnish_requests{ method!="PURGE" }[5m]), "hostname", "$1", "instance", "(.*):.*")) < 0.2
         for: 5m
         labels:
           team: data-engineering
@@ -22,7 +21,7 @@ groups:
 
       # Fire a critical alert if fewer than 10% of the requests are logged to kafka over the same 5 minutes window.
       - alert: VarnishkafkaNoMessages
-        expr: sum by (hostname,cluster) (label_replace (rate(rdkafka_producer_topic_partition_msgs[5m]), "hostname", "$1", "instance", "(.*):.*")) / sum by (cluster,hostname) (label_replace (rate(varnish_requests{ method!="PURGE" }[5m]), "hostname", "$1", "instance", "(.*):.*")) < 0.1
+        expr: sum by (hostname,cluster) (label_replace (rate(rdkafka_producer_topic_partition_msgs_total[5m]), "hostname", "$1", "instance", "(.*):.*")) / sum by (cluster,hostname) (label_replace (rate(varnish_requests{ method!="PURGE" }[5m]), "hostname", "$1", "instance", "(.*):.*")) < 0.1
         for: 5m
         labels:
           team: data-engineering
