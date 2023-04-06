@@ -1,11 +1,16 @@
 # deploy-tag: ops
 # deploy-site: eqiad, codfw
 
+# puppet CA is only running in one site at a time, therefore the other
+# site won't have the metrics. Disable pint checks in such cases to avoid false
+# positives.
+
 groups:
   - name: Puppet CA
     rules:
       - &cert_about_to_expire
         alert: PuppetCertificateAboutToExpire
+        # pint disable promql/series
         expr: 'puppet_ca_cert_expiry - time() < (86400 * 7 * 4)'
         for: 1m
         annotations:
@@ -17,6 +22,7 @@ groups:
           severity: warning
           team: sre
       - <<: *cert_about_to_expire
+        # pint disable promql/series
         expr: 'puppet_ca_cert_expiry - time() < (86400 * 7)'
         labels:
           severity: critical
