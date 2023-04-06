@@ -143,9 +143,9 @@ def test_deploy_metadata(rulefile):
     """Ensure the file 'deploy-tag' metadata is valid"""
 
     tag = _get_tag(rulefile.read_text(), "deploy-tag")
-    if tag is None:
-        warnings.warn(UserWarning("Missing deploy-tag in %r." % rulefile.as_posix()))
-        return
+    assert (
+        tag is not None
+    ), "Please pick Prometheus instance(s) via 'deploy-tag'. See docs at https://wikitech.wikimedia.org/wiki/Alertmanager#deploy-tag"
 
     tags = re.split(r",\s*", tag)
 
