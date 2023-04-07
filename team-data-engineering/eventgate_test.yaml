@@ -48,9 +48,10 @@ tests:
                 severity: critical
                 team: data-engineering
                 stream: mediawiki.revision_score_drafttopic
+                service: eventgate-main
               exp_annotations:
-                description: Eventgate-main stream mediawiki.revision_score_drafttopic validation errors detected in past 15 min
-                summary: Eventgate-main stream mediawiki.revision_score_drafttopic validation errors detected in past 15 min
+                description: eventgate-main stream mediawiki.revision_score_drafttopic validation errors detected in past 15 min
+                summary: eventgate-main stream mediawiki.revision_score_drafttopic validation errors detected in past 15 min
                 dashboard: https://grafana.wikimedia.org/d/ZB39Izmnz/eventgate?orgId=1&refresh=1m&var-service=eventgate-main&var-stream=All&var-kafka_broker=All&var-kafka_producer_type=All&var-dc=thanos
                 runbook: https://wikitech.wikimedia.org/wiki/Event_Platform/EventGate
 
@@ -66,9 +67,10 @@ tests:
                 severity: critical
                 team: data-engineering
                 stream: misc
+                service: eventgate-analytics
               exp_annotations:
-                description: Eventgate-analytics stream misc validation errors detected in past 15 min
-                summary: Eventgate-analytics stream misc validation errors detected in past 15 min
+                description: eventgate-analytics stream misc validation errors detected in past 15 min
+                summary: eventgate-analytics stream misc validation errors detected in past 15 min
                 dashboard: https://grafana.wikimedia.org/d/ZB39Izmnz/eventgate?orgId=1&refresh=1m&var-service=eventgate-analytics&var-stream=All&var-kafka_broker=All&var-kafka_producer_type=All&var-dc=thanos
                 runbook: https://wikitech.wikimedia.org/wiki/Event_Platform/EventGate
 
@@ -84,9 +86,10 @@ tests:
                 severity: critical
                 team: data-engineering
                 stream: eventlogging_ContentTranslationAbuseFilter
+                service: eventgate-analytics-external
               exp_annotations:
-                description: Eventgate-analytics-external stream eventlogging_ContentTranslationAbuseFilter validation errors detected in past 15 min
-                summary: Eventgate-analytics-external stream eventlogging_ContentTranslationAbuseFilter validation errors detected in past 15 min
+                description: eventgate-analytics-external stream eventlogging_ContentTranslationAbuseFilter validation errors detected in past 15 min
+                summary: eventgate-analytics-external stream eventlogging_ContentTranslationAbuseFilter validation errors detected in past 15 min
                 dashboard: https://grafana.wikimedia.org/d/ZB39Izmnz/eventgate?orgId=1&refresh=1m&var-service=eventgate-analytics-external&var-stream=All&var-kafka_broker=All&var-kafka_producer_type=All&var-dc=thanos
                 runbook: https://wikitech.wikimedia.org/wiki/Event_Platform/EventGate
 
@@ -102,9 +105,10 @@ tests:
                 severity: critical
                 team: data-engineering
                 stream: mediawiki.client.error
+                service: eventgate-logging-external
               exp_annotations:
-                description: Eventgate-logging-external stream mediawiki.client.error validation errors detected in past 15 min
-                summary: Eventgate-logging-external stream mediawiki.client.error validation errors detected in past 15 min
+                description: eventgate-logging-external stream mediawiki.client.error validation errors detected in past 15 min
+                summary: eventgate-logging-external stream mediawiki.client.error validation errors detected in past 15 min
                 dashboard: https://grafana.wikimedia.org/d/ZB39Izmnz/eventgate?orgId=1&refresh=1m&var-service=eventgate-logging-external&var-stream=All&var-kafka_broker=All&var-kafka_producer_type=All&var-dc=thanos
                 runbook: https://wikitech.wikimedia.org/wiki/Event_Platform/EventGate
 
