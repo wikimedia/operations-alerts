@@ -30,12 +30,17 @@ groups:
         team: data-engineering
 
 ## Eventgate Services Validation Error Alerts
+
+## Metrics for validation_errors are created dynamically as errors happen in a stream.
+## Therefore disable pint check for missing series.
+
     - alert: EventgateValidationErrors
       annotations:
         description: Eventgate-main stream {{ $labels.stream }} validation errors detected in past 15 min
         summary: Eventgate-main stream {{ $labels.stream }} validation errors detected in past 15 min
         dashboard: https://grafana.wikimedia.org/d/ZB39Izmnz/eventgate?orgId=1&refresh=1m&var-service=eventgate-main&var-stream=All&var-kafka_broker=All&var-kafka_producer_type=All&var-dc=thanos
         runbook: https://wikitech.wikimedia.org/wiki/Event_Platform/EventGate
+      # pint disable promql/series
       expr: sum by (stream) (rate(eventgate_validation_errors_total{service="eventgate-main"} [15m])) > 0.5
       labels:
         severity: critical
@@ -48,6 +53,7 @@ groups:
         summary: Eventgate-analytics stream {{ $labels.stream }} validation errors detected in past 15 min
         dashboard: https://grafana.wikimedia.org/d/ZB39Izmnz/eventgate?orgId=1&refresh=1m&var-service=eventgate-analytics&var-stream=All&var-kafka_broker=All&var-kafka_producer_type=All&var-dc=thanos
         runbook: https://wikitech.wikimedia.org/wiki/Event_Platform/EventGate
+      # pint disable promql/series
       expr: sum by (stream) (rate(eventgate_validation_errors_total{service="eventgate-analytics"} [15m])) > 1
       labels:
         severity: critical
@@ -59,6 +65,7 @@ groups:
         summary: Eventgate-analytics-external stream {{ $labels.stream }} validation errors detected in past 15 min
         dashboard: https://grafana.wikimedia.org/d/ZB39Izmnz/eventgate?orgId=1&refresh=1m&var-service=eventgate-analytics-external&var-stream=All&var-kafka_broker=All&var-kafka_producer_type=All&var-dc=thanos
         runbook: https://wikitech.wikimedia.org/wiki/Event_Platform/EventGate
+      # pint disable promql/series
       expr: sum by (stream) (rate(eventgate_validation_errors_total{service="eventgate-analytics-external"} [15m])) > 2
       labels:
         severity: critical
@@ -70,6 +77,7 @@ groups:
         summary: Eventgate-logging-external stream {{ $labels.stream }} validation errors detected in past 15 min
         dashboard: https://grafana.wikimedia.org/d/ZB39Izmnz/eventgate?orgId=1&refresh=1m&var-service=eventgate-logging-external&var-stream=All&var-kafka_broker=All&var-kafka_producer_type=All&var-dc=thanos
         runbook: https://wikitech.wikimedia.org/wiki/Event_Platform/EventGate
+      # pint disable promql/series
       expr: sum by (stream) (rate(eventgate_validation_errors_total{service="eventgate-logging-external"} [15m])) > 0.5
       labels:
         severity: critical
