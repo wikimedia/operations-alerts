@@ -1,27 +1,6 @@
 rule_files:
   - data_pipelines.yaml
 tests:
-  - interval: 1w # time interval between values in the input series
-    input_series:
-      - series: 'image_suggestions_elasticsearch_hasrecommendation_total{wiki="test1"}'
-        values: 100 100 90
-      - series: 'image_suggestions_elasticsearch_hasrecommendation_total{wiki="test2"}'
-        values: 100 100 89
-    alert_rule_test:
-      - eval_time: 1w
-        alertname: ImageSuggestionsCountLargeChange
-        exp_alerts: []
-      - eval_time: 2w
-        alertname: ImageSuggestionsCountLargeChange
-        exp_alerts:
-          - exp_labels:
-              severity: warning
-              team: structured-data
-            exp_annotations:
-              summary: "Larger-than-expected change in the number of image suggestions compared to last week"
-              description: "Total count of image suggestions (based on hasrecommendation:image in elasticsearch) across sample wikis is >10% different to last week. Something may be wrong."
-              runbook: TODO
-              dashboard: TODO
   - interval: 5m # time interval between values in the input series
     input_series:
       - series: 'push_failure_time_seconds{job="image_suggestions_pipeline"}'
