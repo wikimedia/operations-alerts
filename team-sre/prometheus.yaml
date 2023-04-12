@@ -26,3 +26,16 @@ groups:
       labels:
         severity: critical
         team: sre
+
+    - alert: AlertLintProblem
+      annotations:
+        description: 'Pint reporter {{ $labels.reporter }} found problem(s) in {{ $labels.filename }}: {{ $labels.problem }}'
+        summary: Linting problems found for {{ $labels.name }}
+        dashboard: TODO
+        runbook: https://wikitech.wikimedia.org/wiki/Alertmanager#Alert_linting_found_problems
+          #expr: count without (severity) (pint_problem) > 0
+      expr: pint_problem > 0
+      for: 30m
+      labels:
+        severity: warning
+        team: sre
