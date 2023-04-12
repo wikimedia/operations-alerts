@@ -53,18 +53,6 @@ groups:
           dashboard: https://grafana.wikimedia.org/d/000000143/navigation-timing
           runbook: https://wikitech.wikimedia.org/wiki/Performance/Runbook/Webperf-processor_services
 
-      - alert: PainttimingInvalidsHigh
-        expr: sum(rate(webperf_painttiming_invalid_events_total[5m])) > 5
-        for: 5m
-        labels:
-          severity: warning
-          team: perf
-        annotations:
-          summary: "Painttiming elevated invalid events: {{ $value | humanize }}/s"
-          description: "This metric counts discarded messages.  A discard rate under 0.5 events/sec is normal."
-          dashboard: https://grafana.wikimedia.org/d/IROgrArMk/paint-timing
-          runbook: https://wikitech.wikimedia.org/wiki/Performance/Runbook/Webperf-processor_services
-
       - alert: SavetimingInvalidsHigh
         expr: sum(rate(webperf_savetiming_invalid_events_total[5m])) > 5
         for: 5m

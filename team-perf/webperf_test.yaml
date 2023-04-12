@@ -8,11 +8,7 @@ tests:
       # time() behavior in unit tests is from zero, not the current time.  See:
       # https://github.com/prometheus/prometheus/issues/4817#issuecomment-514765285
       values: '0+60x5 0+0x16'
-    - series: 'webperf_latest_handled_time_seconds{schema="PaintTiming",site="eqiad"}'
-      values: '0+60x21'
     - series: 'webperf_latest_handled_time_seconds{schema="NavigationTiming",site="codfw"}'
-      values: '0+0x21'
-    - series: 'webperf_latest_handled_time_seconds{schema="PaintTiming",site="codfw"}'
       values: '0+0x21'
    alert_rule_test:
     - alertname: NavtimingStaleBeacon
@@ -66,25 +62,6 @@ tests:
            summary: 'Navtiming elevated invalid events: 10/s'
            description: "This metric counts discarded messages.  A discard rate under 0.5 events/sec is normal."
            dashboard: https://grafana.wikimedia.org/d/000000143/navigation-timing
-           runbook: https://wikitech.wikimedia.org/wiki/Performance/Runbook/Webperf-processor_services
-
- - interval: 1m
-   input_series:
-    - series: 'webperf_painttiming_invalid_events_total'
-      values: '0+600x20'
-   alert_rule_test:
-    - alertname: PainttimingInvalidsHigh
-      eval_time: 7m
-    - alertname: PainttimingInvalidsHigh
-      eval_time: 8m
-      exp_alerts:
-       - exp_labels:
-           severity: warning
-           team: perf
-         exp_annotations:
-           summary: 'Painttiming elevated invalid events: 10/s'
-           description: "This metric counts discarded messages.  A discard rate under 0.5 events/sec is normal."
-           dashboard: https://grafana.wikimedia.org/d/IROgrArMk/paint-timing
            runbook: https://wikitech.wikimedia.org/wiki/Performance/Runbook/Webperf-processor_services
 
  - interval: 1m
