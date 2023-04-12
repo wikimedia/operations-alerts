@@ -37,3 +37,30 @@ tests:
            summary: Reduced availability for job fail in foo@eqiad
            dashboard: 'https://grafana.wikimedia.org/d/NEJu05xZz/prometheus-targets'
            runbook: 'https://wikitech.wikimedia.org/wiki/Prometheus#Prometheus_job_unavailable'
+
+  - interval: 1m
+    input_series:
+      - series: 'pint_problem{filename="/srv/alerts/ext/team-perf_webperf.yaml", instance="localhost:9123", job="pint", kind="alerting", name="NavtimingInvalidsHigh", problem="prometheus \"ext\" at http://127.0.0.1:9908/ext did not have any series for \"webperf_navigationtiming_invalid_events_total\" metric in the last 1w", reporter="promql/series", severity="bug"}'
+        values: '1+0x90'
+    external_labels:
+      site: eqiad
+      prometheus: foo
+    alert_rule_test:
+    - alertname: AlertLintProblem
+      eval_time: 40m
+      exp_alerts:
+       - exp_labels:
+           filename: '/srv/alerts/ext/team-perf_webperf.yaml'
+           instance: 'localhost:9123'
+           job: pint
+           kind: alerting
+           name: NavtimingInvalidsHigh
+           problem: 'prometheus "ext" at http://127.0.0.1:9908/ext did not have any series for "webperf_navigationtiming_invalid_events_total" metric in the last 1w'
+           reporter: 'promql/series'
+           team: sre
+           severity: warning
+         exp_annotations:
+           description: 'Pint reporter promql/series found problem(s) in /srv/alerts/ext/team-perf_webperf.yaml: prometheus "ext" at http://127.0.0.1:9908/ext did not have any series for "webperf_navigationtiming_invalid_events_total" metric in the last 1w'
+           summary: Linting problems found for NavtimingInvalidsHigh
+           dashboard: TODO
+           runbook: https://wikitech.wikimedia.org/wiki/Alertmanager#Alert_linting_found_problems
