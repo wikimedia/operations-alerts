@@ -1,0 +1,38 @@
+rule_files:
+  - net_dev.yaml
+evaluation_interval: 1m
+tests:
+  - input_series:
+      - series: 'node_network_speed_bytes{instance="alerts1001:9100", device="eno1"}'
+        values: "1"
+      - series: 'node_network_info{instance="alerts1001:9100", operstate="up", duplex="half",device="eno1"}'
+        values: "1"
+    alert_rule_test:
+      - alertname: InterfaceDuplexError
+        eval_time: 1m
+        exp_alerts:
+          - exp_labels:
+              team: dcops
+              severity: task
+              instance: alerts1001:9100
+              operstate: up
+              duplex: half
+              device: eno1
+            exp_annotations:
+              description: 'eno1 on alerts1001:9100 has the wrong duplex: half.'
+              summary: 'eno1 on alerts1001:9100 has the wrong duplex: half.'
+              dashboard: https://grafana.wikimedia.org/d/000000562
+              runbook: https://wikitech.wikimedia.org/wiki/Monitoring/check_eth
+      - alertname: InterfaceSpeedError
+        exp_alerts:
+          - exp_labels:
+              team: dcops
+              severity: task
+              instance: alerts1001:9100
+              operstate: up
+              device: eno1
+            exp_annotations:
+              description: 'eno1 on alerts1001:9100 has the wrong speed: 1.'
+              summary: 'eno1 on alerts1001:9100 has the wrong speed: 1.'
+              dashboard: https://grafana.wikimedia.org/d/000000562
+              runbook: https://wikitech.wikimedia.org/wiki/Monitoring/check_eth

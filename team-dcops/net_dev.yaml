@@ -1,0 +1,33 @@
+# deploy-tag: ops
+
+groups:
+  - name: net_dev
+    rules:
+      - alert: InterfaceDuplexError
+        annotations:
+          description: '{{$labels.device}} on {{ $labels.instance }} has the wrong duplex: {{$labels.duplex}}.'
+          summary: '{{$labels.device}} on {{ $labels.instance }} has the wrong duplex: {{$labels.duplex}}.'
+          dashboard: https://grafana.wikimedia.org/d/000000562
+          runbook: https://wikitech.wikimedia.org/wiki/Monitoring/check_eth
+        # VMs report unknown so we also exclude that
+        # Ideally we would have a better way to exclude VMs
+        expr: node_network_info{operstate="up", duplex!~"full|unknown", device=~"e.+"} == 1
+        labels:
+          severity: task
+          team: dcops
+      - alert: InterfaceSpeedError
+        annotations:
+          description: '{{$labels.device}} on {{ $labels.instance }} has the wrong speed: {{$value}}.'
+          summary: '{{$labels.device}} on {{ $labels.instance }} has the wrong speed: {{$value}}.'
+          dashboard: https://grafana.wikimedia.org/d/000000562
+          runbook: https://wikitech.wikimedia.org/wiki/Monitoring/check_eth
+        # ignore unknown values (0 or -1)
+        # https://git.kernel.org/pub/scm/network/ethtool/ethtool.git/tree/netlink/settings.c?id=89e6096b8b0bb505f91200cd923da042cd21983e#n471
+        # TODO: use --collector.netclass.ignore-invalid-speed when everything on bookworm
+        expr: >
+          0 < node_network_speed_bytes *
+          on(instance, device) group_left(operstate)
+          node_network_info{operstate="up"} < 125000000
+        labels:
+          severity: task
+          team: dcops
