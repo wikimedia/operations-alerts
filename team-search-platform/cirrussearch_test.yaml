@@ -136,3 +136,21 @@ tests:
               description: "An Elasticsearch instance is not performing index work; find out why"
               runbook: https://wikitech.wikimedia.org/wiki/Search#Indexing_hung_and_not_making_progress
               dashboard: 'https://grafana.wikimedia.org/d/JLK3I_siz/elasticsearch-indexing?orgId=1&from=now-3d&to=now&viewPanel=57'
+  - interval: 1m
+    input_series:
+      - series: elasticsearch_indices_age_days{exported_cluster="production-search-psi-codfw", index="*_titlesuggest"}
+        values: 5+0x10
+    alert_rule_test:
+      - alertname: CirrusSearchTitleSuggestIndexTooOld
+        eval_time: 10m
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              team: search-platform
+              index: '*_titlesuggest'
+              exported_cluster: production-search-psi-codfw
+            exp_annotations:
+              summary: "Some search indices that power autocomplete have not been updated recently"
+              description: "The daily build process for autocomplete indices is probably having issues and should be investigated."
+              runbook: https://wikitech.wikimedia.org/wiki/Search#CirrusSearch_titlesuggest_index_is_too_old
+              dashboard: 'TODO'
