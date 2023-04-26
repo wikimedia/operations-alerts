@@ -24,10 +24,14 @@ groups:
         # ignore unknown values (0 or -1)
         # https://git.kernel.org/pub/scm/network/ethtool/ethtool.git/tree/netlink/settings.c?id=89e6096b8b0bb505f91200cd923da042cd21983e#n471
         # TODO: use --collector.netclass.ignore-invalid-speed when everything on bookworm
+        # TODO: remove the `or` clause when everything is upgraded to > 0.17
         expr: >
           0 < node_network_speed_bytes *
           on(instance, device) group_left(operstate)
           node_network_info{operstate="up"} < 125000000
+          or 0 < node_network_speed_bytes *
+          on(instance, interface) group_left(operstate)
+          node_network_up{operstate="up"} < 125000000
         labels:
           severity: task
           team: dcops
