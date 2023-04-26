@@ -8,7 +8,7 @@ groups:
       alert: JobUnavailable
       annotations:
         description: The Prometheus job {{ $labels.job }} running on {{ $externalLabels.prometheus }}@{{ $externalLabels.site }}
-          has been unable to scrape {{ $value | humanizePercentage }} of its targets.
+          reports {{ $value | humanizePercentage }} of its targets were scrape-able.
           Check if the targets are reachable and exporting metrics.
         summary: Reduced availability for job {{ $labels.job }} in {{ $externalLabels.prometheus }}@{{ $externalLabels.site }}
         dashboard: 'https://grafana.wikimedia.org/d/NEJu05xZz/prometheus-targets'

@@ -20,9 +20,8 @@ tests:
            team: sre
            severity: warning
          exp_annotations:
-           description: The Prometheus job fail running on foo@eqiad has been unable to
-             scrape 0% of its targets. Check if the targets are
-             reachable and exporting metrics.
+           description: The Prometheus job fail running on foo@eqiad reports 0% of its targets
+             were scrape-able. Check if the targets are reachable and exporting metrics.
            summary: Reduced availability for job fail in foo@eqiad
            dashboard: 'https://grafana.wikimedia.org/d/NEJu05xZz/prometheus-targets'
            runbook: 'https://wikitech.wikimedia.org/wiki/Prometheus#Prometheus_job_unavailable'
@@ -31,9 +30,8 @@ tests:
            team: sre
            severity: critical
          exp_annotations:
-           description: The Prometheus job fail running on foo@eqiad has been unable to
-             scrape 0% of its targets. Check if the targets are
-             reachable and exporting metrics.
+           description: The Prometheus job fail running on foo@eqiad reports 0% of its targets
+             were scrape-able. Check if the targets are reachable and exporting metrics.
            summary: Reduced availability for job fail in foo@eqiad
            dashboard: 'https://grafana.wikimedia.org/d/NEJu05xZz/prometheus-targets'
            runbook: 'https://wikitech.wikimedia.org/wiki/Prometheus#Prometheus_job_unavailable'
