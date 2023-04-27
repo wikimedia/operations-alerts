@@ -1,0 +1,51 @@
+rule_files:
+  - rabbitmq_network_partition.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    input_series:
+      - series: 'rabbitmq_network_partition{hostname="cloudrabbit1001"}'
+        values: "0 1+0x15"
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: RabbitmqNetworkPartition
+        eval_time: 16m
+        exp_alerts:
+          - exp_labels:
+              team: wmcs
+              severity: task
+              service: openstack,cloudvps
+              hostname: cloudrabbit1001
+            exp_annotations:
+              description: "The 'Network Partition' section of 'rabbitmqctl cluster_status' is not empty. OpenStack API calls are likely to time out or produce inconsistent results"
+              summary: "A Rabbitmq Network partition has been detected. 1 hosts marked as partitioned."
+              dashboard: "https://grafana.wikimedia.org/d/tn5yHr44k/wmcs-rabbitmq-health"
+              runbook: "https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/RabbitmqNetworkPartition"
+  - interval: 1m
+    input_series:
+      - series: 'rabbitmq_network_partition{hostname="cloudrabbit1001"}'
+        values: "0 0+0x15"
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: RabbitmqNetworkPartition
+        eval_time: 15m
+        exp_alerts: []
+  - interval: 1m
+    input_series: []
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: RabbitmqNetworkPartition
+        eval_time: 16m
+        exp_alerts:
+          - exp_labels:
+              team: wmcs
+              severity: task
+              service: openstack,cloudvps
+            exp_annotations:
+              description: "The 'Network Partition' section of 'rabbitmqctl cluster_status' is not empty. OpenStack API calls are likely to time out or produce inconsistent results"
+              summary: "A Rabbitmq Network partition has been detected. -1 hosts marked as partitioned."
+              dashboard: "https://grafana.wikimedia.org/d/tn5yHr44k/wmcs-rabbitmq-health"
+              runbook: "https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/RabbitmqNetworkPartition"

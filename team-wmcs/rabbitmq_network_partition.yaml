@@ -1,0 +1,17 @@
+# deploy-tag: cloud
+
+groups:
+  - name: rabbitmq_network_partition
+    rules:
+      - alert: RabbitmqNetworkPartition
+        expr: (rabbitmq_network_partition OR on() vector(-1)) != 0
+        for: 10m
+        labels:
+          team: wmcs
+          severity: task
+          service: openstack,cloudvps
+        annotations:
+          summary: "A Rabbitmq Network partition has been detected. {{ $value }} hosts marked as partitioned."
+          description: "The 'Network Partition' section of 'rabbitmqctl cluster_status' is not empty. OpenStack API calls are likely to time out or produce inconsistent results"
+          runbook: https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/RabbitmqNetworkPartition
+          dashboard: https://grafana.wikimedia.org/d/tn5yHr44k/wmcs-rabbitmq-health
