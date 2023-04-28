@@ -6,6 +6,9 @@ groups:
   - name: thanos-query
     rules:
 
+# 'code' label is added dynamically as errors come in, thus disable pint
+# check for missing series
+
     - alert: ThanosQueryHttpRequestQueryErrorRateHigh
       annotations:
         description: Thanos Query {{$labels.job}} is failing to handle {{$value | humanize}}%
@@ -13,6 +16,7 @@ groups:
         summary: Thanos Query is failing to handle requests.
         dashboard: https://grafana.wikimedia.org/d/af36c91291a603f1d9fbdabdd127ac4a/thanos-query
         runbook: https://wikitech.wikimedia.org/wiki/Thanos#Alerts
+      # pint disable promql/series
       expr: |
         (
           sum by (job) (rate(http_requests_total{code=~"5..", job=~".*thanos-query.*", handler="query"}[5m]))
@@ -31,6 +35,7 @@ groups:
         summary: Thanos Query is failing to handle requests.
         dashboard: https://grafana.wikimedia.org/d/af36c91291a603f1d9fbdabdd127ac4a/thanos-query
         runbook: https://wikitech.wikimedia.org/wiki/Thanos#Alerts
+      # pint disable promql/series
       expr: |
         (
           sum by (job) (rate(http_requests_total{code=~"5..", job=~".*thanos-query.*", handler="query_range"}[5m]))
