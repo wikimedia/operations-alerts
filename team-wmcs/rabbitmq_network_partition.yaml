@@ -1,4 +1,4 @@
-# deploy-tag: cloud
+# deploy-tag: eqiad
 
 groups:
   - name: rabbitmq_network_partition
