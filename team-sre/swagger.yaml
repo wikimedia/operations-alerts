@@ -1,0 +1,15 @@
+# deploy-tag: ops
+groups:
+  - name: swagger-up
+    rules:
+    - alert: SwaggerProbeHasFailures
+      annotations:
+        description: Not all openapi/swagger endpoints returned healthy or probing failed for {{$labels.instance}} from {{$externalLabels.site}}
+        summary: Not all openapi/swagger endpoints returned healthy
+        dashboard: https://grafana.wikimedia.org/d/_77ik484k/openapi-swagger-endpoint-state?var-site={{$externalLabels.site}}
+        runbook: https://wikitech.wikimedia.org/wiki/Runbook#{{ $labels.instance }}
+      expr: service_checker_probe_success{job=~"(swagger_.+|probes/swagger)"} < 1
+      for: 5m
+      labels:
+        severity: warning
+        team: sre

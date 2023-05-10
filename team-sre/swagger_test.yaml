@@ -1,0 +1,51 @@
+rule_files:
+  - swagger.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 5m
+    external_labels:
+      site: eqiad
+    input_series:
+      - series: 'service_checker_probe_success{instance="http://kartotherian.svc.eqiad.wmnet:6533", job="swagger_check_kartotherian_cluster_eqiad", site="eqiad"}'
+        values: '0'
+      - series: 'service_checker_probe_success{instance="http://kartotherian.svc.eqiad.wmnet:6533", job="probes/swagger", site="eqiad"}'
+        values: '0'
+    alert_rule_test:
+      - alertname: SwaggerProbeHasFailures
+        eval_time: 5m
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              team: sre
+              site: eqiad
+              job: probes/swagger
+              instance: http://kartotherian.svc.eqiad.wmnet:6533
+            exp_annotations:
+              summary: Not all openapi/swagger endpoints returned healthy
+              description: Not all openapi/swagger endpoints returned healthy or probing failed for http://kartotherian.svc.eqiad.wmnet:6533 from eqiad
+              dashboard: https://grafana.wikimedia.org/d/_77ik484k/openapi-swagger-endpoint-state?var-site=eqiad
+              runbook: https://wikitech.wikimedia.org/wiki/Runbook#http://kartotherian.svc.eqiad.wmnet:6533
+          - exp_labels:
+              severity: warning
+              team: sre
+              site: eqiad
+              job: swagger_check_kartotherian_cluster_eqiad
+              instance: http://kartotherian.svc.eqiad.wmnet:6533
+            exp_annotations:
+              summary: Not all openapi/swagger endpoints returned healthy
+              description: Not all openapi/swagger endpoints returned healthy or probing failed for http://kartotherian.svc.eqiad.wmnet:6533 from eqiad
+              dashboard: https://grafana.wikimedia.org/d/_77ik484k/openapi-swagger-endpoint-state?var-site=eqiad
+              runbook: https://wikitech.wikimedia.org/wiki/Runbook#http://kartotherian.svc.eqiad.wmnet:6533
+
+  - interval: 5m
+    external_labels:
+      site: codfw
+    input_series:
+      - series: 'service_checker_probe_success{instance="http://kartotherian.svc.codfw.wmnet:6533", job="swagger_check_kartotherian_cluster_codfw", site="codfw"}'
+        values: '1'
+      - series: 'service_checker_probe_success{instance="http://kartotherian.svc.codfw.wmnet:6533", job="probes/swagger", site="codfw"}'
+        values: '1'
+    alert_rule_test:
+      - alertname: SwaggerProbeHasFailures
+        eval_time: 5m
+        exp_alerts: []
