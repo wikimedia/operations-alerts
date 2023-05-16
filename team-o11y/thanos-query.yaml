@@ -170,6 +170,7 @@ groups:
         summary: Thanos Query Frontend is failing to handle requests.
         dashboard: https://grafana.wikimedia.org/d/aa7Rx0oMk/thanos-query-frontend
         runbook: https://wikitech.wikimedia.org/wiki/Thanos#Alerts
+      # pint disable promql/series
       expr: |
         (
           sum by (job) (rate(http_requests_total{code=~"5..", job=~".*thanos-query.*", handler="query-frontend"}[5m]))
