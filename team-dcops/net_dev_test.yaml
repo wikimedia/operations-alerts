@@ -23,6 +23,7 @@ tests:
               summary: 'eno1 on alerts1001:9100 has the wrong duplex: half.'
               dashboard: https://grafana.wikimedia.org/d/000000562
               runbook: https://wikitech.wikimedia.org/wiki/Monitoring/check_eth
+
       - alertname: InterfaceSpeedError
         exp_alerts:
           - exp_labels:
