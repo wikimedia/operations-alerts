@@ -4,6 +4,10 @@ groups:
   - name: systemd
     rules:
       - alert: SystemdUnitFailed
+        # The recording rule will not yield results when there are no units
+        # failed (typically in a small site). Therefore disable promql/series
+        # check.
+        # pint disable promql/series
         expr: |
           instance_name:node_systemd_unit_state_failed:count1
           # wmcs has its own systemdunitdown alerts T333315
