@@ -25,7 +25,7 @@ groups:
         expr: |
           increase(node_systemd_service_restart_total[10m])
             * on (instance) group_left(team) role_owner
-          > 7
+          > 12 # more than once a minute
         for: 2m
         labels:
           severity: warning
