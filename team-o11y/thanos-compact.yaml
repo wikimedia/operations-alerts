@@ -67,3 +67,16 @@ groups:
       labels:
         severity: warning
         team: o11y
+
+    - alert: ThanosCompactDownsampleStalled
+      annotations:
+        description: Thanos Compact has not performed the expected downsamples.
+        summary: Thanos Compact did not perform the expected downsamples.
+        dashboard: https://grafana.wikimedia.org/d/651943d05a8123e32867b4673963f42b/thanos-compact
+        runbook: https://wikitech.wikimedia.org/wiki/Thanos#Alerts
+      expr: |
+        sum_over_time( sum(thanos_compact_downsample_total) [1w:1h] ) < 30
+      for: 2d
+      labels:
+        severity: warning
+        team: o11y
