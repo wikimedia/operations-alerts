@@ -21,3 +21,24 @@ tests:
             description: "example.service Failed on sretest1001:9100"
             dashboard: 'https://grafana.wikimedia.org/d/g-AaZRFWk/systemd-status'
             runbook: https://wikitech.wikimedia.org/wiki/Monitoring/check_systemd_state
+
+  - interval: 1m
+    input_series:
+      - series: 'role_owner{instance="sretest1001:9100",team="infrastructure-foundations"}'
+        values: '1+0x60'
+      - series: 'node_systemd_service_restart_total{instance="sretest1001:9100",name="example.service"}'
+        values: '5+10x60'
+    alert_rule_test:
+      - alertname: SystemdUnitCrashLoop
+        eval_time: 13m
+        exp_alerts:
+        - exp_labels:
+            severity: warning
+            team: infrastructure-foundations
+            instance: sretest1001:9100
+            name: example.service
+          exp_annotations:
+            summary: "example.service crashloop on sretest1001:9100"
+            description: "example.service has had 100 restarts in the last 10m"
+            dashboard: 'https://grafana.wikimedia.org/d/g-AaZRFWk/systemd-status'
+            runbook: TODO

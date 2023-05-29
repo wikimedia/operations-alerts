@@ -20,3 +20,18 @@ groups:
           description: "{{$labels.name}} Failed on {{$labels.instance}}"
           dashboard: 'https://grafana.wikimedia.org/d/g-AaZRFWk/systemd-status'
           runbook: https://wikitech.wikimedia.org/wiki/Monitoring/check_systemd_state
+
+      - alert: SystemdUnitCrashLoop
+        expr: |
+          increase(node_systemd_service_restart_total[10m])
+            * on (instance) group_left(team) role_owner
+          > 7
+        for: 2m
+        labels:
+          severity: warning
+          team: "{{$labels.team}}"
+        annotations:
+          summary: "{{$labels.name}} crashloop on {{$labels.instance}}"
+          description: "{{$labels.name}} has had {{ $value }} restarts in the last 10m"
+          dashboard: 'https://grafana.wikimedia.org/d/g-AaZRFWk/systemd-status'
+          runbook: TODO
