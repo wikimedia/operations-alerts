@@ -7,30 +7,30 @@ groups:
       - alert: ImageSuggestionsArticleCountLargeChange
         expr: abs(
             sum(image_suggestions_elasticsearch_hasrecommendation_for_article_total)
-            - sum(image_suggestions_elasticsearch_hasrecommendation_for_article_total offset 1w)
+            - sum(image_suggestions_elasticsearch_hasrecommendation_for_article_total offset 1d)
           ) / sum(image_suggestions_elasticsearch_hasrecommendation_for_article_total)
           > 0.1
         labels:
           team: structured-data
           severity: warning
         annotations:
-          summary: "Larger-than-expected change in the number of article-level image suggestions compared to last week"
-          description: "Total count of image suggestions (based on hasrecommendation:image in elasticsearch) across sample wikis is >10% different to last week. Something may be wrong."
+          summary: "Larger-than-expected change in the number of article-level image suggestions compared to yesterday"
+          description: "Total count of image suggestions (based on hasrecommendation:image in elasticsearch) across sample wikis is >10% different to yesterday. Something may be wrong."
           runbook: TODO
           dashboard: TODO
 
       - alert: ImageSuggestionsSectionCountLargeChange
         expr: abs(
           sum(image_suggestions_elasticsearch_hasrecommendation_for_section_total)
-          - sum(image_suggestions_elasticsearch_hasrecommendation_for_section_total offset 1w)
+          - sum(image_suggestions_elasticsearch_hasrecommendation_for_section_total offset 1d)
           ) / sum(image_suggestions_elasticsearch_hasrecommendation_for_section_total)
           > 0.1
         labels:
           team: structured-data
           severity: warning
         annotations:
-          summary: "Larger-than-expected change in the number of section-level image suggestions compared to last week"
-          description: "Total count of image suggestions (based on hasrecommendation:image_section in elasticsearch) across sample wikis is >10% different to last week. Something may be wrong."
+          summary: "Larger-than-expected change in the number of section-level image suggestions compared to yesterday"
+          description: "Total count of image suggestions (based on hasrecommendation:image_section in elasticsearch) across sample wikis is >10% different to yesterday. Something may be wrong."
           runbook: TODO
           dashboard: TODO
 
@@ -54,5 +54,5 @@ groups:
         annotations:
           summary: "More than expected time since image suggestions metrics were pushed"
           description: "Image suggestions metrics were last pushed to prometheus more than 10 days ago. Expect them to be pushed once per week."
-          runbook: TODO
+          runbook: https://wikitech.wikimedia.org/wiki/Image-suggestion/Runbook
           dashboard: TODO

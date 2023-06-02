@@ -1,47 +1,47 @@
 rule_files:
   - data_pipelines.yaml
 tests:
-  - interval: 1w # time interval between values in the input series
+  - interval: 1d # time interval between values in the input series
     input_series:
       - series: 'image_suggestions_elasticsearch_hasrecommendation_for_article_total{wiki="test1"}'
         values: 100 100 90
       - series: 'image_suggestions_elasticsearch_hasrecommendation_for_article_total{wiki="test2"}'
         values: 100 100 89
     alert_rule_test:
-      - eval_time: 1w
+      - eval_time: 1d
         alertname: ImageSuggestionsArticleCountLargeChange
         exp_alerts: []
-      - eval_time: 2w
+      - eval_time: 2d
         alertname: ImageSuggestionsArticleCountLargeChange
         exp_alerts:
           - exp_labels:
               severity: warning
               team: structured-data
             exp_annotations:
-              summary: "Larger-than-expected change in the number of article-level image suggestions compared to last week"
-              description: "Total count of image suggestions (based on hasrecommendation:image in elasticsearch) across sample wikis is >10% different to last week. Something may be wrong."
+              summary: "Larger-than-expected change in the number of article-level image suggestions compared to yesterday"
+              description: "Total count of image suggestions (based on hasrecommendation:image in elasticsearch) across sample wikis is >10% different to yesterday. Something may be wrong."
               runbook: TODO
               dashboard: TODO
 
-  - interval: 1w # time interval between values in the input series
+  - interval: 1d # time interval between values in the input series
     input_series:
       - series: 'image_suggestions_elasticsearch_hasrecommendation_for_section_total{wiki="test1"}'
         values: 100 100 90
       - series: 'image_suggestions_elasticsearch_hasrecommendation_for_section_total{wiki="test2"}'
         values: 100 100 89
     alert_rule_test:
-      - eval_time: 1w
+      - eval_time: 1d
         alertname: ImageSuggestionsSectionCountLargeChange
         exp_alerts: []
-      - eval_time: 2w
+      - eval_time: 2d
         alertname: ImageSuggestionsSectionCountLargeChange
         exp_alerts:
           - exp_labels:
               severity: warning
               team: structured-data
             exp_annotations:
-              summary: "Larger-than-expected change in the number of section-level image suggestions compared to last week"
-              description: "Total count of image suggestions (based on hasrecommendation:image_section in elasticsearch) across sample wikis is >10% different to last week. Something may be wrong."
+              summary: "Larger-than-expected change in the number of section-level image suggestions compared to yesterday"
+              description: "Total count of image suggestions (based on hasrecommendation:image_section in elasticsearch) across sample wikis is >10% different to yesterday. Something may be wrong."
               runbook: TODO
               dashboard: TODO
 
@@ -84,5 +84,5 @@ tests:
             exp_annotations:
               summary: "More than expected time since image suggestions metrics were pushed"
               description: "Image suggestions metrics were last pushed to prometheus more than 10 days ago. Expect them to be pushed once per week."
-              runbook: TODO
+              runbook: https://wikitech.wikimedia.org/wiki/Image-suggestion/Runbook
               dashboard: TODO
