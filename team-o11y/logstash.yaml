@@ -47,7 +47,7 @@ groups:
         team: o11y
 
     - <<: *logstash_kafka_lag
-      expr: sum by (exported_cluster) (kafka_burrow_partition_lag{exported_cluster=~"logging-.*"}) > 50000
+      expr: sum by (exported_cluster) (kafka_burrow_partition_lag{exported_cluster=~"logging-.*"}) > 500000
       for: 2m
 
     - alert: LogstashUdpLoss
