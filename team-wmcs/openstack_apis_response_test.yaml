@@ -1,0 +1,24 @@
+rule_files:
+  - openstack_apis_response.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    input_series:
+      - series: 'haproxy_backend_http_response_time_average_seconds{instance="cloudcontrol1003"}'
+        # should trigger with > 1
+        values: "1.1"
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: OpenstackAPIResponse
+        eval_time: 16m
+        exp_alerts:
+          - exp_labels:
+              team: wmcs
+              severity: warning
+              service: openstack,cloudvps
+            exp_annotations:
+              summary: "Openstack APIs average response time is too high."
+              description: "The Openstack APIs average response time is too high. It may mean the control plane is unreliable."
+              runbook: https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/OpenstackAPIResponse
+              dashboard: https://grafana.wikimedia.org/d/UUmLqqX4k/openstack-api-performance

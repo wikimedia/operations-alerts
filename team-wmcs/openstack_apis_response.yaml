@@ -1,0 +1,16 @@
+# deploy-tag: eqiad
+groups:
+  - name: openstack_apis_response
+    rules:
+      - alert: OpenstackAPIResponse
+        expr: (sum(avg_over_time(haproxy_backend_http_response_time_average_seconds{instance=~"cloudcontrol1.*"}[12h])) by (node, name)) > 1
+        for: 10m
+        labels:
+          team: wmcs
+          severity: warning
+          service: openstack,cloudvps
+        annotations:
+          summary: "Openstack APIs average response time is too high."
+          description: "The Openstack APIs average response time is too high. It may mean the control plane is unreliable."
+          runbook: https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/OpenstackAPIResponse
+          dashboard: https://grafana.wikimedia.org/d/UUmLqqX4k/openstack-api-performance
