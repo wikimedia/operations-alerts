@@ -1,10 +1,9 @@
-# deploy-tag: eqiad
+# deploy-tag: ops
 groups:
   - name: openstack_apis_response
     rules:
       - alert: OpenstackAPIResponse
         expr: avg_over_time(haproxy_backend_http_response_time_average_seconds{instance=~"cloudcontrol1.*"}[12h]) > 1
-        for: 5m
         labels:
           team: wmcs
           severity: warning

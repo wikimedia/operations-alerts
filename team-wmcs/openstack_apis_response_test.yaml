@@ -2,8 +2,7 @@ rule_files:
   - openstack_apis_response.yaml
 evaluation_interval: 1m
 tests:
-  - interval: 1m
-    input_series:
+  - input_series:
       - series: 'haproxy_backend_http_response_time_average_seconds{instance="cloudcontrol1003", backend="nova_api"}'
         # should trigger with > 1
         values: "1.1"
@@ -11,9 +10,6 @@ tests:
       site: eqiad
     alert_rule_test:
       - alertname: OpenstackAPIResponse
-        # this number checks the 'for' in the original alert, which is set to 5m
-        # so this means that after 6m the alert should trigger, otherwise this test fails
-        eval_time: 6m
         exp_alerts:
           - exp_labels:
               team: wmcs
