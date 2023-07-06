@@ -4,17 +4,13 @@ evaluation_interval: 1m
 tests:
   - interval: 1m
     input_series:
-      - series: cpjobqueue_normal_rule_processing_delay{rule="cirrusSearchElasticaWrite-cpjobqueue-partitioned-mediawiki-job-cirrusSearchElasticaWrite",quantile="0.5",service="cpjobqueue"}
-        values: 22000
-      - series: cpjobqueue_normal_rule_processing_delay{rule="cirrusSearchElasticaWrite-cpjobqueue-partitioned-mediawiki-job-cirrusSearchLinksUpdate",quantile="0.5",service="cpjobqueue"}
-        values: 2200
-      - series: cpjobqueue_normal_rule_processing_delay{rule="cirrusSearchElasticaWrite-cpjobqueue-partitioned-mediawiki-job-cirrusSearchUnrelated",quantile="0.5",service="cpjobqueue"}
-        values: 220000
+      - series: cpjobqueue_normal_rule_processing_delay_sum{rule="cirrusSearchElasticaWrite-cpjobqueue-partitioned-mediawiki-job-cirrusSearchElasticaWrite",service="cpjobqueue"}
+        values: 25000+2000000x40
     external_labels:
       site: eqiad
     alert_rule_test:
       - alertname: CirrusSearchJobQueueLagTooHigh
-        eval_time: 1m
+        eval_time: 20m
         exp_alerts:
           - exp_labels:
               severity: warning
@@ -22,7 +18,7 @@ tests:
               rule: cirrusSearchElasticaWrite-cpjobqueue-partitioned-mediawiki-job-cirrusSearchElasticaWrite
               site: eqiad
             exp_annotations:
-              summary: "CirrusSearch job cirrusSearchElasticaWrite lag is too high: 6h 6m 40s"
+              summary: "CirrusSearch job cirrusSearchElasticaWrite lag is too high: 9h 15m 33s"
               description: "CirrusSearch job lag is too high"
               runbook: TODO
               dashboard: "https://grafana.wikimedia.org/d/CbmStnlGk/jobqueue-job?orgId=1&var-dc=eqiad%20prometheus/k8s&var-job=cirrusSearchElasticaWrite"
