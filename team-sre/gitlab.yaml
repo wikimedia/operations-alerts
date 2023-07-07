@@ -1,0 +1,39 @@
+# deploy-tag: ops
+# deploy-site: eqiad, codfw
+
+groups:
+- name: gitlab
+  rules:
+  - alert: GitLabCIJobErrors
+    expr: sum (rate(gitlab_ci_job_failure_reasons[5m])) / sum (rate(gitlab_ci_active_jobs_sum[5m])) > 0.5
+    for: 5m
+    labels:
+      severity: task
+      team: serviceops-collab
+    annotations:
+      summary: "GitLab - High CI job error rate"
+      description: "GitLab CI job error rate {{ $value }} is above threshold of 0.5"
+      dashboard: https://grafana.wikimedia.org/d/Chb-gC07k/gitlab-ci-overview
+      runbook: https://wikitech.wikimedia.org/wiki/GitLab/Runbook
+  - alert: GitLabCIPipelineErrors
+    expr: sum (rate(gitlab_ci_pipeline_failure_reasons[5m])) / sum (rate(gitlab_ci_active_jobs_sum[5m])) > 0.5
+    for: 5m
+    labels:
+      severity: task
+      team: serviceops-collab
+    annotations:
+      summary: "GitLab - High pipeline error rate"
+      description: "GitLab pipeline error rate {{ $value }} is above threshold of 0.5"
+      dashboard: https://grafana.wikimedia.org/d/Chb-gC07k/gitlab-ci-overview
+      runbook: https://wikitech.wikimedia.org/wiki/GitLab/Runbook
+  - alert: GitLabCIPipelineLatency
+    expr: rate(gitlab_ci_pipeline_creation_duration_seconds_sum[5m]) / rate(gitlab_ci_pipeline_creation_duration_seconds_count[5m]) > 10
+    for: 5m
+    labels:
+      severity: task
+      team: serviceops-collab
+    annotations:
+      summary: "GitLab - High CI pipeline creation time"
+      description: "GitLab pipeline average creation time {{ $value }}s is above threshold of 10s"
+      dashboard: https://grafana.wikimedia.org/d/Chb-gC07k/gitlab-ci-overview
+      runbook: https://wikitech.wikimedia.org/wiki/GitLab/Runbook
