@@ -1,5 +1,3 @@
-# https://prometheus.io/docs/prometheus/latest/configuration/unit_testing_rules/
-# Test locally using `promtool test rules kubernetes_prod.yaml`
 rule_files:
 - kubernetes-prod.yaml
 evaluation_interval: 1m

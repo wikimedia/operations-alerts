@@ -1,5 +1,3 @@
-# https://prometheus.io/docs/prometheus/latest/configuration/unit_testing_rules/
-# Test locally using `promtool test rules rdf-streaming-updater-test.yaml`
 rule_files:
   - rdf_streaming_updater.yaml
 evaluation_interval: 1m
