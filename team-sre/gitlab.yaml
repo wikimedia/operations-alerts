@@ -6,7 +6,7 @@ groups:
   rules:
   - alert: GitLabCIJobErrors
     expr: sum (rate(gitlab_ci_job_failure_reasons[5m])) / sum (rate(gitlab_ci_active_jobs_sum[5m])) > 0.5
-    for: 5m
+    for: 10m
     labels:
       severity: task
       team: serviceops-collab
@@ -16,8 +16,8 @@ groups:
       dashboard: https://grafana.wikimedia.org/d/Chb-gC07k/gitlab-ci-overview
       runbook: https://wikitech.wikimedia.org/wiki/GitLab/Runbook
   - alert: GitLabCIPipelineErrors
-    expr: sum (rate(gitlab_ci_pipeline_failure_reasons[5m])) / sum (rate(gitlab_ci_active_jobs_sum[5m])) > 0.5
-    for: 5m
+    expr: sum (rate(gitlab_ci_pipeline_failure_reasons[5m])) / sum (rate(gitlab_ci_active_jobs_sum[5m])) > 0.7
+    for: 10m
     labels:
       severity: task
       team: serviceops-collab
