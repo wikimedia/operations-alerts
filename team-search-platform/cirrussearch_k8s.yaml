@@ -5,12 +5,10 @@ groups:
    rules:
     - alert: CirrusSearchJobQueueLagTooHigh
       expr: >
-        max(avg_over_time(cpjobqueue_normal_rule_processing_delay{
-          rule=~".*cirrusSearch(DeleteArchive|DeletePages|ElasticaWrite|LinksUpdate*|OtherIndex)",
-          rule!~".*-partitioner-mediawiki-job-.*",
-          quantile="0.5",
-          service="cpjobqueue"
-        }[15m])) by (rule) > 6*60*60
+         sum by (rule) (rate(cpjobqueue_normal_rule_processing_delay_sum{
+            rule=~".*cirrusSearch(DeleteArchive|DeletePages|ElasticaWrite|LinksUpdate*|OtherIndex)",
+            rule!~".*-partitioner-mediawiki-job-.*",
+            service="cpjobqueue"}[15m])) > 6*60*60
       for: 1m
       labels:
         team: search-platform
