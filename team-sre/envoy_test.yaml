@@ -1,0 +1,26 @@
+
+rule_files:
+- envoy.yaml
+evaluation_interval: 1m
+tests:
+- interval: 1m
+  input_series:
+  - series: 'envoy_runtime_admin_overrides_active{instance="fake1001.foo.bar:9091", job="envoy"}'
+    values: "1+1x31"
+  external_labels:
+    site: moon
+    prometheus: eagle
+  alert_rule_test:
+  - alertname: EnvoyRuntimeAdminOverrides
+    eval_time: 31m
+    exp_alerts:
+    - exp_labels:
+        severity: warning
+        team: sre
+        instance: "fake1001.foo.bar:9091"
+        job: "envoy"
+      exp_annotations:
+        summary: "Envoy on fake1001.foo.bar:9091 has active runtime config overrides"
+        description: "There are active manual config overrides in the runtime of envoy on fake1001.foo.bar:9091 for 30min. Ensure debug/testing config gets cleaned up."
+        runbook: https://wikitech.wikimedia.org/wiki/Application_servers/Runbook#Envoy
+        dashboard: TODO
