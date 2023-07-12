@@ -1,0 +1,26 @@
+# https://prometheus.io/docs/prometheus/latest/configuration/unit_testing_rules/
+# Test locally using `promtool test rules flink-operator_test.yaml`
+rule_files:
+  - flink-kubernetes-operator.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    input_series:
+      - series: 'container_cpu_cfs_throttled_seconds_total{namespace="flink-operator", container="flink-kubernetes-operator"}'
+        values: null
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: FlinkOperatorNotRunning
+        eval_time: 5m
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              team: data-engineering
+              container: flink-kubernetes-operator
+              namespace: flink-operator
+            exp_annotations:
+              summary: "Flink kubernetes operator in eqiad is not running"
+              description: "Flink kubernetes operator in eqiad is not running"
+              dashboard: "https://grafana.wikimedia.org/d/H-sRgqLVk/flink-kubernetes-operator?orgId=1"
+              runbook: TODO

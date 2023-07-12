@@ -1,0 +1,62 @@
+# deploy-tag: k8s
+# deploy-site: eqiad, codfw
+# Alerts are enabled only on main k8s.
+groups:
+  - name: mw-page-content-change-enrich
+    rules:
+      - alert: MediawikiPageContentChangeEnrichJobManagerNotRunning
+        expr: |
+          absent(flink_jobmanager_job_uptime{kubernetes_namespace="mw-page-content-change-enrich", release="main", job_name="mw_page_content_change_enrich"})
+        for: 5m
+        labels:
+          team: data-engineering
+          severity: critical
+        annotations:
+          summary: "{{ $labels.job_name }} in {{$externalLabels.site}} is not running"
+          description: "The {{ $labels.job_name }} job is not running"
+          dashboard: 'https://grafana.wikimedia.org/d/K9x0c4aVk/flink-app?orgId=1&var-datasource={{ $externalLabels.site }}%20prometheus/k8s&var-namespace={{ $labels.kubernetes_namespace }}&var-helm_release={{ $labels.release }}&var-operator_name=All&var-flink_job_name={{ $labels.job_name }}'
+          runbook: TODO
+
+      - alert: MediawikiPageContentChangeEnrichTaskManagerNotRunning
+        expr: |
+          flink_jobmanager_numRegisteredTaskManagers{kubernetes_namespace="mw-page-content-change-enrich", release="main"} == 0
+        labels:
+          team: data-engineering
+          severity: critical
+        annotations:
+          summary: "The {{ $labels.kubernetes_namespace }} Flink cluster in {{$externalLabels.site}} has no registered TaskManagers"
+          description: "The {{ $labels.kubernetes_namespace }} Flink cluster in {{$externalLabels.site}} has no registered TaskManagers"
+          dashboard: 'https://grafana.wikimedia.org/d/K9x0c4aVk/flink-app?orgId=1&var-datasource={{ $externalLabels.site }}%20prometheus/k8s&var-namespace={{ $labels.kubernetes_namespace }}&var-helm_release={{ $labels.release }}&var-operator_name=All&var-flink_job_name=All'
+          runbook: TODO
+
+      - alert: MediawikiPageContentChangeEnrichHighKafkaConsumerLag
+        # TODO: update threshold and duration once SLO is finalised.
+        expr: |
+          flink_taskmanager_job_task_operator_KafkaSourceReader_KafkaConsumer_records_lag_max{kubernetes_namespace="mw-page-content-change-enrich", release="main", job_name="mw_page_content_change_enrich"} > 600
+        for: 5m
+        labels:
+          team: data-engineering
+          severity: critical
+        annotations:
+          summary: "High Kafka consumer lag for {{$labels.job_name}} in {{ $externalLabels.site }}"
+          description: "Maximum lag of the consumed Kafka topic partition excedes SLO threshold"
+          dashboard: 'https://grafana.wikimedia.org/d/K9x0c4aVk/flink-app?orgId=1&var-datasource={{ $externalLabels.site }}%20prometheus/k8s&var-namespace={{ $labels.kubernetes_namespace }}&var-helm_release={{ $labels.release }}&var-operator_name=All&var-flink_job_name={{ $labels.job_name }}'
+          runbook: TODO
+
+      - alert: MediawikiPageContentChangeEnrichAvailability
+        # TODO: better name? This maps the SLI defined in https://wikitech.wikimedia.org/wiki/MediaWiki_Event_Enrichment/SLO/Mediawiki_Page_Content_Change_Enrichment
+        # TODO: update threshold and duration once SLO is finalised.
+        expr: |
+          (
+            flink_taskmanager_job_task_operator_event_process_function_events_out_total{kubernetes_namespace="mw-page-content-change-enrich", release="main", job_name="mw_page_content_change_enrich"} /
+            flink_taskmanager_job_task_operator_event_process_function_events_in_total{kubernetes_namespace="mw-page-content-change-enrich", release="main", job_name="mw_page_content_change_enrich"}
+          ) < 0.8
+        for: 5m
+        labels:
+          team: data-engineering
+          severity: critical
+        annotations:
+          summary: "Low percentage of enriched events produced by {{ $labels.job_name }} in {{$externalLabels.site}}"
+          description: "The percentage of enriched events produced is below SLO threshold"
+          dashboard: 'https://grafana.wikimedia.org/d/K9x0c4aVk/flink-app?orgId=1&var-datasource={{ $externalLabels.site }}%20prometheus/k8s&var-namespace={{ $labels.kubernetes_namespace }}&var-helm_release={{ $labels.release }}&var-operator_name=All&var-flink_job_name={{ $labels.job_name }}'
+          runbook: TODO

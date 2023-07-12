@@ -1,0 +1,93 @@
+# https://prometheus.io/docs/prometheus/latest/configuration/unit_testing_rules/
+# Test locally using `promtool test rules mw-page-content-change-enrich_test.yaml`
+rule_files:
+  - mw-page-content-change-enrich.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 5m
+    input_series:
+      - series: 'flink_jobmanager_job_uptime{job_name="Some_Job", kubernetes_namespace="some-ns"}'
+        values: "2000000"
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: MediawikiPageContentChangeEnrichJobManagerNotRunning
+        eval_time: 5m
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              team: data-engineering
+              kubernetes_namespace: mw-page-content-change-enrich
+              release: main
+              job_name: "mw_page_content_change_enrich"
+            exp_annotations:
+              summary: "mw_page_content_change_enrich in eqiad is not running"
+              description: "The mw_page_content_change_enrich job is not running"
+              dashboard: 'https://grafana.wikimedia.org/d/K9x0c4aVk/flink-app?orgId=1&var-datasource=eqiad%20prometheus/k8s&var-namespace=mw-page-content-change-enrich&var-helm_release=main&var-operator_name=All&var-flink_job_name=mw_page_content_change_enrich'
+              runbook: TODO
+  - interval: 1m
+    input_series:
+      - series: 'flink_jobmanager_numRegisteredTaskManagers{kubernetes_namespace="mw-page-content-change-enrich", release="main"}'
+        values: 0
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: MediawikiPageContentChangeEnrichTaskManagerNotRunning
+        eval_time: 5m
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              team: data-engineering
+              kubernetes_namespace: mw-page-content-change-enrich
+              release: main
+            exp_annotations:
+              summary: "The mw-page-content-change-enrich Flink cluster in eqiad has no registered TaskManagers"
+              description: "The mw-page-content-change-enrich Flink cluster in eqiad has no registered TaskManagers"
+              dashboard: 'https://grafana.wikimedia.org/d/K9x0c4aVk/flink-app?orgId=1&var-datasource=eqiad%20prometheus/k8s&var-namespace=mw-page-content-change-enrich&var-helm_release=main&var-operator_name=All&var-flink_job_name=All'
+              runbook: TODO
+
+  - interval: 1m
+    input_series:
+      - series: 'flink_taskmanager_job_task_operator_KafkaSourceReader_KafkaConsumer_records_lag_max{kubernetes_namespace="mw-page-content-change-enrich", release="main", job_name="mw_page_content_change_enrich"}'
+        values: 2000
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: MediawikiPageContentChangeEnrichHighKafkaConsumerLag
+        eval_time: 5m
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              team: data-engineering
+              kubernetes_namespace: mw-page-content-change-enrich
+              release: main
+              job_name: "mw_page_content_change_enrich"
+            exp_annotations:
+              summary: "High Kafka consumer lag for mw_page_content_change_enrich in eqiad"
+              description: "Maximum lag of the consumed Kafka topic partition excedes SLO threshold"
+              dashboard: 'https://grafana.wikimedia.org/d/K9x0c4aVk/flink-app?orgId=1&var-datasource=eqiad%20prometheus/k8s&var-namespace=mw-page-content-change-enrich&var-helm_release=main&var-operator_name=All&var-flink_job_name=mw_page_content_change_enrich'
+              runbook: TODO
+
+  - interval: 1m
+    input_series:
+      - series: 'flink_taskmanager_job_task_operator_event_process_function_events_out_total{kubernetes_namespace="mw-page-content-change-enrich", release="main", job_name="mw_page_content_change_enrich"}'
+        values: 50
+      - series: 'flink_taskmanager_job_task_operator_event_process_function_events_in_total{kubernetes_namespace="mw-page-content-change-enrich", release="main", job_name="mw_page_content_change_enrich"}'
+        values: 100
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: MediawikiPageContentChangeEnrichAvailability
+        eval_time: 5m
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              team: data-engineering
+              kubernetes_namespace: mw-page-content-change-enrich
+              release: main
+              job_name: "mw_page_content_change_enrich"
+            exp_annotations:
+              summary: "Low percentage of enriched events produced by mw_page_content_change_enrich in eqiad"
+              description: "The percentage of enriched events produced is below SLO threshold"
+              dashboard: 'https://grafana.wikimedia.org/d/K9x0c4aVk/flink-app?orgId=1&var-datasource=eqiad%20prometheus/k8s&var-namespace=mw-page-content-change-enrich&var-helm_release=main&var-operator_name=All&var-flink_job_name=mw_page_content_change_enrich'
+              runbook: TODO

@@ -1,0 +1,21 @@
+# deploy-tag: k8s
+# deploy-site: eqiad, codfw
+# Alerts are enabled only on main k8s.
+# TODO: this could be a config shared with team-search-platform.
+
+groups:
+  - name: flink-kubernetes-operator
+    rules:
+      - alert: FlinkOperatorNotRunning
+        expr: absent(container_cpu_cfs_throttled_seconds_total{namespace="flink-operator", container="flink-kubernetes-operator"})
+        for: 5m
+        labels:
+          team: data-engineering
+          severity: critical
+        annotations:
+          summary: "Flink kubernetes operator in {{ $externalLabels.site }} is not running"
+          description: "Flink kubernetes operator in {{ $externalLabels.site }} is not running"
+          dashboard: "https://grafana.wikimedia.org/d/H-sRgqLVk/flink-kubernetes-operator?orgId=1"
+          runbook: TODO
+
+
