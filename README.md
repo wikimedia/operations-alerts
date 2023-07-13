@@ -40,6 +40,19 @@ Finally, to also disable `pint` at startup run the following:
     systemctl stop pint
     systemctl mask pint
 
+Testing with Docker
+----
+Tests can run locally using the CI image blubber file provided with this
+repository.
+
+Build an image from `.pipeline/blubber.yaml` with:
+
+    DOCKER_BUILDKIT=1 docker build --target test -t alerts-tests -f .pipeline/blubber.yaml .
+
+Run the test container with:
+
+    docker run --entrypoint tox alerts-tests
+
 Deploying
 ----
 The repository is self-service for `wmf` LDAP group users. In other words, a +2
