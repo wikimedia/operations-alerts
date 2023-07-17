@@ -23,7 +23,7 @@ groups:
       team: serviceops-collab
     annotations:
       summary: "GitLab - High pipeline error rate"
-      description: "GitLab pipeline error rate {{ $value }} is above threshold of 0.5"
+      description: "GitLab pipeline error rate {{ $value }} is above threshold of 0.7"
       dashboard: https://grafana.wikimedia.org/d/Chb-gC07k/gitlab-ci-overview
       runbook: https://wikitech.wikimedia.org/wiki/GitLab/Runbook
   - alert: GitLabCIPipelineLatency
