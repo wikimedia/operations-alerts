@@ -46,15 +46,19 @@ groups:
       - alert: MediawikiPageContentChangeEnrichAvailability
         # TODO: better name? This maps the SLI defined in https://wikitech.wikimedia.org/wiki/MediaWiki_Event_Enrichment/SLO/Mediawiki_Page_Content_Change_Enrichment
         # TODO: update threshold and duration once SLO is finalised.
-        # these metrics are created only when jobs are scheduled, which might
-        # not happen all the time, thus ignore lint alerts when metrics don't
-        # exist
+        # These metrics are valid only when jobs are consuming kafka topics from the active DC.
+        # For instance, when traffic is routed to eqiad the codfw Kafka source topic won't receive events (save for canary events)
+        # and the ratio will trigger a false positive.
+        # As a workaround, check that events are produced in the input topic on the Kafka broker belonging to the app deployment site.
+        # We could also check the expression against topic metrics reported by the kafka brokers, but bookkeeping would be required if the Kafka topic config changes (e.g. kafka topic is version bumped).
+        # TODO: enable linting before marking this config as ready to be deployed.
         # pint disable promql/series
         expr: |
+          sum by (kubernetes_namespace, release, job_name) (rate(flink_taskmanager_job_task_operator_event_process_function_events_in_total{kubernetes_namespace="mw-page-content-change-enrich", release="main", job_name="mw_page_content_change_enrich"}[5m])) > 0.5 and
           (
-            flink_taskmanager_job_task_operator_event_process_function_events_out_total{kubernetes_namespace="mw-page-content-change-enrich", release="main", job_name="mw_page_content_change_enrich"} /
-            flink_taskmanager_job_task_operator_event_process_function_events_in_total{kubernetes_namespace="mw-page-content-change-enrich", release="main", job_name="mw_page_content_change_enrich"}
-          ) < 0.8
+            sum_over_time(flink_taskmanager_job_task_operator_event_process_function_events_out_total{kubernetes_namespace="mw-page-content-change-enrich", release="main", job_name="mw_page_content_change_enrich"}[5m]) /
+            sum_over_time(flink_taskmanager_job_task_operator_event_process_function_events_in_total{kubernetes_namespace="mw-page-content-change-enrich", release="main", job_name="mw_page_content_change_enrich"}[5m])
+          ) <= 0.8
         for: 5m
         labels:
           team: data-engineering
