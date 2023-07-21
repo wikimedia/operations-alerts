@@ -36,7 +36,7 @@ groups:
         for: 5m
         labels:
           team: data-engineering
-          severity: critical
+          severity: warning
         annotations:
           summary: "High Kafka consumer lag for {{$labels.job_name}} in {{ $externalLabels.site }}"
           description: "Maximum lag of the consumed Kafka topic partition excedes SLO threshold"
@@ -58,7 +58,7 @@ groups:
         for: 5m
         labels:
           team: data-engineering
-          severity: critical
+          severity: warning
         annotations:
           summary: "Low percentage of enriched events produced by {{ $labels.job_name }} in {{$externalLabels.site}}"
           description: "The percentage of enriched events produced is below SLO threshold"

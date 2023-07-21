@@ -57,7 +57,7 @@ tests:
         eval_time: 5m
         exp_alerts:
           - exp_labels:
-              severity: critical
+              severity: warning
               team: data-engineering
               kubernetes_namespace: mw-page-content-change-enrich
               release: main
@@ -81,7 +81,7 @@ tests:
         eval_time: 5m
         exp_alerts:
           - exp_labels:
-              severity: critical
+              severity: warning
               team: data-engineering
               kubernetes_namespace: mw-page-content-change-enrich
               release: main
