@@ -1,0 +1,23 @@
+rule_files:
+  - bird.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    external_labels:
+      site: eqiad
+    input_series:
+      - series: 'node_systemd_service_restart_total{instance="dns1004:9324", name="bird.service"}'
+        values: '0 1 2 3 4 5 6 7'
+    alert_rule_test:
+      - alertname: BirdRestarted
+        eval_time: 5m
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              team: traffic
+              instance: dns1004:9324
+            exp_annotations:
+              summary: 'bird service restarted on dns1004:9324'
+              description: "bird on dns1004:9324 (eqiad) has restarted unexpectedly."
+              dashboard: 'https://grafana.wikimedia.org/d/dxbfeGDZk/anycast?orgId=1&var-protocol=BGP&var-site=eqiad&var-cluster=All&var-ip_version=All'
+              runbook: 'https://wikitech.wikimedia.org/wiki/Anycast#Bird_daemon_not_running'
