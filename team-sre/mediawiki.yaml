@@ -15,7 +15,7 @@ groups:
           /
           sum by (cluster, service) (phpfpm_statustext_processes{cluster=~"(api_appserver|appserver|parsoid)"})
           <= 0.3
-        for: 2m
+        for: 5m
         labels:
           severity: page
           team: sre
