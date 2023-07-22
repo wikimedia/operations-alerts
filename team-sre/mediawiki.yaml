@@ -8,7 +8,7 @@ groups:
         annotations:
           description: 'The MediaWiki cluster {{ $labels.cluster }} in {{ $externalLabels.site }} is experiencing saturation of {{ $labels.service }} workers {{ $value | humanizePercentage }}'
           summary: 'Not enough idle {{ $labels.service }} workers for Mediawiki {{ $labels.cluster }} at {{ $externalLabels.site }} #page'
-          dashboard: 'https://grafana.wikimedia.org/d/RIA1lzDZk/application-servers-red-dashboard?from=now-3h&orgId=1&to=now&var-cluster={{ $labels.cluster }}&var-datasource={{ $externalLabels.site }}%20prometheus/ops&viewPanel=64'
+          dashboard: 'https://grafana.wikimedia.org/d/RIA1lzDZk/application-servers-red-dashboard?from=now-3h&orgId=1&to=now&var-cluster={{ $labels.cluster }}&var-site={{ $externalLabels.site }}&viewPanel=64'
           runbook: 'https://bit.ly/wmf-fpmsat'
         expr:
           sum by (cluster, service) (phpfpm_statustext_processes{cluster=~"(api_appserver|appserver|parsoid)", state="idle"})
@@ -40,7 +40,7 @@ groups:
         annotations:
           description: 'Prometheus in {{ $externalLabels.site }} is unable to scrape metrics for {{ $value | humanizePercentage }} of cluster {{ $labels.cluster }}.'
           summary: 'Appserver unavailable for cluster {{ $labels.cluster }} at {{ $externalLabels.site }}'
-          dashboard: 'https://grafana.wikimedia.org/d/RIA1lzDZk/application-servers-red-dashboard?orgId=1&var-datasource={{ $externalLabels.site }}%20prometheus/ops&var-cluster={{ $labels.cluster }}'
+          dashboard: 'https://grafana.wikimedia.org/d/RIA1lzDZk/application-servers-red-dashboard?orgId=1&var-site={{ $externalLabels.site }}&var-cluster={{ $labels.cluster }}'
           runbook: 'https://wikitech.wikimedia.org/wiki/Application_servers'
         expr: sum(up{job="apache",cluster=~"(api_appserver|appserver|jobrunner|parsoid)"}) by (cluster)
           /
@@ -67,7 +67,7 @@ groups:
         annotations:
           description: 'The mediawiki cluster {{ $labels.cluster }} in {{ $externalLabels.site }} is experiencing slowness. The average latency for {{ $labels.method }}/{{ $labels.code }}: {{ $value }}s'
           summary: 'Average latency high: {{ $externalLabels.site }} {{ $labels.cluster }} {{ $labels.method }}/{{ $labels.code }}'
-          dashboard: 'https://grafana.wikimedia.org/d/RIA1lzDZk/application-servers-red-dashboard?panelId=9&fullscreen&orgId=1&from=now-3h&to=now&var-datasource={{ $externalLabels.site }}%20prometheus/ops&var-cluster={{ $labels.cluster }}&var-method={{ $labels.method }}'
+          dashboard: 'https://grafana.wikimedia.org/d/RIA1lzDZk/application-servers-red-dashboard?panelId=9&fullscreen&orgId=1&from=now-3h&to=now&var-site={{ $externalLabels.site }}&var-cluster={{ $labels.cluster }}&var-method={{ $labels.method }}'
           runbook: 'https://wikitech.wikimedia.org/wiki/Application_servers/Runbook#Average_latency_exceeded'
         expr: >
           sum(

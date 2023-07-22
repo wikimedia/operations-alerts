@@ -22,7 +22,7 @@ tests:
             exp_annotations:
               description: 'The MediaWiki cluster api_appserver in eqiad is experiencing saturation of php7.4-fpm.service workers 2.326%'
               summary: 'Not enough idle php7.4-fpm.service workers for Mediawiki api_appserver at eqiad #page'
-              dashboard: 'https://grafana.wikimedia.org/d/RIA1lzDZk/application-servers-red-dashboard?from=now-3h&orgId=1&to=now&var-cluster=api_appserver&var-datasource=eqiad%20prometheus/ops&viewPanel=64'
+              dashboard: 'https://grafana.wikimedia.org/d/RIA1lzDZk/application-servers-red-dashboard?from=now-3h&orgId=1&to=now&var-cluster=api_appserver&var-site=eqiad&viewPanel=64'
               runbook: 'https://bit.ly/wmf-fpmsat'
 
   - interval: 1m
@@ -75,7 +75,7 @@ tests:
             exp_annotations:
               description: 'Prometheus in eqiad is unable to scrape metrics for 50% of cluster api_appserver.'
               summary: 'Appserver unavailable for cluster api_appserver at eqiad'
-              dashboard: 'https://grafana.wikimedia.org/d/RIA1lzDZk/application-servers-red-dashboard?orgId=1&var-datasource=eqiad%20prometheus/ops&var-cluster=api_appserver'
+              dashboard: 'https://grafana.wikimedia.org/d/RIA1lzDZk/application-servers-red-dashboard?orgId=1&var-site=eqiad&var-cluster=api_appserver'
               runbook: 'https://wikitech.wikimedia.org/wiki/Application_servers'
 
   # Test case for appservers GET
@@ -101,7 +101,7 @@ tests:
             exp_annotations:
               description: 'The mediawiki cluster appserver in eqiad is experiencing slowness. The average latency for GET/200: 1s'
               summary: 'Average latency high: eqiad appserver GET/200'
-              dashboard: 'https://grafana.wikimedia.org/d/RIA1lzDZk/application-servers-red-dashboard?panelId=9&fullscreen&orgId=1&from=now-3h&to=now&var-datasource=eqiad%20prometheus/ops&var-cluster=appserver&var-method=GET'
+              dashboard: 'https://grafana.wikimedia.org/d/RIA1lzDZk/application-servers-red-dashboard?panelId=9&fullscreen&orgId=1&from=now-3h&to=now&var-site=eqiad&var-cluster=appserver&var-method=GET'
               runbook: 'https://wikitech.wikimedia.org/wiki/Application_servers/Runbook#Average_latency_exceeded'
 
   # Test case for memcached errors
