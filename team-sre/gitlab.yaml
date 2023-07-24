@@ -5,25 +5,25 @@ groups:
 - name: gitlab
   rules:
   - alert: GitLabCIJobErrors
-    expr: sum (rate(gitlab_ci_job_failure_reasons[5m])) / sum (rate(gitlab_ci_active_jobs_sum[5m])) > 0.5
+    expr: sum (rate(gitlab_ci_job_failure_reasons[5m])) > 0.05
     for: 10m
     labels:
       severity: task
       team: serviceops-collab
     annotations:
       summary: "GitLab - High CI job error rate"
-      description: "GitLab CI job error rate {{ $value }} is above threshold of 0.5"
+      description: "GitLab CI job error rate {{ $value }} is above threshold of 0.05"
       dashboard: https://grafana.wikimedia.org/d/Chb-gC07k/gitlab-ci-overview
       runbook: https://wikitech.wikimedia.org/wiki/GitLab/Runbook
   - alert: GitLabCIPipelineErrors
-    expr: sum (rate(gitlab_ci_pipeline_failure_reasons[5m])) / sum (rate(gitlab_ci_active_jobs_sum[5m])) > 0.7
+    expr: sum (rate(gitlab_ci_pipeline_failure_reasons[5m])) > 0.05
     for: 10m
     labels:
       severity: task
       team: serviceops-collab
     annotations:
       summary: "GitLab - High pipeline error rate"
-      description: "GitLab pipeline error rate {{ $value }} is above threshold of 0.7"
+      description: "GitLab pipeline error rate {{ $value }} is above threshold of 0.05"
       dashboard: https://grafana.wikimedia.org/d/Chb-gC07k/gitlab-ci-overview
       runbook: https://wikitech.wikimedia.org/wiki/GitLab/Runbook
   - alert: GitLabCIPipelineLatency
