@@ -4,21 +4,29 @@
 groups:
   - name: appservers
     rules:
-      - alert: PHPFPMTooBusy
+      - &PHPFPMTooBusy
+        alert: PHPFPMTooBusy
         annotations:
           description: 'The MediaWiki cluster {{ $labels.cluster }} in {{ $externalLabels.site }} is experiencing saturation of {{ $labels.service }} workers {{ $value | humanizePercentage }}'
           summary: 'Not enough idle {{ $labels.service }} workers for Mediawiki {{ $labels.cluster }} at {{ $externalLabels.site }} #page'
           dashboard: 'https://grafana.wikimedia.org/d/RIA1lzDZk/application-servers-red-dashboard?from=now-3h&orgId=1&to=now&var-cluster={{ $labels.cluster }}&var-site={{ $externalLabels.site }}&viewPanel=64'
           runbook: 'https://bit.ly/wmf-fpmsat'
         expr:
-          sum by (cluster, service) (phpfpm_statustext_processes{cluster=~"(api_appserver|appserver|parsoid)", state="idle"})
+          sum by (cluster, service) (phpfpm_statustext_processes{cluster=~"(api_appserver|appserver)", state="idle"})
           /
-          sum by (cluster, service) (phpfpm_statustext_processes{cluster=~"(api_appserver|appserver|parsoid)"})
+          sum by (cluster, service) (phpfpm_statustext_processes{cluster=~"(api_appserver|appserver)"})
           <= 0.3
-        for: 5m
+        for: 2m
         labels:
           severity: page
           team: sre
+
+      - <<: *PHPFPMTooBusy
+        expr: sum by (cluster, service) (phpfpm_statustext_processes{cluster=~"(parsoid)", state="idle"})
+          /
+          sum by (cluster, service) (phpfpm_statustext_processes{cluster=~"(parsoid)"})
+          <= 0.15
+        for: 5m
 
       - alert: JobrunnerPHPBusyWorkers
         annotations:
@@ -121,7 +129,6 @@ groups:
             rate(mediawiki_http_requests_duration_count{cluster="api_appserver",method="POST", handler=~"proxy:unix:.*"}[2m])
           ) by (code,cluster,handler,method) > 20
       # We don't have parsoid POST alerts because those should not happen.
-
       # Mediawiki error channels related alerts
       # TODO: set to paging?
       - alert: MediaWikiMemcachedHighErrorRate
