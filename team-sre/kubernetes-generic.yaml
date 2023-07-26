@@ -16,8 +16,9 @@ groups:
       runbook: https://wikitech.wikimedia.org/wiki/Calico#Operations
       dashboard: https://grafana.wikimedia.org/d/G8zPL7-Wz/?var-dc={{ $externalLabels.site }}%20prometheus%2F{{ $externalLabels.prometheus }}&var-instance={{ reReplaceAll "([^:]+).*" "$1" $labels.instance }}
 
-  - alert: KubeletOperationalLatency
-    expr: histogram_quantile(0.99, rate(kubelet_runtime_operations_duration_seconds_bucket{job="k8s-node"}[5m])) > 1.0
+  - &KubeletOperationalLatency
+    alert: KubeletOperationalLatency
+    expr: histogram_quantile(0.99, rate(kubelet_runtime_operations_duration_seconds_bucket{job="k8s-node",operation_type!="list_images"}[5m])) > 1.0
     for: 5m
     labels:
       team: sre
@@ -27,6 +28,9 @@ groups:
       summary: "High latency for kubelet {{ $labels.operation_type }} operation on {{ $labels.instance }}"
       runbook: "https://wikitech.wikimedia.org/wiki/Kubernetes"
       dashboard: "https://grafana.wikimedia.org/d/000000472?var-cluster={{ $externalLabels.site }}%20prometheus/{{ $externalLabels.prometheus }}"
+
+  - <<: *KubeletOperationalLatency
+    expr: histogram_quantile(0.99, rate(kubelet_runtime_operations_duration_seconds_bucket{job="k8s-node", operation_type="list_images"}[5m])) > 1.5
 
   # A continuous rate of non 4xx requests may be a pointer to some client/operation constantly failing or doing the wrong thing.
   # So everything non 2xx|0 is defined as "error" here. The special code 0 is currently (k8s 1.16) used for WATCH requests
