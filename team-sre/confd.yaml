@@ -5,9 +5,9 @@ groups:
     rules:
       - alert: ConfdResourceFailed
         expr: |
-          sum by (name) (confd_resource_healthy)
+          sum by (name, instance) (confd_resource_healthy)
             /
-          count by (name) (confd_resource_healthy)
+          count by (name, instance) (confd_resource_healthy)
             < 1
         for: 5m
         annotations:

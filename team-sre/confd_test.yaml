@@ -16,6 +16,7 @@ tests:
               severity: critical
               team: sre
               name: _etc_dsh_group_appserver.toml
+              instance: alert1001:9100
             exp_annotations:
               summary: "confd resource _etc_dsh_group_appserver.toml has errors"
               description: "The confd file /etc/confd/conf.d/_etc_dsh_group_appserver.toml is experiencing errors: success is 0%."
