@@ -4,14 +4,55 @@
 groups:
   - name: openstack_apis_response
     rules:
+      # generic except mysql
       - alert: OpenstackAPIResponse
-        expr: avg_over_time(haproxy_backend_http_response_time_average_seconds{instance=~"cloudcontrol1.*"}[12h]) > 1
+        expr: avg_over_time(haproxy_server_total_time_average_seconds{instance=~"cloudcontrol1.*", proxy!~"(mysql|trove|magnum)"}[12h]) > 1
         labels:
           team: wmcs
           severity: warning
           service: openstack,cloudvps
         annotations:
           summary: "Openstack API average response time is too high."
-          description: "The Openstack API average response time is too high. It may mean the control plane is unreliable."
+          description: "The Openstack API {{ $labels.proxy }} average response time is too high. It may mean that the control plane is unreliable."
           runbook: https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/OpenstackAPIResponse
-          dashboard: https://grafana.wikimedia.org/d/UUmLqqX4k/openstack-api-performance
+          dashboard: https://grafana.wikimedia.org/d/UUmLqqX4k
+
+      # trove
+      - alert: OpenstackAPIResponse
+        expr: avg_over_time(haproxy_server_total_time_average_seconds{instance=~"cloudcontrol1.*", proxy="trove"}[12h]) > 2
+        labels:
+          team: wmcs
+          severity: warning
+          service: openstack,cloudvps
+        annotations:
+          summary: "Openstack API average response time is too high."
+          description: "The Openstack API {{ $labels.proxy }} average response time is too high. It may mean that the control plane is unreliable."
+          runbook: https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/OpenstackAPIResponse
+          dashboard: https://grafana.wikimedia.org/d/UUmLqqX4k
+
+      # magnum
+      - alert: OpenstackAPIResponse
+        expr: avg_over_time(haproxy_server_total_time_average_seconds{instance=~"cloudcontrol1.*", proxy="magnum"}[12h]) > 5
+        labels:
+          team: wmcs
+          severity: warning
+          service: openstack,cloudvps
+        annotations:
+          summary: "Openstack API average response time is too high."
+          description: "The Openstack API {{ $labels.proxy }} average response time is too high. It may mean that the control plane is unreliable."
+          runbook: https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/OpenstackAPIResponse
+          dashboard: https://grafana.wikimedia.org/d/UUmLqqX4k
+
+      # No data test
+      - alert: OpenstackAPIResponse
+        expr: avg_over_time((haproxy_server_total_time_average_seconds{instance=~"cloudcontrol1.*", proxy!="mysql"} OR on() vector(100))[12h:]) > 99
+        labels:
+          team: wmcs
+          severity: warning
+          service: openstack,cloudvps
+          proxy: nodata
+        annotations:
+          summary: "Openstack API average response time is too high."
+          runbook: https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/OpenstackAPIResponse
+          dashboard: https://grafana.wikimedia.org/d/UUmLqqX4k
+          description: "Got no data from the Openstack API to check the response times. It may mean that the control plane is unreliable."

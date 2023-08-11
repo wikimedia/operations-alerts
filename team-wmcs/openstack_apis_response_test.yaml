@@ -2,23 +2,185 @@ rule_files:
   - openstack_apis_response.yaml
 evaluation_interval: 1m
 tests:
-  - input_series:
-      - series: 'haproxy_backend_http_response_time_average_seconds{instance="cloudcontrol1003", backend="nova_api"}'
+  ## Generic
+  # should trigger
+  - interval: 5m # 12 per hour, 144 every 12 hours
+    input_series:
+      - series: 'haproxy_server_total_time_average_seconds{instance="cloudcontrol1003", proxy="nova_api", server="cloudcontrol1007"}'
         # should trigger with > 1
-        values: "1.1"
+        values: "0+0x144 1.1+0x288"
     external_labels:
       site: eqiad
     alert_rule_test:
       - alertname: OpenstackAPIResponse
+        eval_time: 25h
         exp_alerts:
           - exp_labels:
               team: wmcs
               severity: warning
               service: openstack,cloudvps
               instance: cloudcontrol1003
-              backend: nova_api
+              proxy: nova_api
+              server: cloudcontrol1007
             exp_annotations:
               summary: "Openstack API average response time is too high."
-              description: "The Openstack API average response time is too high. It may mean the control plane is unreliable."
+              description: "The Openstack API nova_api average response time is too high. It may mean that the control plane is unreliable."
               runbook: https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/OpenstackAPIResponse
-              dashboard: https://grafana.wikimedia.org/d/UUmLqqX4k/openstack-api-performance
+              dashboard: https://grafana.wikimedia.org/d/UUmLqqX4k
+
+  # should not trigger
+  - interval: 5m
+    input_series:
+      - series: 'haproxy_server_total_time_average_seconds{instance="cloudcontrol1003", proxy="nova_api"}'
+        # small blip, not enough to sway the mean
+        values: "0+0x144 1.1+0x100 0+0x144"
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: OpenstackAPIResponse
+        eval_time: 25h
+        exp_alerts: []
+
+  # should trigger
+  - interval: 5m
+    input_series:
+      - series: 'haproxy_server_total_time_average_seconds{instance="cloudcontrol1003", proxy="nova_api"}'
+        values: "0+0x144 _x288"
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: OpenstackAPIResponse
+        eval_time: 25h
+        exp_alerts:
+          - exp_labels:
+              team: wmcs
+              severity: warning
+              service: openstack,cloudvps
+              proxy: nodata
+            exp_annotations:
+              summary: "Openstack API average response time is too high."
+              description: "Got no data from the Openstack API to check the response times. It may mean that the control plane is unreliable."
+              runbook: https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/OpenstackAPIResponse
+              dashboard: https://grafana.wikimedia.org/d/UUmLqqX4k
+
+  ## Trove
+  # should trigger
+  - interval: 5m # 12 per hour, 144 every 12 hours
+    input_series:
+      - series: 'haproxy_server_total_time_average_seconds{instance="cloudcontrol1003", proxy="trove", server="cloudcontrol1007"}'
+        # should trigger with > 2
+        values: "0+0x144 2.1+0x288"
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: OpenstackAPIResponse
+        eval_time: 25h
+        exp_alerts:
+          - exp_labels:
+              proxy: trove
+              team: wmcs
+              severity: warning
+              service: openstack,cloudvps
+              instance: cloudcontrol1003
+              server: cloudcontrol1007
+            exp_annotations:
+              description: "The Openstack API trove average response time is too high. It may mean that the control plane is unreliable."
+              summary: "Openstack API average response time is too high."
+              runbook: https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/OpenstackAPIResponse
+              dashboard: https://grafana.wikimedia.org/d/UUmLqqX4k
+
+  # should not trigger
+  - interval: 5m
+    input_series:
+      - series: 'haproxy_server_total_time_average_seconds{instance="cloudcontrol1003", proxy="trove"}'
+        # small blip, not enough to sway the mean
+        values: "0+0x144 1.1+0x100 0+0x144"
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: OpenstackAPIResponse
+        eval_time: 25h
+        exp_alerts: []
+
+  # should trigger
+  - interval: 5m
+    input_series:
+      - series: 'haproxy_server_total_time_average_seconds{instance="cloudcontrol1003", proxy="trove"}'
+        values: "0+0x144 _x288"
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: OpenstackAPIResponse
+        eval_time: 25h
+        exp_alerts:
+          - exp_labels:
+              team: wmcs
+              severity: warning
+              service: openstack,cloudvps
+              proxy: nodata
+            exp_annotations:
+              summary: "Openstack API average response time is too high."
+              description: "Got no data from the Openstack API to check the response times. It may mean that the control plane is unreliable."
+              runbook: https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/OpenstackAPIResponse
+              dashboard: https://grafana.wikimedia.org/d/UUmLqqX4k
+
+  ## Magnum
+  # should trigger
+  - interval: 5m # 12 per hour, 144 every 12 hours
+    input_series:
+      - series: 'haproxy_server_total_time_average_seconds{instance="cloudcontrol1003", proxy="magnum", server="cloudcontrol1007"}'
+        # should trigger with > 5
+        values: "0+0x144 5.5+0x288"
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: OpenstackAPIResponse
+        eval_time: 25h
+        exp_alerts:
+          - exp_labels:
+              proxy: magnum
+              team: wmcs
+              severity: warning
+              service: openstack,cloudvps
+              instance: cloudcontrol1003
+              server: cloudcontrol1007
+            exp_annotations:
+              description: "The Openstack API magnum average response time is too high. It may mean that the control plane is unreliable."
+              summary: "Openstack API average response time is too high."
+              runbook: https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/OpenstackAPIResponse
+              dashboard: https://grafana.wikimedia.org/d/UUmLqqX4k
+
+  # should not trigger
+  - interval: 5m
+    input_series:
+      - series: 'haproxy_server_total_time_average_seconds{instance="cloudcontrol1003", proxy="magnum"}'
+        # small blip, not enough to sway the mean
+        values: "0+0x144 4.1+0x100 0+0x144"
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: OpenstackAPIResponse
+        eval_time: 25h
+        exp_alerts: []
+
+  # should trigger
+  - interval: 5m
+    input_series:
+      - series: 'haproxy_server_total_time_average_seconds{instance="cloudcontrol1003", proxy="magnum"}'
+        values: "0+0x144 _x288"
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: OpenstackAPIResponse
+        eval_time: 25h
+        exp_alerts:
+          - exp_labels:
+              team: wmcs
+              severity: warning
+              service: openstack,cloudvps
+              proxy: nodata
+            exp_annotations:
+              summary: "Openstack API average response time is too high."
+              description: "Got no data from the Openstack API to check the response times. It may mean that the control plane is unreliable."
+              runbook: https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/OpenstackAPIResponse
+              dashboard: https://grafana.wikimedia.org/d/UUmLqqX4k
