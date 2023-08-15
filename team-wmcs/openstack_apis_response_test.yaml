@@ -67,7 +67,7 @@ tests:
   # should trigger
   - interval: 5m # 12 per hour, 144 every 12 hours
     input_series:
-      - series: 'haproxy_server_total_time_average_seconds{instance="cloudcontrol1003", proxy="trove", server="cloudcontrol1007"}'
+      - series: 'haproxy_server_total_time_average_seconds{instance="cloudcontrol1003", proxy="trove_api_backend", server="cloudcontrol1007"}'
         # should trigger with > 2
         values: "0+0x144 2.1+0x288"
     external_labels:
@@ -77,14 +77,14 @@ tests:
         eval_time: 25h
         exp_alerts:
           - exp_labels:
-              proxy: trove
+              proxy: trove_api_backend
               team: wmcs
               severity: warning
               service: openstack,cloudvps
               instance: cloudcontrol1003
               server: cloudcontrol1007
             exp_annotations:
-              description: "The Openstack API trove average response time is too high. It may mean that the control plane is unreliable."
+              description: "The Openstack API trove_api_backend average response time is too high. It may mean that the control plane is unreliable."
               summary: "Openstack API average response time is too high."
               runbook: https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/OpenstackAPIResponse
               dashboard: https://grafana.wikimedia.org/d/UUmLqqX4k
@@ -92,7 +92,7 @@ tests:
   # should not trigger
   - interval: 5m
     input_series:
-      - series: 'haproxy_server_total_time_average_seconds{instance="cloudcontrol1003", proxy="trove"}'
+      - series: 'haproxy_server_total_time_average_seconds{instance="cloudcontrol1003", proxy="trove_api_backend"}'
         # small blip, not enough to sway the mean
         values: "0+0x144 1.1+0x100 0+0x144"
     external_labels:
@@ -105,7 +105,7 @@ tests:
   # should trigger
   - interval: 5m
     input_series:
-      - series: 'haproxy_server_total_time_average_seconds{instance="cloudcontrol1003", proxy="trove"}'
+      - series: 'haproxy_server_total_time_average_seconds{instance="cloudcontrol1003", proxy="trove_api_backend"}'
         values: "0+0x144 _x288"
     external_labels:
       site: eqiad
@@ -128,7 +128,7 @@ tests:
   # should trigger
   - interval: 5m # 12 per hour, 144 every 12 hours
     input_series:
-      - series: 'haproxy_server_total_time_average_seconds{instance="cloudcontrol1003", proxy="magnum", server="cloudcontrol1007"}'
+      - series: 'haproxy_server_total_time_average_seconds{instance="cloudcontrol1003", proxy="magnum_backend", server="cloudcontrol1007"}'
         # should trigger with > 5
         values: "0+0x144 5.5+0x288"
     external_labels:
@@ -138,14 +138,14 @@ tests:
         eval_time: 25h
         exp_alerts:
           - exp_labels:
-              proxy: magnum
+              proxy: magnum_backend
               team: wmcs
               severity: warning
               service: openstack,cloudvps
               instance: cloudcontrol1003
               server: cloudcontrol1007
             exp_annotations:
-              description: "The Openstack API magnum average response time is too high. It may mean that the control plane is unreliable."
+              description: "The Openstack API magnum_backend average response time is too high. It may mean that the control plane is unreliable."
               summary: "Openstack API average response time is too high."
               runbook: https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/OpenstackAPIResponse
               dashboard: https://grafana.wikimedia.org/d/UUmLqqX4k
@@ -153,7 +153,7 @@ tests:
   # should not trigger
   - interval: 5m
     input_series:
-      - series: 'haproxy_server_total_time_average_seconds{instance="cloudcontrol1003", proxy="magnum"}'
+      - series: 'haproxy_server_total_time_average_seconds{instance="cloudcontrol1003", proxy="magnum_backend"}'
         # small blip, not enough to sway the mean
         values: "0+0x144 4.1+0x100 0+0x144"
     external_labels:
@@ -166,7 +166,7 @@ tests:
   # should trigger
   - interval: 5m
     input_series:
-      - series: 'haproxy_server_total_time_average_seconds{instance="cloudcontrol1003", proxy="magnum"}'
+      - series: 'haproxy_server_total_time_average_seconds{instance="cloudcontrol1003", proxy="magnum_backend"}'
         values: "0+0x144 _x288"
     external_labels:
       site: eqiad

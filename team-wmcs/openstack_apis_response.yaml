@@ -6,7 +6,7 @@ groups:
     rules:
       # generic except mysql
       - alert: OpenstackAPIResponse
-        expr: avg_over_time(haproxy_server_total_time_average_seconds{instance=~"cloudcontrol1.*", proxy!~"(mysql|trove|magnum)"}[12h]) > 1
+        expr: avg_over_time(haproxy_server_total_time_average_seconds{instance=~"cloudcontrol1.*", proxy!~"(mysql|trove_api_backend|magnum_backend)"}[12h]) > 1
         labels:
           team: wmcs
           severity: warning
@@ -19,7 +19,7 @@ groups:
 
       # trove
       - alert: OpenstackAPIResponse
-        expr: avg_over_time(haproxy_server_total_time_average_seconds{instance=~"cloudcontrol1.*", proxy="trove"}[12h]) > 2
+        expr: avg_over_time(haproxy_server_total_time_average_seconds{instance=~"cloudcontrol1.*", proxy="trove_api_backend"}[12h]) > 2
         labels:
           team: wmcs
           severity: warning
@@ -32,7 +32,7 @@ groups:
 
       # magnum
       - alert: OpenstackAPIResponse
-        expr: avg_over_time(haproxy_server_total_time_average_seconds{instance=~"cloudcontrol1.*", proxy="magnum"}[12h]) > 5
+        expr: avg_over_time(haproxy_server_total_time_average_seconds{instance=~"cloudcontrol1.*", proxy="magnum_backend"}[12h]) > 5
         labels:
           team: wmcs
           severity: warning
