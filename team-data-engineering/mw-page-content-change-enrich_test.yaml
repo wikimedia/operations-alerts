@@ -71,14 +71,14 @@ tests:
   - interval: 1m
     input_series:
       - series: 'flink_taskmanager_job_task_operator_event_process_function_events_out_total{kubernetes_namespace="mw-page-content-change-enrich", release="main", job_name="mw_page_content_change_enrich"}'
-        values: 50
+        values: '1+100x5'
       - series: 'flink_taskmanager_job_task_operator_event_process_function_events_in_total{kubernetes_namespace="mw-page-content-change-enrich", release="main", job_name="mw_page_content_change_enrich"}'
-        values: 100
+        values: '1+200x5'
     external_labels:
       site: eqiad
     alert_rule_test:
       - alertname: MediawikiPageContentChangeEnrichAvailability
-        eval_time: 5m
+        eval_time: 6m
         exp_alerts:
           - exp_labels:
               severity: warning
