@@ -20,6 +20,7 @@ groups:
       - alert: MediawikiPageContentChangeEnrichTaskManagerNotRunning
         expr: |
           flink_jobmanager_numRegisteredTaskManagers{kubernetes_namespace="mw-page-content-change-enrich", release="main"} == 0
+        for: 5m
         labels:
           team: data-engineering
           severity: critical
