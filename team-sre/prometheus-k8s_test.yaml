@@ -1,0 +1,25 @@
+rule_files:
+  - prometheus-k8s.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    input_series:
+      - series: 'up{instance="10.64.32.116:6443", job="k8s-api"}'
+        values: "0+0x11"
+    external_labels:
+      site: eqiad
+      prometheus: foo
+    alert_rule_test:
+      - alertname: KubernetesAPINotScrapable
+        eval_time: 11m
+        exp_alerts:
+        - exp_labels:
+            team: sre
+            severity: critical
+            instance: 10.64.32.116:6443
+            job: k8s-api
+          exp_annotations:
+            description: "Prometheus has failed to scrape the k8s api. A restart might be needed."
+            summary: "foo@eqiad is failing to scrape the k8s api"
+            runbook: "https://phabricator.wikimedia.org/T343529"
+            dashboard: TODO

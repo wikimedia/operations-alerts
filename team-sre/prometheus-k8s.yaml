@@ -1,0 +1,19 @@
+# deploy-tag: k8s*
+# deploy-site: eqiad, codfw
+
+# k8s-specific Prometheus alerts
+groups:
+  - name: prometheus-k8s
+    rules:
+    # Bandaid for https://phabricator.wikimedia.org/T343529
+    - alert: KubernetesAPINotScrapable
+      expr: up{job="k8s-api"} == 0
+      for: 5m
+      labels:
+        team: sre
+        severity: critical
+      annotations:
+        description: "Prometheus has failed to scrape the k8s api. A restart might be needed."
+        summary: "{{ $externalLabels.prometheus }}@{{ $externalLabels.site }} is failing to scrape the k8s api"
+        runbook: "https://phabricator.wikimedia.org/T343529"
+        dashboard: TODO
