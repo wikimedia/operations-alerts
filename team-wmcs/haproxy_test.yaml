@@ -1,0 +1,65 @@
+rule_files:
+  - haproxy.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    input_series:
+      - series: 'haproxy_server_status{instance="cloudlb1001:9900",job="cloudlb-haproxy",proxy="heat_backend",server="cloudcontrol1005.eqiad.wmnet"}'
+        values: "1x10 0x20"
+      - series: 'haproxy_server_status{instance="cloudlb1002:9900",job="cloudlb-haproxy",proxy="heat_backend",server="cloudcontrol1005.eqiad.wmnet"}'
+        values: "1x20 0x10"
+      - series: 'haproxy_server_status{instance="cloudlb1003:9900",job="cloudlb-haproxy",proxy="heat_backend",server="cloudcontrol1005.eqiad.wmnet"}'
+        values: "1x30"
+    alert_rule_test:
+      - alertname: HAProxyBackendUnavailable
+        eval_time: 15m
+        exp_alerts:
+          - exp_labels: &warning_labels
+              severity: warning
+              team: wmcs
+              service: cloudvps
+              proxy: heat_backend
+              server: cloudcontrol1005.eqiad.wmnet
+            exp_annotations:
+              summary: "HAProxy service heat_backend backend cloudcontrol1005.eqiad.wmnet is down"
+              description: "HAProxy service heat_backend backend cloudcontrol1005.eqiad.wmnet is down according to 1 LB servers"
+              runbook: https://wikitech.wikimedia.org/wiki/HAProxy
+              dashboard: TODO
+      - alertname: HAProxyBackendUnavailable
+        eval_time: 25m
+        exp_alerts:
+          - exp_labels: *warning_labels
+            exp_annotations:
+              summary: "HAProxy service heat_backend backend cloudcontrol1005.eqiad.wmnet is down"
+              description: "HAProxy service heat_backend backend cloudcontrol1005.eqiad.wmnet is down according to 2 LB servers"
+              runbook: https://wikitech.wikimedia.org/wiki/HAProxy
+              dashboard: TODO
+
+  - interval: 1m
+    input_series:
+      - series: 'haproxy_backend_active_servers{instance="cloudlb1002:9900",job="cloudlb-haproxy",proxy="cinder-api_backend"}'
+        values: "2x5 1x5 0x5"
+      - series: 'haproxy_backend_active_servers{instance="cloudlb1002:9900",job="cloudlb-haproxy",proxy="stats"}'
+        values: "0x15"
+    alert_rule_test:
+      - alertname: HAProxyServiceUnavailable
+        eval_time: 3m
+        exp_alerts: []
+      - alertname: HAProxyServiceUnavailable
+        eval_time: 8m
+        exp_alerts: []
+      - alertname: HAProxyServiceUnavailable
+        eval_time: 13m
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              team: wmcs
+              service: cloudvps
+              instance: "cloudlb1002:9900"
+              job: cloudlb-haproxy
+              proxy: "cinder-api_backend"
+            exp_annotations:
+              summary: "HAProxy service cinder-api_backend has no available backends on cloudlb1002:9900"
+              description: "HAProxy service cinder-api_backend has no available backends on cloudlb1002:9900"
+              runbook: https://wikitech.wikimedia.org/wiki/HAProxy
+              dashboard: TODO

@@ -1,0 +1,32 @@
+# deploy-tag: cloud
+groups:
+  - name: HAProxy
+    rules:
+      - alert: HAProxyBackendUnavailable
+        # Most likely cause of such an alert is a single backend being down. Aggregate the alert
+        # to only show a single alert even when multiple load balancer servers see it as down.
+        expr: count by (server, proxy) (haproxy_server_status{job="cloudlb-haproxy"} == 0) >= 1
+        for: 1m
+        labels:
+          team: wmcs
+          severity: warning
+          service: cloudvps
+        annotations:
+          summary: "HAProxy service {{ $labels.proxy }} backend {{ $labels.server }} is down"
+          description: "HAProxy service {{ $labels.proxy }} backend {{ $labels.server }} is down according to {{ $value }} LB servers"
+          runbook: https://wikitech.wikimedia.org/wiki/HAProxy
+          dashboard: TODO
+
+      - alert: HAProxyServiceUnavailable
+        # The internal 'stats' server has no defined backends on purpose.
+        expr: haproxy_backend_active_servers{job="cloudlb-haproxy",proxy!="stats"} == 0
+        for: 1m
+        labels:
+          team: wmcs
+          severity: critical
+          service: cloudvps
+        annotations:
+          summary: "HAProxy service {{ $labels.proxy }} has no available backends on {{ $labels.instance }}"
+          description: "HAProxy service {{ $labels.proxy }} has no available backends on {{ $labels.instance }}"
+          runbook: https://wikitech.wikimedia.org/wiki/HAProxy
+          dashboard: TODO
