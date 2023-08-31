@@ -1,0 +1,142 @@
+rule_files:
+  - galera.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    input_series:
+      - series: mysql_up{instance="cloudcontrol1005:9104",job="mysql-galera"}
+        values: "1 1 0 0 0"
+    external_labels:
+      site: eqiad
+      deployment: eqiad1
+    alert_rule_test:
+      - alertname: GaleraDown
+        eval_time: 1m
+        exp_alerts: []
+      - alertname: GaleraDown
+        eval_time: 5m
+        exp_alerts:
+          - exp_labels:
+              team: wmcs
+              severity: warning
+              service: cloudvps
+              job: mysql-galera
+              instance: "cloudcontrol1005:9104"
+            exp_annotations:
+              summary: "Galera/MariaDB down on cloudcontrol1005:9104"
+              description: "Galera/MariaDB node cloudcontrol1005:9104 is not reachable by the Prometheus exporter"
+              runbook: https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/GaleraDown
+              dashboard: https://grafana.wikimedia.org/d/galera-cluster-summary/wmcs-openstack-eqiad-galera-cluster-summary
+
+  - interval: 1m
+    input_series:
+      - series: mysql_global_status_wsrep_ready{instance="cloudcontrol1005:9104",job="mysql-galera"}
+        values: "1 1 0 0 0"
+    external_labels:
+      site: eqiad
+      deployment: eqiad1
+    alert_rule_test:
+      - alertname: GaleraNotEnabled
+        eval_time: 1m
+        exp_alerts:
+      - alertname: GaleraNotEnabled
+        eval_time: 5m
+        exp_alerts:
+          - exp_labels:
+              team: wmcs
+              severity: warning
+              service: cloudvps
+              job: mysql-galera
+              instance: "cloudcontrol1005:9104"
+            exp_annotations:
+              summary: "Galera not enabled on cloudcontrol1005:9104"
+              description: "Galera node cloudcontrol1005:9104 has wsrep_ready = 0"
+              runbook: https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/GaleraNotEnabled
+              dashboard: https://grafana.wikimedia.org/d/galera-cluster-summary/wmcs-openstack-eqiad-galera-cluster-summary
+
+  - interval: 1m
+    input_series:
+      - series: mysql_global_status_wsrep_cluster_size{instance="cloudcontrol1005:9104",job="mysql-galera"}
+        values: "3 3 2 2 2"
+    external_labels:
+      site: eqiad
+      deployment: eqiad1
+    alert_rule_test:
+      - alertname: GaleraClusterSizeMismatch
+        eval_time: 1m
+        exp_alerts: []
+      - alertname: GaleraClusterSizeMismatch
+        eval_time: 5m
+        exp_alerts:
+          - exp_labels:
+              team: wmcs
+              severity: warning
+              service: cloudvps
+              job: mysql-galera
+              instance: "cloudcontrol1005:9104"
+            exp_annotations:
+              summary: "Galera in eqiad1 has 2 nodes"
+              description: "Galera node cloudcontrol1005:9104 sees 2 nodes in the cluster instead of expected three"
+              runbook: https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/GaleraClusterSizeMismatch
+              dashboard: https://grafana.wikimedia.org/d/galera-cluster-summary/wmcs-openstack-eqiad-galera-cluster-summary
+
+  - interval: 1m
+    input_series:
+      - series: mysql_galera_status_info{instance="cloudcontrol1005:9104",job="mysql-galera",wsrep_cluster_state_uuid="df3589cb-94d4-11ec-bd85-efb3e80d641d",wsrep_local_state_uuid="df3589cb-94d4-11ec-bd85-efb3e80d641d",wsrep_provider_version="26.4.11(r67341d07)"}
+        values: "1x10"
+      - series: mysql_galera_status_info{instance="cloudcontrol1006:9104",job="mysql-galera",wsrep_cluster_state_uuid="df3589cb-94d4-11ec-bd85-efb3e80d641d",wsrep_local_state_uuid="df3589cb-94d4-11ec-bd85-efb3e80d641d",wsrep_provider_version="26.4.11(r67341d07)"}
+        values: "1x10"
+      - series: mysql_galera_status_info{instance="cloudcontrol1007:9104",job="mysql-galera",wsrep_cluster_state_uuid="df3589cb-94d4-11ec-bd85-efb3e80d641d",wsrep_local_state_uuid="df3589cb-94d4-11ec-bd85-efb3e80d641d",wsrep_provider_version="26.4.11(r67341d07)"}
+        values: "1x5 _ _ _ _ _"
+      - series: mysql_galera_status_info{instance="cloudcontrol1007:9104",job="mysql-galera",wsrep_cluster_state_uuid="differentuuidreally",wsrep_local_state_uuid="df3589cb-94d4-11ec-bd85-efb3e80d641d",wsrep_provider_version="26.4.11(r67341d07)"}
+        values: "_ _ _ _ _ 1x5"
+    external_labels:
+      site: eqiad
+      deployment: eqiad1
+    alert_rule_test:
+      - alertname: GaleraClusterOutOfSync
+        eval_time: 5m
+        exp_alerts: []
+      - alertname: GaleraClusterOutOfSync
+        eval_time: 10m
+        exp_alerts:
+          - exp_labels:
+              team: wmcs
+              severity: critical
+              service: cloudvps
+            exp_annotations:
+              summary: "Galera in eqiad1 is out of sync"
+              description: "Galera cluster eqiad1 sees 2 different cluster state UUIDs"
+              runbook: https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/GaleraClusterOutOfSync
+              dashboard: https://grafana.wikimedia.org/d/galera-cluster-summary/wmcs-openstack-eqiad-galera-cluster-summary
+
+  - interval: 1m
+    input_series:
+      - series: mysql_galera_status_info{instance="cloudcontrol1007:9104",job="mysql-galera",wsrep_cluster_state_uuid="df3589cb-94d4-11ec-bd85-efb3e80d641d",wsrep_local_state_uuid="df3589cb-94d4-11ec-bd85-efb3e80d641d",wsrep_provider_version="26.4.11(r67341d07)"}
+        values: "1x5 _ _ _ _ _"
+      - series: mysql_galera_status_info{instance="cloudcontrol1007:9104",job="mysql-galera",wsrep_cluster_state_uuid="df3589cb-94d4-11ec-bd85-efb3e80d641d",wsrep_local_state_uuid="differentuuidreally",wsrep_provider_version="26.4.11(r67341d07)"}
+        values: "_ _ _ _ _ 1x5"
+    external_labels:
+      site: eqiad
+      deployment: eqiad1
+    alert_rule_test:
+      - alertname: GaleraNodeOutOfSync
+        eval_time: 5m
+        exp_alerts: []
+      - alertname: GaleraNodeOutOfSync
+        eval_time: 10m
+        exp_alerts:
+          - exp_labels:
+              team: wmcs
+              severity: warning
+              service: cloudvps
+              job: mysql-galera
+              instance: "cloudcontrol1007:9104"
+              wsrep_cluster_state_uuid: df3589cb-94d4-11ec-bd85-efb3e80d641d
+              wsrep_local_state_uuid: differentuuidreally
+              wsrep_provider_version: "26.4.11(r67341d07)"
+            exp_annotations:
+              summary: "Galera node cloudcontrol1007:9104 is out of sync"
+              description: "Galera node cloudcontrol1007:9104 is out of sync with the cluster (wsrep_local_state_uuid does not match wsrep_cluster_state_uuid)"
+              runbook: https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/GaleraNodeOutOfSync
+              dashboard: https://grafana.wikimedia.org/d/galera-cluster-summary/wmcs-openstack-eqiad-galera-cluster-summary

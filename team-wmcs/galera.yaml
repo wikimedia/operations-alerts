@@ -1,0 +1,73 @@
+# deploy-tag: cloud
+groups:
+  - name: Galera
+    rules:
+      - alert: GaleraDown
+        expr: mysql_up{job="mysql-galera"} == 0
+        for: 1m
+        labels:
+          team: wmcs
+          severity: warning
+          service: cloudvps
+        annotations:
+          summary: "Galera/MariaDB down on {{ $labels.instance }}"
+          description: "Galera/MariaDB node {{ $labels.instance }} is not reachable by the Prometheus exporter"
+          runbook: https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/GaleraDown
+          dashboard: https://grafana.wikimedia.org/d/galera-cluster-summary/wmcs-openstack-eqiad-galera-cluster-summary
+
+      - alert: GaleraNotEnabled
+        expr: mysql_global_status_wsrep_ready{job="mysql-galera"} == 0
+        for: 1m
+        labels:
+          team: wmcs
+          severity: warning
+          service: cloudvps
+        annotations:
+          summary: "Galera not enabled on {{ $labels.instance }}"
+          description: "Galera node {{ $labels.instance }} has wsrep_ready = 0"
+          runbook: https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/GaleraNotEnabled
+          dashboard: https://grafana.wikimedia.org/d/galera-cluster-summary/wmcs-openstack-eqiad-galera-cluster-summary
+
+      - alert: GaleraClusterSizeMismatch
+        expr: mysql_global_status_wsrep_cluster_size{job="mysql-galera"} != 3
+        for: 1m
+        labels:
+          team: wmcs
+          severity: warning
+          service: cloudvps
+        annotations:
+          summary: "Galera in {{ $externalLabels.deployment }} has {{ $value }} nodes"
+          description: "Galera node {{ $labels.instance }} sees {{ $value }} nodes in the cluster instead of expected three"
+          runbook: https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/GaleraClusterSizeMismatch
+          dashboard: https://grafana.wikimedia.org/d/galera-cluster-summary/wmcs-openstack-eqiad-galera-cluster-summary
+
+      - alert: GaleraClusterOutOfSync
+        expr: count(count by (wsrep_cluster_state_uuid) (mysql_galera_status_info{job="mysql-galera"})) != 1
+        for: 1m
+        labels:
+          team: wmcs
+          severity: critical
+          service: cloudvps
+        annotations:
+          summary: "Galera in {{ $externalLabels.deployment }} is out of sync"
+          description: "Galera cluster {{ $externalLabels.deployment }} sees {{ $value }} different cluster state UUIDs"
+          runbook: https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/GaleraClusterOutOfSync
+          dashboard: https://grafana.wikimedia.org/d/galera-cluster-summary/wmcs-openstack-eqiad-galera-cluster-summary
+
+      - alert: GaleraNodeOutOfSync
+        # This query detects cases where the 'wsrep_cluster_state_uuid' label
+        # of a 'mysql_galera_status_info' time series does not match the
+        # 'wsrep_local_state_uuid' label on the same series. Apparently this is
+        # one of the only ways to do it in Prometheus:
+        # https://github.com/prometheus/prometheus/issues/11345
+        expr: 'mysql_galera_status_info{job="mysql-galera"} unless ignoring(__dst__) (label_replace(mysql_galera_status_info{job="mysql-galera"}, "__dst__", "$1", "wsrep_cluster_state_uuid", "(.*)") == label_replace(mysql_galera_status_info{job="mysql-galera"}, "__dst__", "$1", "wsrep_local_state_uuid", "(.*)"))'
+        for: 1m
+        labels:
+          team: wmcs
+          severity: warning
+          service: cloudvps
+        annotations:
+          summary: "Galera node {{ $labels.instance }} is out of sync"
+          description: "Galera node {{ $labels.instance }} is out of sync with the cluster (wsrep_local_state_uuid does not match wsrep_cluster_state_uuid)"
+          runbook: https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/GaleraNodeOutOfSync
+          dashboard: https://grafana.wikimedia.org/d/galera-cluster-summary/wmcs-openstack-eqiad-galera-cluster-summary
