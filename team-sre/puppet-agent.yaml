@@ -53,6 +53,17 @@ groups:
       labels:
         severity: critical
         team: sre
+    - alert: PuppetConstantChange
+      annotations:
+        description: Puppet performing a change on every puppet run {{$labels.instance}}
+        summary: Puppet performing a change on every puppet run
+        dashboard: https://grafana.wikimedia.org/d/yOxVDGvWk/puppet
+        runbook: https://puppetboard.wikimedia.org/nodes?status=changed
+      expr: puppet_agent_resources_changed * on (instance) group_left(team) role_owner > 0
+      for: 1d
+      labels:
+        severity: warning
+        team: "{{$labels.team}}"
     - alert: PuppetDisabled
       expr: puppet_agent_enabled * on (instance) group_left(team) role_owner == 0
       for: 1w
