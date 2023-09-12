@@ -14,7 +14,6 @@ groups:
           * on (instance) group_left(team) role_owner{team!="wmcs"}
         labels:
           severity: warning
-          team: "{{$labels.team}}"
         annotations:
           summary: "{{$labels.name}} Failed on {{$labels.instance}}"
           description: "{{$labels.name}} Failed on {{$labels.instance}}"
@@ -29,7 +28,6 @@ groups:
         for: 2m
         labels:
           severity: warning
-          team: "{{$labels.team}}"
         annotations:
           summary: "{{$labels.name}} crashloop on {{$labels.instance}}"
           description: "{{$labels.name}} has had {{ $value }} restarts in the last 10m"

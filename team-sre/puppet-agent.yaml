@@ -53,6 +53,7 @@ groups:
       labels:
         severity: critical
         team: sre
+
     - alert: PuppetConstantChange
       annotations:
         description: Puppet performing a change on every puppet run {{$labels.instance}}
@@ -63,7 +64,7 @@ groups:
       for: 1d
       labels:
         severity: warning
-        team: "{{$labels.team}}"
+
     - alert: PuppetDisabled
       expr: puppet_agent_enabled * on (instance) group_left(team) role_owner == 0
       for: 1w
@@ -74,4 +75,3 @@ groups:
         runbook: https://wikitech.wikimedia.org/wiki/Puppet/Runbooks#Puppet_Disabled
       labels:
         severity: critical
-        team: "{{$labels.team}}"

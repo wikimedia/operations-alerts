@@ -238,7 +238,7 @@ def _get_tag(text, name):
 
 
 def _validate_rule_metadata(rule):
-    required_labels = ("severity", "team")
+    required_labels = ("severity",)
     required_annotations = ("summary", "description", "dashboard", "runbook")
 
     labels = rule["labels"]
@@ -247,6 +247,11 @@ def _validate_rule_metadata(rule):
 
     for l in required_labels:
         assert l in labels
+
+    if "group_left(team)" not in rule["expr"]:
+        assert (
+            "team" in labels
+        ), '"team" label required, unless you are getting the team from "role_owner" metric + group_left(team)'
 
     for a in required_annotations:
         assert a in annotations, (
