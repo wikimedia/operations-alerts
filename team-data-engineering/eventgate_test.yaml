@@ -6,40 +6,112 @@ tests:
 ## Eventgate Logging Latency tests
     - interval: 1m
       input_series:
+        - series: service_method:express_router_request_duration_seconds:90pct5m{method="GET", service="eventgate-main"}
+          values: '1.5'
+        - series: service_method:express_router_request_duration_seconds:90pct5m{method="GET", service="eventgate-analytics"}
+          values: '1.5'
+        - series: service_method:express_router_request_duration_seconds:90pct5m{method="GET", service="eventgate-analytics-external"}
+          values: '1.5'
         - series: service_method:express_router_request_duration_seconds:90pct5m{method="GET", service="eventgate-logging-external"}
           values: '1.5'
       external_labels:
         site: eqiad
       alert_rule_test:
-      - alertname: EventgateLoggingExternalLatency
-        eval_time: 5m
-        exp_alerts:
-        - exp_labels:
-            severity: critical
-            team: data-engineering
-            service: eventgate-logging-external
-            method: GET
-          exp_annotations:
-            description: Critical latency for 90th percentile of GET method events on eventgate-logging-external in eqiad.
-            summary: Critical latency for GET events on eventgate-logging-external in eqiad.
-            dashboard: https://grafana.wikimedia.org/d/ZB39Izmnz/eventgate?viewPanel=79&orgId=1&var-service=eventgate-logging-external
-            runbook: https://wikitech.wikimedia.org/wiki/Event_Platform/EventGate
-        - exp_labels:
-            severity: warning
-            team: data-engineering
-            service: eventgate-logging-external
-            method: GET
-          exp_annotations:
-            description: Elevated latency for 90th percentile of GET method events on eventgate-logging-external in eqiad.
-            summary: Elevated latency for GET events on eventgate-logging-external in eqiad.
-            dashboard: https://grafana.wikimedia.org/d/ZB39Izmnz/eventgate?viewPanel=79&orgId=1&var-service=eventgate-logging-external
-            runbook: https://wikitech.wikimedia.org/wiki/Event_Platform/EventGate
+        - alertname: EventgateLatency
+          eval_time: 5m
+          exp_alerts:
+            - exp_labels:
+                severity: critical
+                team: data-engineering
+                service: eventgate-main
+                method: GET
+              exp_annotations:
+                description: Critical latency for 90th percentile of GET method events on eventgate-main in eqiad.
+                summary: Critical latency for GET events on eventgate-main in eqiad.
+                dashboard: https://grafana.wikimedia.org/d/ZB39Izmnz/eventgate?viewPanel=79&orgId=1&var-service=eventgate-main
+                runbook: https://wikitech.wikimedia.org/wiki/Event_Platform/EventGate
+            - exp_labels:
+                severity: warning
+                team: data-engineering
+                service: eventgate-main
+                method: GET
+              exp_annotations:
+                description: Elevated latency for 90th percentile of GET method events on eventgate-main in eqiad.
+                summary: Elevated latency for GET events on eventgate-main in eqiad.
+                dashboard: https://grafana.wikimedia.org/d/ZB39Izmnz/eventgate?viewPanel=79&orgId=1&var-service=eventgate-main
+                runbook: https://wikitech.wikimedia.org/wiki/Event_Platform/EventGate
+            - exp_labels:
+                severity: critical
+                team: data-engineering
+                service: eventgate-analytics
+                method: GET
+              exp_annotations:
+                description: Critical latency for 90th percentile of GET method events on eventgate-analytics in eqiad.
+                summary: Critical latency for GET events on eventgate-analytics in eqiad.
+                dashboard: https://grafana.wikimedia.org/d/ZB39Izmnz/eventgate?viewPanel=79&orgId=1&var-service=eventgate-analytics
+                runbook: https://wikitech.wikimedia.org/wiki/Event_Platform/EventGate
+            - exp_labels:
+                severity: warning
+                team: data-engineering
+                service: eventgate-analytics
+                method: GET
+              exp_annotations:
+                description: Elevated latency for 90th percentile of GET method events on eventgate-analytics in eqiad.
+                summary: Elevated latency for GET events on eventgate-analytics in eqiad.
+                dashboard: https://grafana.wikimedia.org/d/ZB39Izmnz/eventgate?viewPanel=79&orgId=1&var-service=eventgate-analytics
+                runbook: https://wikitech.wikimedia.org/wiki/Event_Platform/EventGate
+            - exp_labels:
+                severity: critical
+                team: data-engineering
+                service: eventgate-analytics-external
+                method: GET
+              exp_annotations:
+                description: Critical latency for 90th percentile of GET method events on eventgate-analytics-external in eqiad.
+                summary: Critical latency for GET events on eventgate-analytics-external in eqiad.
+                dashboard: https://grafana.wikimedia.org/d/ZB39Izmnz/eventgate?viewPanel=79&orgId=1&var-service=eventgate-analytics-external
+                runbook: https://wikitech.wikimedia.org/wiki/Event_Platform/EventGate
+            - exp_labels:
+                severity: warning
+                team: data-engineering
+                service: eventgate-analytics-external
+                method: GET
+              exp_annotations:
+                description: Elevated latency for 90th percentile of GET method events on eventgate-analytics-external in eqiad.
+                summary: Elevated latency for GET events on eventgate-analytics-external in eqiad.
+                dashboard: https://grafana.wikimedia.org/d/ZB39Izmnz/eventgate?viewPanel=79&orgId=1&var-service=eventgate-analytics-external
+                runbook: https://wikitech.wikimedia.org/wiki/Event_Platform/EventGate
+            - exp_labels:
+                severity: critical
+                team: data-engineering
+                service: eventgate-logging-external
+                method: GET
+              exp_annotations:
+                description: Critical latency for 90th percentile of GET method events on eventgate-logging-external in eqiad.
+                summary: Critical latency for GET events on eventgate-logging-external in eqiad.
+                dashboard: https://grafana.wikimedia.org/d/ZB39Izmnz/eventgate?viewPanel=79&orgId=1&var-service=eventgate-logging-external
+                runbook: https://wikitech.wikimedia.org/wiki/Event_Platform/EventGate
+            - exp_labels:
+                severity: warning
+                team: data-engineering
+                service: eventgate-logging-external
+                method: GET
+              exp_annotations:
+                description: Elevated latency for 90th percentile of GET method events on eventgate-logging-external in eqiad.
+                summary: Elevated latency for GET events on eventgate-logging-external in eqiad.
+                dashboard: https://grafana.wikimedia.org/d/ZB39Izmnz/eventgate?viewPanel=79&orgId=1&var-service=eventgate-logging-external
+                runbook: https://wikitech.wikimedia.org/wiki/Event_Platform/EventGate
 
 ## Eventgate Services Validation Error Rate
     - interval: 1m
       input_series:
         - series: eventgate_validation_errors_total{service="eventgate-main", stream="mediawiki.revision_score_drafttopic"}
           values: '1+50x30'
+        - series: eventgate_validation_errors_total{service="eventgate-analytics", stream="misc"}
+          values: '1+100x30'
+        - series: eventgate_validation_errors_total{service="eventgate-analytics-external", stream="eventlogging_ContentTranslationAbuseFilter"}
+          values: '1+200x30'
+        - series: eventgate_validation_errors_total{service="eventgate-logging-external", stream="mediawiki.client.error"}
+          values: '1+100x30'
       alert_rule_test:
         - alertname: EventgateValidationErrors
           eval_time: 20m
@@ -54,15 +126,6 @@ tests:
                 summary: eventgate-main stream mediawiki.revision_score_drafttopic validation errors detected in past 15 min
                 dashboard: https://grafana.wikimedia.org/d/ZB39Izmnz/eventgate?orgId=1&refresh=1m&var-service=eventgate-main&var-stream=All&var-kafka_broker=All&var-kafka_producer_type=All&var-dc=thanos
                 runbook: https://wikitech.wikimedia.org/wiki/Event_Platform/EventGate
-
-    - interval: 1m
-      input_series:
-        - series: eventgate_validation_errors_total{service="eventgate-analytics", stream="misc"}
-          values: '1+100x30'
-      alert_rule_test:
-        - alertname: EventgateValidationErrors
-          eval_time: 20m
-          exp_alerts:
             - exp_labels:
                 severity: critical
                 team: data-engineering
@@ -73,15 +136,6 @@ tests:
                 summary: eventgate-analytics stream misc validation errors detected in past 15 min
                 dashboard: https://grafana.wikimedia.org/d/ZB39Izmnz/eventgate?orgId=1&refresh=1m&var-service=eventgate-analytics&var-stream=All&var-kafka_broker=All&var-kafka_producer_type=All&var-dc=thanos
                 runbook: https://wikitech.wikimedia.org/wiki/Event_Platform/EventGate
-
-    - interval: 1m
-      input_series:
-        - series: eventgate_validation_errors_total{service="eventgate-analytics-external", stream="eventlogging_ContentTranslationAbuseFilter"}
-          values: '1+200x30'
-      alert_rule_test:
-        - alertname: EventgateValidationErrors
-          eval_time: 20m
-          exp_alerts:
             - exp_labels:
                 severity: critical
                 team: data-engineering
@@ -92,15 +146,6 @@ tests:
                 summary: eventgate-analytics-external stream eventlogging_ContentTranslationAbuseFilter validation errors detected in past 15 min
                 dashboard: https://grafana.wikimedia.org/d/ZB39Izmnz/eventgate?orgId=1&refresh=1m&var-service=eventgate-analytics-external&var-stream=All&var-kafka_broker=All&var-kafka_producer_type=All&var-dc=thanos
                 runbook: https://wikitech.wikimedia.org/wiki/Event_Platform/EventGate
-
-    - interval: 1m
-      input_series:
-        - series: eventgate_validation_errors_total{service="eventgate-logging-external", stream="mediawiki.client.error"}
-          values: '1+100x30'
-      alert_rule_test:
-        - alertname: EventgateValidationErrors
-          eval_time: 20m
-          exp_alerts:
             - exp_labels:
                 severity: critical
                 team: data-engineering
@@ -115,21 +160,57 @@ tests:
 ## Eventgate HTTP errors tests
     - interval: 1m
       input_series:
+        - series: express_router_request_duration_seconds_count{service="eventgate-main",status="501"}
+          values: '100+100x60'
         - series: express_router_request_duration_seconds_count{service="eventgate-logging-external",status="501"}
           values: '100+100x60'
+        - series: express_router_request_duration_seconds_count{service="eventgate-analytics",status="501"}
+          values: '100+100x60'
+        - series: express_router_request_duration_seconds_count{service="eventgate-analytics-external",status="501"}
+          values: '100+100x60'
       external_labels:
-            site: eqiad
+        site: eqiad
       alert_rule_test:
-      - alertname: EventgateHTTPErrors
-        eval_time: 15m
-        exp_alerts:
-        - exp_labels:
-            severity: critical
-            team: data-engineering
-            service: eventgate-logging-external
-            status: 501
-          exp_annotations:
-            description: Elevated errors on eventgate-logging-external in eqiad.
-            summary: Elevated errors on eventgate-logging-external in eqiad.
-            dashboard: https://grafana.wikimedia.org/d/ZB39Izmnz/eventgate?orgId=1&refresh=1m&var-dc=eqiad%2Bprometheus/k8s&var-service=eventgate-logging-external
-            runbook: https://wikitech.wikimedia.org/wiki/Event_Platform/EventGate
+        - alertname: EventgateHTTPErrors
+          eval_time: 15m
+          exp_alerts:
+            - exp_labels:
+                severity: critical
+                team: data-engineering
+                service: eventgate-main
+                status: 501
+              exp_annotations:
+                description: Elevated errors on eventgate-main in eqiad.
+                summary: Elevated errors on eventgate-main in eqiad.
+                dashboard: https://grafana.wikimedia.org/d/ZB39Izmnz/eventgate?orgId=1&refresh=1m&var-dc=eqiad%2Bprometheus/k8s&var-service=eventgate-main
+                runbook: https://wikitech.wikimedia.org/wiki/Event_Platform/EventGate
+            - exp_labels:
+                severity: critical
+                team: data-engineering
+                service: eventgate-logging-external
+                status: 501
+              exp_annotations:
+                description: Elevated errors on eventgate-logging-external in eqiad.
+                summary: Elevated errors on eventgate-logging-external in eqiad.
+                dashboard: https://grafana.wikimedia.org/d/ZB39Izmnz/eventgate?orgId=1&refresh=1m&var-dc=eqiad%2Bprometheus/k8s&var-service=eventgate-logging-external
+                runbook: https://wikitech.wikimedia.org/wiki/Event_Platform/EventGate
+            - exp_labels:
+                severity: critical
+                team: data-engineering
+                service: eventgate-analytics
+                status: 501
+              exp_annotations:
+                description: Elevated errors on eventgate-analytics in eqiad.
+                summary: Elevated errors on eventgate-analytics in eqiad.
+                dashboard: https://grafana.wikimedia.org/d/ZB39Izmnz/eventgate?orgId=1&refresh=1m&var-dc=eqiad%2Bprometheus/k8s&var-service=eventgate-analytics
+                runbook: https://wikitech.wikimedia.org/wiki/Event_Platform/EventGate
+            - exp_labels:
+                severity: critical
+                team: data-engineering
+                service: eventgate-analytics-external
+                status: 501
+              exp_annotations:
+                description: Elevated errors on eventgate-analytics-external in eqiad.
+                summary: Elevated errors on eventgate-analytics-external in eqiad.
+                dashboard: https://grafana.wikimedia.org/d/ZB39Izmnz/eventgate?orgId=1&refresh=1m&var-dc=eqiad%2Bprometheus/k8s&var-service=eventgate-analytics-external
+                runbook: https://wikitech.wikimedia.org/wiki/Event_Platform/EventGate
