@@ -8,7 +8,10 @@ groups:
         summary: Not all openapi/swagger endpoints returned healthy
         dashboard: https://grafana.wikimedia.org/d/_77ik484k/openapi-swagger-endpoint-state?var-site={{$externalLabels.site}}
         runbook: https://wikitech.wikimedia.org/wiki/Runbook#{{ $labels.instance }}
-      expr: service_checker_probe_success{job=~"(swagger_.+|probes/swagger)"} < 1
+      expr: |
+        service_checker_probe_success{job=~"(swagger_.+|probes/swagger)"} < 1
+          or
+        up{job=~"(swagger_.+|probes/swagger)"} < 1
       for: 5m
       labels:
         severity: warning
