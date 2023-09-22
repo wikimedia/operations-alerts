@@ -1,0 +1,48 @@
+rule_files:
+  - jaeger.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    input_series:
+      - series: 'jaeger_collector_spans_dropped_total{instance="10.67.83.216:666",job="k8s-pods",kubernetes_namespace="jaeger"}'
+        values: '3+3x90'
+      - series: 'jaeger_collector_spans_received_total{instance="10.67.83.216:666",job="k8s-pods",kubernetes_namespace="jaeger"}'
+        values: '10+10x90'
+      - series: 'jaeger_query_requests_total{instance="10.67.83.247:666",job="k8s-pods",kubernetes_namespace="jaeger",operation="find_trace_ids",result="err"}'
+        values: '3+3x90'
+      - series: 'jaeger_query_requests_total{instance="10.67.83.247:666",job="k8s-pods",kubernetes_namespace="jaeger",operation="find_trace_ids",result="ok"}'
+        values: '10+10x90'
+    external_labels:
+      site: eqiad
+      prometheus: foo
+    alert_rule_test:
+    - alertname: JaegerCollectorDroppingSpans
+      eval_time: 30m
+      exp_alerts:
+       - exp_labels:
+           job: k8s-pods
+           kubernetes_namespace: jaeger
+           team: sre
+           severity: warning
+           instance: 10.67.83.216:666
+         exp_annotations:
+           description: jaeger collector k8s-pods 10.67.83.216:666 is dropping 30.00% spans
+           summary: jaeger collector at 10.67.83.216:666 is dropping spans
+           dashboard: 'https://grafana.wikimedia.org/d/zLOi95xmk/jaeger'
+           runbook: TODO
+
+    - alertname: JaegerQueryReqsFailing
+      eval_time: 30m
+      exp_alerts:
+       - exp_labels:
+           job: k8s-pods
+           kubernetes_namespace: jaeger
+           team: sre
+           severity: warning
+           instance: 10.67.83.247:666
+           operation: find_trace_ids
+         exp_annotations:
+           description: jaeger query k8s-pods 10.67.83.247:666 is seeing 23.08% query errors on find_trace_ids
+           summary: jaeger query at 10.67.83.247:666 is experiencing errors on find_trace_ids
+           dashboard: 'https://grafana.wikimedia.org/d/zLOi95xmk/jaeger'
+           runbook: TODO

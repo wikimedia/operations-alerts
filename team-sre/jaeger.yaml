@@ -1,0 +1,39 @@
+# deploy-tag: k8s-aux
+# deploy-site: eqiad
+
+groups:
+  - name: jaeger
+    rules:
+    - alert: JaegerCollectorDroppingSpans
+      annotations:
+        description: jaeger collector {{ $labels.job }} {{ $labels.instance }} is dropping {{ printf "%.2f" $value }}% spans
+        summary: jaeger collector at {{ $labels.instance }} is dropping spans
+        dashboard: 'https://grafana.wikimedia.org/d/zLOi95xmk/jaeger'
+        runbook: TODO
+      expr: |
+        100 *
+        sum(rate(jaeger_collector_spans_dropped_total[5m])) by (instance, job, kubernetes_namespace)
+          /
+        sum(rate(jaeger_collector_spans_received_total[5m])) by (instance, job, kubernetes_namespace)
+          > 1
+      for: 15m
+      labels:
+        severity: warning
+        team: sre
+
+    - alert: JaegerQueryReqsFailing
+      annotations:
+        description: jaeger query {{ $labels.job }} {{ $labels.instance }} is seeing {{ printf "%.2f" $value }}% query errors on {{ $labels.operation }}
+        summary: jaeger query at {{ $labels.instance }} is experiencing errors on {{ $labels.operation }}
+        dashboard: 'https://grafana.wikimedia.org/d/zLOi95xmk/jaeger'
+        runbook: TODO
+      expr: |
+        100 *
+        sum(rate(jaeger_query_requests_total{result="err"}[5m])) by (operation, instance, job, kubernetes_namespace)
+          /
+        sum(rate(jaeger_query_requests_total[5m])) by (operation, instance, job, kubernetes_namespace)
+          > 1
+      for: 15m
+      labels:
+        severity: warning
+        team: sre
