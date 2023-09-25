@@ -59,6 +59,7 @@ groups:
 
     - alert: PrometheusRuleEvaluationFailures
       expr: increase(prometheus_rule_evaluation_failures_total[3m]) > 0
+      for: 5m
       labels:
         severity: critical
         team: o11y
