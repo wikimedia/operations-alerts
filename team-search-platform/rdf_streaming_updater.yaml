@@ -34,9 +34,9 @@ groups:
           runbook: https://wikitech.wikimedia.org/wiki/Wikidata_Query_Service/Streaming_Updater
           dashboard: https://grafana.wikimedia.org/d/gCFgfpG7k/flink-session-cluster
       - alert: RdfStreamingUpdaterNotEnoughTaskSlots
-        # 24 = 3nodes * 4tm_slots * 2jobs
+        # 6 = 3nodes * 1tm_slots * 2jobs
         expr: |
-          flink_jobmanager_taskSlotsTotal{kubernetes_namespace="rdf-streaming-updater"} < 24
+          flink_jobmanager_taskSlotsTotal{kubernetes_namespace="rdf-streaming-updater"} < 6
         for: 5m
         labels:
           team: search-platform
