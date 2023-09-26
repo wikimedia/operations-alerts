@@ -51,7 +51,7 @@ groups:
           team: traffic
           severity: warning
         annotations: &VarnishHighThreadCountAnn
-          summary: "Varnish's thread count is high"
+          summary: "Varnish's thread count on {{ $labels.instance }} is high"
           description: "Varnish on {{ $labels.instance }} ({{ $externalLabels.site }}) is at {{ $value }}% of the maximum limit."
           dashboard: 'https://grafana.wikimedia.org/d/wiU3SdEWk/cache-host-drilldown?viewPanel=99&var-site={{ $externalLabels.site }}&var-instance={{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}'
           runbook: *wt-varnish

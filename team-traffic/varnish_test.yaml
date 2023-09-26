@@ -127,7 +127,7 @@ tests:
              team: traffic
              instance: "cp1235:0"
            exp_annotations:
-             summary: "Varnish's thread count is high"
+             summary: "Varnish's thread count on cp1235:0 is high"
              description: "Varnish on cp1235:0 (eqiad) is at 70% of the maximum limit."
              dashboard: 'https://grafana.wikimedia.org/d/wiU3SdEWk/cache-host-drilldown?viewPanel=99&var-site=eqiad&var-instance=cp1235'
              runbook: "https://wikitech.wikimedia.org/wiki/Varnish"
@@ -136,7 +136,7 @@ tests:
              team: traffic
              instance: "cp1236:0"
            exp_annotations:
-             summary: "Varnish's thread count is high"
+             summary: "Varnish's thread count on cp1236:0 is high"
              description: "Varnish on cp1236:0 (eqiad) is at 80% of the maximum limit."
              dashboard: 'https://grafana.wikimedia.org/d/wiU3SdEWk/cache-host-drilldown?viewPanel=99&var-site=eqiad&var-instance=cp1236'
              runbook: "https://wikitech.wikimedia.org/wiki/Varnish"
@@ -145,7 +145,7 @@ tests:
              team: traffic
              instance: "cp1236:0"
            exp_annotations:
-             summary: "Varnish's thread count is high"
+             summary: "Varnish's thread count on cp1236:0 is high"
              description: "Varnish on cp1236:0 (eqiad) is at 80% of the maximum limit."
              dashboard: 'https://grafana.wikimedia.org/d/wiU3SdEWk/cache-host-drilldown?viewPanel=99&var-site=eqiad&var-instance=cp1236'
              runbook: "https://wikitech.wikimedia.org/wiki/Varnish"
