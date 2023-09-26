@@ -14,5 +14,5 @@ groups:
         up{job=~"(swagger_.+|probes/swagger)"} < 1
       for: 5m
       labels:
-        severity: warning
+        severity: critical
         team: sre
