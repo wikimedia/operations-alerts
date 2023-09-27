@@ -8,7 +8,7 @@ groups:
           summary: 'Not enough idle PHP-FPM workers for Mediawiki {{ $labels.deployment }} ({{$labels.release}}) at {{ $externalLabels.site }}'
           dashboard: 'https://grafana.wikimedia.org/d/U7JT--knk/mw-on-k8s?orgId=1&viewPanel=84&var-dc={{ $externalLabels.site }}%20prometheus/k8s&var-service=mediawiki&var-namespace={{$labels.deployment}}&var-release={{$labels.release}}&var-container_name=All'
           runbook: 'https://bit.ly/wmf-fpmsat'
-        expr: sum by (deployment,release) (phpfpm_processes_total{app="mediawiki", state="idle"}) / sum by (deployment,release) (phpfpm_processes_total{app="mediawiki"}) <= 0.3
+        expr: sum by (deployment,release) (phpfpm_processes_total{app="mediawiki", state="idle"}) / sum by (deployment,release) (phpfpm_processes_total{app="mediawiki"}) <= 0.5
         for: 2m
         labels:
           severity: critical
