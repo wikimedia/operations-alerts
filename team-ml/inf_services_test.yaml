@@ -1,0 +1,29 @@
+rule_files:
+  - inf_services.yaml
+evaluation_interval: 30m
+tests:
+  - interval: 1m
+    input_series:
+      - series: 'container_memory_usage_bytes{namespace="revertrisk", container="kserve-container", pod="revertrisk-multilingual-predictor-default-00010-deploymenthndsp"}'
+        values: '0.93+0x60'
+      - series: 'container_spec_memory_limit_bytes{namespace="revertrisk", container="kserve-container", pod="revertrisk-multilingual-predictor-default-00010-deploymenthndsp"}'
+        values: '1+0x60'
+    external_labels:
+      prometheus: "k8s-mlserve"
+      site: codfw
+    alert_rule_test:
+    - alertname: InfServiceHighMemoryUsage
+      eval_time: 1h
+      exp_alerts:
+       - exp_labels:
+           team: ml
+           container: kserve-container
+           severity: critical
+           namespace: revertrisk
+           pod: "revertrisk-multilingual-predictor-default-00010-deploymenthndsp"
+         exp_annotations:
+           summary: "High Memory usage detected in Inference Service"
+           description: "Memory usage for kserve-container in pod revertrisk-multilingual-predictor-default-00010-deploymenthndsp has exceeded 90% for more than 30 minutes."
+           runbook: https://wikitech.wikimedia.org/w/index.php?title=Machine_Learning/LiftWing/Alerts#Inference_Services_High_Memory_Usage_-_InfServiceHighMemoryUsage_alert
+           dashboard: https://grafana.wikimedia.org/d/hyl18XgMk/kubernetes-container-details?orgId=1&var-datasource=codfw%20prometheus%2Fk8s-mlserve&var-namespace=revertrisk&var-pod=revertrisk-multilingual-predictor-default-00010-deploymenthndsp
+
