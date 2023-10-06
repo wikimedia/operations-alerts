@@ -62,7 +62,7 @@ groups:
       description: "Kubernetes API {{ $labels.verb }} requests for {{ $labels.resource }} take {{ $value | humanizeDuration }} in p95 on {{ $externalLabels.prometheus }}@{{ $externalLabels.site }}"
       summary: "High Kubernetes API latency ({{ $labels.verb }} {{ $labels.resource }}) on {{ $externalLabels.prometheus }}@{{ $externalLabels.site }}"
       runbook: "https://wikitech.wikimedia.org/wiki/Kubernetes"
-      dashboard: "https://grafana.wikimedia.org/d/000000435?var-site={{ $externalLabels.site }}&var-cluster={{ $externalLabels.prometheus }}"
+      dashboard: "https://grafana.wikimedia.org/d/ddNd-sLnk/kubernetes-api-details?var-site={{ $externalLabels.site }}&var-cluster={{ $externalLabels.prometheus }}&var-latency_percentile=0.95&var-verb={{ $labels.verb }}"
 
 - name: certmanager
   rules:

@@ -129,4 +129,4 @@ tests:
         description: "Kubernetes API GET requests for shoes take 600ms in p95 on eagle@moon"
         summary: "High Kubernetes API latency (GET shoes) on eagle@moon"
         runbook: "https://wikitech.wikimedia.org/wiki/Kubernetes"
-        dashboard: "https://grafana.wikimedia.org/d/000000435?var-site=moon&var-cluster=eagle"
+        dashboard: "https://grafana.wikimedia.org/d/ddNd-sLnk/kubernetes-api-details?var-site=moon&var-cluster=eagle&var-latency_percentile=0.95&var-verb=GET"
