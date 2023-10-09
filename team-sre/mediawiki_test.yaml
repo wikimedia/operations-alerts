@@ -100,7 +100,7 @@ tests:
               cluster: appserver
             exp_annotations:
               description: 'The mediawiki cluster appserver in eqiad is experiencing slowness. The average latency for GET/200: 1s'
-              summary: 'Average latency high: eqiad appserver GET/200'
+              summary: 'Average latency high: eqiad appserver GET/200: 1s'
               dashboard: 'https://grafana.wikimedia.org/d/RIA1lzDZk/application-servers-red-dashboard?panelId=9&fullscreen&orgId=1&from=now-3h&to=now&var-site=eqiad&var-cluster=appserver&var-method=GET'
               runbook: 'https://wikitech.wikimedia.org/wiki/Application_servers/Runbook#Average_latency_exceeded'
 

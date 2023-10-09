@@ -74,7 +74,7 @@ groups:
         alert: MediaWikiLatencyExceeded
         annotations:
           description: 'The mediawiki cluster {{ $labels.cluster }} in {{ $externalLabels.site }} is experiencing slowness. The average latency for {{ $labels.method }}/{{ $labels.code }}: {{ $value }}s'
-          summary: 'Average latency high: {{ $externalLabels.site }} {{ $labels.cluster }} {{ $labels.method }}/{{ $labels.code }}'
+          summary: 'Average latency high: {{ $externalLabels.site }} {{ $labels.cluster }} {{ $labels.method }}/{{ $labels.code }}: {{ $value }}s'
           dashboard: 'https://grafana.wikimedia.org/d/RIA1lzDZk/application-servers-red-dashboard?panelId=9&fullscreen&orgId=1&from=now-3h&to=now&var-site={{ $externalLabels.site }}&var-cluster={{ $labels.cluster }}&var-method={{ $labels.method }}'
           runbook: 'https://wikitech.wikimedia.org/wiki/Application_servers/Runbook#Average_latency_exceeded'
         expr: >
@@ -99,7 +99,7 @@ groups:
             rate(mediawiki_http_requests_duration_count{cluster="api_appserver",method="GET", handler=~"proxy:unix:.*"}[2m])
           ) by (code,cluster,handler,method) > 100
 
-      # Case 3: parsoid GET: 2s threshold and 20 rps
+      # Case 3: parsoid GET: 2s threshold and 20 rps, for 10m
       - <<: *MediaWikiLatencyExceeded
         expr: >
           sum(
@@ -108,6 +108,18 @@ groups:
           and sum(
             rate(mediawiki_http_requests_duration_count{cluster="parsoid",method="GET", handler=~"proxy:unix:.*"}[2m])
           ) by (code,cluster,handler,method) > 20
+        for: 10m
+
+      # Case 3b: parsoid GET: 4s threshold and 20 rps, for 5m
+      - <<: *MediaWikiLatencyExceeded
+        expr: >
+          sum(
+            cluster_code_method_handler:mediawiki_http_requests_duration:avg2m{cluster="parsoid",method="GET", handler=~"proxy:unix:.*"}
+          ) by (code,cluster,handler,method) > 4.0
+          and sum(
+            rate(mediawiki_http_requests_duration_count{cluster="parsoid",method="GET", handler=~"proxy:unix:.*"}[2m])
+          ) by (code,cluster,handler,method) > 20
+        for: 5m
 
       # Case 4: appserver POST: 2s threshold of 5 rps
       - <<: *MediaWikiLatencyExceeded
