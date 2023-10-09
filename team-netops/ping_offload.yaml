@@ -1,5 +1,5 @@
 # deploy-tag: ops
-# deploy-site: eqiad, codfw, esams
+# deploy-site: eqiad, codfw
 
 groups:
   - name: ping_offload
