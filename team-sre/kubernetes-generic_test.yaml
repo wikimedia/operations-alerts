@@ -27,9 +27,9 @@ tests:
   - series: 'apiserver_request_total{job="k8s-api", code="500"}'
     values: "1+5x6"
   - series: 'apiserver_request_duration_seconds_bucket{verb="GET", resource="shoes", le="+Inf"}'
-    values: "1+1x11"
+    values: "1+1x16"
   - series: 'apiserver_request_duration_seconds_bucket{verb="GET", resource="shoes", le="+0.6"}'
-    values: "0+0x11"
+    values: "0+0x16"
   external_labels:
     site: moon
     prometheus: eagle
@@ -118,7 +118,7 @@ tests:
         dashboard: "https://grafana.wikimedia.org/d/000000435?var-site=moon&var-cluster=eagle"
 
   - alertname: KubernetesAPILatency
-    eval_time: 11m
+    eval_time: 16m
     exp_alerts:
     - exp_labels:
         team: sre
