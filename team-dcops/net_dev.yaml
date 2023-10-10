@@ -43,16 +43,3 @@ groups:
         labels:
           severity: task
           team: dcops
-      - alert: InterfaceErrors
-        annotations:
-          description: '{{$labels.device}} on {{ $labels.instance }} reports {{$value}} errors.'
-          summary: '{{$labels.device}} on {{ $labels.instance }} has errors.'
-          dashboard: https://grafana.wikimedia.org/d/000000342/node-exporter-server-metrics?viewPanel=72
-          runbook: https://wikitech.wikimedia.org/wiki/Monitoring/check_eth
-        expr: |
-          increase(node_network_receive_errs_total{device=~"e.+"}[3h]) > 0
-            or
-          increase(node_network_transmit_errs_total{device=~"e.+"}[3h]) > 0
-        labels:
-          severity: warning
-          team: dcops
