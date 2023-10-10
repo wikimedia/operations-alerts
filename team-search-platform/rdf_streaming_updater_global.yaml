@@ -17,16 +17,16 @@ groups:
           runbook: https://wikitech.wikimedia.org/wiki/Wikidata_Query_Service/Streaming_Updater
           dashboard: https://grafana.wikimedia.org/d/fdU5Zx-Mk/wdqs-streaming-updater
 
-## Swift usage alerts, alert if > 1TB is used
+## Swift usage alerts, alert if > 50GiB is used
 ## the metric is pushed only in a site at a time, hence 'global' deployment
       - alert: RdfStreamingUpdaterSpaceUsageTooHigh
-        expr: swift_account_stats_bytes_total{account="AUTH_wdqs"} > 1099511627776
+        expr: swift_account_stats_bytes_total{account="AUTH_wdqs"} > 53687091200
         for: 1m
         labels:
           team: search-platform
           severity: warning
         annotations:
-          summary: "The RDF Streaming Updater is using more than 1TiB of storage"
+          summary: "The RDF Streaming Updater is using more than 50GiB of storage"
           description: "The containers owned by {{$labels.account}} are using {{ $value | humanize1024 }}, this is more than expected."
           runbook: https://wikitech.wikimedia.org/wiki/Wikidata_Query_Service/Streaming_Updater
           dashboard: https://grafana.wikimedia.org/d/fdU5Zx-Mk/wdqs-streaming-updater
