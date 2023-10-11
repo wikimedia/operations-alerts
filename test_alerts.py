@@ -195,7 +195,7 @@ def test_runbook_exists(rulefile):
                 response = requests.get(runbook)
                 assert response.status_code == 200 and response.text != "", (
                     f"Unable to fetch runbook {runbook}, please make sure that it exists and "
-                    "it's reachable."
+                    "it's reachable. Got {response.text!r} ({response.status_code})"
                 )
 
 
