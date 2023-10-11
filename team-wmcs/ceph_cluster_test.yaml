@@ -18,8 +18,8 @@ tests:
               service: ceph,cloudvps
               job: ceph_eqiad
             exp_annotations:
-              description: "eqiad ceph cluster is in error status."
-              summary: "#page The ceph cluster in eqiad is in error status, that means that it's unable to serve traffic, all VMs could be unusable."
+              description: "eqiad Ceph cluster is unable to serve traffic, all VMs could be unusable."
+              summary: "#page Ceph cluster in eqiad is in error status"
               dashboard: "https://grafana.wikimedia.org/d/P1tFnn3Mk/wmcs-ceph-eqiad-health?orgId=1&search=open&tag=ceph&tag=health&tag=WMCS"
               runbook: "https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/CephClusterInError"
 
@@ -39,8 +39,8 @@ tests:
               service: ceph,cloudvps
               job: ceph_eqiad
             exp_annotations:
-              description: "eqiad ceph cluster is in warning status."
-              summary: "The ceph cluster in eqiad is in warning status, that means that it's high availability is compromised, things should still be working as expected."
+              description: "High availability of the Ceph cluster in eqiad is compromised, but things should still be working as expected."
+              summary: "Ceph cluster in eqiad is in warning status"
               dashboard: "https://grafana.wikimedia.org/d/P1tFnn3Mk/wmcs-ceph-eqiad-health?orgId=1&search=open&tag=ceph&tag=health&tag=WMCS"
               runbook: "https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/CephClusterInWarning"
 
@@ -63,7 +63,7 @@ tests:
               severity: page
               service: ceph,cloudvps
             exp_annotations:
-              description: "All monitor nodes for the ceph cluster in eqiad are down (quorum lost)."
-              summary: "#page All the monitor nodes for the cluster in eqiad have lost quorum, that means that the cluster is down."
+              description: "All monitor nodes for the ceph cluster in eqiad are down (quorum lost), the cluster is down"
+              summary: "#page All the monitor nodes for the cluster in eqiad have lost quorum"
               dashboard: "https://grafana.wikimedia.org/d/P1tFnn3Mk/wmcs-ceph-eqiad-health?orgId=1&search=open&tag=ceph&tag=health&tag=WMCS"
               runbook: "https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/CephClusterAllMonsDown"
