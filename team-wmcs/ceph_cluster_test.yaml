@@ -67,3 +67,24 @@ tests:
               summary: "#page All the monitor nodes for the cluster in eqiad have lost quorum"
               dashboard: "https://grafana.wikimedia.org/d/P1tFnn3Mk/wmcs-ceph-eqiad-health?orgId=1&search=open&tag=ceph&tag=health&tag=WMCS"
               runbook: "https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/CephClusterAllMonsDown"
+
+  - interval: 1m
+    input_series:
+      - series: ceph_healthcheck_slow_ops{job="ceph_eqiad"}
+        values: "0 1 2 3 4 5"
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: CephSlowOps
+        eval_time: 6m
+        exp_alerts:
+          - exp_labels:
+              team: wmcs
+              severity: critical
+              service: ceph,cloudvps
+              job: ceph_eqiad
+            exp_annotations:
+              description: "Ceph cluster in eqiad has slow ops, which might be blocking some writes"
+              summary: "Ceph cluster in eqiad has 5 slow ops"
+              dashboard: "https://grafana.wikimedia.org/d/P1tFnn3Mk/wmcs-ceph-eqiad-health?orgId=1&search=open&tag=ceph&tag=health&tag=WMCS"
+              runbook: "https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/CephSlowOps"
