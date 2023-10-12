@@ -6,8 +6,8 @@ groups:
     rules:
       - alert: CephClusterInError
         annotations:
-          description: "{{ $externalLabels.site }} ceph cluster is in error status."
-          summary: "#page The ceph cluster in {{ $externalLabels.site }} is in error status, that means that it's unable to serve traffic, all VMs could be unusable."
+          description: "{{ $externalLabels.site }} Ceph cluster is unable to serve traffic, all VMs could be unusable."
+          summary: "#page Ceph cluster in {{ $externalLabels.site }} is in error status"
           dashboard: "https://grafana.wikimedia.org/d/P1tFnn3Mk/wmcs-ceph-eqiad-health?orgId=1&search=open&tag=ceph&tag=health&tag=WMCS"
           runbook: "https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/CephClusterInError"
         expr: ceph_health_status{job="ceph_eqiad"} == 2
@@ -19,8 +19,8 @@ groups:
 
       - alert: CephClusterInWarning
         annotations:
-          description: "{{ $externalLabels.site }} ceph cluster is in warning status."
-          summary: "The ceph cluster in {{ $externalLabels.site }} is in warning status, that means that it's high availability is compromised, things should still be working as expected."
+          description: "High availability of the Ceph cluster in {{ $externalLabels.site }} is compromised, but things should still be working as expected."
+          summary: "Ceph cluster in {{ $externalLabels.site }} is in warning status"
           dashboard: "https://grafana.wikimedia.org/d/P1tFnn3Mk/wmcs-ceph-eqiad-health?orgId=1&search=open&tag=ceph&tag=health&tag=WMCS"
           runbook: "https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/CephClusterInWarning"
         expr: ceph_health_status{job="ceph_eqiad"} == 1
@@ -33,8 +33,8 @@ groups:
       # this one is needed as the ones before will not work if the mons are all down
       - alert: CephClusterAllMonsDown
         annotations:
-          description: "All monitor nodes for the ceph cluster in {{ $externalLabels.site }} are down (quorum lost)."
-          summary: "#page All the monitor nodes for the cluster in {{ $externalLabels.site }} have lost quorum, that means that the cluster is down."
+          description: "All monitor nodes for the ceph cluster in {{ $externalLabels.site }} are down (quorum lost), the cluster is down"
+          summary: "#page All the monitor nodes for the cluster in {{ $externalLabels.site }} have lost quorum"
           dashboard: "https://grafana.wikimedia.org/d/P1tFnn3Mk/wmcs-ceph-eqiad-health?orgId=1&search=open&tag=ceph&tag=health&tag=WMCS"
           runbook: "https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/CephClusterAllMonsDown"
         expr: sum(ceph_mon_quorum_status{job="ceph_eqiad"}) == 0
