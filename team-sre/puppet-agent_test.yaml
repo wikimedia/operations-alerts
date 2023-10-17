@@ -65,7 +65,7 @@ tests:
            instance: alert1001:9100
            cluster: alerting
          exp_annotations:
-           summary: Puppet has failed on alerting hosts
+           summary: Puppet has failed on host
            description: 'Puppet failure on alert1001:9100'
            dashboard: https://grafana.wikimedia.org/d/yOxVDGvWk/puppet
            runbook: https://puppetboard.wikimedia.org/nodes?status=failed
