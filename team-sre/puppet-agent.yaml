@@ -45,11 +45,21 @@ groups:
         summary: Puppet has failed on host
         dashboard: https://grafana.wikimedia.org/d/yOxVDGvWk/puppet
         runbook: https://puppetboard.wikimedia.org/nodes?status=failed
-      expr: puppet_agent_failed > 0 or puppet_agent_resources_total == 0
+      expr: puppet_agent_failed * on (instance) group_left(team) role_owner > 0
       for: 80m # At least two puppet runs
       labels:
         severity: critical
-        team: sre
+
+    - alert: PuppetZeroResources
+      annotations:
+        description: Zero Puppet resources on {{$labels.instance}}
+        summary: Puppet has failed generate resources on host
+        dashboard: https://grafana.wikimedia.org/d/yOxVDGvWk/puppet
+        runbook: https://puppetboard.wikimedia.org/nodes?status=failed
+      expr: puppet_agent_resources_total * on (instance) group_left(team) role_owner == 0
+      for: 80m # At least two puppet runs
+      labels:
+        severity: critical
 
     - alert: PuppetConstantChange
       annotations:
