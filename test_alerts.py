@@ -193,9 +193,13 @@ def test_runbook_exists(rulefile):
             runbook = rule.get("annotations", {}).get("runbook", None)
             if runbook is not None and runbook != "TODO":
                 response = requests.get(runbook)
+                # Private runbooks are okay
+                if response.status_code == 401 and ".google.com" in response.url:
+                    continue
+
                 assert response.status_code == 200 and response.text != "", (
                     f"Unable to fetch runbook {runbook}, please make sure that it exists and "
-                    "it's reachable. Got {response.text!r} ({response.status_code})"
+                    f"it's reachable. Got {response.status_code} with body {response.text!r}"
                 )
 
 
