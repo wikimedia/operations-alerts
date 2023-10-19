@@ -67,7 +67,7 @@ tests:
            instance: alert1001:9100
            cluster: alerting
          exp_annotations:
-           summary: Puppet has failed on host
+           summary: Puppet has failed on alert1001:9100
            description: 'Puppet failure on alert1001:9100'
            dashboard: https://grafana.wikimedia.org/d/yOxVDGvWk/puppet
            runbook: https://puppetboard.wikimedia.org/nodes?status=failed
@@ -88,7 +88,7 @@ tests:
            instance: alert1001:9100
            cluster: alerting
          exp_annotations:
-           summary: Puppet has failed generate resources on host
+           summary: Puppet has failed generate resources on alert1001:9100
            description: 'Zero Puppet resources on alert1001:9100'
            dashboard: https://grafana.wikimedia.org/d/yOxVDGvWk/puppet
            runbook: https://puppetboard.wikimedia.org/nodes?status=failed
@@ -119,7 +119,7 @@ tests:
            instance: alert1001:9100
            cluster: alerting
          exp_annotations:
-           summary: Puppet performing a change on every puppet run
+           summary: Puppet performing a change on every puppet run on alert1001:9100
            description: 'Puppet performing a change on every puppet run alert1001:9100'
            dashboard: https://grafana.wikimedia.org/d/yOxVDGvWk/puppet
            runbook: https://puppetboard.wikimedia.org/nodes?status=changed

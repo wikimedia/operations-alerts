@@ -42,7 +42,7 @@ groups:
     - alert: PuppetFailure
       annotations:
         description: Puppet failure on {{$labels.instance}}
-        summary: Puppet has failed on host
+        summary: Puppet has failed on {{$labels.instance}}
         dashboard: https://grafana.wikimedia.org/d/yOxVDGvWk/puppet
         runbook: https://puppetboard.wikimedia.org/nodes?status=failed
       expr: puppet_agent_failed * on (instance) group_left(team) role_owner > 0
@@ -53,7 +53,7 @@ groups:
     - alert: PuppetZeroResources
       annotations:
         description: Zero Puppet resources on {{$labels.instance}}
-        summary: Puppet has failed generate resources on host
+        summary: Puppet has failed generate resources on {{$labels.instance}}
         dashboard: https://grafana.wikimedia.org/d/yOxVDGvWk/puppet
         runbook: https://puppetboard.wikimedia.org/nodes?status=failed
       expr: puppet_agent_resources_total * on (instance) group_left(team) role_owner == 0
@@ -64,7 +64,7 @@ groups:
     - alert: PuppetConstantChange
       annotations:
         description: Puppet performing a change on every puppet run {{$labels.instance}}
-        summary: Puppet performing a change on every puppet run
+        summary: Puppet performing a change on every puppet run on {{$labels.instance}}
         dashboard: https://grafana.wikimedia.org/d/yOxVDGvWk/puppet
         runbook: https://puppetboard.wikimedia.org/nodes?status=changed
       expr: puppet_agent_resources_changed * on (instance) group_left(team) role_owner > 0
