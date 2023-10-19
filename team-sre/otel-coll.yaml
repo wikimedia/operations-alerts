@@ -1,0 +1,40 @@
+# deploy-tag: k8s, k8s-staging
+
+groups:
+  - name: opentelemetry-collector
+    rules:
+      - alert: OtelCollectorDroppedSpans
+        expr: sum(rate(otelcol_processor_dropped_spans[5m])) by (processor) > 0
+        for: 5m
+        labels:
+          severity: critical
+          team: sre
+        annotations:
+          summary: Some spans have been dropped by processor {{ $labels.processor }} on {{ $externalLabels.prometheus }}
+          description: Maybe collector has received non standard spans or it reached some limits
+          dashboard: https://grafana.wikimedia.org/d/SPebYW7Iz/opentelemetry-collector
+          runbook: TODO
+
+      - alert: OtelCollectorRefusedSpans
+        expr: sum(rate(otelcol_receiver_refused_spans[5m])) by (receiver) > 0
+        for: 5m
+        labels:
+          severity: critical
+          team: sre
+        annotations:
+          summary: Some spans have been refused by receiver {{ $labels.receiver }} on {{ $externalLabels.prometheus }}
+          description: Maybe collector has received non standard spans or it reached some limits
+          dashboard: https://grafana.wikimedia.org/d/SPebYW7Iz/opentelemetry-collector
+          runbook: TODO
+
+      - alert: OtelCollectorEnqueuedSpans
+        expr: sum(rate(otelcol_exporter_enqueue_failed_spans[5m])) by (exporter) > 0
+        for: 5m
+        labels:
+          severity: critical
+          team: sre
+        annotations:
+          summary: Some spans have been enqueued by exporter {{ $labels.exporter }} on {{ $externalLabels.prometheus }}
+          description: Maybe used destination has a problem or used payload is not correct
+          dashboard: https://grafana.wikimedia.org/d/SPebYW7Iz/opentelemetry-collector
+          runbook: TODO
