@@ -1,0 +1,16 @@
+# deploy-tag: analytics
+# deploy-site: eqiad
+
+groups:
+  - name: skein
+    rules:
+    - alert: SkeinCertificateCloseToExpiry
+      annotations:
+        description: Skein certificate is close to expiry
+        summary: Skein certificate is close to expiry
+        dashboard: "https://grafana.wikimedia.org/d/980N6H7Iz/skein-certificate-expiry"
+        runbook: "https://wikitech.wikimedia.org/wiki/Data_Engineering/Systems/Airflow#I'm_getting_paged_for_a_Skein_certificate_about_to_expire"
+      expr: ((x509_cert_expiry{subject="skein-internal", cluster="analytics"} - time()) / 86400) < 14
+      labels:
+        severity: critical
+        team: data-engineering
