@@ -1,0 +1,22 @@
+rule_files:
+  - skein_certificate_expiry.yaml
+evaluation_interval: 1m
+tests:
+  - input_series:
+    - series: x509_cert_expiry{subject="skein-internal", cluster="analytics", instance="an-test-client1002.eqiad.wmnet", cert="/srv/airflow-analytics/.skein/skein.crt"}
+      values: '1099800' # 13 * 84600
+    alert_rule_test:
+    - alertname: SkeinCertificateCloseToExpiry
+      exp_alerts:
+      - exp_labels:
+          severity: critical
+          team: data-engineering
+          cluster: analytics
+          subject: skein-internal
+          instance: an-test-client1002.eqiad.wmnet
+          cert: /srv/airflow-analytics/.skein/skein.crt
+        exp_annotations:
+          description: Skein certificate is close to expiry
+          summary: Skein certificate is close to expiry
+          dashboard: "https://grafana.wikimedia.org/d/980N6H7Iz/skein-certificate-expiry"
+          runbook: "https://wikitech.wikimedia.org/wiki/Data_Engineering/Systems/Airflow#I'm_getting_paged_for_a_Skein_certificate_about_to_expire"
