@@ -5,15 +5,15 @@ groups:
     rules:
       - alert: NodeTextfileStale
         expr: |
-          time() -
+          (time() -
             node_textfile_mtime_seconds{
               file!~"(.+/)?(confd-reload-vcl|atlas_metadata|trafficserver_config_.+|varnish_params|role_owner)\\.prom"
             }
+          ) * on (instance) group_left(team) role_owner
           >= 4 * (60*60*24)
         for: 1h
         labels:
-          team: sre
-          severity: critical
+          severity: warning
         annotations:
           summary: "Stale textfile for {{ $labels.instance }}"
           description: >-
