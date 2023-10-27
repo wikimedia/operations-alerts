@@ -29,10 +29,18 @@ groups:
           runbook: https://wikitech.wikimedia.org/wiki/Monitoring/check_systemd_state
 
       - alert: SystemdUnitCrashLoop
+        # Same pattern as above to get 'team' label systemd_unit_owner or
+        # role_owner
         expr: |
-          increase(node_systemd_service_restart_total[10m])
-            * on (instance) group_left(team) role_owner
-          > 12 # more than once a minute
+          (
+            increase(node_systemd_service_restart_total[10m])
+              * on (instance,name) group_left(team) systemd_unit_owner
+          ) > 12 # More than once a minute
+          or ignoring(team)
+          (
+            increase(node_systemd_service_restart_total[10m])
+              * on (instance) group_left(team) role_owner{team!="wmcs"}
+          ) > 12
         for: 2m
         labels:
           severity: warning

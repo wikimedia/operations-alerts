@@ -38,9 +38,13 @@ tests:
 
   - interval: 1m
     input_series:
+      - series: 'systemd_unit_owner{instance="sretest1001:9100",team="serviceops",name="override.service"}'
+        values: '1+0x60'
       - series: 'role_owner{instance="sretest1001:9100",team="infrastructure-foundations"}'
         values: '1+0x60'
       - series: 'node_systemd_service_restart_total{instance="sretest1001:9100",name="example.service"}'
+        values: '5+10x60'
+      - series: 'node_systemd_service_restart_total{instance="sretest1001:9100",name="override.service"}'
         values: '5+10x60'
     alert_rule_test:
       - alertname: SystemdUnitCrashLoop
@@ -54,5 +58,15 @@ tests:
           exp_annotations:
             summary: "example.service crashloop on sretest1001:9100"
             description: "example.service has had 100 restarts in the last 10m"
+            dashboard: 'https://grafana.wikimedia.org/d/g-AaZRFWk/systemd-status'
+            runbook: TODO
+        - exp_labels:
+            severity: warning
+            team: serviceops
+            instance: sretest1001:9100
+            name: override.service
+          exp_annotations:
+            summary: "override.service crashloop on sretest1001:9100"
+            description: "override.service has had 100 restarts in the last 10m"
             dashboard: 'https://grafana.wikimedia.org/d/g-AaZRFWk/systemd-status'
             runbook: TODO
