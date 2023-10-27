@@ -9,9 +9,17 @@ groups:
         # check.
         # pint disable promql/series
         expr: |
-          instance_name:node_systemd_unit_state_failed:count1
-          # wmcs has its own systemdunitdown alerts T333315
-          * on (instance) group_left(team) role_owner{team!="wmcs"}
+          # First try to find the time by looking for the systemd_unit_owner
+          (
+            instance_name:node_systemd_unit_state_failed:count1
+              * on (instance,name) group_left(team) systemd_unit_owner
+          ) == 1
+          # Then fall back to using role_owner (WMCS has its own alerts T333315)
+          or ignoring(team)
+          (
+            instance_name:node_systemd_unit_state_failed:count1
+              * on (instance) group_left(team) role_owner{team!="wmcs"}
+          ) == 1
         labels:
           severity: warning
         annotations:
