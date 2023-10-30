@@ -1,5 +1,9 @@
 # deploy-tag: k8s, k8s-staging
 
+# The metrics below are created on-demand by otel-collector, as such they might
+# not exist all the time. Instruct 'pint' to ignore 'series is missing' checks.
+# pint file/disable promql/series
+
 groups:
   - name: opentelemetry-collector
     rules:
