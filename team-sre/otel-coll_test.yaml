@@ -1,0 +1,54 @@
+rule_files:
+  - otel-coll.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    input_series:
+      - series: 'otelcol_processor_dropped_spans{instance="10.64.75.69:8888", job="k8s-pods", processor="memory_limiter", service_name="otelcol-contrib"}'
+        values: '3+3x90'
+      - series: 'otelcol_receiver_refused_spans{instance="10.64.75.69:8888", job="k8s-pods", receiver="otlp", service_name="otelcol-contrib", transport="grpc"}'
+        values: '10+10x90'
+      - series: 'otelcol_exporter_enqueue_failed_spans{instance="10.64.75.69:8888", job="k8s-pods", exporter="logging", service_name="otelcol-contrib"}'
+        values: '3+3x90'
+    external_labels:
+      site: eqiad
+      prometheus: foo
+    alert_rule_test:
+    - alertname: OtelCollectorDroppedSpans
+      eval_time: 20m
+      exp_alerts:
+       - exp_labels:
+           processor: memory_limiter
+           team: sre
+           severity: critical
+         exp_annotations:
+           summary: Some spans have been dropped by processor memory_limiter on foo
+           description: Maybe collector has received non standard spans or it reached some limits
+           dashboard: https://grafana.wikimedia.org/d/SPebYW7Iz/opentelemetry-collector
+           runbook: TODO
+
+    - alertname: OtelCollectorRefusedSpans
+      eval_time: 20m
+      exp_alerts:
+       - exp_labels:
+           receiver: otlp
+           team: sre
+           severity: critical
+         exp_annotations:
+           summary: Some spans have been refused by receiver otlp on foo
+           description: Maybe collector has received non standard spans or it reached some limits
+           dashboard: https://grafana.wikimedia.org/d/SPebYW7Iz/opentelemetry-collector
+           runbook: TODO
+
+    - alertname: OtelCollectorEnqueuedSpans
+      eval_time: 20m
+      exp_alerts:
+       - exp_labels:
+           exporter: logging
+           team: sre
+           severity: critical
+         exp_annotations:
+          summary: Some spans have been enqueued by exporter logging on foo
+          description: Maybe used destination has a problem or used payload is not correct
+          dashboard: https://grafana.wikimedia.org/d/SPebYW7Iz/opentelemetry-collector
+          runbook: TODO
