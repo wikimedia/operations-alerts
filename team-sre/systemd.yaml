@@ -30,7 +30,11 @@ groups:
 
       - alert: SystemdUnitCrashLoop
         # Same pattern as above to get 'team' label systemd_unit_owner or
-        # role_owner
+        # role_owner.
+        #
+        # We might not have systemd_unit_owner everywhere, thus disable
+        # promql/series check.
+        # pint disable promql/series
         expr: |
           (
             increase(node_systemd_service_restart_total[10m])
