@@ -43,7 +43,7 @@ tests:
   - interval: 1m
     input_series:
       - series: 'flink_jobmanager_taskSlotsTotal{kubernetes_namespace="rdf-streaming-updater"}'
-        values: 22
+        values: 5
       - series: 'flink_jobmanager_taskSlotsTotal{kubernetes_namespace="unrelated-session-cluster"}'
         values: 4
     external_labels:
