@@ -1,0 +1,27 @@
+# deploy-tag: ops
+groups:
+  - name: raid
+    rules:
+      - alert: MDRAIDFailedDisk
+        annotations:
+          description: 'md raid degraded on {{$labels.instance}}'
+          summary: 'MD RAID - Failed disk(s)'
+          dashboard: 'TODO'
+          runbook: 'https://wikitech.wikimedia.org/wiki/Dc-operations/Hardware_Troubleshooting_Runbook#Hardware_Raid_Information_Gathering'
+        expr: node_md_disks{state="failed"} != 0
+        for: 15m
+        labels:
+          severity: critical
+          team: infrastructure-foundations
+
+      - alert: MDRAIDNotEnoughDisks
+        annotations:
+          description: 'md raid degraded on {{$labels.instance}}'
+          summary: 'MD RAID - insufficient active disk(s)'
+          dashboard: 'TODO'
+          runbook: 'https://wikitech.wikimedia.org/wiki/Dc-operations/Hardware_Troubleshooting_Runbook#Hardware_Raid_Information_Gathering'
+        expr: node_md_disks{state="active"} < 2
+        for: 15m
+        labels:
+          severity: critical
+          team: infrastructure-foundations
