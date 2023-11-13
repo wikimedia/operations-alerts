@@ -5,29 +5,59 @@ groups:
     rules:
 
 ## Eventgate Logging Latency alerts
-    - alert: EventgateLoggingExternalLatency
+### Critical for 90th percentile
+    - &EventgateLatencyCritical
+      alert: EventgateLatency
       annotations:
-        description: Critical latency for 90th percentile of {{ $labels.method }} method events on eventgate-logging-external in {{ $externalLabels.site }}.
-        summary: Critical latency for {{ $labels.method }} events on eventgate-logging-external in {{ $externalLabels.site }}.
-        dashboard: https://grafana.wikimedia.org/d/ZB39Izmnz/eventgate?viewPanel=79&orgId=1&var-service=eventgate-logging-external
+        description: Critical latency for 90th percentile of {{ $labels.method }} method events on {{ $labels.service }} in {{ $externalLabels.site }}.
+        summary: Critical latency for {{ $labels.method }} events on {{ $labels.service }} in {{ $externalLabels.site }}.
+        dashboard: https://grafana.wikimedia.org/d/ZB39Izmnz/eventgate?viewPanel=79&orgId=1&var-service={{ $labels.service }}
         runbook: https://wikitech.wikimedia.org/wiki/Event_Platform/EventGate
-      expr: service_method:express_router_request_duration_seconds:90pct5m{service="eventgate-logging-external"} > 1
+      # pint disable promql/series
+      expr: service_method:express_router_request_duration_seconds:90pct5m{service="eventgate-main"} > 1
       for: 5m
       labels:
         severity: critical
         team: data-engineering
 
-    - alert: EventgateLoggingExternalLatency
+    - <<: *EventgateLatencyCritical
+      # pint disable promql/series
+      expr: service_method:express_router_request_duration_seconds:90pct5m{service="eventgate-analytics"} > 1
+
+    - <<: *EventgateLatencyCritical
+      # pint disable promql/series
+      expr: service_method:express_router_request_duration_seconds:90pct5m{service="eventgate-analytics-external"} > 1
+
+    - <<: *EventgateLatencyCritical
+      # pint disable promql/series
+      expr: service_method:express_router_request_duration_seconds:90pct5m{service="eventgate-logging-external"} > 1
+
+###  Elevated (warn) for 90th percentile
+    - &EventgateLatencyElevated
+      alert: EventgateLatency
       annotations:
-        description: Elevated latency for 90th percentile of {{ $labels.method }} method events on eventgate-logging-external in {{ $externalLabels.site }}.
-        summary: Elevated latency for {{ $labels.method }} events on eventgate-logging-external in {{ $externalLabels.site }}.
-        dashboard: https://grafana.wikimedia.org/d/ZB39Izmnz/eventgate?viewPanel=79&orgId=1&var-service=eventgate-logging-external
+        description: Elevated latency for 90th percentile of {{ $labels.method }} method events on {{ $labels.service }} in {{ $externalLabels.site }}.
+        summary: Elevated latency for {{ $labels.method }} events on {{ $labels.service }} in {{ $externalLabels.site }}.
+        dashboard: https://grafana.wikimedia.org/d/ZB39Izmnz/eventgate?viewPanel=79&orgId=1&var-service={{ $labels.service }}
         runbook: https://wikitech.wikimedia.org/wiki/Event_Platform/EventGate
-      expr: service_method:express_router_request_duration_seconds:90pct5m{service="eventgate-logging-external"} > 0.98
+      # pint disable promql/series
+      expr: service_method:express_router_request_duration_seconds:90pct5m{service="eventgate-main"} > 0.98
       for: 5m
       labels:
         severity: warning
         team: data-engineering
+
+    - <<: *EventgateLatencyElevated
+      # pint disable promql/series
+      expr: service_method:express_router_request_duration_seconds:90pct5m{service="eventgate-analytics"} > 0.98
+
+    - <<: *EventgateLatencyElevated
+      # pint disable promql/series
+      expr: service_method:express_router_request_duration_seconds:90pct5m{service="eventgate-analytics-external"} > 0.98
+
+    - <<: *EventgateLatencyElevated
+      # pint disable promql/series
+      expr: service_method:express_router_request_duration_seconds:90pct5m{service="eventgate-logging-external"} > 0.98
 
 ## Eventgate Services Validation Error Alerts
 
@@ -60,18 +90,30 @@ groups:
       expr: sum by (stream, service) (rate(eventgate_validation_errors_total{service="eventgate-logging-external"} [15m])) > 0.5
 
 ## Eventgate HTTP errors
-    - alert: EventgateHTTPErrors
+    - &EventgateHTTPErrors
+      alert: EventgateHTTPErrors
       annotations:
-        description: Elevated errors on eventgate-logging-external in {{ $externalLabels.site }}.
-        summary: Elevated errors on eventgate-logging-external in {{ $externalLabels.site }}.
-        dashboard: https://grafana.wikimedia.org/d/ZB39Izmnz/eventgate?orgId=1&refresh=1m&var-dc={{ $externalLabels.site }}%2Bprometheus/k8s&var-service=eventgate-logging-external
+        description: Elevated errors on {{ $labels.service }} in {{ $externalLabels.site }}.
+        summary: Elevated errors on {{ $labels.service }} in {{ $externalLabels.site }}.
+        dashboard: https://grafana.wikimedia.org/d/ZB39Izmnz/eventgate?orgId=1&refresh=1m&var-dc={{ $externalLabels.site }}%2Bprometheus/k8s&var-service={{ $labels.service }}
         runbook: https://wikitech.wikimedia.org/wiki/Event_Platform/EventGate
       # There might not be 5xx all the time, thus ignore matching 'status'
       # label. https://cloudflare.github.io/pint/checks/promql/series.html#ignorelabel-value
       # pint rule/set promql/series(express_router_request_duration_seconds_count) ignore/label-value status
-      expr: rate(express_router_request_duration_seconds_count{service="eventgate-logging-external",status=~"5.."}[5m]) > 1
+      expr: rate(express_router_request_duration_seconds_count{service="eventgate-main",status=~"5.."}[5m]) > 1
       for: 5m
       labels:
         severity: critical
         team: data-engineering
 
+    - <<: *EventgateHTTPErrors
+      # pint disable promql/series
+      expr: rate(express_router_request_duration_seconds_count{service="eventgate-analytics",status=~"5.."}[5m]) > 1
+
+    - <<: *EventgateHTTPErrors
+      # pint disable promql/series
+      expr: rate(express_router_request_duration_seconds_count{service="eventgate-analytics-external",status=~"5.."}[5m]) > 1
+
+    - <<: *EventgateHTTPErrors
+      # pint disable promql/series
+      expr: rate(express_router_request_duration_seconds_count{service="eventgate-logging-external",status=~"5.."}[5m]) > 1
