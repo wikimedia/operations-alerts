@@ -7,8 +7,8 @@ tests:
   - interval: 5m # 12 per hour, 144 every 12 hours
     input_series:
       - series: 'haproxy_server_total_time_average_seconds{instance="cloudcontrol1003", job="cloudlb-haproxy", proxy="nova_api", server="cloudcontrol1007"}'
-        # should trigger with > 1
-        values: "0+0x144 1.1+0x288"
+        # should trigger with > 1.5
+        values: "0+0x144 1.6+0x288"
     external_labels:
       site: eqiad
     alert_rule_test:

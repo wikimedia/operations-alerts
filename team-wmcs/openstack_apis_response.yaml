@@ -5,7 +5,7 @@ groups:
     rules:
       # generic except mysql
       - alert: OpenstackAPIResponse
-        expr: avg_over_time(haproxy_server_total_time_average_seconds{job="cloudlb-haproxy", proxy!~"(mysql|trove-api_backend|magnum-api_backend)"}[12h]) > 1
+        expr: avg_over_time(haproxy_server_total_time_average_seconds{job="cloudlb-haproxy", proxy!~"(mysql|trove-api_backend|magnum-api_backend)"}[12h]) > 1.5
         labels:
           team: wmcs
           severity: warning
