@@ -1,0 +1,53 @@
+rule_files:
+  - ntp.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    input_series:
+      - series: 'node_timex_sync_status{cluster="misc",instance="sretest2004:9100",job="node",site="codfw"}'
+        values: '1x100'
+      - series: 'node_timex_sync_status{cluster="misc",instance="sretest2003:9100",job="node",site="codfw"}'
+        values: '0x100'
+    external_labels:
+      site: codfw
+    alert_rule_test:
+      - alertname: NTPNoSynced
+        eval_time: 10m
+        exp_alerts:
+          - exp_labels:
+              team: infrastructure-foundations
+              severity: warning
+              job: node
+              instance: sretest2003:9100
+              cluster: misc
+              site: codfw
+            exp_annotations:
+              description: 'time not synced with ntp on sretest2003:9100'
+              summary: 'NTP not synced'
+              dashboard: 'TODO'
+              runbook: 'https://wikitech.wikimedia.org/wiki/NTP'
+
+  - interval: 1m
+    input_series:
+      - series: 'node_timex_offset_seconds{cluster="misc",instance="sretest2004:9100",job="node",site="codfw"}'
+        values: '-2.500x100'
+      - series: 'node_timex_sync_status{cluster="misc",instance="sretest2003:9100",job="node",site="codfw"}'
+        values: '-0.0002x100'
+    external_labels:
+      site: codfw
+    alert_rule_test:
+      - alertname: NTPTimeDrift
+        eval_time: 10m
+        exp_alerts:
+          - exp_labels:
+              team: infrastructure-foundations
+              severity: warning
+              job: node
+              instance: sretest2004:9100
+              cluster: misc
+              site: codfw
+            exp_annotations:
+              description: 'time drift on sretest2004:9100'
+              summary: 'Unacceptable time drift between NTP and systemtime'
+              dashboard: 'TODO'
+              runbook: 'https://wikitech.wikimedia.org/wiki/NTP'
