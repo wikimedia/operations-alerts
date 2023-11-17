@@ -1,5 +1,6 @@
 # deploy-tag: cloud
-# this only deploys to cloudmetrics hosts (and that's only on eqiad for now)
+# deploy-site: eqiad
+
 # Alerts ceph cluster wide issues
 groups:
   - name: ceph_cluster

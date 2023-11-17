@@ -1,4 +1,5 @@
-# deploy-tag: labs
+# deploy-tag: cloud
+# deploy-site: eqiad
 
 groups:
   - name: novafullstack_sustained_failures

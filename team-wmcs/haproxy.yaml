@@ -1,4 +1,6 @@
 # deploy-tag: cloud
+# deploy-site: eqiad
+
 groups:
   - name: HAProxy
     rules:
