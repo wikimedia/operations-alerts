@@ -6,6 +6,8 @@ tests:
     input_series:
       - series: kafka_burrow_partition_lag{group="cpjobqueue-ORESFetchScoreJob", exported_cluster="main-eqiad"}
         values: '101+0x60'
+    external_labels:
+      site: eqiad
     alert_rule_test:
     - alertname: ORESFetchScoreJobKafkaLag
       eval_time: 1h
@@ -19,5 +21,4 @@ tests:
            summary: "Kafka consumer lag for ORESFetchScoreJob over threshold for past 1h."
            description: "Increased duration of ORESFetchScoreJob causes a delay in the ORES recent changes filters."
            runbook: https://wikitech.wikimedia.org/wiki/Machine_Learning/LiftWing/Alerts#Kafka_Consumer_lag_-_ORESFetchScoreJobKafkaLag_alert
-           dashboard: https://grafana.wikimedia.org/d/000000484/kafka-consumer-lag?from=now-3h&orgId=1&to=now&var-cluster=main-eqiad&var-consumer_group=cpjobqueue-ORESFetchScoreJob
-
+           dashboard: https://grafana.wikimedia.org/d/000000484/kafka-consumer-lag?from=now-3h&orgId=1&to=now&var-cluster=main-eqiad&var-consumer_group=cpjobqueue-ORESFetchScoreJob&var-datasource=eqiad%20prometheus/ops
