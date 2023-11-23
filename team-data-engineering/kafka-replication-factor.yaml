@@ -1,0 +1,16 @@
+# deploy-tag: ops
+# deploy-site: eqiad
+
+groups:
+  - name: kafka
+    rules:
+    - alert: KafkaReplicationFactorTooLow
+      annotations:
+        description: Kafka topic replication factor is too low
+        summary: SKafka topic replication factor is too low
+        dashboard: "https://grafana.wikimedia.org/d/000000234/kafka-by-topic?var-kafka_cluster={{ $labels.kafka_cluster }}&var-kafka_broker=All&var-topic={{ $labels.topic }}&viewPanel=40"
+        runbook: "https://wikitech.wikimedia.org/wiki/Kafka/Administration#Increase_a_topic's_replication_factor"
+      expr: (max by (kafka_cluster, topic) (kafka_cluster_Partition_ReplicasCount{topic !~ ".*test.*", kafka_cluster != "test-eqiad"})) < 2
+      labels:
+        severity: warning
+        team: data-engineering
