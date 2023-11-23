@@ -21,8 +21,10 @@ groups:
 
       - alert: HAProxyServiceUnavailable
         # The internal 'stats' server has no defined backends on purpose.
-        expr: haproxy_backend_active_servers{job="cloudlb-haproxy",proxy!="stats"} == 0
-        for: 1m
+        # Ignore wiki replicas as those are spread between two backends (web/analytics),
+        # and it's fine for everything in one to be down, there's a separate check for them below.
+        expr: haproxy_backend_active_servers{job="cloudlb-haproxy",proxy!~"(stats|wikireplica-db-(web|analytics)-s\\d)"} == 0
+        for: 2m
         labels:
           team: wmcs
           severity: critical
@@ -30,5 +32,26 @@ groups:
         annotations:
           summary: "HAProxy service {{ $labels.proxy }} has no available backends on {{ $labels.instance }}"
           description: "HAProxy service {{ $labels.proxy }} has no available backends on {{ $labels.instance }}"
+          runbook: https://wikitech.wikimedia.org/wiki/HAProxy
+          dashboard: TODO
+
+      - alert: HAProxyWikiReplicaSectionUnavailable
+        # Alert if a single section has no servers active in both backend types (web/analytics)
+        # on a single cloudlb node.
+        expr:
+          sum(
+            label_replace(
+              haproxy_backend_active_servers{job="cloudlb-haproxy",proxy=~"wikireplica-db-(web|analytics)-s\\d"},
+              "section", "$2", "proxy", "wikireplica-db-(web|analytics)-(s\\d)"
+            )
+          ) by (instance, section) == 0
+        for: 2m
+        labels:
+          team: wmcs
+          severity: critical
+          service: wikireplicas
+        annotations:
+          summary: "Wiki replica section {{ $labels.section }} has no available servers on {{ $labels.instance }}"
+          description: "Wiki replica section {{ $labels.section }} has no available servers on {{ $labels.instance }}"
           runbook: https://wikitech.wikimedia.org/wiki/HAProxy
           dashboard: TODO

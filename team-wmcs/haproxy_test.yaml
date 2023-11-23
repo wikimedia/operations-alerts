@@ -10,6 +10,8 @@ tests:
         values: "1x20 0x10"
       - series: 'haproxy_server_status{instance="cloudlb1003:9900",job="cloudlb-haproxy",proxy="heat_backend",server="cloudcontrol1005.eqiad.wmnet"}'
         values: "1x30"
+      - series: 'haproxy_server_status{instance="cloudlb1001:9900",job="cloudlb-haproxy",proxy="wikireplica-db-web-s1",server="clouddb1013.eqiad.wmnet"}'
+        values: "1x20 0x10"
     alert_rule_test:
       - alertname: HAProxyBackendUnavailable
         eval_time: 15m
@@ -34,6 +36,17 @@ tests:
               description: "HAProxy service heat_backend backend cloudcontrol1005.eqiad.wmnet is down according to 2 LB servers"
               runbook: https://wikitech.wikimedia.org/wiki/HAProxy
               dashboard: TODO
+          - exp_labels:
+              severity: warning
+              team: wmcs
+              service: cloudvps
+              proxy: wikireplica-db-web-s1
+              server: clouddb1013.eqiad.wmnet
+            exp_annotations:
+              summary: "HAProxy service wikireplica-db-web-s1 backend clouddb1013.eqiad.wmnet is down"
+              description: "HAProxy service wikireplica-db-web-s1 backend clouddb1013.eqiad.wmnet is down according to 1 LB servers"
+              runbook: https://wikitech.wikimedia.org/wiki/HAProxy
+              dashboard: TODO
 
   - interval: 1m
     input_series:
@@ -41,15 +54,21 @@ tests:
         values: "2x5 1x5 0x5"
       - series: 'haproxy_backend_active_servers{instance="cloudlb1002:9900",job="cloudlb-haproxy",proxy="stats"}'
         values: "0x15"
+      - series: 'haproxy_backend_active_servers{instance="cloudlb1002:9900",job="cloudlb-haproxy",proxy="stats"}'
+        values: "0x15"
+      - series: 'haproxy_backend_active_servers{instance="cloudlb1002:9900",job="cloudlb-haproxy",proxy="wikireplica-db-analytics-s3"}'
+        values: "0x15"
+      - series: 'haproxy_backend_active_servers{instance="cloudlb1002:9900",job="cloudlb-haproxy",proxy="wikireplica-db-web-s3"}'
+        values: "1x10 0x5"
     alert_rule_test:
       - alertname: HAProxyServiceUnavailable
-        eval_time: 3m
+        eval_time: 4m
         exp_alerts: []
       - alertname: HAProxyServiceUnavailable
-        eval_time: 8m
+        eval_time: 9m
         exp_alerts: []
       - alertname: HAProxyServiceUnavailable
-        eval_time: 13m
+        eval_time: 14m
         exp_alerts:
           - exp_labels:
               severity: critical
@@ -61,5 +80,23 @@ tests:
             exp_annotations:
               summary: "HAProxy service cinder-api_backend has no available backends on cloudlb1002:9900"
               description: "HAProxy service cinder-api_backend has no available backends on cloudlb1002:9900"
+              runbook: https://wikitech.wikimedia.org/wiki/HAProxy
+              dashboard: TODO
+
+      - alertname: HAProxyWikiReplicaSectionUnavailable
+        eval_time: 9m
+        exp_alerts: []
+      - alertname: HAProxyWikiReplicaSectionUnavailable
+        eval_time: 14m
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              team: wmcs
+              service: wikireplicas
+              instance: "cloudlb1002:9900"
+              section: s3
+            exp_annotations:
+              summary: "Wiki replica section s3 has no available servers on cloudlb1002:9900"
+              description: "Wiki replica section s3 has no available servers on cloudlb1002:9900"
               runbook: https://wikitech.wikimedia.org/wiki/HAProxy
               dashboard: TODO
