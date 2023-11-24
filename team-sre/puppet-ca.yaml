@@ -27,3 +27,15 @@ groups:
         labels:
           severity: critical
           team: sre
+
+      - alert: PuppetPendingCertificateRequest
+        expr: 'time() - puppet_ca_pending_certificate > 86400'
+        for: 1m
+        annotations:
+          summary: 'Puppet CA certificate for {{ $labels.subject }} is pending'
+          description: 'Puppet CA certificate request for {{ $labels.subject }} is {{ $value | humanizeDuration }} old, but has not been approved'
+          runbook: TODO
+          dashboard: TODO
+        labels:
+          severity: warning
+          team: sre
