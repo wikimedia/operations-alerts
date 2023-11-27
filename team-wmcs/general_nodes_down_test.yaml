@@ -5,7 +5,7 @@ tests:
   - interval: 1m
     input_series:
       - series: 'up{job="node", instance="dummynode1:9000", cluster="wmcs"}'
-        values: "1 1 0+0x7"
+        values: "1 0+0x300"
     external_labels:
       cluster: wmcs
     alert_rule_test:
@@ -23,20 +23,23 @@ tests:
               summary: "The node dummynode1 is unreachable."
               dashboard: "https://grafana.wikimedia.org/d/000000377/host-overview?orgId=1&var-server=dummynode1"
               runbook: "https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/NodeDown"
-
-  - interval: 1m
-    input_series:
-      - series: 'up{job="node", instance="dummynode1:9000", cluster="wmcs"}'
-        values: "1 0+0x300"
-    external_labels:
-      cluster: wmcs
-    alert_rule_test:
-      - alertname: NodeDownForLong
+      - alertname: NodeDown
         eval_time: 2h1m
         exp_alerts:
           - exp_labels:
               team: wmcs
-              severity: task
+              severity: warning
+              instance: dummynode1:9000
+              cluster: wmcs
+              job: node
+            exp_annotations:
+              description: "Node dummynode1 is down."
+              summary: "The node dummynode1 is unreachable."
+              dashboard: "https://grafana.wikimedia.org/d/000000377/host-overview?orgId=1&var-server=dummynode1"
+              runbook: "https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/NodeDown"
+          - exp_labels:
+              team: wmcs
+              severity: critical
               instance: dummynode1:9000
               cluster: wmcs
               job: node
@@ -44,29 +47,7 @@ tests:
               description: "Node dummynode1 has been down for long."
               summary: "The node dummynode1 has been unreachable for more than two hours."
               dashboard: "https://grafana.wikimedia.org/d/000000377/host-overview?orgId=1&var-server=dummynode1"
-              runbook: "https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/NodeDownForLong"
-
-  - interval: 1m
-    input_series:
-      - series: 'up{job="node", instance="cloudvirt2001:9000", cluster="wmcs"}'
-        values: "1 0+0x300"
-    external_labels:
-      cluster: wmcs
-    alert_rule_test:
-      - alertname: NodeDownForLong
-        eval_time: 2h1m
-        exp_alerts:
-          - exp_labels:
-              team: wmcs
-              severity: task
-              instance: cloudvirt2001:9000
-              cluster: wmcs
-              job: node
-            exp_annotations:
-              description: "Node cloudvirt2001 has been down for long."
-              summary: "The node cloudvirt2001 has been unreachable for more than two hours."
-              dashboard: "https://grafana.wikimedia.org/d/000000377/host-overview?orgId=1&var-server=cloudvirt2001"
-              runbook: "https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/NodeDownForLong"
+              runbook: "https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/NodeDown"
 
   - interval: 1m
     input_series:
@@ -85,9 +66,9 @@ tests:
               cluster: wmcs
               job: node
             exp_annotations:
-              description: "Cloudvirt node cloudvirt1001 is down."
-              summary: |
-                #page The cloudvirt node cloudvirt1001 is unreachable. This is a
+              summary: "Cloudvirt node cloudvirt1001 is down. #page"
+              description: |
+                The cloudvirt node cloudvirt1001 is unreachable. This is a
                 major outage that requires you to either restore the server or evacuate manually the VMs on it.
               dashboard: "https://grafana.wikimedia.org/d/000000377/host-overview?orgId=1&var-server=cloudvirt1001"
               runbook: "https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/NodeDown"
@@ -120,9 +101,9 @@ tests:
               cluster: wmcs
               job: node
             exp_annotations:
-              description: "Cloudvirt node cloudvirt-wdqs1001 is down."
-              summary: |
-                #page The cloudvirt node cloudvirt-wdqs1001 is unreachable. This is a
+              summary: "Cloudvirt node cloudvirt-wdqs1001 is down. #page"
+              description: |
+                The cloudvirt node cloudvirt-wdqs1001 is unreachable. This is a
                 major outage that requires you to either restore the server or evacuate manually the VMs on it.
               dashboard: "https://grafana.wikimedia.org/d/000000377/host-overview?orgId=1&var-server=cloudvirt-wdqs1001"
               runbook: "https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/NodeDown"
