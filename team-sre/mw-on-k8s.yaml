@@ -9,13 +9,15 @@ groups:
           summary: 'Not enough idle PHP-FPM workers for Mediawiki {{ $labels.deployment }} at {{ $externalLabels.site }}: {{ $value | humanizePercentage }} idle'
           dashboard: 'https://grafana.wikimedia.org/d/U7JT--knk/mw-on-k8s?orgId=1&viewPanel=84&var-dc={{ $externalLabels.site }}%20prometheus/k8s&var-service=mediawiki&var-namespace={{$labels.deployment}}&var-container_name=All'
           runbook: 'https://bit.ly/wmf-fpmsat'
-        expr: sum by (deployment) (phpfpm_processes_total{app="mediawiki", state="idle", deployment!~"(mw-api-int|jobrunner)"}) / sum by (deployment) (phpfpm_processes_total{app="mediawiki", deployment!~"(mw-api-int|jobrunner)"}) <= 0.5
+        expr: sum by (deployment) (phpfpm_processes_total{app="mediawiki", state="idle", deployment!~"(mw-api-int|mw-jobrunner)"}) / sum by (deployment) (phpfpm_processes_total{app="mediawiki", deployment!~"(mw-api-int|mw-jobrunner)"}) <= 0.5
         for: 2m
         labels:
           severity: critical
           team: sre
       - <<: *PHPFPMTooBusy
-        expr: sum by (deployment) (phpfpm_processes_total{app="mediawiki", state="idle", deployment=~"(mw-api-int|jobrunner)"}) / sum by (deployment) (phpfpm_processes_total{app="mediawiki", deployment=~"(mw-api-int|jobrunner)"}) <= 0.3
+        expr: sum by (deployment) (phpfpm_processes_total{app="mediawiki", state="idle", deployment="mw-api-int"}) / sum by (deployment) (phpfpm_processes_total{app="mediawiki", deployment="mw-api-int"}) <= 0.3
+      - <<: *PHPFPMTooBusy
+        expr: sum by (deployment) (phpfpm_processes_total{app="mediawiki", state="idle", deployment="mw-jobrunner"}) / sum by (deployment) (phpfpm_processes_total{app="mediawiki", deployment="mw-jobrunner"}) <= 0.1
 
       - alert: HttpdUnreachable
         annotations:
