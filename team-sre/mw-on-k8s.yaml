@@ -2,17 +2,21 @@
 groups:
   - name: mediawiki-on-k8s
     rules:
-      - alert: PHPFPMTooBusy
+      - &PHPFPMTooBusy
+        alert: PHPFPMTooBusy
         annotations:
           description: 'The MediaWiki k8s deployment {{ $labels.deployment }} in {{ $externalLabels.site }} is experiencing saturation of PHP-FPM workers {{ $value | humanizePercentage }}'
           summary: 'Not enough idle PHP-FPM workers for Mediawiki {{ $labels.deployment }} at {{ $externalLabels.site }}: {{ $value | humanizePercentage }} idle'
           dashboard: 'https://grafana.wikimedia.org/d/U7JT--knk/mw-on-k8s?orgId=1&viewPanel=84&var-dc={{ $externalLabels.site }}%20prometheus/k8s&var-service=mediawiki&var-namespace={{$labels.deployment}}&var-container_name=All'
           runbook: 'https://bit.ly/wmf-fpmsat'
-        expr: sum by (deployment) (phpfpm_processes_total{app="mediawiki", state="idle"}) / sum by (deployment) (phpfpm_processes_total{app="mediawiki"}) <= 0.5
+        expr: sum by (deployment) (phpfpm_processes_total{app="mediawiki", state="idle", deployment!="mw-api-int"}) / sum by (deployment) (phpfpm_processes_total{app="mediawiki", deployment!="mw-api-int"}) <= 0.5
         for: 2m
         labels:
           severity: critical
           team: sre
+      - <<: *PHPFPMTooBusy
+        expr: sum by (deployment) (phpfpm_processes_total{app="mediawiki", state="idle", deployment="mw-api-int"}) / sum by (deployment) (phpfpm_processes_total{app="mediawiki", deployment="mw-api-int"}) <= 0.3
+
       - alert: HttpdUnreachable
         annotations:
           description: 'httpd is unresponsive on {{ $value | humanizePercentage }} of MediaWiki k8s deployment {{ $labels.deployment }}.'
