@@ -5,7 +5,7 @@ groups:
       - alert: MDRAIDFailedDisk
         annotations:
           description: 'md raid degraded on {{$labels.instance}}'
-          summary: 'MD RAID - Failed disk(s)'
+          summary: 'MD RAID - Failed disk(s) on {{$labels.instance}}'
           dashboard: 'TODO'
           runbook: 'https://wikitech.wikimedia.org/wiki/Dc-operations/Hardware_Troubleshooting_Runbook#Hardware_Raid_Information_Gathering'
         expr: node_md_disks{state="failed"} != 0
@@ -17,7 +17,7 @@ groups:
       - alert: MDRAIDNotEnoughDisks
         annotations:
           description: 'md raid degraded on {{$labels.instance}}'
-          summary: 'MD RAID - insufficient active disk(s)'
+          summary: 'MD RAID - insufficient active disk(s) on {{$labels.instance}}'
           dashboard: 'TODO'
           runbook: 'https://wikitech.wikimedia.org/wiki/Dc-operations/Hardware_Troubleshooting_Runbook#Hardware_Raid_Information_Gathering'
         expr: node_md_disks{state="active"} < 2
