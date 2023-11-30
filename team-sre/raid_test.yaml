@@ -24,7 +24,7 @@ tests:
               device: md0
             exp_annotations:
               description: 'md raid degraded on backup2004:9100'
-              summary: 'MD RAID - Failed disk(s)'
+              summary: 'MD RAID - Failed disk(s) on backup2004:9100'
               dashboard: 'TODO'
               runbook: 'https://wikitech.wikimedia.org/wiki/Dc-operations/Hardware_Troubleshooting_Runbook#Hardware_Raid_Information_Gathering'
 
@@ -50,6 +50,6 @@ tests:
               device: md0
             exp_annotations:
               description: 'md raid degraded on backup2004:9100'
-              summary: 'MD RAID - insufficient active disk(s)'
+              summary: 'MD RAID - insufficient active disk(s) on backup2004:9100'
               dashboard: 'TODO'
               runbook: 'https://wikitech.wikimedia.org/wiki/Dc-operations/Hardware_Troubleshooting_Runbook#Hardware_Raid_Information_Gathering'
