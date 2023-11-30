@@ -14,7 +14,7 @@ tests:
           topic: webrequest_text
           kafka_cluster: jumbo-eqiad
         exp_annotations:
-          description: Kafka topic replication factor is too low
-          summary: SKafka topic replication factor is too low
+          description: Kafka topic webrequest_text replication factor is too low on jumbo-eqiad
+          summary: Kafka topic webrequest_text replication factor is too low on jumbo-eqiad
           dashboard: "https://grafana.wikimedia.org/d/000000234/kafka-by-topic?var-kafka_cluster=jumbo-eqiad&var-kafka_broker=All&var-topic=webrequest_text&viewPanel=40"
           runbook: "https://wikitech.wikimedia.org/wiki/Kafka/Administration#Increase_a_topic's_replication_factor"
