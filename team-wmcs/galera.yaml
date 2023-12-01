@@ -73,3 +73,16 @@ groups:
           description: "Galera node {{ $labels.instance }} is out of sync with the cluster (wsrep_local_state_uuid does not match wsrep_cluster_state_uuid)"
           runbook: https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/GaleraNodeOutOfSync
           dashboard: https://grafana.wikimedia.org/d/galera-cluster-summary/wmcs-openstack-eqiad-galera-cluster-summary
+
+      - alert: GaleraNoRecentWrites
+        expr: 'irate(mysql_global_status_wsrep_last_committed{job="mysql-galera"}[1h]) < 0.5'
+        for: 5m
+        labels:
+          team: wmcs
+          severity: warning
+          service: cloudvps
+        annotations:
+          summary: "Galera node {{ $labels.instance }} has no writes"
+          description: "Galera status variable wsrep_last_committed has not increased on {{ $labels.instance }} in the past hour, indicating a sync problem"
+          runbook: https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/GaleraNoRecentWrites
+          dashboard: https://grafana.wikimedia.org/d/galera-cluster-summary/wmcs-openstack-eqiad-galera-cluster-summary
