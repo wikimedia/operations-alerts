@@ -18,7 +18,7 @@ groups:
 
       # trove
       - alert: OpenstackAPIResponse
-        expr: avg_over_time(haproxy_server_total_time_average_seconds{job="cloudlb-haproxy", proxy="trove-api_backend"}[12h]) > 2
+        expr: avg_over_time(haproxy_server_total_time_average_seconds{job="cloudlb-haproxy", proxy="trove-api_backend"}[12h]) > 3
         labels:
           team: wmcs
           severity: warning

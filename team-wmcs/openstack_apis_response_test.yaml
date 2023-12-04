@@ -70,7 +70,7 @@ tests:
     input_series:
       - series: 'haproxy_server_total_time_average_seconds{instance="cloudcontrol1003", job="cloudlb-haproxy", proxy="trove-api_backend", server="cloudcontrol1007"}'
         # should trigger with > 2
-        values: "0+0x144 2.1+0x288"
+        values: "0+0x144 3.1+0x288"
     external_labels:
       site: eqiad
     alert_rule_test:
@@ -96,7 +96,7 @@ tests:
     input_series:
       - series: 'haproxy_server_total_time_average_seconds{instance="cloudcontrol1003", job="cloudlb-haproxy", proxy="trove-api_backend"}'
         # small blip, not enough to sway the mean
-        values: "0+0x144 1.1+0x100 0+0x144"
+        values: "0+0x144 2.1+0x100 0+0x144"
     external_labels:
       site: eqiad
     alert_rule_test:
