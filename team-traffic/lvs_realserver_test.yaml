@@ -1,0 +1,33 @@
+rule_files:
+  - lvs_realserver.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    external_labels:
+      site: ulsfo
+    input_series:
+      # Should trigger a fail
+      - series: 'tcp_mss_clamper_mss_cfg{cluster="ncredir", instance="ncredir4001:2200", interface="lo", job="lvs_realserver", protocol="IPv4"}'
+        values: '1440 1440 1440 1440 1440 1440 1440'
+      - series: 'lvs_realserver_mss_value{cluster="ncredir", endpoint="198.35.26.98:443", instance="ncredir4001:9100", job="node", protocol="IPv4"}'
+        values: '1480 1480 1480 1480 1480 1480 1480'
+      # Should pass
+      - series: 'tcp_mss_clamper_mss_cfg{cluster="ncredir", instance="ncredir4001:2200", interface="lo", job="lvs_realserver", protocol="IPv6"}'
+        values: '1400 1400 1400 1400 1400 1400 1400'
+      - series: 'lvs_realserver_mss_value{cluster="ncredir", endpoint="[2620:0:863:ed1a::3]:443", instance="ncredir4001:9100", job="node", protocol="IPv6"}'
+        values: '1400 1400 1400 1400 1400 1400 1400'
+    alert_rule_test:
+      - alertname: LVSRealserverMSS
+        eval_time: 6m
+        exp_alerts:
+          - exp_labels:
+              endpoint: "198.35.26.98:443"
+              hostname: "ncredir4001"
+              protocol: "IPv4"
+              severity: critical
+              team: traffic
+            exp_annotations:
+              summary: "Unexpected MSS value on 198.35.26.98:443 @ ncredir4001"
+              description: "The host ncredir4001 reports a mismatch between configured and observed TCP MSS on 198.35.26.98:443"
+              dashboard: TODO
+              runbook: TODO
