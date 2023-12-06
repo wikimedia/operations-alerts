@@ -14,10 +14,10 @@ tests:
            cluster: lvs
            device: eno1np0
            instance: lvs1017:9100
-           severity: page
+           severity: critical
            team: traffic
          exp_annotations:
-           summary: 'Excessive RX traffic on lvs1017:9100 (eno1np0) #page'
+           summary: 'Excessive RX traffic on lvs1017:9100 (eno1np0)'
            description: "The host lvs1017:9100 is receiving 381469.7265625 megabits/s on interface eno1np0"
            dashboard: https://grafana.wikimedia.org/d/000000377/host-overview?orgId=1&var-server=lvs1017
            runbook: https://bit.ly/wmf-lvsrx

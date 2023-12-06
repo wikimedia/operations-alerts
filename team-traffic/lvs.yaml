@@ -8,9 +8,9 @@ groups:
         for: 1m
         labels:
           team: traffic
-          severity: page
+          severity: critical
         annotations:
-          summary: "Excessive RX traffic on {{ $labels.instance }} ({{ $labels.device }}) #page"
+          summary: "Excessive RX traffic on {{ $labels.instance }} ({{ $labels.device }})"
           description: "The host {{ $labels.instance }} is receiving {{ $value }} megabits/s on interface {{ $labels.device }}"
           dashboard: 'https://grafana.wikimedia.org/d/000000377/host-overview?orgId=1&var-server={{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}'
           runbook: 'https://bit.ly/wmf-lvsrx'
