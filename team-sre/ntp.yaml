@@ -9,7 +9,7 @@ groups:
       - alert: NTPNoSynced
         annotations:
           description: 'time not synced with ntp on {{$labels.instance}}'
-          summary: 'NTP not synced'
+          summary: 'NTP not synced on {{$labels.instance}}'
           dashboard: 'TODO'
           runbook: 'https://wikitech.wikimedia.org/wiki/NTP'
         expr: node_timex_sync_status == 0
@@ -22,7 +22,7 @@ groups:
       - alert: NTPTimeDrift
         annotations:
           description: 'time drift on {{$labels.instance}}'
-          summary: 'Unacceptable time drift between NTP and systemtime'
+          summary: 'Unacceptable time drift between NTP and systemtime on {{$labels.instance}}'
           dashboard: 'TODO'
           runbook: 'https://wikitech.wikimedia.org/wiki/NTP'
         expr: abs(node_timex_offset_seconds) > 2.0
