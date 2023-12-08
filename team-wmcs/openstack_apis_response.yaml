@@ -12,7 +12,7 @@ groups:
           service: openstack,cloudvps
         annotations:
           summary: "Openstack API average response time is too high."
-          description: "The Openstack API {{ $labels.proxy }} average response time is too high. It may mean that the control plane is unreliable."
+          description: "The Openstack API {{ $labels.proxy }} average response time is too high ({{ $value }} > 1.5). It may mean that the control plane is unreliable."
           runbook: https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/OpenstackAPIResponse
           dashboard: https://grafana.wikimedia.org/d/UUmLqqX4k
 
@@ -25,7 +25,7 @@ groups:
           service: openstack,cloudvps
         annotations:
           summary: "Openstack API average response time is too high."
-          description: "The Openstack API {{ $labels.proxy }} average response time is too high. It may mean that the control plane is unreliable."
+          description: "The Openstack API {{ $labels.proxy }} average response time is too high ({{ $value }} > 3). It may mean that the control plane is unreliable."
           runbook: https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/OpenstackAPIResponse
           dashboard: https://grafana.wikimedia.org/d/UUmLqqX4k
 
@@ -38,7 +38,7 @@ groups:
           service: openstack,cloudvps
         annotations:
           summary: "Openstack API average response time is too high."
-          description: "The Openstack API {{ $labels.proxy }} average response time is too high. It may mean that the control plane is unreliable."
+          description: "The Openstack API {{ $labels.proxy }} average response time is too high ({{ $value }} > 5). It may mean that the control plane is unreliable."
           runbook: https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/OpenstackAPIResponse
           dashboard: https://grafana.wikimedia.org/d/UUmLqqX4k
 

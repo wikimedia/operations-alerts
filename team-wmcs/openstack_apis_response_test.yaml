@@ -25,7 +25,7 @@ tests:
               server: cloudcontrol1007
             exp_annotations:
               summary: "Openstack API average response time is too high."
-              description: "The Openstack API nova_api average response time is too high. It may mean that the control plane is unreliable."
+              description: "The Openstack API nova_api average response time is too high (1.6 > 1.5). It may mean that the control plane is unreliable."
               runbook: https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/OpenstackAPIResponse
               dashboard: https://grafana.wikimedia.org/d/UUmLqqX4k
 
@@ -86,7 +86,7 @@ tests:
               instance: cloudcontrol1003
               server: cloudcontrol1007
             exp_annotations:
-              description: "The Openstack API trove-api_backend average response time is too high. It may mean that the control plane is unreliable."
+              description: "The Openstack API trove-api_backend average response time is too high (3.1 > 3). It may mean that the control plane is unreliable."
               summary: "Openstack API average response time is too high."
               runbook: https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/OpenstackAPIResponse
               dashboard: https://grafana.wikimedia.org/d/UUmLqqX4k
@@ -148,7 +148,7 @@ tests:
               server: cloudcontrol1007
               job: cloudlb-haproxy
             exp_annotations:
-              description: "The Openstack API magnum-api_backend average response time is too high. It may mean that the control plane is unreliable."
+              description: "The Openstack API magnum-api_backend average response time is too high (5.5 > 5). It may mean that the control plane is unreliable."
               summary: "Openstack API average response time is too high."
               runbook: https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/OpenstackAPIResponse
               dashboard: https://grafana.wikimedia.org/d/UUmLqqX4k
