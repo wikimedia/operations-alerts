@@ -107,6 +107,8 @@ tests:
     input_series:
       - series: 'role_owner{instance="alert1001:9100",team="observability"}'
         values: '1x1441'
+      - series: 'puppet_agent_enabled{cluster="alerting",instance="alert1001:9100"}'
+        values: '1x10081'
       - series: 'puppet_agent_resources_changed{cluster="alerting",instance="alert1001:9100",team="observability"}'
         values: '1x1441'
     alert_rule_test:
@@ -123,6 +125,19 @@ tests:
            description: 'Puppet performing a change on every puppet run alert1001:9100'
            dashboard: https://grafana.wikimedia.org/d/yOxVDGvWk/puppet
            runbook: https://puppetboard.wikimedia.org/nodes?status=changed
+  - interval: 1m
+    input_series:
+      - series: 'role_owner{instance="alert1001:9100",team="observability"}'
+        values: '1x1441'
+      - series: 'puppet_agent_resources_changed{cluster="alerting",instance="alert1001:9100",team="observability"}'
+        values: '1x1441'
+      - series: 'puppet_agent_enabled{cluster="alerting",instance="alert1001:9100"}'
+        values: '0x10081'
+    alert_rule_test:
+    - alertname: PuppetConstantChange
+      eval_time: 1d
+      exp_alerts: []
+
   - interval: 1m
     input_series:
       - series: 'role_owner{instance="alert1001:9100",team="observability"}'
