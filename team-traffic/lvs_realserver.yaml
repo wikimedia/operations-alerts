@@ -1,0 +1,23 @@
+# deploy-tag: ops
+
+groups:
+  - name: lvs_realserver
+    rules:
+      - alert: LVSRealserverMSS
+        expr:
+          sum by (hostname, protocol, endpoint) (
+            label_replace(lvs_realserver_mss_value, "hostname", "$1", "instance", "(.*):.*")
+            )
+          / ignoring (endpoint) group_left
+          sum by (hostname, protocol) (
+            label_replace(tcp_mss_clamper_mss_cfg{interface="lo"}, "hostname", "$1", "instance", "(.*):.*")
+          ) != 1
+        for: 1m
+        labels:
+          team: traffic
+          severity: critical
+        annotations:
+          summary: "Unexpected MSS value on {{ $labels.endpoint }} @ {{ $labels.hostname }}"
+          description: "The host {{ $labels.hostname }} reports a mismatch between configured and observed TCP MSS on {{ $labels.endpoint }}"
+          dashboard: TODO
+          runbook: TODO
