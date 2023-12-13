@@ -1,0 +1,18 @@
+# deploy-tag: ops
+# deploy-site: eqiad, codfw
+
+groups:
+  - name: metricsinfra
+    rules:
+      - alert: MetricsinfraAlertmanagerDown
+        expr: 'karma_alertmanager_up{alertmanager="wmcloud.org"} == 0'
+        for: 5m
+        labels:
+          team: wmcs
+          severity: page
+          service: cloudvps
+        annotations:
+          summary: "Metricsinfra alertmanager is unreachable #page"
+          description: "Karma on {{ $labels.instance }} is unable to reach the Cloud VPS metricsinfra alertmanager"
+          runbook: https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/MetricsinfraAlertmanagerDown
+          dashboard: TODO

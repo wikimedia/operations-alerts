@@ -1,0 +1,33 @@
+rule_files:
+  - metricsinfra.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    input_series:
+      - series: karma_alertmanager_up{alertmanager="wikimedia.org", cluster="alerting", instance="alert1001:19194", job="alertmanager"}
+        values: "1x20"
+      - series: karma_alertmanager_up{alertmanager="wmcloud.org", cluster="alerting", instance="alert1001:19194", job="alertmanager"}
+        values: '1x10 0x10'
+    external_labels:
+      prometheus: ops
+      site: eqiad
+    alert_rule_test:
+      - alertname: MetricsinfraAlertmanagerDown
+        eval_time: 8m
+        exp_alerts: []
+      - alertname: MetricsinfraAlertmanagerDown
+        eval_time: 18m
+        exp_alerts:
+          - exp_labels:
+              team: wmcs
+              severity: page
+              service: cloudvps
+              cluster: alerting
+              alertmanager: 'wmcloud.org'
+              instance: "alert1001:19194"
+              job: alertmanager
+            exp_annotations:
+              summary: "Metricsinfra alertmanager is unreachable #page"
+              description: "Karma on alert1001:19194 is unable to reach the Cloud VPS metricsinfra alertmanager"
+              runbook: https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/MetricsinfraAlertmanagerDown
+              dashboard: TODO
