@@ -5,11 +5,11 @@ groups:
     rules:
       - alert: LVSRealserverMSS
         expr:
-          sum by (hostname, protocol, endpoint) (
+          sum by (hostname, protocol, endpoint, cluster) (
             label_replace(lvs_realserver_mss_value, "hostname", "$1", "instance", "(.*):.*")
             )
           / ignoring (endpoint) group_left
-          sum by (hostname, protocol) (
+          sum by (hostname, protocol, cluster) (
             label_replace(tcp_mss_clamper_mss_cfg{interface="lo"}, "hostname", "$1", "instance", "(.*):.*")
           ) != 1
         for: 1m
@@ -19,5 +19,5 @@ groups:
         annotations:
           summary: "Unexpected MSS value on {{ $labels.endpoint }} @ {{ $labels.hostname }}"
           description: "The host {{ $labels.hostname }} reports a mismatch between configured and observed TCP MSS on {{ $labels.endpoint }}"
-          dashboard: TODO
+          dashboard: "https://grafana.wikimedia.org/d/Y9-MQxNSk/ipip-encapsulated-services?orgId=1&viewPanel=2&var-site={{ $externalLabels.site }}&var-cluster={{ $labels.cluster }}"
           runbook: TODO
