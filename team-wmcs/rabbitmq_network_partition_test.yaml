@@ -14,7 +14,7 @@ tests:
         exp_alerts:
           - exp_labels:
               team: wmcs
-              severity: task
+              severity: critical
               service: openstack,cloudvps
               hostname: cloudrabbit1001
             exp_annotations:
@@ -42,7 +42,7 @@ tests:
         exp_alerts:
           - exp_labels:
               team: wmcs
-              severity: task
+              severity: critical
               service: openstack,cloudvps
             exp_annotations:
               description: "The 'Network Partition' section of 'rabbitmqctl cluster_status' is not empty. OpenStack API calls are likely to time out or produce inconsistent results"

@@ -8,7 +8,7 @@ groups:
         for: 10m
         labels:
           team: wmcs
-          severity: task
+          severity: critical
           service: openstack,cloudvps
         annotations:
           summary: "A Rabbitmq Network partition has been detected. {{ $value }} hosts marked as partitioned."
