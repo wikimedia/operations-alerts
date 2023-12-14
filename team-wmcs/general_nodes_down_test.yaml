@@ -23,20 +23,9 @@ tests:
               summary: "The node dummynode1 is unreachable."
               dashboard: "https://grafana.wikimedia.org/d/000000377/host-overview?orgId=1&var-server=dummynode1"
               runbook: "https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/NodeDown"
-      - alertname: NodeDown
+      - alertname: NodeDownForLong
         eval_time: 2h1m
         exp_alerts:
-          - exp_labels:
-              team: wmcs
-              severity: warning
-              instance: dummynode1:9000
-              cluster: wmcs
-              job: node
-            exp_annotations:
-              description: "Node dummynode1 is down."
-              summary: "The node dummynode1 is unreachable."
-              dashboard: "https://grafana.wikimedia.org/d/000000377/host-overview?orgId=1&var-server=dummynode1"
-              runbook: "https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/NodeDown"
           - exp_labels:
               team: wmcs
               severity: critical
