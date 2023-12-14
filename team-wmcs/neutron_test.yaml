@@ -22,7 +22,7 @@ tests:
               runbook: https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Troubleshooting#Networking_failures
               dashboard: https://grafana.wikimedia.org/d/wKnDJf97z/wmcs-neutron-eqiad1
       # Check that after two hours the priority increases to task
-      - alertname: NeutronAgentDown
+      - alertname: NeutronAgentDownForLong
         eval_time: 125m # a bit more than two hours
         exp_alerts:
           - exp_labels:
@@ -31,6 +31,8 @@ tests:
               adminState: up
               hostname: cloudnet1003
               service: neutron-metadata-agent
-            exp_annotations: *alert_annotations
-          - exp_labels: *warning_labels
-            exp_annotations: *alert_annotations
+            exp_annotations:
+              summary: "Neutron neutron-metadata-agent on cloudnet1003 has been down for more than 2h"
+              description: "A Neutron agent has been down for more than 2h, VMs will have connectivity issues"
+              runbook: https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Troubleshooting#Networking_failures
+              dashboard: https://grafana.wikimedia.org/d/wKnDJf97z/wmcs-neutron-eqiad1
