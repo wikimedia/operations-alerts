@@ -90,6 +90,8 @@ tests:
     input_series:
       - series: 'probe_ssl_earliest_cert_expiry{job="probes/test", instance="service:443"}'
         values: '777600-60x6 604800-60x6'
+      - series: 'probe_ssl_earliest_cert_expiry{job="probes/custom", instance="custom_service:443"}'
+        values: '777600-60x6 604800-60x6'
     external_labels:
       site: eqiad
     alert_rule_test:
