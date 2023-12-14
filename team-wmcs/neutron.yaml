@@ -20,7 +20,7 @@ groups:
         for: 2h
         labels:
           team: wmcs
-          severity: task
+          severity: critical
         annotations:
           summary: "Neutron {{ $labels.service }} on {{ $labels.hostname }} has been down for more than 2h"
           description: "A Neutron agent has been down for more than 2h, VMs will have connectivity issues"

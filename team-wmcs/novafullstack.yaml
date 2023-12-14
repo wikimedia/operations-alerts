@@ -9,7 +9,7 @@ groups:
         for: 5h
         labels:
           team: wmcs
-          severity: task
+          severity: critical
           service: openstack,cloudvps,novafullstack
         annotations:
           summary: "Novafullstack tests have been failing for more than 5hours in {{ $externalLabels.site }}"
@@ -22,7 +22,7 @@ groups:
         for: 5h
         labels:
           team: wmcs
-          severity: task
+          severity: critical
           service: openstack,cloudvps,novafullstack
         annotations:
           summary: "Novafullstack tests have been over the leaked VM limit for more than 5hours in {{ $externalLabels.site }}"

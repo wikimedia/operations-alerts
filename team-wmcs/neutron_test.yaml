@@ -21,12 +21,12 @@ tests:
               description: "A Neutron agent is down, VMs will have connectivity issues"
               runbook: https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Troubleshooting#Networking_failures
               dashboard: https://grafana.wikimedia.org/d/wKnDJf97z/wmcs-neutron-eqiad1
-      # Check that after two hours the priority increases to task
+      # Check that after two hours the priority increases to critical
       - alertname: NeutronAgentDownForLong
         eval_time: 125m # a bit more than two hours
         exp_alerts:
           - exp_labels:
-              severity: task
+              severity: critical
               team: wmcs
               adminState: up
               hostname: cloudnet1003

@@ -14,7 +14,7 @@ tests:
         exp_alerts:
           - exp_labels:
               team: wmcs
-              severity: task
+              severity: critical
               service: openstack,cloudvps,novafullstack
             exp_annotations:
               summary: "Novafullstack tests have been failing for more than 5hours in eqiad"
@@ -36,7 +36,7 @@ tests:
         exp_alerts:
           - exp_labels:
               team: wmcs
-              severity: task
+              severity: critical
               service: openstack,cloudvps,novafullstack
             exp_annotations:
               summary: "Novafullstack tests have been over the leaked VM limit for more than 5hours in eqiad"
