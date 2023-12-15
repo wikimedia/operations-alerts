@@ -19,7 +19,7 @@ groups:
           summary: "{{$labels.job_name}} in {{$externalLabels.site}} ({{$externalLabels.prometheus}}) is not running"
           description: "The flink job is not running"
           runbook: https://wikitech.wikimedia.org/wiki/Wikidata_Query_Service/Streaming_Updater
-          dashboard: https://grafana.wikimedia.org/d/gCFgfpG7k/flink-session-cluster
+          dashboard: https://grafana.wikimedia.org/d/K9x0c4aVk/flink-app?var-datasource={{$externalLabels.site}}+prometheus%2F{{$externalLabels.prometheus}}&var-namespace=rdf-streaming-updater&var-helm_release=wikidata
 
       - alert: WcqsStreamingUpdaterFlinkJobNotRunning
         expr: |
@@ -32,7 +32,7 @@ groups:
           summary: "{{$labels.job_name}} in {{$externalLabels.site}} ({{$externalLabels.prometheus}}) is not running"
           description: "The flink job is not running"
           runbook: https://wikitech.wikimedia.org/wiki/Wikidata_Query_Service/Streaming_Updater
-          dashboard: https://grafana.wikimedia.org/d/gCFgfpG7k/flink-session-cluster
+          dashboard: https://grafana.wikimedia.org/d/K9x0c4aVk/flink-app?var-datasource={{$externalLabels.site}}+prometheus%2F{{$externalLabels.prometheus}}&var-namespace=rdf-streaming-updater&var-helm_release=commons
 
 ## RDF Streaming Updater Producer alerts
       - alert: RdfStreamingUpdaterFlinkJobUnstable
@@ -43,7 +43,7 @@ groups:
         # max_over_time does seem to workaround these problems and will only fail if the series goes away for more than
         # 10 mins in which case the WdqsStreamingUpdaterFlinkJobNotRunning alert should have been triggered a long time ago
         expr: |
-          max by (job_name, kubernetes_namespace) (max_over_time(flink_jobmanager_job_uptime{kubernetes_namespace="rdf-streaming-updater"}[10m])) < 300000
+          max by (job_name, release, kubernetes_namespace) (max_over_time(flink_jobmanager_job_uptime{kubernetes_namespace="rdf-streaming-updater"}[10m])) < 300000
         for: 1m
         labels:
           team: search-platform
@@ -52,11 +52,11 @@ groups:
           summary: "{{$labels.job_name}} in {{$externalLabels.site}} ({{$externalLabels.prometheus}}) is unstable"
           description: "The flink job has an uptime below 5 minutes for the past 10 minutes, it is probably trying to start in vain"
           runbook: https://wikitech.wikimedia.org/wiki/Wikidata_Query_Service/Streaming_Updater
-          dashboard: https://grafana.wikimedia.org/d/gCFgfpG7k/flink-session-cluster
+          dashboard: https://grafana.wikimedia.org/d/K9x0c4aVk/flink-app?var-datasource={{$externalLabels.site}}+prometheus%2F{{$externalLabels.prometheus}}&var-namespace=rdf-streaming-updater&var-helm_release={{$labels.release}}
 
       - alert: RdfStreamingUpdaterFlinkProcessingLatencyIsHigh
         expr: |
-          avg by (job_name, kubernetes_namespace) (avg_over_time(flink_taskmanager_job_task_operator_processing_latency_ms{kubernetes_namespace="rdf-streaming-updater"}[5m]) > 600000)
+          avg by (job_name, release, kubernetes_namespace) (avg_over_time(flink_taskmanager_job_task_operator_processing_latency_ms{kubernetes_namespace="rdf-streaming-updater"}[5m]) > 600000)
         for: 1m
         labels:
           team: search-platform
@@ -65,4 +65,4 @@ groups:
           summary: "Processing latency of {{$labels.job_name}} in {{$externalLabels.site}} ({{$externalLabels.prometheus}}) is above 10 minutes"
           description: "The flink job has a processing latency above 10 minutes"
           runbook: https://wikitech.wikimedia.org/wiki/Wikidata_Query_Service/Streaming_Updater
-          dashboard: https://grafana.wikimedia.org/d/fdU5Zx-Mk/wdqs-streaming-updater
+          dashboard: https://grafana.wikimedia.org/d/K9x0c4aVk/flink-app?var-datasource={{$externalLabels.site}}+prometheus%2F{{$externalLabels.prometheus}}&var-namespace=rdf-streaming-updater&var-helm_release={{$labels.release}}
