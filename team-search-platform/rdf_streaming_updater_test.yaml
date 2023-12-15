@@ -42,28 +42,6 @@ tests:
               dashboard: https://grafana.wikimedia.org/d/fdU5Zx-Mk/wdqs-streaming-updater
   - interval: 1m
     input_series:
-      - series: 'flink_jobmanager_taskSlotsTotal{kubernetes_namespace="rdf-streaming-updater"}'
-        values: 5
-      - series: 'flink_jobmanager_taskSlotsTotal{kubernetes_namespace="unrelated-session-cluster"}'
-        values: 4
-    external_labels:
-      site: codfw
-      prometheus: k8s
-    alert_rule_test:
-      - alertname: RdfStreamingUpdaterNotEnoughTaskSlots
-        eval_time: 5m
-        exp_alerts:
-          - exp_labels:
-              severity: warning
-              team: search-platform
-              kubernetes_namespace: rdf-streaming-updater
-            exp_annotations:
-              summary: "The flink session cluster rdf-streaming-updater in codfw (k8s) does not have enough task slots"
-              description: "The expected number of task slots is too low for the jobs to function properly"
-              runbook: https://wikitech.wikimedia.org/wiki/Wikidata_Query_Service/Streaming_Updater
-              dashboard: https://grafana.wikimedia.org/d/gCFgfpG7k/flink-session-cluster
-  - interval: 1m
-    input_series:
       - series: 'flink_jobmanager_job_uptime{job_name="Unrelated_Job", kubernetes_namespace="unrelated-ns"}'
         values: "2000000"
     external_labels:
