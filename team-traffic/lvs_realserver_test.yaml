@@ -26,8 +26,9 @@ tests:
               protocol: "IPv4"
               severity: critical
               team: traffic
+              cluster: "ncredir"
             exp_annotations:
               summary: "Unexpected MSS value on 198.35.26.98:443 @ ncredir4001"
               description: "The host ncredir4001 reports a mismatch between configured and observed TCP MSS on 198.35.26.98:443"
-              dashboard: TODO
+              dashboard: "https://grafana.wikimedia.org/d/Y9-MQxNSk/ipip-encapsulated-services?orgId=1&viewPanel=2&var-site=ulsfo&var-cluster=ncredir"
               runbook: TODO
