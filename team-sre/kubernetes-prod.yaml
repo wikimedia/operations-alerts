@@ -20,3 +20,17 @@ groups:
     labels:
       team: sre
       severity: critical
+
+- name: calico
+  rules:
+  - alert: CalicoTyphaDown
+    expr: sum(up{kubernetes_namespace="kube-system", k8s_app="calico-typha"}) < 2
+    for: 5m
+    labels:
+      team: sre
+      severity: critical
+    annotations:
+      summary: "Too few ({{ $value }}) calico-typha replicas running"
+      description: "There should be at least 2 calico-typha pods up and running in the kube-system namespace"
+      runbook: https://wikitech.wikimedia.org/wiki/Calico#Typha"
+      dashboard: TODO

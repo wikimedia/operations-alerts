@@ -2,7 +2,7 @@
 # deploy-site: eqiad, codfw
 
 groups:
-- name: kubernetes
+- name: calico
   rules:
   - alert: KubernetesCalicoDown
     expr: up{job="calico-felix"} == 0
@@ -16,6 +16,20 @@ groups:
       runbook: https://wikitech.wikimedia.org/wiki/Calico#Operations
       dashboard: https://grafana.wikimedia.org/d/G8zPL7-Wz/?var-dc={{ $externalLabels.site }}%20prometheus%2F{{ $externalLabels.prometheus }}&var-instance={{ reReplaceAll "([^:]+).*" "$1" $labels.instance }}
 
+  - alert: CalicoKubeControllersDown
+    expr: sum(up{kubernetes_namespace="kube-system", k8s_app="calico-kube-controllers"}) == 0
+    for: 5m
+    labels:
+      team: sre
+      severity: critical
+    annotations:
+      summary: "Calico Kubernetes Controllers not running"
+      description: "The calico-kube-controllers pod is not running in the kube-system namespace"
+      runbook: https://wikitech.wikimedia.org/wiki/Calico#Kube_Controllers"
+      dashboard: TODO
+
+- name: kubernetes
+  rules:
   - &KubeletOperationalLatency
     alert: KubeletOperationalLatency
     expr: histogram_quantile(0.99, rate(kubelet_runtime_operations_duration_seconds_bucket{job="k8s-node",operation_type!="list_images"}[5m])) > 1.0

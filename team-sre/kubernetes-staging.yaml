@@ -13,3 +13,17 @@ groups:
       description: "The certificate {{ $labels.name }} in namespace {{ $labels.namespace }} is {{ $value | humanizeDuration }} from expiry ({{ $externalLabels.prometheus }}@{{ $externalLabels.site }}). It should have been refreshed 8 hours before expiry"
       runbook: https://wikitech.wikimedia.org/wiki/Kubernetes/cert-manager
       dashboard: https://grafana.wikimedia.org/d/vo5tiJTnz?var-site={{ $externalLabels.site }}&var-cluster={{ $externalLabels.prometheus }}&var-namespace={{ $labels.namespace }}
+
+- name: calico
+  rules:
+  - alert: CalicoTyphaDown
+    expr: sum(up{kubernetes_namespace="kube-system", k8s_app="calico-typha"}) == 0
+    for: 5m
+    labels:
+      team: sre
+      severity: critical
+    annotations:
+      summary: "Too few ({{ $value }}) calico-typha replicas running"
+      description: "There should be at least 1 calico-typha pods up and running in the kube-system namespace"
+      runbook: https://wikitech.wikimedia.org/wiki/Calico#Typha"
+      dashboard: TODO
