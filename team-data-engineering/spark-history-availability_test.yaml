@@ -1,0 +1,36 @@
+rule_files:
+  - spark-history-availability.yaml
+evaluation_interval: 5m
+tests:
+  - input_series:
+    - series: kube_deployment_status_replicas_available{deployment="spark-history-analytics-test-hadoop", namespace="spark-history-test"}
+      values: '0'
+    alert_rule_test:
+    - alertname: SparkHistoryTestServiceUnavailable
+      exp_alerts:
+      - exp_annotations:
+          description: spark-history-analytics-test-hadoop is unavailable on k8s-dse
+          summary: spark-history-analytics-test-hadoop is unavailable on k8s-dse
+          dashboard: 'https://grafana.wikimedia.org/d/hyl18XgMk/kubernetes-container-details?orgId=1&var-datasource=eqiad%2Bprometheus/k8s-dse&var-namespace=spark-history-test&var-container=All'
+          runbook: "https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Spark_History#The_app_isn't_running"
+        exp_labels:
+          namespace: spark-history-test
+          deployment: spark-history-analytics-test-hadoop
+          severity: warning
+          team: data-engineering
+  - input_series:
+    - series: kube_deployment_status_replicas_available{deployment="spark-history-analytics-hadoop", namespace="spark-history"}
+      values: '0'
+    alert_rule_test:
+    - alertname: SparkHistoryServiceUnavailable
+      exp_alerts:
+      - exp_annotations:
+          description: spark-history-analytics-hadoop is unavailable on k8s-dse
+          summary: spark-history-analytics-hadoop is unavailable on k8s-dse
+          dashboard: 'https://grafana.wikimedia.org/d/hyl18XgMk/kubernetes-container-details?orgId=1&var-datasource=eqiad%2Bprometheus/k8s-dse&var-namespace=spark-history&var-container=All'
+          runbook: "https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Spark_History#The_app_isn't_running"
+        exp_labels:
+          namespace: spark-history
+          deployment: spark-history-analytics-hadoop
+          severity: critical
+          team: data-engineering
