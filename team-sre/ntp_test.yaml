@@ -23,7 +23,7 @@ tests:
               site: codfw
             exp_annotations:
               description: 'time not synced with ntp on sretest2003:9100'
-              summary: 'NTP not synced'
+              summary: 'NTP not synced on sretest2003:9100'
               dashboard: 'TODO'
               runbook: 'https://wikitech.wikimedia.org/wiki/NTP'
 
@@ -48,6 +48,6 @@ tests:
               site: codfw
             exp_annotations:
               description: 'time drift on sretest2004:9100'
-              summary: 'Unacceptable time drift between NTP and systemtime'
+              summary: 'Unacceptable time drift between NTP and systemtime on sretest2004:9100'
               dashboard: 'TODO'
               runbook: 'https://wikitech.wikimedia.org/wiki/NTP'
