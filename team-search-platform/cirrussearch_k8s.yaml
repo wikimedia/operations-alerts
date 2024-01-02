@@ -5,10 +5,10 @@ groups:
    rules:
     - alert: CirrusSearchJobQueueLagTooHigh
       expr: >
-         sum by (rule) (rate(cpjobqueue_normal_rule_processing_delay_sum{
+          histogram_quantile(0.95, sum by (rule,le) (rate(cpjobqueue_normal_rule_processing_delay_bucket{
             rule=~".*cirrusSearch(DeleteArchive|DeletePages|ElasticaWrite|LinksUpdate*|OtherIndex)",
             rule!~".*-partitioner-mediawiki-job-.*",
-            service="cpjobqueue"}[15m])) > 6*60*60
+            service="cpjobqueue"}[15m]))) > 6*60*60
       for: 1m
       labels:
         team: search-platform
