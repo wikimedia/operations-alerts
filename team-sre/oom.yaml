@@ -1,0 +1,15 @@
+# deploy-tag: ops
+
+groups:
+  - name: oom
+    rules:
+      - alert: OOM
+        annotations:
+          description: 'OOM killer active on {{$labels.instance}}'
+          summary: 'OOM killer active on {{$labels.instance}}'
+          dashboard: 'https://grafana.wikimedia.org/d/-OcleDKIz/oom-kill'
+          runbook: 'TODO'
+        expr: increase(node_vmstat_oom_kill{cluster!~"kubernetes|k8s|ml_serve"}[5m]) > 0
+        labels:
+          severity: warning
+          team: 'sre'
