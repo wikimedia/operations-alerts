@@ -6,6 +6,9 @@ groups:
       - alert: PybalBackendDown
         # pybal uses 'host' label for the backend fqdn, replace it with
         # 'instance' (and trim to an hostname) so host-based silences work as expected.
+        # pybal_monitor_*_results_* metrics are only created when PyBal goes
+        # down: When PyBal is fresh, these metrics are not output. T353760
+        # pint disable promql/series
         expr: |
           sum without (host) (
             label_replace(
