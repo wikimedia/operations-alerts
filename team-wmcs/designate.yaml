@@ -1,0 +1,17 @@
+# deploy-tag: cloud
+# deploy-site: eqiad
+
+groups:
+  - name: cloudvps_designateleaks
+    rules:
+      - alert: CloudVPSDesignateLeaks
+        expr: cloudvps_designateleaks != 0
+        for: 20m
+        labels:
+          team: wmcs
+          severity: warning
+        annotations:
+          summary: "Detected {{ $value }} stray dns records on {{ $labels.hostname }}"
+          description: "There are either DNS records not attached to VMs, or VMs without DNS records, or VMs with too many DNS records."
+          runbook: https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/Designate_record_leaks
+          dashboard: TODO
