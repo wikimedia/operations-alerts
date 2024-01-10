@@ -12,7 +12,7 @@ groups:
           severity: warning
           service: cloudvps
         annotations:
-          summary: "Detected {{ $value }} stray dns records on {{ $labels.hostname }}"
+          summary: "Detected {{ $value }} stray dns records"
           description: "There are either DNS records not attached to VMs, or VMs without DNS records, or VMs with too many DNS records."
           runbook: https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/Designate_record_leaks
           dashboard: https://grafana.wikimedia.org/d/ebJoA6VWz/wmcs-openstack-eqiad-nova-fullstack
