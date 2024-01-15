@@ -1,0 +1,44 @@
+rule_files:
+  - netfilter.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    input_series:
+      - series: 'node_nf_conntrack_entries{cluster="api_appserver",instance="mw2001:9100",job="node",site="codfw"}'
+        values: '209716x100'
+      - series: 'node_nf_conntrack_entries_limit{cluster="api_appserver",instance="mw2001:9100",job="node",site="codfw"}'
+        values: '262144x100'
+      - series: 'node_nf_conntrack_entries{cluster="api_appserver",instance="mw2002:9100",job="node",site="codfw"}'
+        values: '250000x100'
+      - series: 'node_nf_conntrack_entries_limit{cluster="api_appserver",instance="mw2002:9100",job="node",site="codfw"}'
+        values: '262144x100'
+    external_labels:
+      site: codfw
+    alert_rule_test:
+      - alertname: MaxConnTrack
+        eval_time: 1m
+        exp_alerts:
+          - exp_labels:
+              team: sre
+              severity: warning
+              job: node
+              instance: mw2001:9100
+              cluster: api_appserver
+              site: codfw
+            exp_annotations:
+              description: 'Netfilter: Maximum number of allowed connection tracking entries warning on mw2001:9100'
+              summary: 'Max conntrack at 80% on mw2001:9100'
+              dashboard: 'https://grafana.wikimedia.org/d/oITUqwKIk/netfilter-connection-tracking'
+              runbook: 'https://wikitech.wikimedia.org/wiki/Monitoring/check_conntrack'
+          - exp_labels:
+              team: sre
+              severity: critical
+              job: node
+              instance: mw2002:9100
+              cluster: api_appserver
+              site: codfw
+            exp_annotations:
+              description: 'Netfilter: Maximum number of allowed connection tracking entries alert on mw2002:9100'
+              summary: 'Max conntrack at 90% on mw2002:9100'
+              dashboard: 'https://grafana.wikimedia.org/d/oITUqwKIk/netfilter-connection-tracking'
+              runbook: 'https://wikitech.wikimedia.org/wiki/Monitoring/check_conntrack'
