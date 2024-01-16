@@ -4,13 +4,13 @@ groups:
   - name: netfilter
     rules:
       - &max_conn_track
-        alert: MaxConnTrack
+        alert: MaxConntrack
         annotations:
           description: 'Netfilter: Maximum number of allowed connection tracking entries warning on {{$labels.instance}}'
-          summary: 'Max conntrack at 80% on {{$labels.instance}}'
+          summary: 'Max conntrack at {{humanize $value}}% on {{$labels.instance}}'
           dashboard: 'https://grafana.wikimedia.org/d/oITUqwKIk/netfilter-connection-tracking'
           runbook: 'https://wikitech.wikimedia.org/wiki/Monitoring/check_conntrack'
-        expr: node_nf_conntrack_entries / node_nf_conntrack_entries_limit * 100 >= 80 and node_nf_conntrack_entries / node_nf_conntrack_entries_limit * 100 < 90
+        expr: 90 > node_nf_conntrack_entries{cluster!~"lvs|wmcs"} / node_nf_conntrack_entries_limit * 100 >= 80
         labels:
           severity: warning
           team: 'sre'
@@ -18,10 +18,10 @@ groups:
       - <<: *max_conn_track
         annotations:
           description: 'Netfilter: Maximum number of allowed connection tracking entries alert on {{$labels.instance}}'
-          summary: 'Max conntrack at 90% on {{$labels.instance}}'
+          summary: 'Max conntrack at {{ humanize $value}}% on {{$labels.instance}}'
           dashboard: 'https://grafana.wikimedia.org/d/oITUqwKIk/netfilter-connection-tracking'
           runbook: 'https://wikitech.wikimedia.org/wiki/Monitoring/check_conntrack'
-        expr: node_nf_conntrack_entries / node_nf_conntrack_entries_limit * 100 >= 90
+        expr: node_nf_conntrack_entries{cluster!~"lvs|wmcs"} / node_nf_conntrack_entries_limit * 100 >= 90
         labels:
           severity: critical
           team: 'sre'

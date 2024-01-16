@@ -15,7 +15,7 @@ tests:
     external_labels:
       site: codfw
     alert_rule_test:
-      - alertname: MaxConnTrack
+      - alertname: MaxConntrack
         eval_time: 1m
         exp_alerts:
           - exp_labels:
@@ -39,6 +39,6 @@ tests:
               site: codfw
             exp_annotations:
               description: 'Netfilter: Maximum number of allowed connection tracking entries alert on mw2002:9100'
-              summary: 'Max conntrack at 90% on mw2002:9100'
+              summary: 'Max conntrack at 95.37% on mw2002:9100'
               dashboard: 'https://grafana.wikimedia.org/d/oITUqwKIk/netfilter-connection-tracking'
               runbook: 'https://wikitech.wikimedia.org/wiki/Monitoring/check_conntrack'
