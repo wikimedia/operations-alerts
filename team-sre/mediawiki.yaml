@@ -167,3 +167,15 @@ groups:
           team: sre
         for: 2m
         expr: 'sum(log_mediawiki_servergroup_level_channel_doc_count{channel=~"(fatal|exception)", level="ERROR"}) by (servergroup) > 100'
+
+      - alert: MediaWikiEditFailures
+        annotations:
+          description: 'Elevated MediaWiki edit failures ({{ $labels.cause }}): {{ $value }}/min'
+          summary: 'Elevated MediaWiki edit failures ({{ $labels.cause }}) for cluster {{ $labels.cluster }}'
+          dashboard: 'https://grafana.wikimedia.org/d/000000208/edit-count?orgId=1&viewPanel=13'
+          runbook: 'https://wikitech.wikimedia.org/wiki/Application_servers/Runbook'
+        labels:
+          severity: critical
+          team: sre
+        for: 2m
+        expr: sum by (cause, cluster) (rate(mediawiki_edit_failure_total[5m]) * 60) > 20
