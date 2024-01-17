@@ -5,11 +5,11 @@ tests:
   - interval: 1m
     input_series:
       - series: 'node_memory_MemFree_bytes{cluster="ganeti",instance="ganeti1001:9100",job="node", site="eqiad"}'
-        values: '31267361914x100'
+        values: '3092376453x100'
       - series: 'node_memory_MemTotal_bytes{cluster="ganeti",instance="ganeti1001:9100",job="node", site="eqiad"}'
         values: '34359738368x100'
       - series: 'node_memory_MemFree_bytes{cluster="ganeti",instance="ganeti1002:9100",job="node", site="eqiad"}'
-        values: '33672543600x100'
+        values: '1073741824x100'
       - series: 'node_memory_MemTotal_bytes{cluster="ganeti",instance="ganeti1002:9100",job="node", site="eqiad"}'
         values: '34359738368x100'
     external_labels:
@@ -27,7 +27,7 @@ tests:
               site: eqiad
             exp_annotations:
               description: 'Ganeti: High memory usage on ganeti1001:9100'
-              summary: 'Ganeti: High memory usage on ganeti1001:9100'
+              summary: 'Ganeti: High memory usage (91%) on ganeti1001:9100'
               dashboard: 'https://grafana.wikimedia.org/d/508r1Jz4z/ganeti-capacity-management?orgId=1'
               runbook: 'https://wikitech.wikimedia.org/wiki/Ganeti#Memory_pressure'
           - exp_labels:
@@ -39,6 +39,6 @@ tests:
               site: eqiad
             exp_annotations:
               description: 'Ganeti: High memory usage on ganeti1002:9100'
-              summary: 'Ganeti: High memory usage on ganeti1002:9100'
+              summary: 'Ganeti: High memory usage (96.88%) on ganeti1002:9100'
               dashboard: 'https://grafana.wikimedia.org/d/508r1Jz4z/ganeti-capacity-management?orgId=1'
               runbook: 'https://wikitech.wikimedia.org/wiki/Ganeti#Memory_pressure'
