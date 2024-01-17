@@ -28,7 +28,7 @@ tests:
             exp_annotations:
               description: 'Ganeti: High memory usage on ganeti1001:9100'
               summary: 'Ganeti: High memory usage (91%) on ganeti1001:9100'
-              dashboard: 'https://grafana.wikimedia.org/d/508r1Jz4z/ganeti-capacity-management?orgId=1'
+              dashboard: 'https://grafana.wikimedia.org/d/gd6vep5Iz/ganeti-memory-pressure?orgId=1&var-site=eqiad'
               runbook: 'https://wikitech.wikimedia.org/wiki/Ganeti#Memory_pressure'
           - exp_labels:
               team: infrastructure-foundations
@@ -40,5 +40,5 @@ tests:
             exp_annotations:
               description: 'Ganeti: High memory usage on ganeti1002:9100'
               summary: 'Ganeti: High memory usage (96.88%) on ganeti1002:9100'
-              dashboard: 'https://grafana.wikimedia.org/d/508r1Jz4z/ganeti-capacity-management?orgId=1'
+              dashboard: 'https://grafana.wikimedia.org/d/gd6vep5Iz/ganeti-memory-pressure?orgId=1&var-site=eqiad'
               runbook: 'https://wikitech.wikimedia.org/wiki/Ganeti#Memory_pressure'

@@ -8,7 +8,7 @@ groups:
         annotations:
           description: 'Ganeti: High memory usage on {{$labels.instance}}'
           summary: 'Ganeti: High memory usage ({{ humanize $value }}%) on {{$labels.instance}}'
-          dashboard: 'https://grafana.wikimedia.org/d/508r1Jz4z/ganeti-capacity-management?orgId=1'
+          dashboard: 'https://grafana.wikimedia.org/d/gd6vep5Iz/ganeti-memory-pressure?orgId=1&var-site={{$externalLabels.site}}'
           runbook: 'https://wikitech.wikimedia.org/wiki/Ganeti#Memory_pressure'
         expr: 95 > (node_memory_MemTotal_bytes{cluster="ganeti"} - node_memory_MemFree_bytes) / node_memory_MemTotal_bytes * 100 > 90
         labels:
