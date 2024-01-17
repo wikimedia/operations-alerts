@@ -10,13 +10,13 @@ groups:
           summary: 'Ganeti: High memory usage ({{ humanize $value }}%) on {{$labels.instance}}'
           dashboard: 'https://grafana.wikimedia.org/d/508r1Jz4z/ganeti-capacity-management?orgId=1'
           runbook: 'https://wikitech.wikimedia.org/wiki/Ganeti#Memory_pressure'
-        expr: 95 > (node_memory_MemTotal_bytes{cluster="ganeti"} - node_memory_MemFree_bytes) / node_memory_MemTotal_bytes * 100 > 90
+        expr: 95 > (node_memory_MemTotal_bytes{cluster="ganeti"} - node_memory_MemAvailable_bytes)  / node_memory_MemTotal_bytes * 100 > 90
         labels:
           severity: warning
           team: 'infrastructure-foundations'
 
       - <<: *ganeti_memory_pressure
-        expr: (node_memory_MemTotal_bytes{cluster="ganeti"} - node_memory_MemFree_bytes) / node_memory_MemTotal_bytes * 100 > 95
+        expr: (node_memory_MemTotal_bytes{cluster="ganeti"} - node_memory_MemAvailable_bytes)  / node_memory_MemTotal_bytes * 100 > 95
         labels:
           severity: critical
           team: 'infrastructure-foundations'

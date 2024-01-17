@@ -4,11 +4,11 @@ evaluation_interval: 1m
 tests:
   - interval: 1m
     input_series:
-      - series: 'node_memory_MemFree_bytes{cluster="ganeti",instance="ganeti1001:9100",job="node", site="eqiad"}'
+      - series: 'node_memory_MemAvailable_bytes{cluster="ganeti",instance="ganeti1001:9100",job="node", site="eqiad"}'
         values: '3092376453x100'
       - series: 'node_memory_MemTotal_bytes{cluster="ganeti",instance="ganeti1001:9100",job="node", site="eqiad"}'
         values: '34359738368x100'
-      - series: 'node_memory_MemFree_bytes{cluster="ganeti",instance="ganeti1002:9100",job="node", site="eqiad"}'
+      - series: 'node_memory_MemAvailable_bytes{cluster="ganeti",instance="ganeti1002:9100",job="node", site="eqiad"}'
         values: '1073741824x100'
       - series: 'node_memory_MemTotal_bytes{cluster="ganeti",instance="ganeti1002:9100",job="node", site="eqiad"}'
         values: '34359738368x100'
