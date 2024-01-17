@@ -1,0 +1,44 @@
+rule_files:
+  - ganeti.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    input_series:
+      - series: 'node_memory_MemFree_bytes{cluster="ganeti",instance="ganeti1001:9100",job="node", site="eqiad"}'
+        values: '31267361914x100'
+      - series: 'node_memory_MemTotal_bytes{cluster="ganeti",instance="ganeti1001:9100",job="node", site="eqiad"}'
+        values: '34359738368x100'
+      - series: 'node_memory_MemFree_bytes{cluster="ganeti",instance="ganeti1002:9100",job="node", site="eqiad"}'
+        values: '33672543600x100'
+      - series: 'node_memory_MemTotal_bytes{cluster="ganeti",instance="ganeti1002:9100",job="node", site="eqiad"}'
+        values: '34359738368x100'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: GanetiMemoryPressure
+        eval_time: 1m
+        exp_alerts:
+          - exp_labels:
+              team: infrastructure-foundations
+              severity: warning
+              job: node
+              instance: ganeti1001:9100
+              cluster: ganeti
+              site: eqiad
+            exp_annotations:
+              description: 'Ganeti: High memory usage on ganeti1001:9100'
+              summary: 'Ganeti: High memory usage on ganeti1001:9100'
+              dashboard: 'https://grafana.wikimedia.org/d/508r1Jz4z/ganeti-capacity-management?orgId=1'
+              runbook: 'https://wikitech.wikimedia.org/wiki/Ganeti#Memory_pressure'
+          - exp_labels:
+              team: infrastructure-foundations
+              severity: critical
+              job: node
+              instance: ganeti1002:9100
+              cluster: ganeti
+              site: eqiad
+            exp_annotations:
+              description: 'Ganeti: High memory usage on ganeti1002:9100'
+              summary: 'Ganeti: High memory usage on ganeti1002:9100'
+              dashboard: 'https://grafana.wikimedia.org/d/508r1Jz4z/ganeti-capacity-management?orgId=1'
+              runbook: 'https://wikitech.wikimedia.org/wiki/Ganeti#Memory_pressure'
