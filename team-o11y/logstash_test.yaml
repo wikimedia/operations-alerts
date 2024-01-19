@@ -43,7 +43,7 @@ tests:
 
  - interval: 1m
    input_series:
-    - series: 'kafka_burrow_partition_lag{exported_cluster="logging-eqiad"}'
+    - series: 'kafka_burrow_partition_lag{exported_cluster="logging-eqiad",group="logstash7-eqiad"}'
       values: '5000+0x20'
    external_labels:
      site: eqiad
@@ -55,10 +55,11 @@ tests:
            severity: critical
            team: o11y
            exported_cluster: logging-eqiad
+           group: logstash7-eqiad
          exp_annotations:
           description: Logstash consumers are not keeping up with the rate of log production.
             Either Logstash has reduced throughput capacity or log generators are producing too many logs.
-          summary: Too many messages in kafka logging
+          summary: Too many messages in logging-eqiad for group logstash7-eqiad
           dashboard: https://grafana.wikimedia.org/d/000000484/kafka-consumer-lag?var-cluster=logging-eqiad&var-datasource=eqiad%20prometheus/ops
           runbook: https://wikitech.wikimedia.org/wiki/Logstash#Kafka_consumer_lag
 
