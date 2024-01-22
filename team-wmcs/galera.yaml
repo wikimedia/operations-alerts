@@ -38,21 +38,21 @@ groups:
           severity: warning
           service: cloudvps
         annotations:
-          summary: "Galera in {{ $externalLabels.deployment }} has {{ $value }} nodes"
+          summary: "Galera in {{ $labels.deployment }} has {{ $value }} nodes"
           description: "Galera node {{ $labels.instance }} sees {{ $value }} nodes in the cluster instead of expected three"
           runbook: https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/GaleraClusterSizeMismatch
           dashboard: https://grafana.wikimedia.org/d/galera-cluster-summary/wmcs-openstack-eqiad-galera-cluster-summary
 
       - alert: GaleraClusterOutOfSync
-        expr: count(count by (wsrep_cluster_state_uuid) (mysql_galera_status_info{job="mysql-galera"})) != 1
+        expr: count by (deployment) (count by (wsrep_cluster_state_uuid, deployment) (mysql_galera_status_info{job="mysql-galera"})) != 1
         for: 1m
         labels:
           team: wmcs
           severity: critical
           service: cloudvps
         annotations:
-          summary: "Galera in {{ $externalLabels.deployment }} is out of sync"
-          description: "Galera cluster {{ $externalLabels.deployment }} sees {{ $value }} different cluster state UUIDs"
+          summary: "Galera in {{ $labels.deployment }} is out of sync"
+          description: "Galera cluster {{ $labels.deployment }} sees {{ $value }} different cluster state UUIDs"
           runbook: https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/GaleraClusterOutOfSync
           dashboard: https://grafana.wikimedia.org/d/galera-cluster-summary/wmcs-openstack-eqiad-galera-cluster-summary
 
