@@ -1,0 +1,24 @@
+rule_files:
+  - mediawiki-global.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    input_series:
+      - series: 'mediawiki_edit_failure_total{cause="session_loss",cluster="appserver"}'
+        values: '20+50x20'
+    external_labels:
+      site: codfw
+    alert_rule_test:
+      - alertname: MediaWikiEditFailures
+        eval_time: 10m
+        exp_alerts:
+          - exp_labels:
+              team: sre
+              severity: critical
+              cluster: appserver
+              cause: session_loss
+            exp_annotations:
+              description: 'Elevated MediaWiki edit failures (session_loss): 50/min'
+              summary: 'Elevated MediaWiki edit failures (session_loss) for cluster appserver'
+              dashboard: 'https://grafana.wikimedia.org/d/000000208/edit-count?orgId=1&viewPanel=13'
+              runbook: 'https://wikitech.wikimedia.org/wiki/Application_servers/Runbook'

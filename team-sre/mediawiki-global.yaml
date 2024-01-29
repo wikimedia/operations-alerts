@@ -1,0 +1,19 @@
+# deploy-tag: global
+
+# Alerts with global aggregation needed
+
+groups:
+  - name: mediawiki
+    rules:
+      - alert: MediaWikiEditFailures
+        annotations:
+          description: 'Elevated MediaWiki edit failures ({{ $labels.cause }}): {{ $value }}/min'
+          summary: 'Elevated MediaWiki edit failures ({{ $labels.cause }}) for cluster {{ $labels.cluster }}'
+          dashboard: 'https://grafana.wikimedia.org/d/000000208/edit-count?orgId=1&viewPanel=13'
+          runbook: 'https://wikitech.wikimedia.org/wiki/Application_servers/Runbook'
+        labels:
+          severity: critical
+          team: sre
+        for: 2m
+        # sum across baremetal and k8s
+        expr: sum by (cause, cluster) (rate(mediawiki_edit_failure_total[5m]) * 60) > 20
