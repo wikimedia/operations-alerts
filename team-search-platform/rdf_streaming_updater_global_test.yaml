@@ -29,7 +29,7 @@ tests:
         eval_time: 1m
         exp_alerts:
           - exp_labels:
-              severity: warning
+              severity: task
               team: search-platform
               account: AUTH_wdqs
             exp_annotations:
@@ -37,4 +37,3 @@ tests:
               description: "The containers owned by AUTH_wdqs are using 50Gi, this is more than expected."
               runbook: https://wikitech.wikimedia.org/wiki/Wikidata_Query_Service/Streaming_Updater
               dashboard: https://grafana.wikimedia.org/d/fdU5Zx-Mk/wdqs-streaming-updater
-

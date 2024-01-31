@@ -24,7 +24,7 @@ groups:
         for: 1m
         labels:
           team: search-platform
-          severity: warning
+          severity: task
         annotations:
           summary: "The RDF Streaming Updater is using more than 50GiB of storage"
           description: "The containers owned by {{$labels.account}} are using {{ $value | humanize1024 }}, this is more than expected."
