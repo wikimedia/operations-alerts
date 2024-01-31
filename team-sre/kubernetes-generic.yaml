@@ -33,7 +33,7 @@ groups:
   - &KubeletOperationalLatency
     alert: KubeletOperationalLatency
     expr: histogram_quantile(0.99, rate(kubelet_runtime_operations_duration_seconds_bucket{job="k8s-node",operation_type!="list_images"}[5m])) > 1.0
-    for: 5m
+    for: 15m
     labels:
       team: sre
       severity: warning

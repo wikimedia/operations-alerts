@@ -13,13 +13,13 @@ tests:
   - series: 'helm_release_status{namespace="pinkunicorn", name="main", status="deployed"}'
     values: "1 1 1 1 1 1 1 1 1 1 1 0"
   - series: 'kubelet_runtime_operations_duration_seconds_bucket{job="k8s-node", instance="kubefakenode:1234", operation_type="fakeop", le="+Inf"}'
-    values: "1+1x6"
+    values: "1+1x16"
   - series: 'kubelet_runtime_operations_duration_seconds_bucket{job="k8s-node", instance="kubefakenode:1234", operation_type="list_images", le="+Inf"}'
-    values: "1+1x6"
+    values: "1+1x16"
   - series: 'kubelet_runtime_operations_duration_seconds_bucket{job="k8s-node", instance="kubefakenode:1234", operation_type="fakeop", le="1.1"}'
-    values: "0+0x6"
+    values: "0+0x16"
   - series: 'kubelet_runtime_operations_duration_seconds_bucket{job="k8s-node", instance="kubefakenode:1234", operation_type="list_images", le="1.6"}'
-    values: "0+0x6"
+    values: "0+0x16"
   - series: 'apiserver_request_total{job="k8s-api", code="200"}'
     values: "100+1x6"
   - series: 'apiserver_request_total{job="k8s-api", code="0"}'
@@ -79,7 +79,7 @@ tests:
         dashboard: https://grafana.wikimedia.org/d/UT4GtK3nz?var-site=moon&var-cluster=eagle&var-namespace=pinkunicorn
 
   - alertname: KubeletOperationalLatency
-    eval_time: 6m
+    eval_time: 16m
     exp_alerts:
     - exp_labels:
         team: sre
