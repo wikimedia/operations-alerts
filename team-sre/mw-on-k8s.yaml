@@ -37,12 +37,13 @@ groups:
       # Latency alert:
       # we alert on the 75th percentile of request time. We use p75 instead of p99 here to 
       # avoid the effect of a few slow requests to cause false negatives.
-      # Limits are for now 800 ms and at least 30 rps (so about 8 rps slower than 800 ms)
+      # Limits are for now 800 ms and at least 300 rps (so about 60 rps slower than 800 ms)
       # For now, we're using envoy's metrics so we can't differentiate by HTTP method or response code
-      - alert: MediaWikiLatencyExceeded
+      - &MediaWikiLatencyExceeded
+        alert: MediaWikiLatencyExceeded
         annotations:
-          description: 'The mediawiki k8s deployment {{ $labels.deployment }} in {{ $externalLabels.site }} is experiencing slowness. 95th percentile latency: {{ $value }}s'
-          summary: 'Average latency high: {{ $externalLabels.site }} {{ $labels.deployment }} (k8s)'
+          description: 'The mediawiki k8s deployment {{ $labels.deployment }} in {{ $externalLabels.site }} is experiencing slowness. 75th percentile latency: {{ $value | humanizeDuration }}'
+          summary: 'p75 latency high: {{ $externalLabels.site }} {{ $labels.deployment }} (k8s) {{ $value | humanizeDuration }}'
           dashboard: 'https://grafana.wikimedia.org/d/U7JT--knk/mw-on-k8s?orgId=1&viewPanel=55&var-dc={{ $externalLabels.site }}%20prometheus/k8s&var-service=mediawiki&var-namespace={{ $labels.deployment }}'
           runbook: 'https://wikitech.wikimedia.org/wiki/Application_servers/Runbook#Average_latency_exceeded'
         expr: >
@@ -54,9 +55,18 @@ groups:
           ) > 800
           and sum(
             rate(envoy_cluster_upstream_rq_time_count{app="mediawiki",envoy_cluster_name="local_service", deployment!="mw-jobrunner"}[2m])
-          ) by (deployment) > 30
+          ) by (deployment) > 300
         for: 4m
         labels:
           severity: critical
           team: sre
+      # However, if p75 is above 1s, even with less than 300rps, we want to alert
+      - <<: *MediaWikiLatencyExceeded
+        expr: >
+          histogram_quantile(
+            0.75,
+            sum(
+              rate(envoy_cluster_upstream_rq_time_bucket{ app="mediawiki", envoy_cluster_name="local_service", deployment!="mw-jobrunner"}[2m])
+            ) by (le, deployment)
+          ) > 1000
 
