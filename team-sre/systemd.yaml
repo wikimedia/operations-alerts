@@ -21,7 +21,7 @@ groups:
               * on (instance) group_left(team) role_owner{team!="wmcs"}
           ) == 1
         labels:
-          severity: warning
+          severity: critical
         annotations:
           summary: "{{$labels.name}} Failed on {{$labels.instance}}"
           description: "{{$labels.name}} Failed on {{$labels.instance}}"
