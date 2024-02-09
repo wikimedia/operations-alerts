@@ -1,0 +1,27 @@
+# deploy-tag: ops
+
+groups:
+  - name: pki
+    rules:
+    - &pki_cert_about_to_expire
+      alert: PKICertificateExpiry
+      annotations:
+        description: 'A certificate in the trust chain for {{ $labels.module | reReplaceAll "http_PKI_" "" | reReplaceAll "_ip4" "" }} will expire in less than 14 days'
+        summary: 'A certificate in the trust chain for {{ $labels.module | reReplaceAll "http_PKI_" "" | reReplaceAll "_ip4" "" }} expires in {{ $value | humanizeDuration }}'
+        dashboard: 'TODO'
+        runbook: 'https://wikitech.wikimedia.org/wiki/PKI/CA_Operations'
+      expr: (86400 * 7) < probe_ssl_earliest_cert_expiry{module=~"http_PKI_.+"} - time() < (86400 * 14)
+      for: 10m
+      labels:
+        severity: warning
+        team: 'infrastructure-foundations'
+    - <<: *pki_cert_about_to_expire
+      annotations:
+        description: 'A certificate in the trust chain for {{ $labels.module | reReplaceAll "http_PKI_" "" | reReplaceAll "_ip4" "" }} will expire in less than 7 days'
+        summary: 'A certificate in the trust chain for {{ $labels.module | reReplaceAll "http_PKI_" "" | reReplaceAll "_ip4" "" }} expires in {{ $value | humanizeDuration }}'
+        dashboard: 'TODO'
+        runbook: 'https://wikitech.wikimedia.org/wiki/PKI/CA_Operations'
+      expr: probe_ssl_earliest_cert_expiry{module=~"http_PKI_.+"} - time() < (86400 * 7)
+      labels:
+        severity: critical
+        team: 'infrastructure-foundations'

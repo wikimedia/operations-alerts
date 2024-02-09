@@ -1,0 +1,42 @@
+rule_files:
+  - pki.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    input_series:
+      - series: 'probe_ssl_earliest_cert_expiry{address="10.0.0.2", family="ip4", instance="pki2002:443", job="probes/custom", module="http_PKI_syslog_ip4"}'
+        values: '1209600-60x43200'
+      - series: 'probe_ssl_earliest_cert_expiry{address="10.0.0.2", family="ip4", instance="pki2002:443", job="probes/custom", module="http_PKI_etcd_ip4"}'
+        values: '605000-60x43200'
+    external_labels:
+      site: codfw
+    alert_rule_test:
+      - alertname: PKICertificateExpiry
+        eval_time: 4h
+        exp_alerts:
+          - exp_labels:
+              team: infrastructure-foundations
+              severity: warning
+              module: http_PKI_syslog_ip4
+              family: ip4
+              address: 10.0.0.2
+              job: probes/custom
+              instance: pki2002:443
+            exp_annotations:
+              description: 'A certificate in the trust chain for syslog will expire in less than 14 days'
+              summary: 'A certificate in the trust chain for syslog expires in 13d 16h 0m 0s'
+              dashboard: 'TODO'
+              runbook: 'https://wikitech.wikimedia.org/wiki/PKI/CA_Operations'
+          - exp_labels:
+              team: infrastructure-foundations
+              severity: critical
+              module: http_PKI_etcd_ip4
+              family: ip4
+              address: 10.0.0.2
+              job: probes/custom
+              instance: pki2002:443
+            exp_annotations:
+              description: 'A certificate in the trust chain for etcd will expire in less than 7 days'
+              summary: 'A certificate in the trust chain for etcd expires in 6d 16h 3m 20s'
+              dashboard: 'TODO'
+              runbook: 'https://wikitech.wikimedia.org/wiki/PKI/CA_Operations'
