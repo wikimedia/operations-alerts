@@ -20,6 +20,7 @@ groups:
             instance_name:node_systemd_unit_state_failed:count1
               * on (instance) group_left(team) role_owner{team!="wmcs"}
           ) == 1
+        for: 3m
         labels:
           severity: critical
         annotations:

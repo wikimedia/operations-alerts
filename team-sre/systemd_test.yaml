@@ -5,15 +5,16 @@ tests:
   - interval: 1m
     input_series:
       - series: 'systemd_unit_owner{instance="sretest1001:9100",team="serviceops",name="override.service"}'
-        values: '1'
+        values: '1+0x10'
       - series: 'role_owner{instance="sretest1001:9100",team="infrastructure-foundations"}'
-        values: '1'
+        values: '1+0x10'
       - series: 'instance_name:node_systemd_unit_state_failed:count1{instance="sretest1001:9100",name="example.service"}'
-        values: '1'
+        values: '1+0x10'
       - series: 'instance_name:node_systemd_unit_state_failed:count1{instance="sretest1001:9100",name="override.service"}'
-        values: '1'
+        values: '1+0x10'
     alert_rule_test:
       - alertname: SystemdUnitFailed
+        eval_time: 5m
         exp_alerts:
         - exp_labels:
             severity: critical
