@@ -24,8 +24,8 @@ groups:
         labels:
           severity: critical
         annotations:
-          summary: "{{$labels.name}} Failed on {{$labels.instance}}"
-          description: "{{$labels.name}} Failed on {{$labels.instance}}"
+          summary: "{{$labels.name}} on {{$labels.instance}}"
+          description: "{{$labels.name}} on {{$labels.instance}}"
           dashboard: 'https://grafana.wikimedia.org/d/g-AaZRFWk/systemd-status'
           runbook: https://wikitech.wikimedia.org/wiki/Monitoring/check_systemd_state
 

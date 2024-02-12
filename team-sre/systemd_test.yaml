@@ -22,8 +22,8 @@ tests:
             instance: sretest1001:9100
             name: example.service
           exp_annotations:
-            summary: "example.service Failed on sretest1001:9100"
-            description: "example.service Failed on sretest1001:9100"
+            summary: "example.service on sretest1001:9100"
+            description: "example.service on sretest1001:9100"
             dashboard: 'https://grafana.wikimedia.org/d/g-AaZRFWk/systemd-status'
             runbook: https://wikitech.wikimedia.org/wiki/Monitoring/check_systemd_state
         - exp_labels:
@@ -32,8 +32,8 @@ tests:
             instance: sretest1001:9100
             name: override.service
           exp_annotations:
-            summary: "override.service Failed on sretest1001:9100"
-            description: "override.service Failed on sretest1001:9100"
+            summary: "override.service on sretest1001:9100"
+            description: "override.service on sretest1001:9100"
             dashboard: 'https://grafana.wikimedia.org/d/g-AaZRFWk/systemd-status'
             runbook: https://wikitech.wikimedia.org/wiki/Monitoring/check_systemd_state
 
