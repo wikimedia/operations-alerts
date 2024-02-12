@@ -52,7 +52,7 @@ groups:
             sum(
               rate(envoy_cluster_upstream_rq_time_bucket{ app="mediawiki", envoy_cluster_name="local_service", deployment!="mw-jobrunner"}[2m])
             ) by (le, deployment)
-          ) > 800
+          ) / 1000 > 0.8
           and sum(
             rate(envoy_cluster_upstream_rq_time_count{app="mediawiki",envoy_cluster_name="local_service", deployment!="mw-jobrunner"}[2m])
           ) by (deployment) > 300
@@ -68,5 +68,5 @@ groups:
             sum(
               rate(envoy_cluster_upstream_rq_time_bucket{ app="mediawiki", envoy_cluster_name="local_service", deployment!="mw-jobrunner"}[2m])
             ) by (le, deployment)
-          ) > 1000
+          ) / 1000 > 1
 
