@@ -29,6 +29,7 @@ groups:
           team: sre
 
       - alert: PuppetPendingCertificateRequest
+        # pint disable promql/series
         expr: 'time() - puppet_ca_pending_certificate > 86400'
         for: 1m
         annotations:
