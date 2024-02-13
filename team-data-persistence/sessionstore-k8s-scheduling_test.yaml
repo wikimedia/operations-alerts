@@ -14,7 +14,7 @@ tests:
         exp_alerts:
           - exp_labels:
               severity: critical
-              team: data-persistence
+              team: serviceops
             exp_annotations:
               summary: Sessionstore k8s pods are running on non-dedicated hosts
               description: Sessionstore k8s pods are running on hosts that don't have the 'kask' taint

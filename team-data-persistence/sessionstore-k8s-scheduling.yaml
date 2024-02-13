@@ -12,4 +12,4 @@ groups:
       for: 5m
       labels:
         severity: critical
-        team: data-persistence
+        team: serviceops
