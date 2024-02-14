@@ -1,0 +1,16 @@
+# deploy-tag: ops
+
+groups:
+- name: planet
+  rules:
+  - alert: PlanetNotUpdating
+    expr: time() - probe_http_last_modified_timestamp_seconds{module="http_en_planet_wikimedia_org_ip4"} > 86400
+    for: 5m
+    labels:
+      severity: warning
+      team: collaboration-services
+    annotations:
+      summary: "en.planet.wikimedia.org content not updating"
+      description: "en.planet.wikimedia.org content has not changed in {{ $value | humanizeDuration }}"
+      runbook: https://wikitech.wikimedia.org/wiki/Planet.wikimedia.org
+      dashboard: TODO
