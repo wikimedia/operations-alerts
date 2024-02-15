@@ -1,0 +1,29 @@
+rule_files:
+  - puppetmaster.yaml
+evaluation_interval: 60m
+tests:
+  - interval: 1m
+    input_series:
+      - series: 'puppetmaster_commits_ahead{cluster="puppet", instance="puppetmaster2001:9100", job="node", repository="puppet", site="codfw"}'
+        values: '1x3600'
+      - series: 'puppetmaster_commits_ahead{cluster="puppet", instance="puppetmaster1001:9100", job="node", repository="puppet", site="eqiad"}'
+        values: '0x3600'
+    external_labels:
+      site: codfw
+    alert_rule_test:
+      - alertname: UnmergedPuppetChanges
+        eval_time: 60m
+        exp_alerts:
+          - exp_labels:
+              team: sre
+              severity: critical
+              job: node
+              instance: puppetmaster2001:9100
+              repository: puppet
+              cluster: puppet
+              site: codfw
+            exp_annotations:
+              description: 'Unmerged changes on repository puppet on puppetmaster2001:9100'
+              summary: 'Unmerged changes on repository puppet on puppetmaster2001:9100'
+              dashboard: 'TODO'
+              runbook: 'https://wikitech.wikimedia.org/wiki/Monitoring/unmerged_changes'

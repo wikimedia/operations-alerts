@@ -1,0 +1,17 @@
+# deploy-tag: ops
+# deploy-site: eqiad, codfw
+
+groups:
+  - name: puppetmaster
+    rules:
+      - alert: UnmergedPuppetChanges
+        annotations:
+          description: 'Unmerged changes on repository {{ $labels.repository }} on {{ $labels.instance }}'
+          summary: 'Unmerged changes on repository {{ $labels.repository }} on {{ $labels.instance }}'
+          dashboard: 'TODO'
+          runbook: 'https://wikitech.wikimedia.org/wiki/Monitoring/unmerged_changes'
+        expr: puppetmaster_commits_ahead != 0
+        for: 15m
+        labels:
+          severity: critical
+          team: sre
