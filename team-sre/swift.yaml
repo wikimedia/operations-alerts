@@ -39,3 +39,33 @@ groups:
       description: "Too many MediaWiki media originals being uploaded (hourly) in {{ $externalLabels.site }}; {{ $value }} uploads during the last hour"
       dashboard: "https://grafana.wikimedia.org/d/OPgmB1Eiz/swift?panelId=26&fullscreen&orgId=1&var-DC={{ $externalLabels.site }}"
       runbook: "https://wikitech.wikimedia.org/wiki/Swift/How_To#mediawiki_originals_uploads"
+
+  - &swift_node_load
+    alert: SwiftNodeLoad
+    annotations:
+      description: 'Very high load average likely xfs'
+      summary: 'Very high load average likely xfs - {{ $labels.instance }} load: {{ $value }}'
+      dashboard: 'https://grafana.wikimedia.org/d/OPgmB1Eiz/swift?orgId=1'
+      runbook: 'https://wikitech.wikimedia.org/wiki/Swift/How_To'
+    expr: 200 >node_load1{cluster="swift"} > 80
+    for: 1m
+    labels:
+      severity: warning
+      team: 'sre'
+  - <<: *swift_node_load
+    expr: 200 > node_load5{cluster="swift"} > 80
+    for: 5m
+  - <<: *swift_node_load
+    expr: 200> node_load15{cluster="swift"} > 80
+    for: 5m
+  - <<: *swift_node_load
+    annotations:
+      description: 'Very high load across three or more nodes in {{ $labels.site }} cluster'
+      summary: 'Very high load across three or more nodes in {{ $labels.site }} cluster'
+      dashboard: 'https://grafana.wikimedia.org/d/OPgmB1Eiz/swift?orgId=1'
+      runbook: 'https://wikitech.wikimedia.org/wiki/Swift/How_To'
+    expr: count by (site) (node_load1{cluster="swift"} >= 200) >= 3
+    for: 1m
+    labels:
+      severity: critical
+      team: 'sre'

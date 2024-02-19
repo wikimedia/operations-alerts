@@ -10,6 +10,12 @@ tests:
         values: '100-1x100'
       - series: 'swift_container_stats_objects_total{class="originals", site="eqiad"}'
         values: '100000+1000x120'
+      - series: 'node_load1{cluster="swift", instance="ms-fe1010:9112", job="node", site="codfw"}'
+        values: '190+1x1200'
+      - series: 'node_load1{cluster="swift", instance="ms-fe1009:9112", job="node", site="codfw"}'
+        values: '190+2x1200'
+      - series: 'node_load1{cluster="swift", instance="ms-fe1008:9112", job="node", site="codfw"}'
+        values: '190+2x1200'
     external_labels:
       site: eqiad
     alert_rule_test:
@@ -56,3 +62,16 @@ tests:
               description: "Too many MediaWiki media originals being uploaded (hourly) in eqiad; 60000 uploads during the last hour"
               dashboard: "https://grafana.wikimedia.org/d/OPgmB1Eiz/swift?panelId=26&fullscreen&orgId=1&var-DC=eqiad"
               runbook: "https://wikitech.wikimedia.org/wiki/Swift/How_To#mediawiki_originals_uploads"
+
+      - alertname: SwiftNodeLoad
+        eval_time: 15m
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              site: codfw
+              team: sre
+            exp_annotations:
+              description: 'Very high load across three or more nodes in codfw cluster'
+              summary: "Very high load across three or more nodes in codfw cluster"
+              dashboard: 'https://grafana.wikimedia.org/d/OPgmB1Eiz/swift?orgId=1'
+              runbook: 'https://wikitech.wikimedia.org/wiki/Swift/How_To'
