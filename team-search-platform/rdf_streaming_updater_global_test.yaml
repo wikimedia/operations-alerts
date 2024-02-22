@@ -23,7 +23,7 @@ tests:
   - interval: 1m
     input_series:
       - series: 'swift_account_stats_bytes_total{account="AUTH_wdqs"}'
-        values: 53687091201
+        values: 107374182401
     alert_rule_test:
       - alertname: RdfStreamingUpdaterSpaceUsageTooHigh
         eval_time: 1m
@@ -33,7 +33,7 @@ tests:
               team: search-platform
               account: AUTH_wdqs
             exp_annotations:
-              summary: "The RDF Streaming Updater is using more than 50GiB of storage"
-              description: "The containers owned by AUTH_wdqs are using 50Gi, this is more than expected."
+              summary: "The RDF Streaming Updater is using more than 100GiB of storage"
+              description: "The containers owned by AUTH_wdqs are using 100Gi, this is more than expected."
               runbook: https://wikitech.wikimedia.org/wiki/Wikidata_Query_Service/Streaming_Updater
               dashboard: https://grafana.wikimedia.org/d/fdU5Zx-Mk/wdqs-streaming-updater
