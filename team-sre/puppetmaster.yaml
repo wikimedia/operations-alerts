@@ -11,7 +11,7 @@ groups:
           dashboard: 'TODO'
           runbook: 'https://wikitech.wikimedia.org/wiki/Monitoring/unmerged_changes'
         expr: puppetmaster_commits_ahead != 0
-        for: 15m
+        for: 10m
         labels:
           severity: critical
           team: sre
