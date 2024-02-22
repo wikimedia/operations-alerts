@@ -59,7 +59,7 @@ groups:
       expr: puppet_agent_resources_total * on (instance) group_left(team) role_owner == 0
       for: 80m # At least two puppet runs
       labels:
-        severity: critical
+        severity: warning
 
     - alert: PuppetConstantChange
       annotations:

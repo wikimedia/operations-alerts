@@ -83,7 +83,7 @@ tests:
       eval_time: 90m
       exp_alerts:
        - exp_labels:
-           severity: critical
+           severity: warning
            team: infrastructure-foundation
            instance: alert1001:9100
            cluster: alerting
