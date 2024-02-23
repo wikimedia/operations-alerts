@@ -8,9 +8,9 @@ tests:
         values: '10+0x666'
       - series: 'puppet_agent_failed{cluster="misc"}'
         values: '100+0x666'
-      - series: 'cluster:puppet_agent_resources_total:count0{cluster="misc"}'
-        values: '10+0x666'
-      - series: 'cluster:puppet_agent_resources_total:count{cluster="misc"}'
+      - series: 'puppet_agent_resources_total{cluster="misc"}'
+        values: '0+0x666'
+      - series: 'puppet_agent_resources_total{cluster="misc"}'
         values: '100+0x666'
     external_labels:
       site: eqiad

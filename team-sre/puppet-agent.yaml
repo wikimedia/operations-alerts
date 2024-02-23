@@ -13,9 +13,9 @@ groups:
         dashboard: https://grafana.wikimedia.org/d/yOxVDGvWk/puppet?orgId=1&viewPanel=6
         runbook: https://puppetboard.wikimedia.org/nodes?status=failed
       expr: |
-        sum(puppet_agent_failed) / count(puppet_agent_failed) >= 0.1
+        sum(puppet_agent_failed) / count(puppet_agent_failed) >= 0.03
            or
-        sum(puppet_agent_resources_total == 0) / count(puppet_agent_resources_total == 0) >= 0.1
+        count(puppet_agent_resources_total == 0) / count(puppet_agent_resources_total) >= 0.03
       labels:
         severity: critical
         team: sre
