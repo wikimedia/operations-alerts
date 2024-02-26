@@ -52,6 +52,12 @@ tests:
     input_series:
       - series: 'haproxy_backend_active_servers{instance="cloudlb1002:9900",job="cloudlb-haproxy",proxy="cinder-api_backend"}'
         values: "2x5 1x5 0x5"
+      - series: 'haproxy_backend_backup_servers{instance="cloudlb1002:9900",job="cloudlb-haproxy",proxy="cinder-api_backend"}'
+        values: "0x15"
+      - series: 'haproxy_backend_active_servers{instance="cloudlb1002:9900",job="cloudlb-haproxy",proxy="mysql"}'
+        values: "0x15"
+      - series: 'haproxy_backend_backup_servers{instance="cloudlb1002:9900",job="cloudlb-haproxy",proxy="mysql"}'
+        values: "2x10 0x5"
       - series: 'haproxy_backend_active_servers{instance="cloudlb1002:9900",job="cloudlb-haproxy",proxy="stats"}'
         values: "0x15"
       - series: 'haproxy_backend_active_servers{instance="cloudlb1002:9900",job="cloudlb-haproxy",proxy="stats"}'
@@ -80,6 +86,18 @@ tests:
             exp_annotations:
               summary: "HAProxy service cinder-api_backend has no available backends on cloudlb1002:9900"
               description: "HAProxy service cinder-api_backend has no available backends on cloudlb1002:9900"
+              runbook: https://wikitech.wikimedia.org/wiki/HAProxy
+              dashboard: TODO
+          - exp_labels:
+              severity: critical
+              team: wmcs
+              service: cloudvps
+              instance: "cloudlb1002:9900"
+              job: cloudlb-haproxy
+              proxy: "mysql"
+            exp_annotations:
+              summary: "HAProxy service mysql has no available backends on cloudlb1002:9900"
+              description: "HAProxy service mysql has no available backends on cloudlb1002:9900"
               runbook: https://wikitech.wikimedia.org/wiki/HAProxy
               dashboard: TODO
 
