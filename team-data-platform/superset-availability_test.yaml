@@ -1,0 +1,36 @@
+rule_files:
+  - superset-availability.yaml
+evaluation_interval: 5m
+tests:
+  - input_series:
+    - series: kube_deployment_status_replicas_available{deployment="superset-staging", namespace="superset-next"}
+      values: '0'
+    alert_rule_test:
+    - alertname: SupersetNextServiceUnavailable
+      exp_alerts:
+      - exp_annotations:
+          description: superset-staging is unavailable on k8s-dse
+          summary: superset-staging is unavailable on k8s-dse
+          dashboard: 'https://grafana.wikimedia.org/d/hyl18XgMk/kubernetes-container-details?orgId=1&var-datasource=thanos&var-site=eqiad&var-cluster=k8s-dse&var-namespace=superset-next&var-pod=superset-staging-78cbb9d959-bfm5d&var-container=All'
+          runbook: "https://wikitech.wikimedia.org/wiki/Analytics/Systems/Superset/Administration#Alerting"
+        exp_labels:
+          namespace: superset-next
+          deployment: superset-staging
+          severity: warning
+          team: data-platform
+  - input_series:
+    - series: kube_deployment_status_replicas_available{deployment="superset-production", namespace="superset"}
+      values: '0'
+    alert_rule_test:
+    - alertname: SupersetServiceUnavailable
+      exp_alerts:
+      - exp_annotations:
+          description: superset-production is unavailable on k8s-dse
+          summary: superset-production is unavailable on k8s-dse
+          dashboard: 'https://grafana.wikimedia.org/d/hyl18XgMk/kubernetes-container-details?orgId=1&var-datasource=thanos&var-site=eqiad&var-cluster=k8s-dse&var-namespace=superset&var-pod=superset-production-746ff8c7d7-2h4xk&var-container=All'
+          runbook: "https://wikitech.wikimedia.org/wiki/Analytics/Systems/Superset/Administration#Alerting"
+        exp_labels:
+          namespace: superset
+          deployment: superset-production
+          severity: critical
+          team: data-platform
