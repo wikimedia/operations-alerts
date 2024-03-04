@@ -4,9 +4,9 @@ evaluation_interval: 1m
 tests:
   - interval: 1m
     input_series:
-      - series: 'probe_ssl_earliest_cert_expiry{address="10.0.0.2", family="ip4", instance="pki2002:443", job="probes/custom", module="http_PKI_syslog_ip4"}'
-        values: '1209600-60x43200'
-      - series: 'probe_ssl_earliest_cert_expiry{address="10.0.0.2", family="ip4", instance="pki2002:443", job="probes/custom", module="http_PKI_etcd_ip4"}'
+      - series: 'x509_cert_expiry{cert="/etc/ssl/signers/aux/ca/aux.pem", cluster="pki", instance="pki2002:9100", job="node", site="codfw", subject="aux"}'
+        values: '2419200-60x43200'
+      - series: 'x509_cert_expiry{cert="/etc/ssl/signers/network/ca/network.pem", cluster="pki", instance="pki2002:9100", job="node", site="codfw", subject="network"}'
         values: '605000-60x43200'
     external_labels:
       site: codfw
@@ -16,27 +16,29 @@ tests:
         exp_alerts:
           - exp_labels:
               team: infrastructure-foundations
+              cert: /etc/ssl/signers/aux/ca/aux.pem
+              job: node
+              site: codfw
               severity: warning
-              module: http_PKI_syslog_ip4
-              family: ip4
-              address: 10.0.0.2
-              job: probes/custom
-              instance: pki2002:443
+              subject: aux
+              cluster: pki
+              instance: pki2002:9100
             exp_annotations:
-              description: 'A certificate in the trust chain for syslog will expire in less than 14 days'
-              summary: 'A certificate in the trust chain for syslog expires in 13d 16h 0m 0s'
+              description: 'Intermediate certificate in the trust chain for aux will expire in less than 30 days'
+              summary: 'Intermediate certificate in the trust chain for aux expires in 27d 16h 0m 0s'
               dashboard: 'TODO'
               runbook: 'https://wikitech.wikimedia.org/wiki/PKI/CA_Operations'
           - exp_labels:
               team: infrastructure-foundations
+              cert: /etc/ssl/signers/network/ca/network.pem
+              job: node
+              site: codfw
               severity: critical
-              module: http_PKI_etcd_ip4
-              family: ip4
-              address: 10.0.0.2
-              job: probes/custom
-              instance: pki2002:443
+              subject: network
+              cluster: pki
+              instance: pki2002:9100
             exp_annotations:
-              description: 'A certificate in the trust chain for etcd will expire in less than 7 days'
-              summary: 'A certificate in the trust chain for etcd expires in 6d 16h 3m 20s'
+              description: 'Intermediate certificate in the trust chain for network will expire in less than 7 days'
+              summary: 'Intermediate certificate in the trust chain for network expires in 6d 16h 3m 20s'
               dashboard: 'TODO'
               runbook: 'https://wikitech.wikimedia.org/wiki/PKI/CA_Operations'
