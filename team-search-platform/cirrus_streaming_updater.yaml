@@ -1,0 +1,41 @@
+##
+# flink alerts for the Cirrus Streaming Updater
+# deploy-tag: k8s
+groups:
+  - name: cirrus-streaming-updater
+    rules:
+## Cirrus Streaming Updater Producer alerts
+      - alert: CirrusStreamingUpdaterFlinkJobUnstable
+        # We try to detect crashloop, use the uptime of the job and take its max over a 10minute period.
+        # Using resets() or repetive instant checks for 10m do not seem to work because:
+        # - the series might differ if the k8s pod crashes making resets unable to detect the resets of the counter
+        # - the series might disappear while the job is being restarted making instant checks flappy
+        # max_over_time does seem to workaround these problems and will only fail if the series goes away for more than
+        # 10 mins in which case the CirrusStreamingUpdaterFlinkJobNotRunning alert should have been triggered a long time ago
+        expr: |
+            max by (job_name, release, kubernetes_namespace) (max_over_time(flink_jobmanager_job_uptime{kubernetes_namespace="cirrus-streaming-updater", job_name !~ ".*_backfill_.*"}[10m])) < 300000
+        for: 1m
+        labels:
+          team: search-platform
+          severity: critical
+        annotations:
+          summary: "{{$labels.job_name}} in {{$externalLabels.site}} ({{$externalLabels.prometheus}}) is unstable"
+          description: "The flink job has an uptime below 5 minutes for the past 10 minutes, it is probably trying to start in vain"
+          runbook: https://wikitech.wikimedia.org/wiki/Search#Streaming_Updater
+          dashboard: https://grafana.wikimedia.org/d/K9x0c4aVk/flink-app?var-datasource={{$externalLabels.site}}+prometheus%2F{{$externalLabels.prometheus}}&var-namespace=cirrus-streaming-updater&var-helm_release={{$labels.release}}
+
+      - alert: CirrusProducerFlinkJobNotRunning
+        expr: |
+          absent(flink_jobmanager_job_uptime{kubernetes_namespace="cirrus-streaming-updater", job_name=~"cirrus_streaming_updater_producer_(eqiad|codfw)"})
+        for: 5m
+        labels:
+          team: search-platform
+          severity: critical
+          job_name:
+        annotations:
+          summary: "cirrus_streaming_updater_producer in {{$externalLabels.site}} ({{$externalLabels.prometheus}}) is not running"
+          description: "The flink job is not running"
+          runbook: https://wikitech.wikimedia.org/wiki/Search#Streaming_Updater
+          dashboard: https://grafana.wikimedia.org/d/K9x0c4aVk/flink-app?var-datasource={{$externalLabels.site}}+prometheus%2F{{$externalLabels.prometheus}}&var-namespace=cirrus-streaming-updater&var-helm_release=producer
+
+      # TODO: alert for CirrusConsumerFlinkJobNotRunning once we are running the consumer in eqiad/codfw

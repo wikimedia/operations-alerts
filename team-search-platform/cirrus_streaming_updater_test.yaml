@@ -1,0 +1,50 @@
+rule_files:
+  - cirrus_streaming_updater.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    input_series:
+      - series: 'flink_jobmanager_job_uptime{job_name="cirrus_streaming_updater_producer_eqiad", kubernetes_namespace="cirrus-streaming-updater", pod="1", release="producer"}'
+        values: "2000000 0 60000 120000 180000 0 0 0 0 0 0 0"
+      - series: 'flink_jobmanager_job_uptime{job_name="cirrus_streaming_updater_producer_eqiad", kubernetes_namespace="cirrus-streaming-updater", pod="2", release="producer"}'
+        values: "0 0 0 0 0 0 60000 120000 180000 240000 0 60000"
+      - series: 'flink_taskmanager_job_task_operator_processing_latency_ms{kubernetes_namespace="cirrus-streaming-updater", job_name="cirrus_streaming_updater_producer_eqiad", release="producer"}'
+        values: "600001"
+    external_labels:
+      site: eqiad
+      prometheus: k8s
+    alert_rule_test:
+      - alertname: CirrusStreamingUpdaterFlinkJobUnstable
+        eval_time: 12m
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              team: search-platform
+              kubernetes_namespace: cirrus-streaming-updater
+              job_name: cirrus_streaming_updater_producer_eqiad
+              release: producer
+            exp_annotations:
+              summary: "cirrus_streaming_updater_producer_eqiad in eqiad (k8s) is unstable"
+              description: "The flink job has an uptime below 5 minutes for the past 10 minutes, it is probably trying to start in vain"
+              runbook: "https://wikitech.wikimedia.org/wiki/Search#Streaming_Updater"
+              dashboard: https://grafana.wikimedia.org/d/K9x0c4aVk/flink-app?var-datasource=eqiad+prometheus%2Fk8s&var-namespace=cirrus-streaming-updater&var-helm_release=producer
+  - interval: 1m
+    input_series:
+      - series: 'flink_jobmanager_job_uptime{job_name="Unrelated_Job", kubernetes_namespace="unrelated-ns", release="producer"}'
+        values: "2000000"
+    external_labels:
+      site: eqiad
+      prometheus: k8s
+    alert_rule_test:
+      - alertname: CirrusProducerFlinkJobNotRunning
+        eval_time: 6m
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              team: search-platform
+              kubernetes_namespace: cirrus-streaming-updater
+            exp_annotations:
+              summary: "cirrus_streaming_updater_producer in eqiad (k8s) is not running"
+              description: "The flink job is not running"
+              runbook: https://wikitech.wikimedia.org/wiki/Search#Streaming_Updater
+              dashboard: https://grafana.wikimedia.org/d/K9x0c4aVk/flink-app?var-datasource=eqiad+prometheus%2Fk8s&var-namespace=cirrus-streaming-updater&var-helm_release=producer
