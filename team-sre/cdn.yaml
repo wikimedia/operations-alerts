@@ -9,8 +9,8 @@ groups:
           dashboard: 'https://grafana.wikimedia.org/d/1T_4O08Wk/ats-backends-origin-servers-overview?orgId=1&viewPanel=12&var-site={{ $externalLabels.site }}&var-cluster={{ $labels.cluster | reReplaceAll "cache_" ""}}&var-origin={{ $labels.backend }}'
           runbook: 'https://wikitech.wikimedia.org/wiki/Apache_Traffic_Server#Debugging'
         # Historically only real outages would've triggered this alert by keeping errors over 3 per second per backend for over 15 minutes.
-        # I looked back at 90 days of data in prometheus for this alert and only found occurences for more than 15 minutes due to swift and wdqs outages:
-        expr: sum(rate(trafficserver_backend_requests_seconds_count{status=~"5[0-9][0-9]", backend!~"localhost|127.0.0.1"}[2m])) by (backend, cluster) > 3
+        # We exclude explicitly the API gateways as we have individual alerts for them. See team-sre/api-gateway.yaml
+        expr: sum(rate(trafficserver_backend_requests_seconds_count{status=~"5[0-9][0-9]", backend!~"localhost|127.0.0.1|rest-gateway.discovery.wmnet|api-gateway.discovery.wmnet"}[2m])) by (backend, cluster) > 3
         for: 15m
         labels:
           severity: page
