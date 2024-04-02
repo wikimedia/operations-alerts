@@ -32,3 +32,23 @@ groups:
             rate(mediawiki_WikimediaEvents_authmanager_error_total{event="centrallogin"}[5m])
           ) * 60 # per minute
           > 1
+
+      - alert: MediaWikiAccountCreationFailures
+        annotations:
+          description: 'Elevated MediaWiki account creation failures: {{ $value | humanizePercentage }}'
+          summary: 'Elevated MediaWiki account creation failures: {{ $value | humanizePercentage }}'
+          dashboard: 'https://grafana.wikimedia.org/d/000000438/mediawiki-exceptions-alerts?viewPanel=23'
+          runbook: 'https://wikitech.wikimedia.org/wiki/Application_servers/Runbook'
+        labels:
+          severity: critical
+          team: sre
+        for: 2m
+        expr: |
+          sum(mediawiki_WikimediaEvents_authmanager_error_total{event="accountcreation"})
+            /
+          (
+            sum(mediawiki_WikimediaEvents_authmanager_success_total{event="accountcreation"})
+            +
+            sum(mediawiki_WikimediaEvents_authmanager_error_total{event="accountcreation"})
+          )
+          >= 0.9
