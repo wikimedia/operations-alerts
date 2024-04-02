@@ -22,3 +22,23 @@ tests:
               summary: 'Elevated MediaWiki edit failures (session_loss) for cluster appserver'
               dashboard: 'https://grafana.wikimedia.org/d/000000208/edit-count?orgId=1&viewPanel=13'
               runbook: 'https://wikitech.wikimedia.org/wiki/Application_servers/Runbook'
+
+  - interval: 1m
+    input_series:
+      - series: 'mediawiki_WikimediaEvents_authmanager_error_total{event="centrallogin", reason="centralauth_error_badtoken"}'
+        values: '20+50x20'
+    external_labels:
+      site: codfw
+    alert_rule_test:
+      - alertname: MediaWikiLoginFailures
+        eval_time: 5m
+        exp_alerts:
+          - exp_labels:
+              team: sre
+              severity: critical
+              reason: centralauth_error_badtoken
+            exp_annotations:
+              description: 'Elevated MediaWiki centrallogin failures (centralauth_error_badtoken): 50/min'
+              summary: 'Elevated MediaWiki centrallogin failures (centralauth_error_badtoken)'
+              dashboard: 'https://grafana.wikimedia.org/d/000000438/mediawiki-exceptions-alerts?viewPanel=3'
+              runbook: 'https://wikitech.wikimedia.org/wiki/Application_servers/Runbook'
