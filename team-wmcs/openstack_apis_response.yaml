@@ -44,7 +44,7 @@ groups:
 
       # No data test
       - alert: OpenstackAPIResponse
-        expr: avg_over_time((haproxy_server_total_time_average_seconds{job="cloudlb-haproxy", proxy!="mysql"} OR on() vector(100))[12h:]) > 99
+        expr: avg_over_time((haproxy_server_total_time_average_seconds{job="cloudlb-haproxy", proxy!~"(mysql|wikireplica-db-(web|analytics)-s\\d)"} OR on() vector(100))[12h:]) > 99
         labels:
           team: wmcs
           severity: warning
