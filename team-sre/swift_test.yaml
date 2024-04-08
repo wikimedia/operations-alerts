@@ -54,7 +54,7 @@ tests:
         exp_alerts:
           - exp_labels:
               team: sre
-              severity: critical
+              severity: warning
               site: eqiad
               class: originals
             exp_annotations:

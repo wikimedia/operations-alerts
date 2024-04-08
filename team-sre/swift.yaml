@@ -32,7 +32,7 @@ groups:
     expr: 'swift_container_stats_objects_total{class="originals"} - swift_container_stats_objects_total{class="originals"} offset 1h >= 6000'
     for: 5m
     labels:
-      severity: critical
+      severity: warning
       team: sre
     annotations:
       summary: "Too many {{ $externalLabels.site }} mediawiki originals uploads"
