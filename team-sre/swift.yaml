@@ -29,8 +29,8 @@ groups:
       runbook: "https://wikitech.wikimedia.org/wiki/Swift/How_To"
 
   - alert: SwiftTooManyMediaUploads
-    expr: 'increase(swift_container_stats_objects_total{class="originals"}[1h]) >= 6000'
-    for: 30m
+    expr: 'swift_container_stats_objects_total{class="originals"} - swift_container_stats_objects_total{class="originals"} offset 1h >= 6000'
+    for: 5m
     labels:
       severity: critical
       team: sre
