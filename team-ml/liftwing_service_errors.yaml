@@ -1,0 +1,31 @@
+# deploy-tag: k8s-mlserve
+# deploy-site: eqiad, codfw
+
+groups:
+  - name: liftwing_service_errors
+    rules:
+      - alert: LiftWingServiceErrorRate
+        expr: |
+          (
+            (sum by
+              (destination_canonical_service, destination_service_namespace, kubernetes_namespace)
+              (
+                rate(istio_requests_total{kubernetes_namespace="istio-system", destination_canonical_service!="unknown", response_code!~"(2|3|4).."}[5m])
+              )
+            )/
+            (sum by
+              (destination_canonical_service, destination_service_namespace, kubernetes_namespace)
+              (
+                rate(istio_requests_total{kubernetes_namespace="istio-system", destination_canonical_service!="unknown"}[5m])
+              )
+            )
+          ) > 0.3
+        for: 30m
+        labels:
+          team: ml
+          severity: critical
+        annotations:
+          summary: "LiftWing service has a high rate of non 2/3/400 error code responses"
+          description: "The rate of errors (non-2/3/4xx return codes) in the LiftWing service {{ $labels.destination_canonical_service }} in {{ $externalLabels.site }} is higher than the configured threshold."
+          runbook: https://wikitech.wikimedia.org/wiki/Machine_Learning/LiftWing/Alerts#LiftWingServiceErrorRate
+          dashboard: https://grafana.wikimedia.org/d/G7yj84Vnk/istio?orgId=1&refresh=30s&var-cluster={{ $externalLabels.site }}%20prometheus/k8s-mlserve&var-namespace={{ $labels.destination_service_namespace }}&var-backend={{ $labels.destination_canonical_service }}.%2A
