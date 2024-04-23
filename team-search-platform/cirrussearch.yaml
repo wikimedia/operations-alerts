@@ -6,7 +6,7 @@ groups:
    rules:
     - alert: CirrusSearchJVMGCYoungPoolInsufficient
       expr: max_over_time(elasticsearch_jvm_memory_pool_used_bytes{exported_cluster=~"production-search-.*", pool="young"}[1h]) < 500000000
-      for: 1m
+      for: 5m
       labels:
         team: search-platform
         severity: warning
