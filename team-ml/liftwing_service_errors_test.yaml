@@ -1,0 +1,28 @@
+rule_files:
+  - liftwing_service_errors.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    input_series:
+      - series: istio_requests_total{destination_canonical_service="testing_service", response_code="200", destination_service_namespace="test_ns", kubernetes_namespace="istio-system"}
+        values: '0+1x60'
+      - series: istio_requests_total{destination_canonical_service="testing_service", response_code="500", destination_service_namespace="test_ns", kubernetes_namespace="istio-system"}
+        values: '0+1x60'
+    external_labels:
+      site: eqiad
+      prometheus: k8s-mlserve
+    alert_rule_test:
+    - alertname: LiftWingServiceErrorRate
+      eval_time: 60m
+      exp_alerts:
+       - exp_labels:
+           team: ml
+           severity: critical
+           destination_canonical_service: testing_service
+           destination_service_namespace: test_ns
+           kubernetes_namespace: istio-system
+         exp_annotations:
+           summary: "LiftWing service has a high rate of non 2/3/400 error code responses"
+           description: "The rate of errors (non-2/3/4xx return codes) in the LiftWing service testing_service in eqiad is higher than the configured threshold."
+           runbook: https://wikitech.wikimedia.org/wiki/Machine_Learning/LiftWing/Alerts#LiftWingServiceErrorRate
+           dashboard: https://grafana.wikimedia.org/d/G7yj84Vnk/istio?orgId=1&refresh=30s&var-cluster=eqiad%20prometheus/k8s-mlserve&var-namespace=test_ns&var-backend=testing_service.%2A
