@@ -127,3 +127,23 @@ tests:
               description: "The daily build process for autocomplete indices is probably having issues and should be investigated."
               runbook: https://wikitech.wikimedia.org/wiki/Search#CirrusSearch_titlesuggest_index_is_too_old
               dashboard: 'TODO'
+
+  - interval: 1m
+    input_series:
+      - series: envoy_cluster_upstream_rq{envoy_cluster_name="search-https_eqiad", cluster="appserver", envoy_response_code="503"}
+        values: '0+400x20'
+    external_labels:
+      site: eqiad
+      prometheus: ops
+    alert_rule_test:
+      - alertname: CirrusBackendErrorRateTooHigh
+        eval_time: 10m
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              team: search-platform
+            exp_annotations:
+                  summary: 'CirrusSearch getting over 0.1% error responses from elasticsearch'
+                  description: "Envoy reports 5xx rate over 5 minutes of more than .1%"
+                  runbook: 'TODO'
+                  dashboard: 'https://grafana.wikimedia.org/d/VTCkm29Wz/envoy-telemetry?orgId=1&var-datasource=eqiad%20prometheus-ops&var-origin=appserver&var-origin_instance=All&var-destination=search-https_eqiad'
