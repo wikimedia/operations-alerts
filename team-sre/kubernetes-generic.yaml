@@ -24,7 +24,7 @@ groups:
       severity: critical
     annotations:
       summary: "Calico Kubernetes Controllers not running"
-      description: "The calico-kube-controllers pod is not running in the kube-system namespace"
+      description: "The calico-kube-controllers pod is not running in the {{ $externalLabels.prometheus }}@{{ $externalLabels.site }} kube-system namespace"
       runbook: https://wikitech.wikimedia.org/wiki/Calico#Kube_Controllers"
       dashboard: TODO
 
