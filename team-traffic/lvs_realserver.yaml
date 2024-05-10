@@ -20,4 +20,4 @@ groups:
           summary: "Unexpected MSS value on {{ $labels.endpoint }} @ {{ $labels.hostname }}"
           description: "The host {{ $labels.hostname }} reports a mismatch between configured and observed TCP MSS on {{ $labels.endpoint }}"
           dashboard: "https://grafana.wikimedia.org/d/Y9-MQxNSk/ipip-encapsulated-services?orgId=1&viewPanel=2&var-site={{ $externalLabels.site }}&var-cluster={{ $labels.cluster }}"
-          runbook: TODO
+          runbook: "https://wikitech.wikimedia.org/wiki/LVS#LVSRealserverMSS_alert"
