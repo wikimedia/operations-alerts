@@ -16,7 +16,7 @@ tests:
         exp_alerts:
         - exp_labels:
             severity: page
-            team: data-engineering
+            team: data-platform
             hadoop_cluster: analytics-hadoop
           exp_annotations:
             description: Free space on the analytics-hadoop HDFS cluster is below the paging threshold of 5%.
@@ -25,7 +25,7 @@ tests:
             runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#HDFS_Capacity_Remaining
         - exp_labels:
             severity: critical
-            team: data-engineering
+            team: data-platform
             hadoop_cluster: analytics-hadoop
           exp_annotations:
             description: Free space on the analytics-hadoop HDFS cluster is below the critical threshold of 10%.
@@ -34,7 +34,7 @@ tests:
             runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#HDFS_Capacity_Remaining
         - exp_labels:
             severity: warning
-            team: data-engineering
+            team: data-platform
             hadoop_cluster: analytics-hadoop
           exp_annotations:
             description: Free space on the analytics-hadoop HDFS cluster is below the warning threshold of 15%.
@@ -53,7 +53,7 @@ tests:
         exp_alerts:
         - exp_labels:
             severity: critical
-            team: data-engineering
+            team: data-platform
             hadoop_cluster: analytics-hadoop
           exp_annotations:
             description: More than 50 HDFS corrupt blocks detected on the analytics-hadoop HDFS cluster.
@@ -62,7 +62,7 @@ tests:
             runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#HDFS_corrupt_blocks
         - exp_labels:
             severity: warning
-            team: data-engineering
+            team: data-platform
             hadoop_cluster: analytics-hadoop
           exp_annotations:
             description: More than 30 HDFS corrupt blocks detected on the analytics-hadoop HDFS cluster.
@@ -81,7 +81,7 @@ tests:
         exp_alerts:
         - exp_labels:
             severity: critical
-            team: data-engineering
+            team: data-platform
             hadoop_cluster: analytics-hadoop
           exp_annotations:
             description: More than 5 HDFS missing blocks detected on the analytics-hadoop HDFS cluster.
@@ -90,7 +90,7 @@ tests:
             runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#HDFS_missing_blocks
         - exp_labels:
             severity: warning
-            team: data-engineering
+            team: data-platform
             hadoop_cluster: analytics-hadoop
           exp_annotations:
             description: More than 2 HDFS missing blocks detected on the analytics-hadoop HDFS cluster.
@@ -109,7 +109,7 @@ tests:
         exp_alerts:
         - exp_labels:
             severity: critical
-            team: data-engineering
+            team: data-platform
             hadoop_cluster: analytics-hadoop
           exp_annotations:
             description: The total number of files on the analytics-hadoop HDFS cluster are more than the heap can support.
@@ -118,7 +118,7 @@ tests:
             runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#HDFS_total_files_and_heap_size
         - exp_labels:
             severity: warning
-            team: data-engineering
+            team: data-platform
             hadoop_cluster: analytics-hadoop
           exp_annotations:
             description: The total number of files on the analytics-hadoop HDFS cluster are more than the heap can support.
@@ -137,7 +137,7 @@ tests:
         exp_alerts:
         - exp_labels:
             severity: critical
-            team: data-engineering
+            team: data-platform
             hadoop_cluster: analytics-hadoop
           exp_annotations:
             description: The HDFS Namenode RPC 8020 call queue length on the analytics-hadoop cluster is too high.
@@ -146,7 +146,7 @@ tests:
             runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#HDFS_Namenode_RPC_length_queue
         - exp_labels:
             severity: warning
-            team: data-engineering
+            team: data-platform
             hadoop_cluster: analytics-hadoop
           exp_annotations:
             description: The HDFS Namenode RPC 8020 call queue length on the analytics-hadoop cluster is too high.
@@ -167,7 +167,7 @@ tests:
         exp_alerts:
         - exp_labels:
             severity: critical
-            team: data-engineering
+            team: data-platform
             hadoop_cluster: analytics-hadoop
             instance: an-master1001:10080
             job: jmx_hadoop
@@ -179,7 +179,7 @@ tests:
             runbook: https://wikitech.wikimedia.org/wiki/Analytics/Cluster/Hadoop/Alerts#HDFS_FSImage_too_old
         - exp_labels:
             severity: warning
-            team: data-engineering
+            team: data-platform
             hadoop_cluster: analytics-hadoop
             instance: an-master1001:10080
             job: jmx_hadoop

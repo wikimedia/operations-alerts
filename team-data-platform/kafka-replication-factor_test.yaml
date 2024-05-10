@@ -10,7 +10,7 @@ tests:
       exp_alerts:
       - exp_labels:
           severity: warning
-          team: data-engineering
+          team: data-platform
           topic: webrequest_text
           kafka_cluster: jumbo-eqiad
         exp_annotations:

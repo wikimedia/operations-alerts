@@ -15,7 +15,7 @@ tests:
         exp_alerts:
         - exp_labels:
             severity: critical
-            team: data-engineering
+            team: data-platform
             hadoop_cluster: analytics-hadoop
             instance: an-master1001:10080
             area: heap
@@ -30,7 +30,7 @@ tests:
             runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#HDFS_total_files_and_heap_size
         - exp_labels:
             severity: warning
-            team: data-engineering
+            team: data-platform
             hadoop_cluster: analytics-hadoop
             instance: an-master1001:10080
             area: heap
@@ -57,7 +57,7 @@ tests:
         exp_alerts:
         - exp_labels:
             severity: critical
-            team: data-engineering
+            team: data-platform
             hadoop_cluster: analytics-hadoop
             instance: an-worker1099:51010
             area: heap
@@ -72,7 +72,7 @@ tests:
             runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#HDFS_Datanode_JVM_Heap_Usage
         - exp_labels:
             severity: warning
-            team: data-engineering
+            team: data-platform
             hadoop_cluster: analytics-hadoop
             instance: an-worker1099:51010
             area: heap
@@ -99,7 +99,7 @@ tests:
         exp_alerts:
         - exp_labels:
             severity: critical
-            team: data-engineering
+            team: data-platform
             hadoop_cluster: analytics-hadoop
             instance: an-master1001:10083
             area: heap
@@ -114,7 +114,7 @@ tests:
             runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#Yarn_Nodemanager_JVM_Heap_Usage
         - exp_labels:
             severity: warning
-            team: data-engineering
+            team: data-platform
             hadoop_cluster: analytics-hadoop
             instance: an-master1001:10083
             area: heap
@@ -141,7 +141,7 @@ tests:
         exp_alerts:
         - exp_labels:
             severity: critical
-            team: data-engineering
+            team: data-platform
             instance: an-coord1001:9183
             area: heap
             cluster: analytics
@@ -155,7 +155,7 @@ tests:
             runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hive/Alerts#Hive_Metastore_Heap_Usage
         - exp_labels:
             severity: warning
-            team: data-engineering
+            team: data-platform
             instance: an-coord1001:9183
             area: heap
             cluster: analytics
@@ -181,7 +181,7 @@ tests:
         exp_alerts:
         - exp_labels:
             severity: critical
-            team: data-engineering
+            team: data-platform
             instance: an-coord1001:10100
             area: heap
             cluster: analytics
@@ -195,7 +195,7 @@ tests:
             runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hive/Alerts#Hive_Server_Heap_Usage
         - exp_labels:
             severity: warning
-            team: data-engineering
+            team: data-platform
             instance: an-coord1001:10100
             area: heap
             cluster: analytics

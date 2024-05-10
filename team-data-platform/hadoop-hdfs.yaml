@@ -16,7 +16,7 @@ groups:
       for: 5m
       labels:
         severity: page
-        team: data-engineering
+        team: data-platform
 
     - alert: HdfsCapacityRemainingPercent
       annotations:
@@ -28,7 +28,7 @@ groups:
       for: 5m
       labels:
         severity: critical
-        team: data-engineering
+        team: data-platform
 
     - alert: HdfsCapacityRemainingPercent
       annotations:
@@ -40,7 +40,7 @@ groups:
       for: 5m
       labels:
         severity: warning
-        team: data-engineering
+        team: data-platform
 
 ## HDFS Corrupt Blocks alerts
     - alert: HdfsCorruptBlocks
@@ -53,7 +53,7 @@ groups:
       for: 5m
       labels:
         severity: critical
-        team: data-engineering
+        team: data-platform
 
     - alert: HdfsCorruptBlocks
       annotations:
@@ -65,7 +65,7 @@ groups:
       for: 5m
       labels:
         severity: warning
-        team: data-engineering
+        team: data-platform
 
 ## HDFS Missing Blocks alerts
     - alert: HdfsMissingBlocks
@@ -78,7 +78,7 @@ groups:
       for: 5m
       labels:
         severity: critical
-        team: data-engineering
+        team: data-platform
 
     - alert: HdfsMissingBlocks
       annotations:
@@ -90,7 +90,7 @@ groups:
       for: 5m
       labels:
         severity: warning
-        team: data-engineering
+        team: data-platform
 
 ## HDFS Total Files alerts
     - alert: HdfsTotalFilesHeap
@@ -103,7 +103,7 @@ groups:
       for: 5m
       labels:
         severity: critical
-        team: data-engineering
+        team: data-platform
 
     - alert: HdfsTotalFilesHeap
       annotations:
@@ -115,7 +115,7 @@ groups:
       for: 5m
       labels:
         severity: warning
-        team: data-engineering
+        team: data-platform
 
 ## HDFS Namenode RPC Call Queue Length alerts
     - alert: HdfsRpcQueueLength
@@ -128,7 +128,7 @@ groups:
       for: 5m
       labels:
         severity: critical
-        team: data-engineering
+        team: data-platform
 
     - alert: HdfsRpcQueueLength
       annotations:
@@ -140,7 +140,7 @@ groups:
       for: 5m
       labels:
         severity: warning
-        team: data-engineering
+        team: data-platform
 
 ## HDFS Namenode FSImage Age
     - alert: HdfsFSImageAge
@@ -153,7 +153,7 @@ groups:
       for: 5m
       labels:
         severity: critical
-        team: data-engineering
+        team: data-platform
 
     - alert: HdfsFSImageAge
       annotations:
@@ -165,4 +165,4 @@ groups:
       for: 5m
       labels:
         severity: warning
-        team: data-engineering
+        team: data-platform

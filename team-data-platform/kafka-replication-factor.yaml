@@ -13,4 +13,4 @@ groups:
       expr: (max by (kafka_cluster, topic) (kafka_cluster_Partition_ReplicasCount{topic !~ ".*test.*", kafka_cluster != "test-eqiad"})) < 2
       labels:
         severity: warning
-        team: data-engineering
+        team: data-platform

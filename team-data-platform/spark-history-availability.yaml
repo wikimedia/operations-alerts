@@ -13,7 +13,7 @@ groups:
       expr: kube_deployment_status_replicas_available{deployment="spark-history-analytics-test-hadoop", namespace="spark-history-test"} < 1
       labels:
         severity: warning
-        team: data-engineering
+        team: data-platform
 
     - alert: SparkHistoryServiceUnavailable
       annotations:
@@ -24,4 +24,4 @@ groups:
       expr: kube_deployment_status_replicas_available{deployment="spark-history-analytics-hadoop", namespace="spark-history"} < 1
       labels:
         severity: critical
-        team: data-engineering
+        team: data-platform

@@ -16,7 +16,7 @@ groups:
       for: 5m
       labels:
         severity: critical
-        team: data-engineering
+        team: data-platform
 
     - alert: DruidNetflowSupervisor
       annotations:
@@ -28,7 +28,7 @@ groups:
       for: 5m
       labels:
         severity: warning
-        team: data-engineering
+        team: data-platform
 
 ## Druid Segments Unavailable alerts
     - alert: DruidSegmentsUnavailable
@@ -41,7 +41,7 @@ groups:
       for: 5m
       labels:
         severity: critical
-        team: data-engineering
+        team: data-platform
 
     - alert: DruidSegmentsUnavailable
       annotations:
@@ -53,4 +53,4 @@ groups:
       for: 5m
       labels:
         severity: warning
-        team: data-engineering
+        team: data-platform

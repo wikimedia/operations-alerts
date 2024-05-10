@@ -14,7 +14,7 @@ tests:
         exp_alerts:
         - exp_labels:
             severity: critical
-            team: data-engineering
+            team: data-platform
             hadoop_cluster: analytics-hadoop
           exp_annotations:
             description: 3 or more Yarn Nodemanagers on the analytics-hadoop cluster are in an unhealthy state.
@@ -23,7 +23,7 @@ tests:
             runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#Unhealthy_Yarn_Nodemanagers
         - exp_labels:
             severity: warning
-            team: data-engineering
+            team: data-platform
             hadoop_cluster: analytics-hadoop
           exp_annotations:
             description: 1 or more Yarn Nodemanagers on the analytics-hadoop cluster are in an unhealthy state.

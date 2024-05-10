@@ -22,7 +22,7 @@ tests:
         exp_alerts:
         - exp_labels:
             severity: critical
-            team: data-engineering
+            team: data-platform
           exp_annotations:
             description: There have been zero wmf_netflow events received on the druid_analytics cluster over a 30 minutes period.
             summary: Zero wmf_netflow events received by druid_analytics over the last 30 minutes.
@@ -30,7 +30,7 @@ tests:
             runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Druid/Alerts#Druid_Netlow_Supervisor
         - exp_labels:
             severity: warning
-            team: data-engineering
+            team: data-platform
           exp_annotations:
             description: There have been fewer than 10 wmf_netflow events received on the druid_analytics cluster over a 30 minutes period.
             summary: Fewer than 10 wmf_netflow events received by druid_analytics over the last 30 minutes.
@@ -48,7 +48,7 @@ tests:
         exp_alerts:
         - exp_labels:
             severity: critical
-            team: data-engineering
+            team: data-platform
             cluster: druid_analytics
             datasource: event_navigationtiming
           exp_annotations:
@@ -58,7 +58,7 @@ tests:
             runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Druid/Alerts#Druid_Segments_Unavailable
         - exp_labels:
             severity: warning
-            team: data-engineering
+            team: data-platform
             cluster: druid_analytics
             datasource: event_navigationtiming
           exp_annotations:

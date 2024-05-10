@@ -10,7 +10,7 @@ tests:
       exp_alerts:
       - exp_labels:
           severity: critical
-          team: data-engineering
+          team: data-platform
           cluster: analytics
           subject: skein-internal
           instance: an-test-client1002.eqiad.wmnet

@@ -13,4 +13,4 @@ groups:
       expr: ((x509_cert_expiry{subject="skein-internal", cluster="analytics"} - time()) / 86400) < 14
       labels:
         severity: critical
-        team: data-engineering
+        team: data-platform

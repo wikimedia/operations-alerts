@@ -15,7 +15,7 @@ groups:
       for: 5m
       labels:
         severity: critical
-        team: data-engineering
+        team: data-platform
 
     - alert: HadoopYarnUnhealthyWorkers
       annotations:
@@ -27,4 +27,4 @@ groups:
       for: 5m
       labels:
         severity: warning
-        team: data-engineering
+        team: data-platform

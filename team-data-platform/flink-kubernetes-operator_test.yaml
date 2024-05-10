@@ -16,7 +16,7 @@ tests:
         exp_alerts:
           - exp_labels:
               severity: critical
-              team: data-engineering
+              team: data-platform
               container: flink-kubernetes-operator
               namespace: flink-operator
             exp_annotations:

@@ -17,7 +17,7 @@ tests:
           namespace: spark-history-test
           deployment: spark-history-analytics-test-hadoop
           severity: warning
-          team: data-engineering
+          team: data-platform
   - input_series:
     - series: kube_deployment_status_replicas_available{deployment="spark-history-analytics-hadoop", namespace="spark-history"}
       values: '0'
@@ -33,4 +33,4 @@ tests:
           namespace: spark-history
           deployment: spark-history-analytics-hadoop
           severity: critical
-          team: data-engineering
+          team: data-platform

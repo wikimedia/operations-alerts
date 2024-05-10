@@ -10,7 +10,7 @@ groups:
         expr: absent(container_cpu_cfs_throttled_seconds_total{namespace="flink-operator", container="flink-kubernetes-operator"})
         for: 5m
         labels:
-          team: data-engineering
+          team: data-platform
           severity: critical
         annotations:
           summary: "Flink kubernetes operator in {{ $externalLabels.site }} is not running"

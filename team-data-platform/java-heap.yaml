@@ -16,7 +16,7 @@ groups:
       for: 5m
       labels:
         severity: critical
-        team: data-engineering
+        team: data-platform
 
     - alert: HdfsNameNodeHeapUsage
       annotations:
@@ -28,7 +28,7 @@ groups:
       for: 5m
       labels:
         severity: warning
-        team: data-engineering
+        team: data-platform
 
 ## HDFS Datanode JVM Heap alerts
     - alert: HdfsDataNodeHeapUsage
@@ -41,7 +41,7 @@ groups:
       for: 5m
       labels:
         severity: critical
-        team: data-engineering
+        team: data-platform
 
     - alert: HdfsDataNodeHeapUsage
       annotations:
@@ -53,7 +53,7 @@ groups:
       for: 5m
       labels:
         severity: warning
-        team: data-engineering
+        team: data-platform
 
 ## Hadoop YARN Resource Manager JVM heap alerts
     - alert: YarnResourceManagerHeapUsage
@@ -66,7 +66,7 @@ groups:
       for: 5m
       labels:
         severity: critical
-        team: data-engineering
+        team: data-platform
 
     - alert: YarnResourceManagerHeapUsage
       annotations:
@@ -78,7 +78,7 @@ groups:
       for: 5m
       labels:
         severity: warning
-        team: data-engineering
+        team: data-platform
 
 ## Hive Metastore JVM Heap alerts
     - alert: HiveMetastoreHeapUsage
@@ -91,7 +91,7 @@ groups:
       for: 5m
       labels:
         severity: critical
-        team: data-engineering
+        team: data-platform
 
     - alert: HiveMetastoreHeapUsage
       annotations:
@@ -103,7 +103,7 @@ groups:
       for: 5m
       labels:
         severity: warning
-        team: data-engineering
+        team: data-platform
 
 ## Hive Server JVM heap alerts
     - alert: HiveServerHeapUsage
@@ -116,7 +116,7 @@ groups:
       for: 5m
       labels:
         severity: critical
-        team: data-engineering
+        team: data-platform
 
     - alert: HiveServerHeapUsage
       annotations:
@@ -128,4 +128,4 @@ groups:
       for: 5m
       labels:
         severity: warning
-        team: data-engineering
+        team: data-platform
