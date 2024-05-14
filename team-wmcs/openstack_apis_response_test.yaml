@@ -6,7 +6,7 @@ tests:
   # should trigger
   - interval: 5m # 12 per hour, 144 every 12 hours
     input_series:
-      - series: 'haproxy_server_total_time_average_seconds{instance="cloudcontrol1003", job="cloudlb-haproxy", proxy="nova_api", server="cloudcontrol1007"}'
+      - series: 'haproxy_server_total_time_average_seconds{instance="cloudcontrol1007", job="cloudlb-haproxy", proxy="nova_api", server="cloudcontrol1007"}'
         # should trigger with > 1.5
         values: "0+0x144 1.6+0x288"
     external_labels:
@@ -19,7 +19,7 @@ tests:
               team: wmcs
               severity: warning
               service: openstack,cloudvps
-              instance: cloudcontrol1003
+              instance: cloudcontrol1007
               proxy: nova_api
               job: cloudlb-haproxy
               server: cloudcontrol1007
@@ -32,7 +32,7 @@ tests:
   # should not trigger
   - interval: 5m
     input_series:
-      - series: 'haproxy_server_total_time_average_seconds{instance="cloudcontrol1003", job="cloudlb-haproxy", proxy="nova_api"}'
+      - series: 'haproxy_server_total_time_average_seconds{instance="cloudcontrol1007", job="cloudlb-haproxy", proxy="nova_api"}'
         # small blip, not enough to sway the mean
         values: "0+0x144 1.1+0x100 0+0x144"
     external_labels:
@@ -45,7 +45,7 @@ tests:
   # should trigger
   - interval: 5m
     input_series:
-      - series: 'haproxy_server_total_time_average_seconds{instance="cloudcontrol1003", job="cloudlb-haproxy", proxy="nova_api"}'
+      - series: 'haproxy_server_total_time_average_seconds{instance="cloudcontrol1007", job="cloudlb-haproxy", proxy="nova_api"}'
         values: "0+0x144 _x288"
     external_labels:
       site: eqiad
@@ -68,7 +68,7 @@ tests:
   # should trigger
   - interval: 5m # 12 per hour, 144 every 12 hours
     input_series:
-      - series: 'haproxy_server_total_time_average_seconds{instance="cloudcontrol1003", job="cloudlb-haproxy", proxy="trove-api_backend", server="cloudcontrol1007"}'
+      - series: 'haproxy_server_total_time_average_seconds{instance="cloudcontrol1007", job="cloudlb-haproxy", proxy="trove-api_backend", server="cloudcontrol1007"}'
         # should trigger with > 2
         values: "0+0x144 3.1+0x288"
     external_labels:
@@ -83,7 +83,7 @@ tests:
               severity: warning
               service: openstack,cloudvps
               job: cloudlb-haproxy
-              instance: cloudcontrol1003
+              instance: cloudcontrol1007
               server: cloudcontrol1007
             exp_annotations:
               description: "The Openstack API trove-api_backend average response time is too high (3.1 > 3). It may mean that the control plane is unreliable."
@@ -94,7 +94,7 @@ tests:
   # should not trigger
   - interval: 5m
     input_series:
-      - series: 'haproxy_server_total_time_average_seconds{instance="cloudcontrol1003", job="cloudlb-haproxy", proxy="trove-api_backend"}'
+      - series: 'haproxy_server_total_time_average_seconds{instance="cloudcontrol1007", job="cloudlb-haproxy", proxy="trove-api_backend"}'
         # small blip, not enough to sway the mean
         values: "0+0x144 2.1+0x100 0+0x144"
     external_labels:
@@ -107,7 +107,7 @@ tests:
   # should trigger
   - interval: 5m
     input_series:
-      - series: 'haproxy_server_total_time_average_seconds{instance="cloudcontrol1003", job="cloudlb-haproxy", proxy="trove-api_backend"}'
+      - series: 'haproxy_server_total_time_average_seconds{instance="cloudcontrol1007", job="cloudlb-haproxy", proxy="trove-api_backend"}'
         values: "0+0x144 _x288"
     external_labels:
       site: eqiad
@@ -130,7 +130,7 @@ tests:
   # should trigger
   - interval: 5m # 12 per hour, 144 every 12 hours
     input_series:
-      - series: 'haproxy_server_total_time_average_seconds{instance="cloudcontrol1003", job="cloudlb-haproxy", proxy="magnum-api_backend", server="cloudcontrol1007"}'
+      - series: 'haproxy_server_total_time_average_seconds{instance="cloudcontrol1007", job="cloudlb-haproxy", proxy="magnum-api_backend", server="cloudcontrol1007"}'
         # should trigger with > 5
         values: "0+0x144 5.5+0x288"
     external_labels:
@@ -144,7 +144,7 @@ tests:
               team: wmcs
               severity: warning
               service: openstack,cloudvps
-              instance: cloudcontrol1003
+              instance: cloudcontrol1007
               server: cloudcontrol1007
               job: cloudlb-haproxy
             exp_annotations:
@@ -156,7 +156,7 @@ tests:
   # should not trigger
   - interval: 5m
     input_series:
-      - series: 'haproxy_server_total_time_average_seconds{instance="cloudcontrol1003", job="cloudlb-haproxy", proxy="magnum-api_backend"}'
+      - series: 'haproxy_server_total_time_average_seconds{instance="cloudcontrol1007", job="cloudlb-haproxy", proxy="magnum-api_backend"}'
         # small blip, not enough to sway the mean
         values: "0+0x144 4.1+0x100 0+0x144"
     external_labels:
@@ -169,7 +169,69 @@ tests:
   # should trigger
   - interval: 5m
     input_series:
-      - series: 'haproxy_server_total_time_average_seconds{instance="cloudcontrol1003", job="cloudlb-haproxy", proxy="magnum-api_backend"}'
+      - series: 'haproxy_server_total_time_average_seconds{instance="cloudcontrol1007", job="cloudlb-haproxy", proxy="magnum-api_backend"}'
+        values: "0+0x144 _x288"
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: OpenstackAPIResponse
+        eval_time: 25h
+        exp_alerts:
+          - exp_labels:
+              team: wmcs
+              severity: warning
+              service: openstack,cloudvps
+              proxy: nodata
+            exp_annotations:
+              summary: "Openstack API average response time is too high."
+              description: "Got no data from the Openstack API to check the response times. It may mean that the control plane is unreliable."
+              runbook: https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/OpenstackAPIResponse
+              dashboard: https://grafana.wikimedia.org/d/UUmLqqX4k
+
+  ## radosgw
+  # should trigger
+  - interval: 5m # 12 per hour, 144 every 12 hours
+    input_series:
+      - series: 'haproxy_server_total_time_average_seconds{instance="cloudcontrol1007", job="cloudlb-haproxy", proxy="radosgw-api_backend", server="cloudcontrol1007"}'
+        # should trigger with > 5
+        values: "0+0x144 61+0x288"
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: OpenstackAPIResponse
+        eval_time: 25h
+        exp_alerts:
+          - exp_labels:
+              proxy: radosgw-api_backend
+              team: wmcs
+              severity: warning
+              service: openstack,cloudvps
+              instance: cloudcontrol1007
+              server: cloudcontrol1007
+              job: cloudlb-haproxy
+            exp_annotations:
+              description: "The Openstack API radosgw-api_backend average response time is too high (61 > 60). It may mean that the control plane is unreliable."
+              summary: "Openstack API average response time is too high."
+              runbook: https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/OpenstackAPIResponse
+              dashboard: https://grafana.wikimedia.org/d/UUmLqqX4k
+
+  # should not trigger
+  - interval: 5m
+    input_series:
+      - series: 'haproxy_server_total_time_average_seconds{instance="cloudcontrol1007", job="cloudlb-haproxy", proxy="radosgw-api_backend"}'
+        # small blip, not enough to sway the mean
+        values: "0+0x144 4.1+0x100 0+0x144"
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: OpenstackAPIResponse
+        eval_time: 25h
+        exp_alerts: []
+
+  # should trigger
+  - interval: 5m
+    input_series:
+      - series: 'haproxy_server_total_time_average_seconds{instance="cloudcontrol1007", job="cloudlb-haproxy", proxy="radosgw-api_backend"}'
         values: "0+0x144 _x288"
     external_labels:
       site: eqiad
