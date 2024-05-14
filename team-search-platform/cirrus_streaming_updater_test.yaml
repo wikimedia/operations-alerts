@@ -48,3 +48,56 @@ tests:
               description: "The flink job is not running"
               runbook: https://wikitech.wikimedia.org/wiki/Search#Streaming_Updater
               dashboard: https://grafana.wikimedia.org/d/K9x0c4aVk/flink-app?var-datasource=eqiad+prometheus%2Fk8s&var-namespace=cirrus-streaming-updater&var-helm_release=producer
+  - interval: 1m
+    input_series:
+      - series: 'flink_taskmanager_job_task_operator_numRecordsOut{job_name="cirrus_streaming_updater_consumer_search_eqiad", kubernetes_namespace="cirrus-streaming-updater", operator_name="fetch_failure_sink:_Writer", release="consumer-search"}'
+        values: 1 1 2 2 2 2 2
+      - series: 'flink_taskmanager_job_task_operator_numRecordsOut{job_name="cirrus_streaming_updater_consumer_cloudelastic_search_eqiad", kubernetes_namespace="cirrus-streaming-updater", operator_name="fetch_failure_sink:_Writer", release="consumer-cloudelastic"}'
+        values: 1 20 30 40 50 60 70
+      - series: 'flink_taskmanager_job_task_operator_numRecordsOut{job_name="cirrus_streaming_updater_consumer_backfill_search_eqiad", kubernetes_namespace="cirrus-streaming-updater", operator_name="fetch_failure_sink:_Writer", release="consumer-search-backfill"}'
+        values: 1 20 30 40 50 60 70
+    external_labels:
+      site: eqiad
+      prometheus: k8s
+    alert_rule_test:
+      - alertname: CirrusConsumerFetchErrorRate
+        eval_time: 6m
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              team: search-platform
+              kubernetes_namespace: cirrus-streaming-updater
+              job_name: cirrus_streaming_updater_consumer_cloudelastic_search_eqiad
+              release: consumer-cloudelastic
+            exp_annotations:
+              summary: "cirrus_streaming_updater_consumer_cloudelastic_search_eqiad in eqiad (k8s): fetch error rate too high"
+              description: "The flink job is failing to fetch the cirrus documents at a high rate"
+              runbook: https://wikitech.wikimedia.org/wiki/Search#Streaming_Updater
+              dashboard: https://grafana.wikimedia.org/d/K9x0c4aVk/flink-app?var-datasource=eqiad+prometheus%2Fk8s&var-namespace=cirrus-streaming-updater&var-helm_release=consumer-cloudelastic
+
+  - interval: 1m
+    input_series:
+      - series: 'flink_taskmanager_job_task_operator_numRecordsOut{job_name="cirrus_streaming_updater_consumer_search_eqiad", kubernetes_namespace="cirrus-streaming-updater", operator_name="rerender_fetch_failure_sink:_Writer", release="consumer-search"}'
+        values: 1 2 3 4 5 6 7
+      - series: 'flink_taskmanager_job_task_operator_numRecordsOut{job_name="cirrus_streaming_updater_consumer_cloudelastic_search_eqiad", kubernetes_namespace="cirrus-streaming-updater", operator_name="rerender_fetch_failure_sink:_Writer", release="consumer-cloudelastic"}'
+        values: 1 100 200 300 400 500 600
+      - series: 'flink_taskmanager_job_task_operator_numRecordsOut{job_name="cirrus_streaming_updater_consumer_backfill_search_eqiad", kubernetes_namespace="cirrus-streaming-updater", operator_name="rerender_fetch_failure_sink:_Writer", release="consumer-search-backfill"}'
+        values: 1 100 200 300 400 500 600
+    external_labels:
+      site: eqiad
+      prometheus: k8s
+    alert_rule_test:
+      - alertname: CirrusConsumerRerenderFetchErrorRate
+        eval_time: 6m
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              team: search-platform
+              kubernetes_namespace: cirrus-streaming-updater
+              job_name: cirrus_streaming_updater_consumer_cloudelastic_search_eqiad
+              release: consumer-cloudelastic
+            exp_annotations:
+              summary: "cirrus_streaming_updater_consumer_cloudelastic_search_eqiad in eqiad (k8s): fetch error (rerenders) rate too high"
+              description: "The flink job is failing to fetch the cirrus documents at a high rate for rerenders"
+              runbook: https://wikitech.wikimedia.org/wiki/Search#Streaming_Updater
+              dashboard: https://grafana.wikimedia.org/d/K9x0c4aVk/flink-app?var-datasource=eqiad+prometheus%2Fk8s&var-namespace=cirrus-streaming-updater&var-helm_release=consumer-cloudelastic
