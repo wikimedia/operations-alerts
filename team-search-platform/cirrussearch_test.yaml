@@ -143,7 +143,7 @@ tests:
               severity: critical
               team: search-platform
             exp_annotations:
-                  summary: 'CirrusSearch getting over 0.1% error responses from elasticsearch'
-                  description: "Envoy reports 5xx rate over 5 minutes of more than .1%"
+                  summary: 'CirrusSearch getting over 0.5% error responses from elasticsearch'
+                  description: "Envoy reports 5xx rate over 5 minutes of more than .5%"
                   runbook: 'TODO'
                   dashboard: 'https://grafana.wikimedia.org/d/VTCkm29Wz/envoy-telemetry?orgId=1&var-datasource=eqiad%20prometheus-ops&var-origin=appserver&var-origin_instance=All&var-destination=search-https_eqiad'
