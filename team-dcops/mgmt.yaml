@@ -8,7 +8,7 @@ groups:
           description: 'The management interface at {{ $labels.instance }} has been unresponsive for multiple hours.'
           summary: 'Unresponsive management for {{ $labels.instance }}'
           dashboard: TODO
-          runbook: https://wikitech.wikimedia.org/wiki/Dc-operations/Hardware_Troubleshooting_Runbook
+          runbook: https://wikitech.wikimedia.org/wiki/Management_Interfaces#Reset_the_management_card
         expr: probe_success{job="probes/mgmt"} == 0
         for: 12h
         labels:

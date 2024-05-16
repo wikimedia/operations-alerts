@@ -21,4 +21,4 @@ tests:
               description: "The management interface at bast5001.mgmt:22 has been unresponsive for multiple hours."
               summary: "Unresponsive management for bast5001.mgmt:22"
               dashboard: TODO
-              runbook: https://wikitech.wikimedia.org/wiki/Dc-operations/Hardware_Troubleshooting_Runbook
+              runbook: https://wikitech.wikimedia.org/wiki/Management_Interfaces#Reset_the_management_card
