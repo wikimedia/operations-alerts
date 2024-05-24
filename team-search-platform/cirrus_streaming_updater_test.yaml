@@ -78,17 +78,17 @@ tests:
   - interval: 1m
     input_series:
       - series: 'flink_taskmanager_job_task_operator_numRecordsOut{job_name="cirrus_streaming_updater_consumer_search_eqiad", kubernetes_namespace="cirrus-streaming-updater", operator_name="rerender_fetch_failure_sink:_Writer", release="consumer-search"}'
-        values: 1 2 3 4 5 6 7
+        values: 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21
       - series: 'flink_taskmanager_job_task_operator_numRecordsOut{job_name="cirrus_streaming_updater_consumer_cloudelastic_search_eqiad", kubernetes_namespace="cirrus-streaming-updater", operator_name="rerender_fetch_failure_sink:_Writer", release="consumer-cloudelastic"}'
-        values: 1 100 200 300 400 500 600
+        values: 1 100 200 300 400 500 600 700 800 900 1000 1100 1200 1300 1400 1500 1600 1800 1900 2000 2100
       - series: 'flink_taskmanager_job_task_operator_numRecordsOut{job_name="cirrus_streaming_updater_consumer_backfill_search_eqiad", kubernetes_namespace="cirrus-streaming-updater", operator_name="rerender_fetch_failure_sink:_Writer", release="consumer-search-backfill"}'
-        values: 1 100 200 300 400 500 600
+        values: 1 100 200 300 400 500 600 700 800 900 1000 1100 1200 1300 1400 1500 1600 1800 1900 2000 2100
     external_labels:
       site: eqiad
       prometheus: k8s
     alert_rule_test:
       - alertname: CirrusConsumerRerenderFetchErrorRate
-        eval_time: 6m
+        eval_time: 21m
         exp_alerts:
           - exp_labels:
               severity: critical
