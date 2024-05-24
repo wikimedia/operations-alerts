@@ -9,7 +9,7 @@ groups:
     for: 10m
     labels:
       severity: task
-      team: serviceops-collab
+      team: collaboration-services
     annotations:
       summary: "GitLab - High CI job error rate"
       description: "GitLab CI job error rate {{ $value }} is above threshold of 0.05"
@@ -20,7 +20,7 @@ groups:
     for: 10m
     labels:
       severity: task
-      team: serviceops-collab
+      team: collaboration-services
     annotations:
       summary: "GitLab - High pipeline error rate"
       description: "GitLab pipeline error rate {{ $value }} is above threshold of 0.05"
@@ -31,7 +31,7 @@ groups:
     for: 5m
     labels:
       severity: task
-      team: serviceops-collab
+      team: collaboration-services
     annotations:
       summary: "GitLab - High CI pipeline creation time"
       description: "GitLab pipeline average creation time {{ $value }}s is above threshold of 10s"
@@ -41,7 +41,7 @@ groups:
     expr: gitlab_runners_up{description=~"Trusted.*", locked="False"} > 0 or gitlab_runners_up{description=~"Trusted.*", access_level="not_protected"} > 0
     labels:
       severity: task
-      team: serviceops-collab
+      team: collaboration-services
     annotations:
       summary: "Trusted gitlab-runner missing config"
       description: "The trusted gitlab-runner {{ $labels.description }}, ID {{ $labels.description }} is missing a config"
