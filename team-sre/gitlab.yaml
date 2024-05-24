@@ -37,3 +37,13 @@ groups:
       description: "GitLab pipeline average creation time {{ $value }}s is above threshold of 10s"
       dashboard: https://grafana.wikimedia.org/d/Chb-gC07k/gitlab-ci-overview
       runbook: https://wikitech.wikimedia.org/wiki/GitLab/Runbook
+  - alert: GitLabRunnerTrustedConfigMissing
+    expr: gitlab_runners_up{description=~"Trusted.*", locked="False"} > 0 or gitlab_runners_up{description=~"Trusted.*", access_level="not_protected"} > 0
+    labels:
+      severity: task
+      team: serviceops-collab
+    annotations:
+      summary: "Trusted gitlab-runner missing config"
+      description: "The trusted gitlab-runner {{ $labels.description }}, ID {{ $labels.description }} is missing a config"
+      dashboard: https://grafana.wikimedia.org/d/Chb-gC07k/gitlab-ci-overview
+      runbook: https://wikitech.wikimedia.org/wiki/GitLab/Runbook#GitLabRunnerTrustedConfigMissing
