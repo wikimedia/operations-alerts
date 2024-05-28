@@ -64,4 +64,17 @@ groups:
           runbook: https://wikitech.wikimedia.org/wiki/Search#Streaming_Updater
           dashboard: https://grafana.wikimedia.org/d/K9x0c4aVk/flink-app?var-datasource={{$externalLabels.site}}+prometheus%2F{{$externalLabels.prometheus}}&var-namespace=cirrus-streaming-updater&var-helm_release={{$labels.release}}
 
+      - alert: CirrusStreamingUpdaterRateTooLow
+        expr:
+          sum by (app) (rate(flink_taskmanager_job_task_operator_bulk_change_type_result_actions[5m])) < 80
+        for: 10m
+        labels:
+          team: search-platform
+          severity: critical
+        annotations:
+          summary: "CirrusSearch update rate from {{$labels.app}} is critically low"
+          description: "Updates are either not flowing, or flowing at a greatly reduced rate."
+          runbook: https://wikitech.wikimedia.org/wiki/Search#Streaming_Updater
+          dashboard: https://grafana.wikimedia.org/d/jKqki4MSk/cirrus-streaming-updater
+
       # TODO: alert for CirrusConsumerFlinkJobNotRunning once we are running the consumer in eqiad/codfw

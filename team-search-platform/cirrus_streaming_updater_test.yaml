@@ -101,3 +101,21 @@ tests:
               description: "The flink job is failing to fetch the cirrus documents at a high rate for rerenders"
               runbook: https://wikitech.wikimedia.org/wiki/Search#Streaming_Updater
               dashboard: https://grafana.wikimedia.org/d/K9x0c4aVk/flink-app?var-datasource=eqiad+prometheus%2Fk8s&var-namespace=cirrus-streaming-updater&var-helm_release=consumer-cloudelastic
+
+  - interval: 1m
+    input_series:
+      - series: 'flink_taskmanager_job_task_operator_bulk_change_type_result_actions{app="flink-app-consumer-cloudelastic"}'
+        values: 0 0 0 0 0 0 0 0 0 0 0 0
+    alert_rule_test:
+      - alertname: CirrusStreamingUpdaterRateTooLow
+        eval_time: 15m
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              team: search-platform
+              app: flink-app-consumer-cloudelastic
+            exp_annotations:
+              summary: "CirrusSearch update rate from flink-app-consumer-cloudelastic is critically low"
+              description: "Updates are either not flowing, or flowing at a greatly reduced rate."
+              runbook: https://wikitech.wikimedia.org/wiki/Search#Streaming_Updater
+              dashboard: https://grafana.wikimedia.org/d/jKqki4MSk/cirrus-streaming-updater
