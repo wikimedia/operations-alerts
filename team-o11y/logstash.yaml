@@ -40,14 +40,16 @@ groups:
         summary: Too many messages in {{ $labels.exported_cluster }} for group {{ $labels.group }}
         dashboard: https://grafana.wikimedia.org/d/000000484/kafka-consumer-lag?var-cluster={{ $labels.exported_cluster }}&var-datasource={{ $externalLabels.site }}%20prometheus/ops
         runbook: https://wikitech.wikimedia.org/wiki/Logstash#Kafka_consumer_lag
-      expr: sum by (exported_cluster, group) (kafka_burrow_partition_lag{exported_cluster=~"logging-.*"}) > 1500
+      # Consumer groups:
+      #   * logstash7-(eqiad|codfw): Logstash service consumer group writing to OpenSearch and Loki
+      expr: sum by (exported_cluster, group) (kafka_burrow_partition_lag{exported_cluster=~"logging-.*",group=~"logstash7-.+"}) > 1500
       for: 10m
       labels:
         severity: critical
         team: o11y
 
     - <<: *logstash_kafka_lag
-      expr: sum by (exported_cluster, group) (kafka_burrow_partition_lag{exported_cluster=~"logging-.*"}) > 500000
+      expr: sum by (exported_cluster, group) (kafka_burrow_partition_lag{exported_cluster=~"logging-.*",group=~"logstash7-.+"}) > 500000
       for: 2m
 
     - alert: LogstashUdpLoss
