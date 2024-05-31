@@ -41,3 +41,25 @@ tests:
               description: "Blazegraph will soon be unable to apply updates"
               runbook: https://wikitech.wikimedia.org/wiki/Wikidata_Query_Service/Runbook
               dashboard: https://grafana.wikimedia.org/d/000000489/wikidata-query-service
+
+  - interval: 1m
+    external_labels:
+      site: eqiad
+    input_series:
+      - series: 'blazegraph_lastupdated{site="eqiad", cluster="wdqs", instance="wdqs3050:9193"}'
+        values: "0x10"
+      - series: org_wikidata_query_rdf_blazegraph_filters_QueryEventSenderFilter_event_sender_filter_StartedQueries{instance="wdqs3050:9194", site="eqiad"}
+        values: "10000+10000x10"
+    alert_rule_test:
+      - alertname: ElevatedMaxLagWDQS
+        eval_time: 12m
+        exp_alerts:
+          - exp_labels:
+              team: search-platform
+              severity: critical
+              cluster: wdqs
+            exp_annotations:
+              summary: "WDQS lag is above 10 minutes"
+              description: "WDQS cluster in eqiad is throttling all connections due to high lag"
+              runbook: https://wikitech.wikimedia.org/wiki/Wikidata_Query_Service/Runbook
+              dashboard: https://grafana.wikimedia.org/d/000000489/wikidata-query-service
