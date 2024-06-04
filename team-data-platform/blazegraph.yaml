@@ -1,0 +1,42 @@
+# deploy-tag: ops
+# deploy-site: eqiad, codfw
+
+groups:
+  - name: blazegraph
+    rules:
+      - alert: BlazegraphFreeAllocatorsDecreasingRapidly
+        expr: deriv(blazegraph_free_allocators{instance=~".*:919[35]"}[10m]) < -0.03
+        for: 5m
+        labels:
+          team: data-platform
+          severity: critical
+        annotations:
+          summary: "Blazegraph instance {{$labels.instance}} is burning free allocators at a very high rate"
+          description: "Blazegraph is misbehaving and will rapidly corrupt its journal."
+          runbook: https://wikitech.wikimedia.org/wiki/Wikidata_Query_Service/Runbook#Free_allocators_decrease_rapidly
+          dashboard: https://grafana.wikimedia.org/d/000000489/wikidata-query-service
+
+      - alert: BlazegraphFreeAllocatorsRunningOut
+        expr: blazegraph_free_allocators < 100000
+        for: 1m
+        labels:
+          team: data-platform
+          severity: critical
+        annotations:
+          summary: "Blazegraph instance {{$labels.instance}} is running out of free allocators"
+          description: "Blazegraph will soon be unable to apply updates"
+          runbook: https://wikitech.wikimedia.org/wiki/Wikidata_Query_Service/Runbook
+          dashboard: https://grafana.wikimedia.org/d/000000489/wikidata-query-service
+
+      - alert: ElevatedMaxLagWDQS
+        expr: max(time() - label_replace(blazegraph_lastupdated{cluster="wdqs"}, "host", "$1", "instance", "^([^:]+):.*") and on(host) label_replace(rate(org_wikidata_query_rdf_blazegraph_filters_QueryEventSenderFilter_event_sender_filter_StartedQueries{}[5m]) > 0.2, "host", "$1", "instance", "^([^:]+):.*"))/60 > 10
+        for: 1m
+        labels:
+          cluster: wdqs
+          team: data-platform
+          severity: critical
+        annotations:
+          summary: "WDQS lag is above 10 minutes"
+          description: "WDQS cluster in {{ $externalLabels.site }} is throttling all connections due to high lag"
+          runbook: https://wikitech.wikimedia.org/wiki/Wikidata_Query_Service/Runbook
+          dashboard: https://grafana.wikimedia.org/d/000000489/wikidata-query-service
