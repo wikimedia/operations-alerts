@@ -1,0 +1,27 @@
+# deploy-tag: k8s-dse
+# deploy-site: eqiad
+
+groups:
+  - name: datahub
+    rules:
+    - alert: DatahubNextServiceUnavailable
+      annotations:
+        description: 'datahub-next is unavailable on k8s-dse'
+        summary: 'datahub-next is unavailable on k8s-dse'
+        dashboard: "https://grafana.wikimedia.org/d/hyl18XgMk/kubernetes-container-details?orgId=1&var-datasource=thanos&var-site=eqiad&var-cluster=k8s-dse&var-namespace=datahub-next&var-container=All"
+        runbook: "https://wikitech.wikimedia.org/wiki/Data_Engineering/Systems/DataHub/Administration#Alerting"
+      expr: kube_deployment_status_replicas_available{deployment="datahub-staging", namespace="datahub-next"} < 1
+      labels:
+        severity: warning
+        team: data-platform
+
+    - alert: DatahubServiceUnavailable
+      annotations:
+        description: 'datahub is unavailable on k8s-dse'
+        summary: 'datahub is unavailable on k8s-dse'
+        dashboard: "https://grafana.wikimedia.org/d/hyl18XgMk/kubernetes-container-details?orgId=1&var-datasource=thanos&var-site=eqiad&var-cluster=k8s-dse&var-namespace=datahub&var-container=All"
+        runbook: "https://wikitech.wikimedia.org/wiki/Data_Engineering/Systems/DataHub/Administration#Alerting"
+      expr: kube_deployment_status_replicas_available{deployment="datahub-production", namespace="datahub"} < 1
+      labels:
+        severity: critical
+        team: data-platform
