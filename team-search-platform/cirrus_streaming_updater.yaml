@@ -40,8 +40,8 @@ groups:
 
       - alert: CirrusConsumerFetchErrorRate
         expr: |
-            sum(rate(flink_taskmanager_job_task_operator_numRecordsOut{job_name=~"cirrus_streaming_updater_consumer_.*", kubernetes_namespace="cirrus-streaming-updater", release !~ ".*backfill", operator_name="fetch_failure_sink:_Writer"}[5m])) by (job_name, kubernetes_namespace, release) > 0.05
-        for: 5m
+            sum(rate(flink_taskmanager_job_task_operator_numRecordsOut{job_name=~"cirrus_streaming_updater_consumer_.*", kubernetes_namespace="cirrus-streaming-updater", release !~ ".*backfill", operator_name="fetch_failure_sink:_Writer"}[5m])) by (job_name, kubernetes_namespace, release) > 0.1
+        for: 20m
         labels:
           team: search-platform
           severity: critical
