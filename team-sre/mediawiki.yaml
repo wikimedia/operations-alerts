@@ -21,13 +21,6 @@ groups:
           severity: page
           team: sre
 
-      - <<: *PHPFPMTooBusy
-        expr: sum by (cluster, service) (phpfpm_statustext_processes{cluster=~"(parsoid)", state="idle"})
-          /
-          sum by (cluster, service) (phpfpm_statustext_processes{cluster=~"(parsoid)"})
-          <= 0.15
-        for: 5m
-
       - alert: JobrunnerPHPBusyWorkers
         annotations:
           description: 'Jobrunners in {{ $externalLabels.site }} is experiencing saturation of php-fpm workers: {{ $value | humanizePercentage }} for more than 10 minutes.'
@@ -50,9 +43,9 @@ groups:
           summary: 'Appserver unavailable for cluster {{ $labels.cluster }} at {{ $externalLabels.site }}'
           dashboard: 'https://grafana.wikimedia.org/d/RIA1lzDZk/application-servers-red-dashboard?orgId=1&var-site={{ $externalLabels.site }}&var-cluster={{ $labels.cluster }}'
           runbook: 'https://wikitech.wikimedia.org/wiki/Application_servers'
-        expr: sum(up{job="apache",cluster=~"(api_appserver|appserver|jobrunner|parsoid)"}) by (cluster)
+        expr: sum(up{job="apache",cluster=~"(api_appserver|appserver|jobrunner)"}) by (cluster)
           /
-          count(up{job="apache",cluster=~"(api_appserver|appserver|jobrunner|parsoid)"}) by (cluster)
+          count(up{job="apache",cluster=~"(api_appserver|appserver|jobrunner)"}) by (cluster)
           <= 0.9
         for: 4m
         labels:
@@ -62,9 +55,9 @@ groups:
       # Re-use the alert above and check that apache-exporter can actually talk
       # to apache itself (i.e. apache_up == 1)
       - <<: *AppserversUnreachable
-        expr: sum(apache_up{job="apache",cluster=~"(api_appserver|appserver|jobrunner|parsoid)"}) by (cluster)
+        expr: sum(apache_up{job="apache",cluster=~"(api_appserver|appserver|jobrunner)"}) by (cluster)
           /
-          count(apache_up{job="apache",cluster=~"(api_appserver|appserver|jobrunner|parsoid)"}) by (cluster)
+          count(apache_up{job="apache",cluster=~"(api_appserver|appserver|jobrunner)"}) by (cluster)
           <= 0.9
 
       # Latency alerts:
@@ -98,28 +91,6 @@ groups:
           and sum(
             rate(mediawiki_http_requests_duration_count{cluster="api_appserver",method="GET", handler=~"proxy:unix:.*"}[2m])
           ) by (code,cluster,handler,method) > 100
-
-      # Case 3: parsoid GET: 2s threshold and 20 rps, for 10m
-      - <<: *MediaWikiLatencyExceeded
-        expr: >
-          sum(
-            cluster_code_method_handler:mediawiki_http_requests_duration:avg2m{cluster="parsoid",method="GET", handler=~"proxy:unix:.*"}
-          ) by (code,cluster,handler,method) > 2.0
-          and sum(
-            rate(mediawiki_http_requests_duration_count{cluster="parsoid",method="GET", handler=~"proxy:unix:.*"}[2m])
-          ) by (code,cluster,handler,method) > 20
-        for: 10m
-
-      # Case 3b: parsoid GET: 4s threshold and 20 rps, for 5m
-      - <<: *MediaWikiLatencyExceeded
-        expr: >
-          sum(
-            cluster_code_method_handler:mediawiki_http_requests_duration:avg2m{cluster="parsoid",method="GET", handler=~"proxy:unix:.*"}
-          ) by (code,cluster,handler,method) > 4.0
-          and sum(
-            rate(mediawiki_http_requests_duration_count{cluster="parsoid",method="GET", handler=~"proxy:unix:.*"}[2m])
-          ) by (code,cluster,handler,method) > 20
-        for: 5m
 
       # Case 4: appserver POST: 2s threshold of 5 rps
       - <<: *MediaWikiLatencyExceeded
