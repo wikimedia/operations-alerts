@@ -5,7 +5,7 @@ groups:
 - name: gitlab
   rules:
   - alert: GitLabCIJobErrors
-    expr: sum (rate(gitlab_ci_job_failure_reasons[5m])) > 0.05
+    expr: sum (rate(gitlab_ci_job_failure_reasons{reason!="script_failure"}[5m])) > 0.05
     for: 10m
     labels:
       severity: task
