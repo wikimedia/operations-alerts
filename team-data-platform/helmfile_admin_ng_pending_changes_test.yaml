@@ -1,0 +1,22 @@
+rule_files:
+  - helmfile_admin_ng_pending_changes.yaml
+evaluation_interval: 1h
+tests:
+  - interval: 1h
+    input_series:
+    - series: helmfile_admin_ng_pending_changes{exported_cluster="dse-k8s-eqiad"}
+      values: '1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1'
+    alert_rule_test:
+    - alertname: HelmfileAdminNGPendingChanges
+      eval_time: 1d
+      exp_alerts:
+      - exp_annotations:
+          description: 'pending admin_ng changes on dse-k8s-eqiad'
+          summary: 'pending admin_ng changes on dse-k8s-eqiad'
+          dashboard: "https://grafana.wikimedia.org/d/d15d3135-ff1c-4c6f-bebe-ee57b136df70/helmfile-admin-ng-pending-changes?orgId=1&var-kubernetes_cluster=dse-k8s-eqiad"
+          runbook: "https://wikitech.wikimedia.org/wiki/Kubernetes/Add_a_new_service#Deploy_changes_to_helmfile.d%2Fadmin_ng"
+        exp_labels:
+          alertname: HelmfileAdminNGPendingChanges
+          exported_cluster: dse-k8s-eqiad
+          severity: warning
+          team: data-platform
