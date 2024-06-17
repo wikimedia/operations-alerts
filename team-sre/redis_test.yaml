@@ -23,8 +23,9 @@ tests:
             exp_annotations:
               description: 'The redis instance at rdb1:16378 has filled all of its RAM space'
               summary: 'Redis memory full on rdb1:16378'
-              dashboard: 'https://grafana.wikimedia.org/d/000000174/redis?orgId=1&var-datasource=eqiad%20prometheus/ops&var-job=redis_gitlab&var-instance=rdb1:16378&viewPanel=16'
+              dashboard: 'https://grafana.wikimedia.org/d/000000174/redis?orgId=1&var-site=eqiad&var-job=redis_gitlab&var-instance=rdb1:16378&viewPanel=16'
               runbook: 'https://wikitech.wikimedia.org/wiki/Redis#Cluster_redis_gitlab'
+
   - interval: 1m
     input_series:
       - series: 'redis_memory_used_bytes{instance="rdb1:16378", job="redis_gitlab", site="eqiad"}'
@@ -37,3 +38,27 @@ tests:
       - alertname: RedisMemoryFull
         eval_time: 10m
         exp_alerts: []
+
+  - interval: 1m
+    input_series:
+      - series: 'redis_master_link_up{instance="rdb1014:16378", job="redis_misc", site="eqiad"}'
+        values: '0x10'
+      - series: 'redis_mem_clients_slaves{instance="rdb1014:16378", job="redis_misc", site="eqiad"}'
+        values: '0x10'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: RedisReplicaDown
+        eval_time: 10m
+        exp_alerts:
+          - exp_labels:
+              team: sre
+              severity: critical
+              job: redis_misc
+              instance: rdb1014:16378
+              site: eqiad
+            exp_annotations:
+              description: 'The redis replica at rdb1014:16378 redis_misc is down'
+              summary: 'Redis replica down rdb1014:16378 redis_misc'
+              dashboard: 'https://grafana.wikimedia.org/d/000000174/redis?orgId=1&var-site=eqiad&var-job=redis_misc&var-instance=rdb1014:16378'
+              runbook: 'https://wikitech.wikimedia.org/wiki/Redis#Cluster_redis_misc'

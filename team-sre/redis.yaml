@@ -8,9 +8,21 @@ groups:
         annotations:
           description: 'The redis instance at {{ $labels.instance }} has filled all of its RAM space'
           summary: 'Redis memory full on {{ $labels.instance }}'
-          dashboard: 'https://grafana.wikimedia.org/d/000000174/redis?orgId=1&var-datasource={{ $externalLabels.site }}%20prometheus/ops&var-job={{ $labels.job }}&var-instance={{ $labels.instance }}&viewPanel=16'
+          dashboard: 'https://grafana.wikimedia.org/d/000000174/redis?orgId=1&var-site={{ $externalLabels.site }}&var-job={{ $labels.job }}&var-instance={{ $labels.instance }}&viewPanel=16'
           runbook: 'https://wikitech.wikimedia.org/wiki/Redis#Cluster_{{ $labels.job }}'
         expr: redis_memory_used_bytes / redis_memory_max_bytes > 0.98
+        for: 5m
+        labels:
+          severity: critical
+          team: sre
+
+      - alert: RedisReplicaDown
+        annotations:
+          description: 'The redis replica at {{ $labels.instance }} {{$labels.job}} is down'
+          summary: 'Redis replica down {{ $labels.instance }} {{ $labels.job }}'
+          dashboard: 'https://grafana.wikimedia.org/d/000000174/redis?orgId=1&var-site={{ $externalLabels.site }}&var-job={{ $labels.job }}&var-instance={{ $labels.instance }}'
+          runbook: 'https://wikitech.wikimedia.org/wiki/Redis#Cluster_{{ $labels.job }}'
+        expr: redis_master_link_up == 0 unless (redis_mem_clients_slaves > 0)
         for: 5m
         labels:
           severity: critical
