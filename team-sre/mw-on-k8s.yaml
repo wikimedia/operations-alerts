@@ -67,4 +67,3 @@ groups:
               rate(envoy_cluster_upstream_rq_time_bucket{ app="mediawiki", envoy_cluster_name="local_service", deployment!="mw-jobrunner"}[2m])
             ) by (le, deployment)
           ) / 1000 > 1
-
