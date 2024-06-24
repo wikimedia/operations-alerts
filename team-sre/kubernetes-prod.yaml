@@ -27,18 +27,6 @@ groups:
       runbook: "https://wikitech.wikimedia.org/wiki/Kubernetes" # This needs a proper runbook
       dashboard: https://grafana.wikimedia.org/d/hyl18XgMk?var-site={{ $externalLabels.site }}&var-cluster={{ $externalLabels.prometheus }}&var-namespace={{ $labels.namespace }}&var-pod={{ $labels.pod }}
 
-  - alert: KubernetesDeploymentUnavailableReplicas
-    expr: sum(kube_deployment_status_replicas_unavailable) by (namespace, deployment) > 0
-    for: 30m
-    labels:
-      team: sre
-      severity: warning
-    annotations:
-      summary: "Deployment {{ $labels.deployment }} in {{ $labels.namespace }} at {{ $externalLabels.site }} has persistently unavailable replicas"
-      description: "Deployment {{ $labels.deployment }} in namespace {{ $labels.namespace }} at site {{ $externalLabels.site }} has had non-zero unavailable replicas (current: {{ $value }}) for at least 30m"
-      runbook: "https://wikitech.wikimedia.org/wiki/Kubernetes/Troubleshooting#Troubleshooting_a_deployment"
-      dashboard: https://grafana.wikimedia.org/d/a260da06-259a-4ee4-9540-5cab01a246c8/kubernetes-deployment-details?var-site={{ $externalLabels.site }}&var-cluster={{ $externalLabels.prometheus }}&var-namespace={{ $labels.namespace }}&var-deployment={{ $labels.deployment }}
-
 - name: certmanager
   rules:
   - &CertManagerCertExpirySoon
