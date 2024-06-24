@@ -1,0 +1,45 @@
+rule_files:
+  - mysql-io-pressure.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    input_series:
+      - series: 'node_pressure_io_waiting_seconds_total{instance="db1099:9100",cluster="mysql"}'
+        values: "0+15200x1000"
+    alert_rule_test:
+      - alertname: MysqlHostIoPressure
+        eval_time: 45m
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              team: data-persistence
+              instance: db1099:9100
+              cluster: mysql
+            exp_annotations:
+              summary: "MySQL instance db1099:9100 has too much pressure on its io capabilities: (253.3)"
+              description: "Host db1099:9100 has too much pressure on its io capabilities. Please consider debugging."
+              runbook: https://wikitech.wikimedia.org/wiki/MariaDB/troubleshooting
+              dashboard: https://grafana.wikimedia.org/d/rYdddlPWk/node-exporter-full?orgId=1&refresh=1m&viewPanel=323&var-datasource=thanos&var-job=All&var-node=db1099%3A9100
+          - exp_labels:
+              severity: critical
+              team: data-persistence
+              instance: db1099:9100
+              cluster: mysql
+            exp_annotations:
+              summary: "MySQL instance db1099:9100 has too much pressure on its io capabilities: (253.3)"
+              description: "Host db1099:9100 has too much pressure on its io capabilities. Please consider depooling."
+              runbook: https://wikitech.wikimedia.org/wiki/MariaDB/troubleshooting#Depooling_a_replica
+              dashboard: https://grafana.wikimedia.org/d/rYdddlPWk/node-exporter-full?orgId=1&refresh=1m&viewPanel=323&var-datasource=thanos&var-job=All&var-node=db1099%3A9100
+      # - alertname: MysqlHostIoPressure
+      #   eval_time: 45m
+      #   exp_alerts:
+      #     - exp_labels:
+      #         severity: page
+      #         team: data-persistence
+      #         instance: db1099:9100
+      #         cluster: mysql
+      #       exp_annotations:
+      #         summary: "MySQL instance db1099:9100 has too much pressure on its io capabilities: (253.3) #page"
+      #         description: "Host db1099:9100 has too much pressure on its io capabilities. Please depool and try to debug or notify data-persistence."
+      #         runbook: https://wikitech.wikimedia.org/wiki/MariaDB/troubleshooting#Depooling_a_replica
+      #         dashboard: https://grafana.wikimedia.org/d/rYdddlPWk/node-exporter-full?orgId=1&refresh=1m&viewPanel=323&var-datasource=thanos&var-job=All&var-node=db1099%3A9100

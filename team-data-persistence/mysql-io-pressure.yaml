@@ -1,0 +1,39 @@
+# deploy-tag: ops
+# deploy-site: eqiad, codfw
+
+groups:
+  - name: mysql
+    rules:
+    - alert: MysqlHostIoPressure
+      annotations:
+        description: Host {{$labels.instance}} has too much pressure on its io capabilities. Please consider debugging.
+        runbook: https://wikitech.wikimedia.org/wiki/MariaDB/troubleshooting
+        dashboard: 'https://grafana.wikimedia.org/d/rYdddlPWk/node-exporter-full?orgId=1&refresh=1m&viewPanel=323&var-datasource=thanos&var-job=All&var-node={{ $labels.instance | reReplaceAll ":.*" "" }}%3A9100'
+        summary: "MySQL instance {{$labels.instance }} has too much pressure on its io capabilities: ({{ $value | humanize }})"
+      expr: rate(node_pressure_io_waiting_seconds_total{cluster="mysql"}[5m]) > 0.3
+      for: 30m
+      labels:
+        severity: warning
+        team: data-persistence
+    - alert: MysqlHostIoPressure
+      annotations:
+        description: Host {{$labels.instance}} has too much pressure on its io capabilities. Please consider depooling.
+        runbook: https://wikitech.wikimedia.org/wiki/MariaDB/troubleshooting#Depooling_a_replica
+        dashboard: 'https://grafana.wikimedia.org/d/rYdddlPWk/node-exporter-full?orgId=1&refresh=1m&viewPanel=323&var-datasource=thanos&var-job=All&var-node={{ $labels.instance | reReplaceAll ":.*" "" }}%3A9100'
+        summary: "MySQL instance {{$labels.instance}} has too much pressure on its io capabilities: ({{ $value | humanize }})"
+      expr: rate(node_pressure_io_waiting_seconds_total{cluster="mysql"}[5m]) > 0.4
+      for: 10m
+      labels:
+        severity: critical
+        team: data-persistence
+    # - alert: MysqlHostIoPressure
+    #   annotations:
+    #     description: Host {{$labels.instance}} has too much pressure on its io capabilities. Please depool and try to debug or notify data-persistence.
+    #     runbook: https://wikitech.wikimedia.org/wiki/MariaDB/troubleshooting#Depooling_a_replica
+    #     dashboard: 'https://grafana.wikimedia.org/d/rYdddlPWk/node-exporter-full?orgId=1&refresh=1m&viewPanel=323&var-datasource=thanos&var-job=All&var-node={{ $labels.instance | reReplaceAll ":.*" "" }}%3A9100'
+    #     summary: "MySQL instance {{$labels.instance}} has too much pressure on its io capabilities: ({{ $value | humanize }}) #page"
+    #   expr: rate(node_pressure_io_waiting_seconds_total{cluster="mysql"}[5m]) > 0.8
+    #   for: 10m
+    #   labels:
+    #     severity: page
+    #     team: data-persistence
