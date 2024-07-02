@@ -19,3 +19,27 @@ groups:
         description: "CirrusSearch job lag is too high"
         runbook: TODO
         dashboard: 'https://grafana.wikimedia.org/d/CbmStnlGk/jobqueue-job?orgId=1&var-dc={{ $externalLabels.site }}%20prometheus/k8s&var-job={{ $labels.rule | reReplaceAll ".*-([^-]*$)" "${1}" }}'
+    - alert: CirrusSearchPoolCounterRejectionTooHigh
+      expr: sum(rate(mediawiki_CirrusSearch_pool_counter_seconds_count{status="failure"}[5m])) > 1000
+      for: 1m
+      labels:
+        team: search-platform
+        severity: critical
+      annotations:
+        summary: 'MediaWiki CirrusSearch failing to obtain a token from the pool counter at a very high rate'
+        description: "Rate of failures when obtaining a token from the pool counter is above 1000 errors/sec"
+        runbook: 'https://wikitech.wikimedia.org/wiki/Search#Pool_Counter_rejections_(search_is_currently_too_busy)'
+        dashboard: 'https://grafana.wikimedia.org/d/qrOStmdGk/elasticsearch-pool-counters?viewPanel=4&orgId=1'
+    - alert: CirrusSearchSaneitizerFixRateTooHigh
+      expr: sum(increase(mediawiki_CirrusSearch_sanitization_total{action="fixed"}[1w])) > 100000
+      for: 5m
+      labels:
+        team: search-platform
+        severity: warning
+      annotations:
+        summary: 'MediaWiki CirrusSearch Saneitizer is fixing is an abnormally high number of documents'
+        description: "MediaWiki CirrusSearch Saneitizer Weekly Fix Rate is above 100000/week"
+        runbook: 'https://wikitech.wikimedia.org/wiki/Search#Saneitizer_(background_repair_process)'
+        dashboard: 'https://grafana.wikimedia.org/d/JLK3I_siz/elasticsearch-indexing?viewPanel=35&orgId=1&from=now-6M&to=now'
+
+
