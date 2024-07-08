@@ -1,0 +1,23 @@
+rule_files:
+  - sli.yaml
+evaluation_interval: 1m
+tests:
+ - interval: 1m
+   input_series:
+    - series: 'dummy'
+      values: '0+42x60'
+   external_labels:
+     site: eqiad
+   alert_rule_test:
+    - alertname: SLIMetricMissing
+      eval_time: 10m
+      exp_alerts:
+       - exp_labels:
+           severity: warning
+           team: o11y
+           sli: istio_sli_availability
+         exp_annotations:
+           summary: SLI metric has gone absent
+           description: SLI metric has gone absent, there may be an issue with the recording rule
+           dashboard: TODO
+           runbook: TODO
