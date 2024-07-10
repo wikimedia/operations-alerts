@@ -20,3 +20,78 @@ tests:
            description: "Replica db1099:13318 is lagging behind more than 300 seconds, it probably needs depooling"
            runbook: https://wikitech.wikimedia.org/wiki/MariaDB/troubleshooting#Depooling_a_replica
            dashboard: https://grafana.wikimedia.org/d/000000273/mysql?orgId=1&refresh=1m&var-job=All&var-server=db1099&var-port=13318
+  - interval: 1m
+    input_series:
+      - series: 'mysql_heartbeat_now_timestamp_seconds{job="mysql-core", instance="db1099:9104"}'
+        values: '120'
+      - series: 'mysql_heartbeat_stored_timestamp_seconds{job="mysql-core", instance="db1099:9104"}'
+        values: '50'
+    alert_rule_test:
+      - alertname: MysqlReplicationLagPtHeartbeat
+        eval_time: 1m
+        exp_alerts:
+          - exp_labels:
+              alertname: MysqlReplicationLagPtHeartbeat
+              instance: db1099:9104
+              job: mysql-core
+              severity: warning
+              team: data-persistence
+            exp_annotations:
+              description: 'Replica db1099:9104 is lagging behind more than 60 seconds, it probably needs depooling'
+              runbook: 'https://wikitech.wikimedia.org/wiki/MariaDB/troubleshooting#Depooling_a_replica'
+              dashboard: 'https://grafana.wikimedia.org/d/000000273/mysql?orgId=1&refresh=1m&var-job=All&var-server=db1099&var-port=9104'
+              summary: 'MySQL instance db1099:9104 has too large replication lag (1m 10s)'
+
+  - interval: 1m
+    input_series:
+      - series: 'mysql_heartbeat_now_timestamp_seconds{job="mysql-core", instance="db1099:9104"}'
+        values: '120x100'
+      - series: 'mysql_heartbeat_stored_timestamp_seconds{job="mysql-core", instance="db1099:9104"}'
+        values: '50x100'
+    alert_rule_test:
+      - alertname: MysqlReplicationLagPtHeartbeat
+        eval_time: 10m
+        exp_alerts:
+          - exp_labels:
+              alertname: MysqlReplicationLagPtHeartbeat
+              instance: db1099:9104
+              job: mysql-core
+              severity: critical
+              team: data-persistence
+            exp_annotations:
+              description: 'Replica db1099:9104 is lagging behind more than 60 seconds, it probably needs depooling'
+              runbook: 'https://wikitech.wikimedia.org/wiki/MariaDB/troubleshooting#Depooling_a_replica'
+              dashboard: 'https://grafana.wikimedia.org/d/000000273/mysql?orgId=1&refresh=1m&var-job=All&var-server=db1099&var-port=9104'
+              summary: 'MySQL instance db1099:9104 has too large replication lag (1m 10s)'
+          - exp_labels:
+              alertname: MysqlReplicationLagPtHeartbeat
+              instance: db1099:9104
+              job: mysql-core
+              severity: warning
+              team: data-persistence
+            exp_annotations:
+              description: 'Replica db1099:9104 is lagging behind more than 60 seconds, it probably needs depooling'
+              runbook: 'https://wikitech.wikimedia.org/wiki/MariaDB/troubleshooting#Depooling_a_replica'
+              dashboard: 'https://grafana.wikimedia.org/d/000000273/mysql?orgId=1&refresh=1m&var-job=All&var-server=db1099&var-port=9104'
+              summary: 'MySQL instance db1099:9104 has too large replication lag (1m 10s)'
+  # - interval: 1m
+  #   input_series:
+  #     - series: 'mysql_heartbeat_now_timestamp_seconds{job="mysql-core", instance="db1099:9104"}'
+  #       values: '120x1000'
+  #     - series: 'mysql_heartbeat_stored_timestamp_seconds{job="mysql-core", instance="db1099:9104"}'
+  #       values: '50x1000'
+  #   alert_rule_test:
+  #     - alertname: MysqlReplicationLagPtHeartbeat
+  #       eval_time: 20m
+  #       exp_alerts:
+  #         - exp_labels:
+  #             alertname: MysqlReplicationLagPtHeartbeat
+  #             instance: db1099:9104
+  #             job: mysql-core
+  #             severity: page
+  #             team: data-persistence
+  #           exp_annotations:
+  #             description: 'Replica db1099:9104 is lagging behind more than 60 seconds, it probably needs depooling'
+  #             runbook: 'https://wikitech.wikimedia.org/wiki/MariaDB/troubleshooting#Depooling_a_replica'
+  #             dashboard: 'https://grafana.wikimedia.org/d/000000273/mysql?orgId=1&refresh=1m&var-job=All&var-server=db1099&var-port=9104'
+  #             summary: 'MySQL instance db1099:9104 has too large replication lag (1m 10s) #page'

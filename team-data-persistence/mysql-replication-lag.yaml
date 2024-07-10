@@ -15,3 +15,36 @@ groups:
       labels:
         severity: warning
         team: data-persistence
+    - alert: MysqlReplicationLagPtHeartbeat
+      annotations:
+        description: Replica {{$labels.instance}} is lagging behind more than 60 seconds, it probably needs depooling
+        runbook: https://wikitech.wikimedia.org/wiki/MariaDB/troubleshooting#Depooling_a_replica
+        dashboard: https://grafana.wikimedia.org/d/000000273/mysql?orgId=1&refresh=1m&var-job=All&var-server={{ $labels.instance | reReplaceAll ":.*" "" }}&var-port={{ $labels.instance | reReplaceAll ".*:" "" }}
+        summary: MySQL instance {{$labels.instance}} has too large replication lag ({{ $value | humanizeDuration }})
+      expr: mysql_heartbeat_now_timestamp_seconds{job="mysql-core", instance=~".*:9104"} - mysql_heartbeat_stored_timestamp_seconds{job="mysql-core", instance=~".*:9104"} > 60
+      for: 1m
+      labels:
+        severity: warning
+        team: data-persistence
+    - alert: MysqlReplicationLagPtHeartbeat
+      annotations:
+        description: Replica {{$labels.instance}} is lagging behind more than 60 seconds, it probably needs depooling
+        runbook: https://wikitech.wikimedia.org/wiki/MariaDB/troubleshooting#Depooling_a_replica
+        dashboard: https://grafana.wikimedia.org/d/000000273/mysql?orgId=1&refresh=1m&var-job=All&var-server={{ $labels.instance | reReplaceAll ":.*" "" }}&var-port={{ $labels.instance | reReplaceAll ".*:" "" }}
+        summary: MySQL instance {{$labels.instance}} has too large replication lag ({{ $value | humanizeDuration }})
+      expr: mysql_heartbeat_now_timestamp_seconds{job="mysql-core", instance=~".*:9104"} - mysql_heartbeat_stored_timestamp_seconds{job="mysql-core", instance=~".*:9104"} > 60
+      for: 10m
+      labels:
+        severity: critical
+        team: data-persistence
+    # - alert: MysqlReplicationLagPtHeartbeatPage
+    #   annotations:
+    #     description: Replica {{$labels.instance}} is lagging behind more than 60 seconds, it probably needs depooling
+    #     runbook: https://wikitech.wikimedia.org/wiki/MariaDB/troubleshooting#Depooling_a_replica
+    #     dashboard: https://grafana.wikimedia.org/d/000000273/mysql?orgId=1&refresh=1m&var-job=All&var-server={{ $labels.instance | reReplaceAll ":.*" "" }}&var-port={{ $labels.instance | reReplaceAll ".*:" "" }}
+    #     summary: "MySQL instance {{$labels.instance}} has too large replication lag ({{ $value | humanizeDuration }}) #page"
+    #   expr: mysql_heartbeat_now_timestamp_seconds{job="mysql-core", instance=~".*:9104"} - mysql_heartbeat_stored_timestamp_seconds{job="mysql-core", instance=~".*:9104"} > 60
+    #   for: 20m
+    #   labels:
+    #     severity: page
+    #     team: data-persistence
