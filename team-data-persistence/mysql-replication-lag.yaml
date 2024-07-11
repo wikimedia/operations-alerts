@@ -59,3 +59,36 @@ groups:
     #   labels:
     #     severity: page
     #     team: data-persistence
+    - alert: MysqlReplicationLag
+      annotations:
+        description: Replica {{$labels.instance}} is lagging behind more than 60 seconds, it probably needs depooling
+        runbook: https://wikitech.wikimedia.org/wiki/MariaDB/troubleshooting#Depooling_a_replica
+        dashboard: https://grafana.wikimedia.org/d/000000273/mysql?orgId=1&refresh=1m&var-job=All&var-server={{ $labels.instance | reReplaceAll ":.*" "" }}&var-port={{ $labels.instance | reReplaceAll ".*:" "" }}
+        summary: MySQL instance {{$labels.instance}} has too large replication lag ({{ $value | humanizeDuration }})
+      expr: mysql_slave_status_seconds_behind_master{job="mysql-core", instance=~".*9104"} > 60
+      for: 2m
+      labels:
+        severity: warning
+        team: data-persistence
+    - alert: MysqlReplicationLag
+      annotations:
+        description: Replica {{$labels.instance }} is lagging behind more than 60 seconds, it probably needs depooling
+        runbook: https://wikitech.wikimedia.org/wiki/MariaDB/troubleshooting#Depooling_a_replica
+        dashboard: https://grafana.wikimedia.org/d/000000273/mysql?orgId=1&refresh=1m&var-job=All&var-server={{ $labels.instance | reReplaceAll ":.*" "" }}&var-port={{ $labels.instance | reReplaceAll ".*:" "" }}
+        summary: MySQL instance {{ $labels.instance }}@{{ $labels.shard }} has too large replication lag ({{ $value | humanizeDuration }}). Its replication source is {{ $labels.master_host }}.
+      expr: mysql_slave_status_seconds_behind_master{job="mysql-core", instance=~".*9104"} > 60
+      for: 10m
+      labels:
+        severity: critical
+        team: data-persistence
+    # - alert: MysqlReplicationLag
+    #   annotations:
+    #     description: Replica {{$labels.instance}} is lagging behind more than 60 seconds, it probably needs depooling
+    #     runbook: https://wikitech.wikimedia.org/wiki/MariaDB/troubleshooting#Depooling_a_replica
+    #     dashboard: https://grafana.wikimedia.org/d/000000273/mysql?orgId=1&refresh=1m&var-job=All&var-server={{ $labels.instance | reReplaceAll ":.*" "" }}&var-port={{ $labels.instance | reReplaceAll ".*:" "" }}
+    #     summary: "MySQL instance {{$labels.instance}} has too large replication lag ({{ $value | humanizeDuration }}) #page"
+    #   expr: mysql_slave_status_seconds_behind_master{job="mysql-core", instance=~".*9104"} > 60
+    #   for: 7m
+    #   labels:
+    #     severity: page
+    #     team: data-persistence
