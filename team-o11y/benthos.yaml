@@ -30,5 +30,9 @@ groups:
       for: 2m
 
     - <<: *benthos_kafka_lag
+      # alerts in this file are deployed to eqiad and codfw, though this metric
+      # exists only in eqiad. disable the pint check as opposed to deploy this
+      # alert to its own file
+      # pint disable promql/series
       expr: sum by (exported_cluster, group) (kafka_burrow_partition_lag{exported_cluster="jumbo-eqiad",group=~"benthos-webrequest.+"}) > 30000
       for: 4m
