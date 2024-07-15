@@ -61,7 +61,124 @@ tests:
               severity: warning
               team: search-platform
             exp_annotations:
-              summary: 'MediaWiki CirrusSearch Saneitizer is fixing is an abnormally high number of documents'
+              summary: 'MediaWiki CirrusSearch Saneitizer is fixing an abnormally high number of documents'
               description: "MediaWiki CirrusSearch Saneitizer Weekly Fix Rate is above 100000/week"
               runbook: 'https://wikitech.wikimedia.org/wiki/Search#Saneitizer_(background_repair_process)'
               dashboard: 'https://grafana.wikimedia.org/d/JLK3I_siz/elasticsearch-indexing?viewPanel=35&orgId=1&from=now-6M&to=now'
+  - interval: '1m'
+    input_series:
+      # histograms for full_text search to eqiad p95 is 1.238s
+      - series: mediawiki_CirrusSearch_request_time_seconds_bucket{search_cluster="eqiad", type="full_text", le="+Inf"}
+        values: '0+1x6'
+      - series: mediawiki_CirrusSearch_request_time_seconds_bucket{search_cluster="eqiad", type="full_text", le="2.5"}
+        values: '0+101x6'
+      - series: mediawiki_CirrusSearch_request_time_seconds_bucket{search_cluster="eqiad", type="full_text", le="1"}
+        values: '0+95x6'
+      - series: mediawiki_CirrusSearch_request_time_seconds_bucket{search_cluster="eqiad", type="full_text", le="0.5"}
+        values: '0+10x6'
+
+      # histograms for full_text search to codfw p95 is 972.3ms
+      - series: mediawiki_CirrusSearch_request_time_seconds_bucket{search_cluster="codfw", type="full_text", le="+Inf"}
+        values: '0+1x6'
+      - series: mediawiki_CirrusSearch_request_time_seconds_bucket{search_cluster="codfw", type="full_text", le="2.5"}
+        values: '0+95x6'
+      - series: mediawiki_CirrusSearch_request_time_seconds_bucket{search_cluster="codfw", type="full_text", le="1"}
+        values: '0+101x6'
+      - series: mediawiki_CirrusSearch_request_time_seconds_bucket{search_cluster="codfw", type="full_text", le="0.5"}
+        values: '0+10x6'
+
+      # histograms for comp_suggest search to eqiad p95 is 289.6ms
+      - series: mediawiki_CirrusSearch_request_time_seconds_bucket{search_cluster="eqiad", type="comp_suggest", le="+Inf"}
+        values: '0+1x6'
+      - series: mediawiki_CirrusSearch_request_time_seconds_bucket{search_cluster="eqiad", type="comp_suggest", le="0.5"}
+        values: '0+101x6'
+      - series: mediawiki_CirrusSearch_request_time_seconds_bucket{search_cluster="eqiad", type="comp_suggest", le="0.25"}
+        values: '0+95x6'
+      - series: mediawiki_CirrusSearch_request_time_seconds_bucket{search_cluster="eqiad", type="comp_suggest", le="0.1"}
+        values: '0+10x6'
+
+      # histograms for comp_suggest search to codfw p95 is 241.7ms
+      - series: mediawiki_CirrusSearch_request_time_seconds_bucket{search_cluster="codfw", type="comp_suggest", le="+Inf"}
+        values: '0+1x6'
+      - series: mediawiki_CirrusSearch_request_time_seconds_bucket{search_cluster="codfw", type="comp_suggest", le="0.5"}
+        values: '0+95x6'
+      - series: mediawiki_CirrusSearch_request_time_seconds_bucket{search_cluster="codfw", type="comp_suggest", le="0.25"}
+        values: '0+101x6'
+      - series: mediawiki_CirrusSearch_request_time_seconds_bucket{search_cluster="codfw", type="comp_suggest", le="0.1"}
+        values: '0+10x6'
+
+      # histograms for more_like search to eqiad p95 is 1.75s
+      - series: mediawiki_CirrusSearch_request_time_seconds_bucket{search_cluster="eqiad", type="more_like", le="+Inf"}
+        values: '0+1x6'
+      - series: mediawiki_CirrusSearch_request_time_seconds_bucket{search_cluster="eqiad", type="more_like", le="2.5"}
+        values: '0+100x6'
+      - series: mediawiki_CirrusSearch_request_time_seconds_bucket{search_cluster="eqiad", type="more_like", le="1"}
+        values: '0+90x6'
+
+      # histograms for more_like search to codfw p95 is 1.429s
+      - series: mediawiki_CirrusSearch_request_time_seconds_bucket{search_cluster="codfw", type="more_like", le="+Inf"}
+        values: '0+1x6'
+      - series: mediawiki_CirrusSearch_request_time_seconds_bucket{search_cluster="codfw", type="more_like", le="2.5"}
+        values: '0+100x6'
+      - series: mediawiki_CirrusSearch_request_time_seconds_bucket{search_cluster="codfw", type="more_like", le="1"}
+        values: '0+93x6'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: CirrusSearchFullTextLatencyTooHigh
+        eval_time: '6m'
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              team: search-platform
+              search_cluster: eqiad
+            exp_annotations:
+              summary: 'CirrusSearch full_text 95th percentiles latency is too high (mw@eqiad to eqiad)'
+              description: "CirrusSearch full_text eqiad 95th percentile latency"
+              runbook: 'https://wikitech.wikimedia.org/wiki/Search#Health/Activity_Monitoring'
+              dashboard: 'https://grafana.wikimedia.org/d/000000455/elasticsearch-percentiles?orgId=1&var-cirrus_group=eqiad&var-cluster=elasticsearch&var-exported_cluster=production-search&var-smoothing=1'
+      - alertname: CirrusSearchCompletionLatencyTooHigh
+        eval_time: '6m'
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              team: search-platform
+              search_cluster: eqiad
+            exp_annotations:
+              summary: 'CirrusSearch comp_suggest 95th percentiles latency is too high (mw@eqiad to eqiad)'
+              description: "CirrusSearch comp_suggest eqiad 95th percentile latency"
+              runbook: 'https://wikitech.wikimedia.org/wiki/Search#Health/Activity_Monitoring'
+              dashboard: 'https://grafana.wikimedia.org/d/000000455/elasticsearch-percentiles?orgId=1&var-cirrus_group=eqiad&var-cluster=elasticsearch&var-exported_cluster=production-search&var-smoothing=1'
+      - alertname: CirrusSearchMoreLikeLatencyTooHigh
+        eval_time: '6m'
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              team: search-platform
+              search_cluster: eqiad
+            exp_annotations:
+              summary: 'CirrusSearch more_like 95th percentiles latency is too high (mw@eqiad to eqiad)'
+              description: "CirrusSearch more_like eqiad 95th percentile latency"
+              runbook: 'https://wikitech.wikimedia.org/wiki/Search#Health/Activity_Monitoring'
+              dashboard: 'https://grafana.wikimedia.org/d/000000455/elasticsearch-percentiles?orgId=1&var-cirrus_group=eqiad&var-cluster=elasticsearch&var-exported_cluster=production-search&var-smoothing=1'
+  - interval: '1m'
+    input_series:
+      - series: mediawiki_CirrusSearch_backend_failures_total{type="memory_issue", search_cluster="eqiad"}
+        values: '0+3x12'
+      - series: mediawiki_CirrusSearch_backend_failures_total{type="memory_issue", search_cluster="codfw"}
+        values: '0+2x12'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: CirrusSearchBackendMemoryIssue
+        eval_time: '12m'
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              team: search-platform
+              search_cluster: eqiad
+            exp_annotations:
+              summary: 'CirrusSearch backend failed 30 times in the last 10 minutes due to memory usage (mw@eqiad to eqiad)'
+              description: 'Number of requests triggering circuit breakers due to excessive memory usage'
+              runbook: 'https://wikitech.wikimedia.org/wiki/Search#Health/Activity_Monitoring'
+              dashboard: 'https://grafana.wikimedia.org/d/000000455/elasticsearch-percentiles?orgId=1&var-cirrus_group=eqiad&var-cluster=elasticsearch&var-exported_cluster=production-search&var-smoothing=1'

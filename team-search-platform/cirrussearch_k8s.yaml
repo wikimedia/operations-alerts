@@ -37,9 +37,51 @@ groups:
         team: search-platform
         severity: warning
       annotations:
-        summary: 'MediaWiki CirrusSearch Saneitizer is fixing is an abnormally high number of documents'
+        summary: 'MediaWiki CirrusSearch Saneitizer is fixing an abnormally high number of documents'
         description: "MediaWiki CirrusSearch Saneitizer Weekly Fix Rate is above 100000/week"
         runbook: 'https://wikitech.wikimedia.org/wiki/Search#Saneitizer_(background_repair_process)'
         dashboard: 'https://grafana.wikimedia.org/d/JLK3I_siz/elasticsearch-indexing?viewPanel=35&orgId=1&from=now-6M&to=now'
-
-
+    - alert: CirrusSearchFullTextLatencyTooHigh
+      expr: histogram_quantile(0.95, sum by (le, search_cluster) (rate(mediawiki_CirrusSearch_request_time_seconds_bucket{type="full_text"}[5m]))) > 1.0
+      for: 5m
+      labels:
+        team: search-platform
+        severity: critical
+      annotations:
+        summary: 'CirrusSearch full_text 95th percentiles latency is too high (mw@{{ $externalLabels.site }} to {{ $labels.search_cluster }})'
+        description: "CirrusSearch full_text {{ $labels.search_cluster }} 95th percentile latency"
+        runbook: 'https://wikitech.wikimedia.org/wiki/Search#Health/Activity_Monitoring'
+        dashboard: 'https://grafana.wikimedia.org/d/000000455/elasticsearch-percentiles?orgId=1&var-cirrus_group={{ $labels.search_cluster }}&var-cluster=elasticsearch&var-exported_cluster=production-search&var-smoothing=1'
+    - alert: CirrusSearchCompletionLatencyTooHigh
+      expr: histogram_quantile(0.95, sum by (le, search_cluster) (rate(mediawiki_CirrusSearch_request_time_seconds_bucket{type="comp_suggest"}[5m]))) > 0.25
+      for: 5m
+      labels:
+        team: search-platform
+        severity: critical
+      annotations:
+        summary: 'CirrusSearch comp_suggest 95th percentiles latency is too high (mw@{{ $externalLabels.site }} to {{ $labels.search_cluster }})'
+        description: "CirrusSearch comp_suggest {{ $labels.search_cluster }} 95th percentile latency"
+        runbook: 'https://wikitech.wikimedia.org/wiki/Search#Health/Activity_Monitoring'
+        dashboard: 'https://grafana.wikimedia.org/d/000000455/elasticsearch-percentiles?orgId=1&var-cirrus_group={{ $labels.search_cluster }}&var-cluster=elasticsearch&var-exported_cluster=production-search&var-smoothing=1'
+    - alert: CirrusSearchMoreLikeLatencyTooHigh
+      expr: histogram_quantile(0.95, sum by (le, search_cluster) (rate(mediawiki_CirrusSearch_request_time_seconds_bucket{type="more_like"}[5m]))) > 1.5
+      for: 5m
+      labels:
+        team: search-platform
+        severity: critical
+      annotations:
+        summary: 'CirrusSearch more_like 95th percentiles latency is too high (mw@{{ $externalLabels.site }} to {{ $labels.search_cluster }})'
+        description: "CirrusSearch more_like {{ $labels.search_cluster }} 95th percentile latency"
+        runbook: 'https://wikitech.wikimedia.org/wiki/Search#Health/Activity_Monitoring'
+        dashboard: 'https://grafana.wikimedia.org/d/000000455/elasticsearch-percentiles?orgId=1&var-cirrus_group={{ $labels.search_cluster }}&var-cluster=elasticsearch&var-exported_cluster=production-search&var-smoothing=1'
+    - alert: CirrusSearchBackendMemoryIssue
+      expr: sum by (search_cluster)(increase(mediawiki_CirrusSearch_backend_failures_total{type="memory_issue"}[10m])) > 20
+      for: 5m
+      labels:
+        team: search-platform
+        severity: critical
+      annotations:
+        summary: 'CirrusSearch backend failed {{ $value }} times in the last 10 minutes due to memory usage (mw@{{ $externalLabels.site }} to {{ $labels.search_cluster }})'
+        description: 'Number of requests triggering circuit breakers due to excessive memory usage'
+        runbook: 'https://wikitech.wikimedia.org/wiki/Search#Health/Activity_Monitoring'
+        dashboard: 'https://grafana.wikimedia.org/d/000000455/elasticsearch-percentiles?orgId=1&var-cirrus_group={{ $labels.search_cluster }}&var-cluster=elasticsearch&var-exported_cluster=production-search&var-smoothing=1'
