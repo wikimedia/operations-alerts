@@ -1,6 +1,13 @@
 # deploy-tag: ops
 # deploy-site: eqiad, codfw
 
+# Alerts in this file are deployed to eqiad and codfw because kafka logging
+# cluster is present in both sites.
+# Most often though only logging-eqiad cluster is active, which means pint
+# won't find the burrow metrics for codfw and thus alert. Disable checking for
+# series present for the whole file.
+# pint file/disable promql/series
+
 groups:
   - name: benthos
     rules:
@@ -19,20 +26,16 @@ groups:
       #       Benthos instance generating metrics from events on topic `mediawiki.httpd.accesslog`
       #   * benthos-webrequest-sampled-live: role(syslog::centralserver)
       #       Benthos instance to sample webrequest "firehose" from kafka jumbo (defined below)
-      expr: sum by (exported_cluster, group) (kafka_burrow_partition_lag{exported_cluster=~"logging-.*",group=~"benthos-.+"}) > 1500
+      expr: sum by (exported_cluster, group) (kafka_burrow_partition_lag{exported_cluster=~"logging-.+",group=~"benthos-.+"}) > 1500
       for: 10m
       labels:
         severity: critical
         team: o11y
 
     - <<: *benthos_kafka_lag
-      expr: sum by (exported_cluster, group) (kafka_burrow_partition_lag{exported_cluster=~"logging-.*",group=~"benthos-.+"}) > 500000
+      expr: sum by (exported_cluster, group) (kafka_burrow_partition_lag{exported_cluster=~"logging-.+",group=~"benthos-.+"}) > 500000
       for: 2m
 
     - <<: *benthos_kafka_lag
-      # alerts in this file are deployed to eqiad and codfw, though this metric
-      # exists only in eqiad. disable the pint check as opposed to deploy this
-      # alert to its own file
-      # pint disable promql/series
       expr: sum by (exported_cluster, group) (kafka_burrow_partition_lag{exported_cluster="jumbo-eqiad",group=~"benthos-webrequest.+"}) > 30000
       for: 4m
