@@ -1,0 +1,15 @@
+# deploy-tag: ops
+
+groups:
+  - name: traffic_anycast_healthchecker
+    rules:
+      - alert: AnycastHealthcheckerRestarted
+        expr: 'sum(node_systemd_service_restart_total{name="anycast-healthchecker.service", instance=~"(dns|doh|durum).*"}) by (instance) >= 1'
+        labels:
+          team: traffic
+          severity: critical
+        annotations:
+          summary: 'anycast-healthchecker service restarted on {{ $labels.instance }}'
+          description: "anycast-healthchecker on {{ $labels.instance }} ({{ $externalLabels.site }}) has restarted unexpectedly."
+          dashboard: 'https://grafana.wikimedia.org/d/dxbfeGDZk/anycast?orgId=1&var-protocol=BGP&var-site={{ $externalLabels.site }}&var-cluster=All&var-ip_version=All'
+          runbook: 'https://wikitech.wikimedia.org/wiki/Anycast#Anycast_healthchecker_not_running'
