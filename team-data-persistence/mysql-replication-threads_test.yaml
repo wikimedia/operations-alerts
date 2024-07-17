@@ -1,0 +1,35 @@
+rule_files:
+  - mysql-replication-threads.yaml
+evaluation_interval: 1m
+# mysql-replication-threads_test.yaml
+tests:
+  - interval: 1m
+    input_series:
+      - series: 'mysql_slave_status_slave_sql_running{role="slave", instance="instance1"}'
+        values: '0x10000000'
+      - series: 'mysql_slave_status_slave_io_running{role="slave", instance="instance1"}'
+        values: '0x10000000'
+    alert_rule_test:
+      - eval_time: 50m
+        alertname: MysqlReplicationThreadCountTooLow
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              team: data-persistence
+              instance: instance1
+              role: slave
+            exp_annotations:
+              description: 'Replica instance1 has 0 replication threads running, it should have 2.'
+              summary: 'MySQL instance instance1 has replication issues.'
+              dashboard: https://grafana.wikimedia.org/d/000000273/mysql?orgId=1&refresh=1m&var-job=All&var-server=instance1&var-port=instance1
+              runbook: https://wikitech.wikimedia.org/wiki/MariaDB/troubleshooting#Depooling_a_replica
+          - exp_labels:
+              severity: critical
+              team: data-persistence
+              instance: instance1
+              role: slave
+            exp_annotations:
+              description: 'Replica instance1 has 0 replication threads running, it should have 2.'
+              summary: 'MySQL instance instance1 has replication issues.'
+              dashboard: https://grafana.wikimedia.org/d/000000273/mysql?orgId=1&refresh=1m&var-job=All&var-server=instance1&var-port=instance1
+              runbook: https://wikitech.wikimedia.org/wiki/MariaDB/troubleshooting#Depooling_a_replica
