@@ -3,7 +3,7 @@ rule_files:
 evaluation_interval: 5m
 tests:
   - input_series:
-    - series: kube_deployment_status_replicas_available{deployment="datahub-staging", namespace="datahub-next"}
+    - series: kube_deployment_status_replicas_available{deployment="datahub-gms-staging", namespace="datahub-next"}
       values: '0'
     alert_rule_test:
     - alertname: DatahubNextServiceUnavailable
@@ -15,11 +15,11 @@ tests:
           runbook: "https://wikitech.wikimedia.org/wiki/Data_Engineering/Systems/DataHub/Administration#Alerting"
         exp_labels:
           namespace: datahub-next
-          deployment: datahub-staging
+          deployment: datahub-gms-staging
           severity: warning
           team: data-platform
   - input_series:
-    - series: kube_deployment_status_replicas_available{deployment="datahub-production", namespace="datahub"}
+    - series: kube_deployment_status_replicas_available{deployment="datahub-gms-production", namespace="datahub"}
       values: '0'
     alert_rule_test:
     - alertname: DatahubServiceUnavailable
@@ -31,6 +31,6 @@ tests:
           runbook: "https://wikitech.wikimedia.org/wiki/Data_Engineering/Systems/DataHub/Administration#Alerting"
         exp_labels:
           namespace: datahub
-          deployment: datahub-production
+          deployment: datahub-gms-production
           severity: critical
           team: data-platform

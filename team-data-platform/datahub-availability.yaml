@@ -10,7 +10,7 @@ groups:
         summary: 'datahub-next is unavailable on k8s-dse'
         dashboard: "https://grafana.wikimedia.org/d/hyl18XgMk/kubernetes-container-details?orgId=1&var-datasource=thanos&var-site=eqiad&var-cluster=k8s-dse&var-namespace=datahub-next&var-container=All"
         runbook: "https://wikitech.wikimedia.org/wiki/Data_Engineering/Systems/DataHub/Administration#Alerting"
-      expr: kube_deployment_status_replicas_available{deployment="datahub-staging", namespace="datahub-next"} < 1
+      expr: kube_deployment_status_replicas_available{deployment=~"datahub-.+-staging", namespace="datahub-next"} < 1
       labels:
         severity: warning
         team: data-platform
@@ -21,7 +21,7 @@ groups:
         summary: 'datahub is unavailable on k8s-dse'
         dashboard: "https://grafana.wikimedia.org/d/hyl18XgMk/kubernetes-container-details?orgId=1&var-datasource=thanos&var-site=eqiad&var-cluster=k8s-dse&var-namespace=datahub&var-container=All"
         runbook: "https://wikitech.wikimedia.org/wiki/Data_Engineering/Systems/DataHub/Administration#Alerting"
-      expr: kube_deployment_status_replicas_available{deployment="datahub-production", namespace="datahub"} < 1
+      expr: kube_deployment_status_replicas_available{deployment=~"datahub-.+-production", namespace="datahub"} < 1
       labels:
         severity: critical
         team: data-platform
