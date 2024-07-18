@@ -21,7 +21,7 @@ groups:
         runbook: https://wikitech.wikimedia.org/wiki/MariaDB/troubleshooting#Depooling_a_replica
         dashboard: https://grafana.wikimedia.org/d/000000273/mysql?orgId=1&refresh=1m&var-job=All&var-server={{ $labels.instance | reReplaceAll ":.*" "" }}&var-port={{ $labels.instance | reReplaceAll ".*:" "" }}
         summary: MySQL instance {{$labels.instance}} has too large replication lag ({{ $value | humanizeDuration }})
-      expr: mysql_heartbeat_now_timestamp_seconds{job="mysql-core", instance=~".*:9104"} - mysql_heartbeat_stored_timestamp_seconds{job="mysql-core", instance=~".*:9104"} > 60
+      expr: mysql_heartbeat_now_timestamp_seconds{job="mysql-core", shard!~"tendril|staging|matomo|analytics_meta", role!="standalone", instance=~".*:9104"} - mysql_heartbeat_stored_timestamp_seconds{job="mysql-core", shard!~"tendril|staging|matomo|analytics_meta", role!="standalone", instance=~".*:9104"} > 60
       for: 1m
       labels:
         severity: warning
@@ -32,7 +32,7 @@ groups:
         runbook: https://wikitech.wikimedia.org/wiki/MariaDB/troubleshooting#Depooling_a_replica
         dashboard: https://grafana.wikimedia.org/d/000000273/mysql?orgId=1&refresh=1m&var-job=All&var-server={{ $labels.instance | reReplaceAll ":.*" "" }}&var-port={{ $labels.instance | reReplaceAll ".*:" "" }}
         summary: MySQL instance {{$labels.instance}} has too large replication lag ({{ $value | humanizeDuration }})
-      expr: mysql_heartbeat_now_timestamp_seconds{job="mysql-core", instance=~".*:9104"} - mysql_heartbeat_stored_timestamp_seconds{job="mysql-core", instance=~".*:9104"} > 60
+      expr: mysql_heartbeat_now_timestamp_seconds{job="mysql-core", shard!~"tendril|staging|matomo|analytics_meta", role!="standalone", instance=~".*:9104"} - mysql_heartbeat_stored_timestamp_seconds{job="mysql-core", shard!~"tendril|staging|matomo|analytics_meta", role!="standalone", instance=~".*:9104"} > 60
       for: 10m
       labels:
         severity: critical
@@ -43,7 +43,7 @@ groups:
     #     runbook: https://wikitech.wikimedia.org/wiki/MariaDB/troubleshooting#Depooling_a_replica
     #     dashboard: https://grafana.wikimedia.org/d/000000273/mysql?orgId=1&refresh=1m&var-job=All&var-server={{ $labels.instance | reReplaceAll ":.*" "" }}&var-port={{ $labels.instance | reReplaceAll ".*:" "" }}
     #     summary: "MySQL instance {{$labels.instance}} has too large replication lag ({{ $value | humanizeDuration }}) #page"
-    #   expr: mysql_heartbeat_now_timestamp_seconds{job="mysql-core", instance=~".*:9104"} - mysql_heartbeat_stored_timestamp_seconds{job="mysql-core", instance=~".*:9104"} > 60
+    #   expr: mysql_heartbeat_now_timestamp_seconds{job="mysql-core", shard!~"tendril|staging|matomo|analytics_meta", role!="standalone", instance=~".*:9104"} - mysql_heartbeat_stored_timestamp_seconds{job="mysql-core", shard!~"tendril|staging|matomo|analytics_meta", role!="standalone", instance=~".*:9104"} > 60
     #   for: 20m
     #   labels:
     #     severity: page
