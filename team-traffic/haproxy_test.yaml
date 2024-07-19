@@ -8,6 +8,8 @@ tests:
     input_series:
       - series: 'node_systemd_service_restart_total{instance="cp1234:9100", name="haproxy.service"}'
         values: '0 1 2 3 4 5 6 7'
+      - series: 'node_systemd_service_restart_total{instance="cp1235:9100", name="haproxy.service"}'
+        values: '0 1 0 0 0 0 0 0'
     alert_rule_test:
       - alertname: HAProxyRestarted
         eval_time: 7m
