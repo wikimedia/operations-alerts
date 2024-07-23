@@ -25,3 +25,43 @@ tests:
               description: "CirrusSearch job lag is too high"
               runbook: TODO
               dashboard: "https://grafana.wikimedia.org/d/CbmStnlGk/jobqueue-job?orgId=1&var-dc=eqiad%20prometheus/k8s&var-job=cirrusSearchElasticaWrite"
+  - interval: 1m
+    input_series:
+      - series: mediawiki_CirrusSearch_pool_counter_seconds_count{status="success", type="fulltext"}
+        values: '0+120000x6'
+      - series: mediawiki_CirrusSearch_pool_counter_seconds_count{status="failure", type="fulltext"}
+        values: '0+30001x6'
+      - series: mediawiki_CirrusSearch_pool_counter_seconds_count{status="failure", type="completion"}
+        values: '0+30000x6'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: CirrusSearchPoolCounterRejectionTooHigh
+        eval_time: 6m
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              team: search-platform
+            exp_annotations:
+              summary: 'MediaWiki CirrusSearch failing to obtain a token from the pool counter at a very high rate'
+              description: "Rate of failures when obtaining a token from the pool counter is above 1000 errors/sec"
+              runbook: 'https://wikitech.wikimedia.org/wiki/Search#Pool_Counter_rejections_(search_is_currently_too_busy)'
+              dashboard: 'https://grafana.wikimedia.org/d/qrOStmdGk/elasticsearch-pool-counters?viewPanel=4&orgId=1'
+  - interval: '1d'
+    input_series:
+      - series: mediawiki_CirrusSearch_sanitization_total{action="fixed"}
+        values: '0+20000x7'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: CirrusSearchSaneitizerFixRateTooHigh
+        eval_time: '7d'
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              team: search-platform
+            exp_annotations:
+              summary: 'MediaWiki CirrusSearch Saneitizer is fixing is an abnormally high number of documents'
+              description: "MediaWiki CirrusSearch Saneitizer Weekly Fix Rate is above 100000/week"
+              runbook: 'https://wikitech.wikimedia.org/wiki/Search#Saneitizer_(background_repair_process)'
+              dashboard: 'https://grafana.wikimedia.org/d/JLK3I_siz/elasticsearch-indexing?viewPanel=35&orgId=1&from=now-6M&to=now'
