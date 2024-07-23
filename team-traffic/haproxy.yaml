@@ -5,7 +5,7 @@ groups:
     rules:
       - alert: HAProxyRestarted
         # In normal conditions, restart count is 0. Alert if it is >= 1.
-        expr: 'sum(node_systemd_service_restart_total{name="haproxy.service", instance=~"(cp|dns).*"}) by (instance) >= 1'
+        expr: 'sum by (instance) (increase(node_systemd_service_restart_total{name="haproxy.service", instance=~"(cp|dns).*"}[5m]) > 0)'
         labels:
           team: traffic
           severity: critical
