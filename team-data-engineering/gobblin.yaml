@@ -18,7 +18,9 @@ groups:
       runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Gobblin
 
   - alert: GobblinKafkaRecordsExtractedNotEqualRecordsExpected
-    expr: topk(1, (gobblin_kafka_extracted_records_expected_count - gobblin_kafka_extracted_records_actual_count) != 0)
+    # The excluded topics are compacted, meaning they are expected to fail this alert, as compaction
+    # deletes messages by design.
+    expr: topk(1, (gobblin_kafka_extracted_records_expected_count{kafka_topic!~"(eqiad|codfw).mediawiki.cirrussearch.page_rerender.v1"} - gobblin_kafka_extracted_records_actual_count{kafka_topic!~"(eqiad|codfw).mediawiki.cirrussearch.page_rerender.v1"}) != 0)
     for: 1m
     labels:
       severity: warning
