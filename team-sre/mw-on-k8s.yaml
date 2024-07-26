@@ -48,11 +48,11 @@ groups:
           histogram_quantile(
             0.75,
             sum(
-              rate(envoy_cluster_upstream_rq_time_bucket{ app="mediawiki", envoy_cluster_name=~"(local_service|LOCAL_mediawiki.*)", deployment!="mw-jobrunner"}[2m])
+              rate(envoy_cluster_upstream_rq_time_bucket{ app="mediawiki", envoy_cluster_name=~"(local_service|LOCAL_.*)", deployment!="mw-jobrunner"}[2m])
             ) by (le, deployment)
           ) / 1000 > 0.8
           and sum(
-            rate(envoy_cluster_upstream_rq_time_count{app="mediawiki",envoy_cluster_name=~"(local_service|LOCAL_mediawiki.*)", deployment!="mw-jobrunner"}[2m])
+            rate(envoy_cluster_upstream_rq_time_count{app="mediawiki",envoy_cluster_name=~"(local_service|LOCAL_.*)", deployment!="mw-jobrunner"}[2m])
           ) by (deployment) > 300
         for: 4m
         labels:
@@ -64,6 +64,6 @@ groups:
           histogram_quantile(
             0.75,
             sum(
-              rate(envoy_cluster_upstream_rq_time_bucket{ app="mediawiki", envoy_cluster_name=~"(local_service|LOCAL_mediawiki.*)", deployment!="mw-jobrunner"}[2m])
+              rate(envoy_cluster_upstream_rq_time_bucket{ app="mediawiki", envoy_cluster_name=~"(local_service|LOCAL_.*)", deployment!="mw-jobrunner"}[2m])
             ) by (le, deployment)
           ) / 1000 > 1
