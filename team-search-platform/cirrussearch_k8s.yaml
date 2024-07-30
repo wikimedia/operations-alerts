@@ -75,6 +75,8 @@ groups:
         runbook: 'https://wikitech.wikimedia.org/wiki/Search#Health/Activity_Monitoring'
         dashboard: 'https://grafana.wikimedia.org/d/000000455/elasticsearch-percentiles?orgId=1&var-cirrus_group={{ $labels.search_cluster }}&var-cluster=elasticsearch&var-exported_cluster=production-search&var-smoothing=1'
     - alert: CirrusSearchBackendMemoryIssue
+      # the metric might not exist if no memory issues are reported
+      # pint disable promql/series
       expr: sum by (search_cluster)(increase(mediawiki_CirrusSearch_backend_failures_total{type="memory_issue"}[10m])) > 20
       for: 5m
       labels:
