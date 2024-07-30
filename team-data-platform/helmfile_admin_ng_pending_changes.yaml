@@ -1,4 +1,4 @@
-# deploy-tag: k8s-dse
+# deploy-tag: ops
 # deploy-site: eqiad
 
 groups:
