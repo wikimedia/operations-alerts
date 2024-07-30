@@ -39,6 +39,9 @@ groups:
           dashboard: https://grafana.wikimedia.org/d/K9x0c4aVk/flink-app?var-datasource={{$externalLabels.site}}+prometheus%2F{{$externalLabels.prometheus}}&var-namespace=cirrus-streaming-updater&var-helm_release=producer
 
       - alert: CirrusConsumerFetchErrorRate
+        # flink_taskmanager_job_task_operator_numRecordsOut is reported as a
+        # gauge, though rate() should be applied to counters only
+        # pint disable promql/rate
         expr: |
             sum(rate(flink_taskmanager_job_task_operator_numRecordsOut{job_name=~"cirrus_streaming_updater_consumer_.*", kubernetes_namespace="cirrus-streaming-updater", release !~ ".*backfill", operator_name="fetch_failure_sink:_Writer"}[5m])) by (job_name, kubernetes_namespace, release) > 0.1
         for: 20m
@@ -52,6 +55,9 @@ groups:
           dashboard: https://grafana.wikimedia.org/d/K9x0c4aVk/flink-app?var-datasource={{$externalLabels.site}}+prometheus%2F{{$externalLabels.prometheus}}&var-namespace=cirrus-streaming-updater&var-helm_release={{$labels.release}}
 
       - alert: CirrusConsumerRerenderFetchErrorRate
+        # flink_taskmanager_job_task_operator_numRecordsOut is reported as a
+        # gauge, though rate() should be applied to counters only
+        # pint disable promql/rate
         expr: |
             sum(rate(flink_taskmanager_job_task_operator_numRecordsOut{job_name=~"cirrus_streaming_updater_consumer_.*", kubernetes_namespace="cirrus-streaming-updater", release !~ ".*backfill", operator_name="rerender_fetch_failure_sink:_Writer"}[5m])) by (job_name, kubernetes_namespace, release) > 0.1
         for: 20m
@@ -65,6 +71,10 @@ groups:
           dashboard: https://grafana.wikimedia.org/d/K9x0c4aVk/flink-app?var-datasource={{$externalLabels.site}}+prometheus%2F{{$externalLabels.prometheus}}&var-namespace=cirrus-streaming-updater&var-helm_release={{$labels.release}}
 
       - alert: CirrusStreamingUpdaterRateTooLow
+        # flink_taskmanager_job_task_operator_bulk_change_type_result_actions
+        # is reported as a gauge, though rate() should be applied to counters
+        # only
+        # pint disable promql/rate
         expr:
           sum by (app) (rate(flink_taskmanager_job_task_operator_bulk_change_type_result_actions[5m])) < 80
         for: 10m
