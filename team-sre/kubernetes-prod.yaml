@@ -15,8 +15,9 @@ groups:
       runbook: "https://wikitech.wikimedia.org/wiki/Kubernetes" # This needs a proper runbook
       dashboard: https://grafana.wikimedia.org/d/hyl18XgMk?var-site={{ $externalLabels.site }}&var-cluster={{ $externalLabels.prometheus }}&var-namespace={{ $labels.namespace }}&var-pod={{ $labels.pod }}
 
-  - alert: KubernetesContainerReachingMemoryLimit
-    expr: (container_memory_working_set_bytes{container!~"POD|"} / (container_spec_memory_limit_bytes{container!~"POD|"} > 0)) > 0.95
+  - &KubernetesContainerReachingMemoryLimit
+    alert: KubernetesContainerReachingMemoryLimit
+    expr: (container_memory_working_set_bytes{container!~"POD|", namespace!="mw-mcrouter"} / (container_spec_memory_limit_bytes{container!~"POD|", namespace!="mw-mcrouter"} > 0)) > 0.95
     for: 10m
     labels:
       team: sre
@@ -26,6 +27,9 @@ groups:
       description: "Container {{ $labels.container }} in pod {{ $labels.namespace }}/{{ $labels.pod }} is consistently using {{ $value | humanizePercentage }} of its memory limit over the last 10min"
       runbook: "https://wikitech.wikimedia.org/wiki/Kubernetes" # This needs a proper runbook
       dashboard: https://grafana.wikimedia.org/d/hyl18XgMk?var-site={{ $externalLabels.site }}&var-cluster={{ $externalLabels.prometheus }}&var-namespace={{ $labels.namespace }}&var-pod={{ $labels.pod }}
+  - <<: *KubernetesContainerReachingMemoryLimit
+    expr: (container_memory_working_set_bytes{container!~"POD|", namespace="mw-mcrouter"} / (container_spec_memory_limit_bytes{container!~"POD|", namespace="mw-mcrouter"} > 0)) > 0.99
+
 
 - name: certmanager
   rules:
