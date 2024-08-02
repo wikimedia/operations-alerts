@@ -20,5 +20,5 @@ tests:
          exp_annotations:
           description: Benthos consumers are not keeping up with the rate of log production.
           summary: Too many messages in logging-eqiad for group benthos-eqiad
-          dashboard: https://grafana.wikimedia.org/d/000000484/kafka-consumer-lag?var-cluster=logging-eqiad&var-datasource=eqiad%20prometheus/ops
+          dashboard: https://grafana.wikimedia.org/d/000000484/kafka-consumer-lag?var-cluster=logging-eqiad&var-datasource=eqiad%20prometheus/ops&var-consumer_group=benthos-eqiad
           runbook: TODO

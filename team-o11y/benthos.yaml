@@ -17,7 +17,11 @@ groups:
       annotations:
         description: Benthos consumers are not keeping up with the rate of log production.
         summary: Too many messages in {{ $labels.exported_cluster }} for group {{ $labels.group }}
-        dashboard: https://grafana.wikimedia.org/d/000000484/kafka-consumer-lag?var-cluster={{ $labels.exported_cluster }}&var-datasource={{ $externalLabels.site }}%20prometheus/ops
+        dashboard:
+          "https://grafana.wikimedia.org/d/000000484/kafka-consumer-lag\
+          ?var-cluster={{ $labels.exported_cluster }}\
+          &var-datasource={{ $externalLabels.site }}%20prometheus/ops\
+          &var-consumer_group={{ $labels.group }}"
         runbook: TODO
       # Consumer groups:
       #   * benthos-(eqiad|codfw): role(logging::opensearch::collector)
@@ -37,5 +41,5 @@ groups:
       for: 2m
 
     - <<: *benthos_kafka_lag
-      expr: sum by (exported_cluster, group) (kafka_burrow_partition_lag{exported_cluster="jumbo-eqiad",group=~"benthos-webrequest.+"}) > 30000
-      for: 4m
+      expr: sum by (exported_cluster, group) (kafka_burrow_partition_lag{exported_cluster="jumbo-eqiad",group=~"benthos-webrequest.+"}) > 500000
+      for: 10m
