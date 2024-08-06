@@ -57,7 +57,7 @@ groups:
         # flink_taskmanager_job_task_operator_event_process_function_events_in_total is reported as a gauge, not as a counter
         # pint disable promql/rate
         expr: |
-          sum by (kubernetes_namespace, release, job_name) (rate(flink_taskmanager_job_task_operator_event_process_function_events_in_total{kubernetes_namespace="mw-page-content-change-enrich", release="main", job_name="mw_page_content_change_enrich"}[5m])) > 0.5 and
+          sum by (kubernetes_namespace, release, job_name) (rate(flink_taskmanager_job_task_operator_event_process_function_events_in_total{kubernetes_namespace="mw-page-content-change-enrich", release="main", job_name="mw_page_content_change_enrich"}[5m])) > 0.5 and on()
           (
             sum_over_time(flink_taskmanager_job_task_operator_event_process_function_events_out_total{kubernetes_namespace="mw-page-content-change-enrich", release="main", job_name="mw_page_content_change_enrich"}[5m]) /
             sum_over_time(flink_taskmanager_job_task_operator_event_process_function_events_in_total{kubernetes_namespace="mw-page-content-change-enrich", release="main", job_name="mw_page_content_change_enrich"}[5m])
