@@ -28,6 +28,9 @@ groups:
       runbook: "https://wikitech.wikimedia.org/wiki/Kubernetes" # This needs a proper runbook
       dashboard: https://grafana.wikimedia.org/d/hyl18XgMk?var-site={{ $externalLabels.site }}&var-cluster={{ $externalLabels.prometheus }}&var-namespace={{ $labels.namespace }}&var-pod={{ $labels.pod }}
   - <<: *KubernetesContainerReachingMemoryLimit
+    # this alert file is deployed to all k8s prometheus, though mw-mcrouter exists only on wikikube
+    # thus ignore "metric not found" lint alert
+    # pint disable promql/series
     expr: (container_memory_working_set_bytes{container!~"POD|", namespace="mw-mcrouter"} / (container_spec_memory_limit_bytes{container!~"POD|", namespace="mw-mcrouter"} > 0)) > 0.99
 
 
