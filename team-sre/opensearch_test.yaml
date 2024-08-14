@@ -1,0 +1,119 @@
+rule_files:
+  - opensearch.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    input_series:
+      - series: 'up{instance="logstash2037:9108", cluster="logstash", job="elasticsearch"}'
+        values: "0x50 0"
+      - series: 'role_owner{instance="logstash2037:9100", cluster="logstash", team="observability"}'
+        values: "1x50 1"
+      - series: 'elasticsearch_clusterinfo_version_info{cluster="logstash", exported_cluster="production-elk7-codfw", instance="logstash2037:9108"}'
+        values: "1x50 1"
+    external_labels:
+      site: codfw
+    alert_rule_test:
+      - alertname: OpensearchAPIsUnreachable
+        eval_time: 5m
+        exp_alerts:
+          - exp_labels:
+              cluster: logstash
+              exported_cluster: production-elk7-codfw
+              severity: warning
+              nodename: logstash2037
+              instance: logstash2037:9108
+              team: observability
+            exp_annotations:
+              description: Opensearch API endpoint not reachable on instance logstash2037:9108
+              summary: Opensearch API endpoint not reachable on instance logstash2037:9108
+              dashboard:
+                "https://grafana.wikimedia.org/d/e7d7fa18-7bc3-4548-bb07-ef261a9d3b8b/opensearch-cluster-health\
+                ?var-cluster=production-elk7-codfw"
+              runbook: https://wikitech.wikimedia.org/wiki/Runbook
+
+  - interval: 1m
+    input_series:
+      - series: 'elasticsearch_cluster_health_status{color="yellow", exported_cluster="production-elk7-codfw", instance="logstash2037:9108", cluster="logstash"}'
+        values: "1x50 1"
+      - series: 'role_owner{instance="logstash2037:9100", cluster="logstash", team="observability"}'
+        values: "1x50 1"
+    external_labels:
+      site: codfw
+    alert_rule_test:
+      - alertname: OpensearchClusterHealth
+        eval_time: 5m
+        exp_alerts:
+          - exp_labels:
+              cluster: logstash
+              exported_cluster: production-elk7-codfw
+              color: yellow
+              severity: warning
+              team: observability
+            exp_annotations:
+              description: Opensearch cluster health reported as yellow
+              summary: Opensearch cluster health reported as yellow
+              dashboard:
+                "https://grafana.wikimedia.org/d/e7d7fa18-7bc3-4548-bb07-ef261a9d3b8b/opensearch-cluster-health\
+                ?var-cluster=production-elk7-codfw"
+              runbook: https://wikitech.wikimedia.org/wiki/Runbook
+
+  - interval: 1m
+    input_series:
+      - series: 'elasticsearch_cluster_health_status{color="red", exported_cluster="production-elk7-codfw", instance="logstash2037:9108", cluster="logstash"}'
+        values: "1x50 0"
+      - series: 'role_owner{instance="logstash2037:9100", cluster="logstash", team="observability"}'
+        values: "1x50 1"
+    external_labels:
+      site: codfw
+    alert_rule_test:
+      - alertname: OpensearchClusterHealth
+        eval_time: 5m
+        exp_alerts:
+          - exp_labels:
+              cluster: logstash
+              exported_cluster: production-elk7-codfw
+              color: red
+              severity: critical
+              team: observability
+            exp_annotations:
+              description: Opensearch cluster health reported as red
+              summary: Opensearch cluster health reported as red
+              dashboard:
+                "https://grafana.wikimedia.org/d/e7d7fa18-7bc3-4548-bb07-ef261a9d3b8b/opensearch-cluster-health\
+                ?var-cluster=production-elk7-codfw"
+              runbook: https://wikitech.wikimedia.org/wiki/Runbook
+
+  - interval: 1m
+    input_series:
+      - series: 'elasticsearch_cluster_health_unassigned_shards{exported_cluster="production-elk7-codfw", instance="logstash2037:9108", cluster="logstash"}'
+        values: "50x720 0"
+      - series: 'elasticsearch_cluster_health_initializing_shards{exported_cluster="production-elk7-codfw", instance="logstash2037:9108", cluster="logstash"}'
+        values: "50x720 0"
+      - series: 'elasticsearch_cluster_health_active_shards{exported_cluster="production-elk7-codfw", instance="logstash2037:9108", cluster="logstash"}'
+        values: "50x720 0"
+      - series: 'elasticsearch_cluster_health_relocating_shards{exported_cluster="production-elk7-codfw", instance="logstash2037:9108", cluster="logstash"}'
+        values: "50x720 0"
+      - series: 'elasticsearch_cluster_health_active_primary_shards{exported_cluster="production-elk7-codfw", instance="logstash2037:9108", cluster="logstash"}'
+        values: "50x720 0"
+      - series: 'elasticsearch_cluster_health_delayed_unassigned_shards{exported_cluster="production-elk7-codfw", instance="logstash2037:9108", cluster="logstash"}'
+        values: "50x720 0"
+      - series: 'role_owner{instance="logstash2037:9100", cluster="logstash", team="observability"}'
+        values: "1x720 1"
+    external_labels:
+      site: codfw
+    alert_rule_test:
+      - alertname: OpensearchUnassignedOrInitializingShardsRatio
+        eval_time: 12h
+        exp_alerts:
+          - exp_labels:
+              cluster: logstash
+              exported_cluster: production-elk7-codfw
+              severity: critical
+              team: observability
+            exp_annotations:
+              description: Unassigned+Initializing shards in OpenSearch exceed the allowed ratio
+              summary: Unassigned+Initializing shards in OpenSearch exceed the allowed ratio
+              dashboard:
+                "https://grafana.wikimedia.org/d/e7d7fa18-7bc3-4548-bb07-ef261a9d3b8b/opensearch-cluster-health\
+                ?var-cluster=production-elk7-codfw"
+              runbook: https://wikitech.wikimedia.org/wiki/Runbook

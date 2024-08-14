@@ -1,0 +1,94 @@
+# deploy-tag: ops
+# deploy-site: eqiad, codfw
+
+groups:
+  - name: Opensearch
+    rules:
+      - alert: OpensearchAPIsUnreachable
+        annotations:
+          description: Opensearch API endpoint not reachable on instance {{ $labels.instance }}
+          summary: Opensearch API endpoint not reachable on instance {{ $labels.instance }}
+          dashboard:
+            "https://grafana.wikimedia.org/d/e7d7fa18-7bc3-4548-bb07-ef261a9d3b8b/opensearch-cluster-health\
+            ?var-cluster={{ $labels.exported_cluster }}"
+          runbook: https://wikitech.wikimedia.org/wiki/Runbook
+        # We are checking the up metric to infer the state of the exporter (if the exporter is down or it cannot reach the Elastic|Open-search daemon, it's an error).
+        # The joins add information to the up metrics for correctly routing alerts in Alertmanager.
+        # The last_over_time function is needed to avoid situations where these metrics are unavailable due to scraping errors. Since these metrics do not change too often over time, we simply consider the last successfully scraped occurrence as correct.
+        expr: >
+          (label_replace(
+            sum by (cluster, exported_cluster, instance) (
+              up{job="elasticsearch"}
+              * on (instance) group_left(exported_cluster)
+              max by (instance, exported_cluster) (
+                1 + last_over_time(elasticsearch_clusterinfo_version_info{exported_cluster=~"(datahub|(production-elk7-.+))"}[1d])
+              )
+            )
+          , "nodename", "$1", "instance", "(.*):.*")
+          * on(cluster, nodename) group_left(team)
+          label_replace(
+            max by(cluster, instance, team) (
+              last_over_time(role_owner[1d])
+            )
+          , "nodename", "$1", "instance", "(.*):.*"))
+           < 1
+        for: 5m
+        labels:
+          severity: warning
+
+      - &opensearch_cluster_health
+        alert: OpensearchClusterHealth
+        annotations:
+          description: Opensearch cluster health reported as {{ $labels.color }}
+          summary: Opensearch cluster health reported as {{ $labels.color }}
+          dashboard:
+            "https://grafana.wikimedia.org/d/e7d7fa18-7bc3-4548-bb07-ef261a9d3b8b/opensearch-cluster-health\
+            ?var-cluster={{ $labels.exported_cluster }}"
+          runbook: https://wikitech.wikimedia.org/wiki/Runbook
+        expr: >
+          max without (nodename) ( max (label_replace(elasticsearch_cluster_health_status{color="yellow", exported_cluster=~"(datahub|(production-elk7-.+))"}, "nodename", "$1", "instance", "(.*):.*")) by (cluster, exported_cluster, nodename, color)
+          * on(cluster, nodename) group_left(team)
+          label_replace(role_owner, "nodename", "$1", "instance", "(.*):.*"))
+          > 0
+        for: 5m
+        labels:
+          severity: warning
+
+      - <<: *opensearch_cluster_health
+        expr: >
+          max without (nodename) ( sum (label_replace(elasticsearch_cluster_health_status{color="red", exported_cluster=~"(datahub|(production-elk7-.+))"}, "nodename", "$1", "instance", "(.*):.*")) by (cluster, exported_cluster, nodename, color)
+          * on(cluster, nodename) group_left(team)
+          label_replace(role_owner, "nodename", "$1", "instance", "(.*):.*"))
+          > 0
+        for: 5m
+        labels:
+          severity: critical
+
+      - alert: OpensearchUnassignedOrInitializingShardsRatio
+        annotations:
+          description: Unassigned+Initializing shards in OpenSearch exceed the allowed ratio
+          summary: Unassigned+Initializing shards in OpenSearch exceed the allowed ratio
+          dashboard:
+            "https://grafana.wikimedia.org/d/e7d7fa18-7bc3-4548-bb07-ef261a9d3b8b/opensearch-cluster-health\
+            ?var-cluster={{ $labels.exported_cluster }}"
+          runbook: https://wikitech.wikimedia.org/wiki/Runbook
+        expr: >
+          (max by (cluster, exported_cluster, team)
+            (sum
+              (label_replace({__name__=~"elasticsearch_cluster_health_(unassigned|initializing)_shards", exported_cluster=~"(datahub|(production-elk7-.+))"}, "nodename", "$1", "instance", "(.*):.*"))
+            by (cluster, exported_cluster, nodename)
+            * on(cluster, nodename) group_left(team)
+              label_replace(role_owner, "nodename", "$1", "instance", "(.*):.*"))
+          /
+          max by (cluster, exported_cluster, team)
+            (sum
+              (label_replace({__name__=~"elasticsearch_cluster_health_(unassigned|initializing|active|relocating|active_primary|delayed_unassigned)_shards"}, "nodename", "$1", "instance", "(.*):.*"))
+            by (cluster, exported_cluster, nodename)
+            * on(cluster, nodename) group_left(team)
+              label_replace(role_owner, "nodename", "$1", "instance", "(.*):.*"))
+          ) * 100
+          > 5
+        for: 12h
+        labels:
+          severity: critical
+
