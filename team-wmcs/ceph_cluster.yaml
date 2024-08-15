@@ -64,7 +64,7 @@ groups:
           summary: "#page Ceph cluster in {{ $externalLabels.site }} is in unknown status"
           dashboard: "https://grafana.wikimedia.org/d/P1tFnn3Mk/wmcs-ceph-eqiad-health?orgId=1&search=open&tag=ceph&tag=health&tag=WMCS"
           runbook: "https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/CephClusterInUnknown"
-        expr: (something OR on() vector(1)) == 1
+        expr: (ceph_health_status{job="ceph_eqiad"} or on() vector(-1)) == -1
         for: 5m
         labels:
           severity: page
