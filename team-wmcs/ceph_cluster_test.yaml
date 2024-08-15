@@ -45,6 +45,24 @@ tests:
               runbook: "https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/CephClusterInWarning"
 
   - interval: 1m
+    input_series: []
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: CephClusterInUnknown
+        eval_time: 8m
+        exp_alerts:
+          - exp_labels:
+              team: wmcs
+              severity: page
+              service: ceph,cloudvps
+            exp_annotations:
+              description: "Unable to gather metrics from eqiad Ceph cluster, all VMs could be unusable."
+              summary: "#page Ceph cluster in eqiad is in unknown status"
+              dashboard: "https://grafana.wikimedia.org/d/P1tFnn3Mk/wmcs-ceph-eqiad-health?orgId=1&search=open&tag=ceph&tag=health&tag=WMCS"
+              runbook: "https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/CephClusterInUnknown"
+
+  - interval: 1m
     input_series:
       - series: ceph_mon_quorum_status{job="ceph_eqiad", ceph_daemon="mon.coludcephmon1001"}
         values: "1 1 0x10"
@@ -88,3 +106,4 @@ tests:
               summary: "Ceph cluster in eqiad has 5 slow ops"
               dashboard: "https://grafana.wikimedia.org/d/P1tFnn3Mk/wmcs-ceph-eqiad-health?orgId=1&search=open&tag=ceph&tag=health&tag=WMCS"
               runbook: "https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/CephSlowOps"
+
