@@ -70,10 +70,10 @@ tests:
 
   - interval: 1m
     input_series:
-      - series: 'flink_taskmanager_job_task_operator_event_process_function_events_out_total{kubernetes_namespace="mw-page-content-change-enrich", release="main", job_name="mw_page_content_change_enrich"}'
-        values: '1+100x5'
-      - series: 'flink_taskmanager_job_task_operator_event_process_function_events_in_total{kubernetes_namespace="mw-page-content-change-enrich", release="main", job_name="mw_page_content_change_enrich"}'
-        values: '1+200x5'
+      - series: 'flink_taskmanager_job_task_operator_KafkaProducer_record_send_total{job_name="mw_page_content_change_enrich", kubernetes_namespace="mw-page-content-change-enrich", operator_name="kafka__mediawiki_page_content_change_v1:_Writer", release="main"}'
+        values: '1+16x10'
+      - series: 'flink_taskmanager_job_task_operator_KafkaSourceReader_KafkaConsumer_records_consumed_total{job_name="mw_page_content_change_enrich", kubernetes_namespace="mw-page-content-change-enrich", operator_name="Source:_kafka__mediawiki_page_change_v1", release="main"}'
+        values: '1+2000x10'
     external_labels:
       site: eqiad
     alert_rule_test:
