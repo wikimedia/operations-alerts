@@ -4,7 +4,8 @@ groups:
 - name: kubernetes
   rules:
   - alert: KubernetesDeploymentUnavailableReplicas
-    expr: sum(kube_deployment_status_replicas_unavailable) by (namespace, deployment) > 0
+    # shellbox-video is expected to have non-ready pods at steady state.
+    expr: sum(kube_deployment_status_replicas_unavailable{namespace!="shellbox-video"}) by (namespace, deployment) > 0
     for: 1h
     labels:
       team: sre

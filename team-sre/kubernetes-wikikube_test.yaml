@@ -26,3 +26,14 @@ tests:
         description: "Deployment fakedeploy in namespace fakespace at site moon has had non-zero unavailable replicas (current: 3) for at least 1h"
         runbook: "https://wikitech.wikimedia.org/wiki/Kubernetes/Troubleshooting#Troubleshooting_a_deployment"
         dashboard: https://grafana.wikimedia.org/d/a260da06-259a-4ee4-9540-5cab01a246c8/kubernetes-deployment-details?var-site=moon&var-cluster=eagle&var-namespace=fakespace&var-deployment=fakedeploy
+- interval: 1m
+  input_series:
+  - series: kube_deployment_status_replicas_unavailable{namespace="shellbox-video", deployment="fakedeploy"}
+    values: "0x10 3x65"
+  external_labels:
+    site: moon
+    prometheus: eagle
+  alert_rule_test:
+  - alertname: KubernetesDeploymentUnavailableReplicas
+    eval_time: 75m
+    exp_alerts: []  # Not firing (shellbox-video is excluded)
