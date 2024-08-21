@@ -1,0 +1,17 @@
+# deploy-tag: analytics
+# deploy-site: eqiad
+
+groups:
+  - name: stat
+    rules:
+      - alert: statNodeHighLoad
+        expr: node_load15{cluster="analytics",instance=~"stat1[0-9]{3}:9100"} > 100
+        for: 1m
+        labels:
+          severity: warning
+          team: 'data-platform'
+        annotations:
+          description: 'Very high load average on {{ $labels.instance }}'
+          summary: 'Very high load average on {{ $labels.instance }} load: {{ $value }}'
+          dashboard: 'https://grafana.wikimedia.org/d/000000342/node-exporter-server-metrics?orgId=1&var-node={{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}%3A9100&var-datasource=eqiad%2Bprometheus%252Fops&var-disk_device=All&var-net_dev=All'
+          runbook: 'TODO'
