@@ -16,7 +16,7 @@ tests:
               cluster: analytics
               instance: 'stat1010:9100'
               job: node
-              severity: warning
+              severity: critical
               site: eqiad
               team: 'data-platform'
             exp_annotations:
