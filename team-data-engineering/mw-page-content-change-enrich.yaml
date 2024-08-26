@@ -54,14 +54,21 @@ groups:
         # We could also check the expression against topic metrics reported by the kafka brokers, but bookkeeping would be required if the Kafka topic config changes (e.g. kafka topic is version bumped).
         # TODO: enable linting before marking this config as ready to be deployed.
         # pint disable promql/series
-        # flink_taskmanager_job_task_operator_event_process_function_events_in_total is reported as a gauge, not as a counter
         # pint disable promql/rate
         expr: |
-          sum by (kubernetes_namespace, release, job_name) (rate(flink_taskmanager_job_task_operator_event_process_function_events_in_total{kubernetes_namespace="mw-page-content-change-enrich", release="main", job_name="mw_page_content_change_enrich"}[5m])) > 0.5 and on()
-          (
-            sum_over_time(flink_taskmanager_job_task_operator_event_process_function_events_out_total{kubernetes_namespace="mw-page-content-change-enrich", release="main", job_name="mw_page_content_change_enrich"}[5m]) /
-            sum_over_time(flink_taskmanager_job_task_operator_event_process_function_events_in_total{kubernetes_namespace="mw-page-content-change-enrich", release="main", job_name="mw_page_content_change_enrich"}[5m])
-          ) <= 0.8
+          sum by (kubernetes_namespace, release, job_name) (
+            increase(
+              flink_taskmanager_job_task_operator_KafkaProducer_record_send_total{job_name="mw_page_content_change_enrich", kubernetes_namespace="mw-page-content-change-enrich", operator_name="kafka__mediawiki_page_content_change_v1:_Writer", release="main"}[5m]
+              )
+          ) /
+          sum by (kubernetes_namespace, release, job_name) (
+            clamp_min(
+              increase(
+                flink_taskmanager_job_task_operator_KafkaSourceReader_KafkaConsumer_records_consumed_total{job_name="mw_page_content_change_enrich", kubernetes_namespace="mw-page-content-change-enrich", operator_name="Source:_kafka__mediawiki_page_change_v1", release="main"}[5m]),1e-10) ) <= 0.8
+          and on()
+          sum by (kubernetes_namespace, release, job_name) (
+            rate(
+              flink_taskmanager_job_task_operator_KafkaSourceReader_KafkaConsumer_records_consumed_total{job_name="mw_page_content_change_enrich", kubernetes_namespace="mw-page-content-change-enrich", operator_name="Source:_kafka__mediawiki_page_change_v1", release="main"}[5m])) > 5.0
         for: 5m
         labels:
           team: data-engineering
