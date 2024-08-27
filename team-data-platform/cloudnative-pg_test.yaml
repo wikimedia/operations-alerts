@@ -1,0 +1,274 @@
+rule_files:
+  - cloudnative-pg.yaml
+evaluation_interval: 1m
+tests:
+
+  # The cloudnative-pg operator pod is running
+  - input_series:
+    - series: kube_deployment_status_replicas_available{deployment="cloudnative-pg", namespace="cloudnative-pg-operator"}
+      values: '1'
+    alert_rule_test:
+    - alertname: CloudnativePGPodUnavailable
+      exp_alerts: []
+
+  # The cloudnative-pg operator pod is not running
+  - input_series:
+    - series: kube_deployment_status_replicas_available{deployment="cloudnative-pg", namespace="cloudnative-pg-operator"}
+      values: '0'
+    alert_rule_test:
+    - alertname: CloudnativePGPodUnavailable
+      exp_alerts:
+      - exp_annotations:
+          description: 'The cloudnative-pg-operator pod is not running'
+          summary: 'The cloudnative-pg-operator pod is not running'
+          dashboard: "https://grafana.wikimedia.org/d/cloudnative-pg/cloudnativepg?forceLogin=&from=now-15m&orgId=1&refresh=30s&to=now&var-DS_PROMETHEUS=eqiad%2Bprometheus%252Fk8s-dse&var-operatorNamespace=cloudnative-pg-operator"
+          runbook: "https://wikitech.wikimedia.org/wiki/Data_Platform/Systems/CloudnativePG#How_we_deploy_it"
+        exp_labels:
+          namespace: cloudnative-pg-operator
+          deployment: cloudnative-pg
+          severity: warning
+          team: data-platform
+
+  # The PG server is at 10% connection usage
+  - input_series:
+    - series: cnpg_backends_total{cnpg_io_cluster="postgresql-test", kubernetes_namespace="postgresql-test", kubernetes_pod_name="postgresql-test-1", cnpg_io_podRole="instance"}
+      values: 10
+    - series: cnpg_pg_settings_setting{cnpg_io_cluster="postgresql-test", kubernetes_namespace="postgresql-test", kubernetes_pod_name="postgresql-test-1", name="max_connections"}
+      values: 100
+    alert_rule_test:
+    - alertname: CloudnativePGConnectionCountIsHighWarning
+      eval_time: 5m
+      exp_alerts: []
+
+  # The PG server is at 85% connection usage
+  - input_series:
+    - series: cnpg_backends_total{cnpg_io_cluster="postgresql-test", kubernetes_namespace="postgresql-test", kubernetes_pod_name="postgresql-test-1", cnpg_io_podRole="instance"}
+      values: 85
+    - series: cnpg_pg_settings_setting{cnpg_io_cluster="postgresql-test", kubernetes_namespace="postgresql-test", kubernetes_pod_name="postgresql-test-1", name="max_connections"}
+      values: 100
+    alert_rule_test:
+    - alertname: CloudnativePGConnectionCountIsHighWarning
+      eval_time: 5m
+      exp_alerts:
+      - exp_annotations:
+          description: 'High number of connection on PG cluster postgresql-test.postgresql-test'
+          summary: 'High number of connection on PG cluster postgresql-test.postgresql-test'
+          dashboard: "https://grafana.wikimedia.org/d/cloudnative-pg/cloudnativepg?forceLogin=&from=now-15m&orgId=1&refresh=30s&to=now&var-DS_PROMETHEUS=eqiad%2Bprometheus%252Fk8s-dse&var-cluster=postgresql-test&var-instances=All&var-namespace=postgresql-test&var-operatorNamespace=cloudnative-pg-operator"
+          runbook: "https://wikitech.wikimedia.org/wiki/Data_Platform/Systems/CloudnativePG/Clusters#Increasing_the_max_number_of_connections_on_PostgreSQL"
+        exp_labels:
+          kubernetes_namespace: postgresql-test
+          kubernetes_pod_name: postgresql-test-1
+          cnpg_io_cluster: postgresql-test
+          severity: warning
+          team: data-platform
+
+  # The PG server is at 93% connection usage
+  - input_series:
+    - series: cnpg_backends_total{cnpg_io_cluster="postgresql-test", kubernetes_namespace="postgresql-test", kubernetes_pod_name="postgresql-test-1", cnpg_io_podRole="instance"}
+      values: 93
+    - series: cnpg_pg_settings_setting{cnpg_io_cluster="postgresql-test", kubernetes_namespace="postgresql-test", kubernetes_pod_name="postgresql-test-1", name="max_connections"}
+      values: 100
+    alert_rule_test:
+    - alertname: CloudnativePGConnectionCountIsHighCritical
+      eval_time: 5m
+      exp_alerts:
+      - exp_annotations:
+          description: 'High number of connection on PG cluster postgresql-test.postgresql-test'
+          summary: 'High number of connection on PG cluster postgresql-test.postgresql-test'
+          dashboard: "https://grafana.wikimedia.org/d/cloudnative-pg/cloudnativepg?forceLogin=&from=now-15m&orgId=1&refresh=30s&to=now&var-DS_PROMETHEUS=eqiad%2Bprometheus%252Fk8s-dse&var-cluster=postgresql-test&var-instances=All&var-namespace=postgresql-test&var-operatorNamespace=cloudnative-pg-operator"
+          runbook: "https://wikitech.wikimedia.org/wiki/Data_Platform/Systems/CloudnativePG/Clusters#Increasing_the_max_number_of_connections_on_PostgreSQL"
+        exp_labels:
+          kubernetes_namespace: postgresql-test
+          kubernetes_pod_name: postgresql-test-1
+          cnpg_io_cluster: postgresql-test
+          severity: critical
+          team: data-platform
+
+  # Both replicas are up
+  - input_series:
+    - series: cnpg_pg_replication_streaming_replicas{cnpg_io_cluster="postgresql-test", kubernetes_namespace="postgresql-test", kubernetes_pod_name="postgresql-test-1", cnpg_io_instanceRole="primary"}
+      values: 2
+    - series: cnpg_pg_replication_is_wal_receiver_up{cnpg_io_cluster="postgresql-test", kubernetes_namespace="postgresql-test", kubernetes_pod_name="postgresql-test-2", cnpg_io_instanceRole="replica"}
+      values: 1
+    - series: cnpg_pg_replication_is_wal_receiver_up{cnpg_io_cluster="postgresql-test", kubernetes_namespace="postgresql-test", kubernetes_pod_name="postgresql-test-3", cnpg_io_instanceRole="replica"}
+      values: 1
+    alert_rule_test:
+    - alertname: CloudnativePGNoReplicaCritical
+      eval_time: 5m
+      exp_alerts: []
+
+  # No replica is lagging
+  - input_series:
+    - series: cnpg_pg_replication_lag{cnpg_io_cluster="postgresql-test", kubernetes_namespace="postgresql-test", kubernetes_pod_name="postgresql-test-2", cnpg_io_instanceRole="replica"}
+      values: 0
+    - series: cnpg_pg_replication_lag{cnpg_io_cluster="postgresql-test", kubernetes_namespace="postgresql-test", kubernetes_pod_name="postgresql-test-2", cnpg_io_instanceRole="replica"}
+      values: 0
+    alert_rule_test:
+    - alertname: CloudnativePGReplicationLagWarning
+      eval_time: 5m
+      exp_alerts: []
+
+  # One replica is lagging
+  - input_series:
+    - series: cnpg_pg_replication_lag{cnpg_io_cluster="postgresql-test", kubernetes_namespace="postgresql-test", kubernetes_pod_name="postgresql-test-2", cnpg_io_instanceRole="replica"}
+      values: 0
+    - series: cnpg_pg_replication_lag{cnpg_io_cluster="postgresql-test", kubernetes_namespace="postgresql-test", kubernetes_pod_name="postgresql-test-3", cnpg_io_instanceRole="replica"}
+      values: 800
+    alert_rule_test:
+    - alertname: CloudnativePGReplicationLagWarning
+      eval_time: 5m
+      exp_alerts:
+      - exp_annotations:
+          description: 'PG cluster postgresql-test.postgresql-test has a lagging replica: postgresql-test-3'
+          summary: 'PG cluster postgresql-test.postgresql-test has a lagging replica: postgresql-test-3'
+          dashboard: "https://grafana.wikimedia.org/d/cloudnative-pg/cloudnativepg?forceLogin=&from=now-15m&orgId=1&refresh=30s&to=now&var-DS_PROMETHEUS=eqiad%2Bprometheus%252Fk8s-dse&var-cluster=postgresql-test&var-instances=All&var-namespace=postgresql-test&var-operatorNamespace=cloudnative-pg-operator"
+          runbook: "TODO"
+        exp_labels:
+          kubernetes_namespace: postgresql-test
+          kubernetes_pod_name: postgresql-test-3
+          cnpg_io_cluster: postgresql-test
+          severity: warning
+          team: data-platform
+
+  # One replica is critically lagging
+  - input_series:
+    - series: cnpg_pg_replication_lag{cnpg_io_cluster="postgresql-test", kubernetes_namespace="postgresql-test", kubernetes_pod_name="postgresql-test-2", cnpg_io_instanceRole="replica"}
+      values: 0
+    - series: cnpg_pg_replication_lag{cnpg_io_cluster="postgresql-test", kubernetes_namespace="postgresql-test", kubernetes_pod_name="postgresql-test-3", cnpg_io_instanceRole="replica"}
+      values: 1300
+    alert_rule_test:
+    - alertname: CloudnativePGReplicationLagCritical
+      eval_time: 5m
+      exp_alerts:
+      - exp_annotations:
+          description: 'PG cluster postgresql-test.postgresql-test has a lagging replica: postgresql-test-3'
+          summary: 'PG cluster postgresql-test.postgresql-test has a lagging replica: postgresql-test-3'
+          dashboard: "https://grafana.wikimedia.org/d/cloudnative-pg/cloudnativepg?forceLogin=&from=now-15m&orgId=1&refresh=30s&to=now&var-DS_PROMETHEUS=eqiad%2Bprometheus%252Fk8s-dse&var-cluster=postgresql-test&var-instances=All&var-namespace=postgresql-test&var-operatorNamespace=cloudnative-pg-operator"
+          runbook: "TODO"
+        exp_labels:
+          kubernetes_namespace: postgresql-test
+          kubernetes_pod_name: postgresql-test-3
+          cnpg_io_cluster: postgresql-test
+          severity: critical
+          team: data-platform
+
+  # Each pod is deployed on a different node
+  - input_series:
+    - series: kube_pod_info{created_by_kind="Cluster", job="k8s-pods", node="testnode1001.eqiad.wmnet", kubernetes_namespace="postgresql-test", created_by_name="postgresql-test"}
+      values: 1
+    - series: kube_pod_info{created_by_kind="Cluster", job="k8s-pods", node="testnode1002.eqiad.wmnet", kubernetes_namespace="postgresql-test", created_by_name="postgresql-test"}
+      values: 1
+    - series: kube_pod_info{created_by_kind="Cluster", job="k8s-pods", node="testnode1003.eqiad.wmnet", kubernetes_namespace="postgresql-test", created_by_name="postgresql-test"}
+      values: 1
+    alert_rule_test:
+    - alertname: CloudnativePGReplicationLagCritical
+      eval_time: 5m
+      exp_alerts: []
+
+  # A PVC has 80% avaible space
+  - input_series:
+    - series: kubelet_volume_stats_capacity_bytes{persistentvolumeclaim="postgresql-test-1", namespace="postgresql-test"}
+      values: 1000000000 # 1GB
+    - series: kubelet_volume_stats_available_bytes{persistentvolumeclaim="postgresql-test-1", namespace="postgresql-test"}
+      values: 800000000 # 800MB
+    alert_rule_test:
+    - alertname: CloudnativePGLowDiskSpaceWarning
+      eval_time: 5m
+      exp_alerts: []
+
+  # A PVC has 15% avaible space
+  - input_series:
+    - series: kubelet_volume_stats_capacity_bytes{persistentvolumeclaim="postgresql-test-1", namespace="postgresql-test"}
+      values: 1000000000 # 1GB
+    - series: kubelet_volume_stats_available_bytes{persistentvolumeclaim="postgresql-test-1", namespace="postgresql-test"}
+      values: 150000000 # 150MB
+    alert_rule_test:
+    - alertname: CloudnativePGLowDiskSpaceWarning
+      eval_time: 5m
+      exp_alerts:
+      - exp_annotations:
+          description: 'postgresql-test-1.postgresql-test has low available disk space'
+          summary: 'postgresql-test-1.postgresql-test has low available disk space'
+          dashboard: "https://grafana.wikimedia.org/d/cloudnative-pg/cloudnativepg?forceLogin=&from=now-15m&orgId=1&refresh=30s&to=now&var-DS_PROMETHEUS=eqiad%2Bprometheus%252Fk8s-dse&var-instances=postgresql-test-1&var-namespace=postgresql-test&var-operatorNamespace=cloudnative-pg-operator"
+          runbook: "https://wikitech.wikimedia.org/wiki/Data_Platform/Systems/CloudnativePG/Clusters#Increasing_the_storage_size_of_a_cluster"
+        exp_labels:
+          namespace: postgresql-test
+          persistentvolumeclaim: postgresql-test-1
+          severity: warning
+          team: data-platform
+
+  # A PVC has <10% avaible space
+  - input_series:
+    - series: kubelet_volume_stats_capacity_bytes{persistentvolumeclaim="postgresql-test-1", namespace="postgresql-test"}
+      values: 1000000000 # 1GB
+    - series: kubelet_volume_stats_available_bytes{persistentvolumeclaim="postgresql-test-1", namespace="postgresql-test"}
+      values: 80000000 # 80MB
+    alert_rule_test:
+    - alertname: CloudnativePGLowDiskSpaceCritical
+      eval_time: 5m
+      exp_alerts:
+      - exp_annotations:
+          description: 'postgresql-test-1.postgresql-test has low available disk space'
+          summary: 'postgresql-test-1.postgresql-test has low available disk space'
+          dashboard: "https://grafana.wikimedia.org/d/cloudnative-pg/cloudnativepg?forceLogin=&from=now-15m&orgId=1&refresh=30s&to=now&var-DS_PROMETHEUS=eqiad%2Bprometheus%252Fk8s-dse&var-instances=postgresql-test-1&var-namespace=postgresql-test&var-operatorNamespace=cloudnative-pg-operator"
+          runbook: "https://wikitech.wikimedia.org/wiki/Data_Platform/Systems/CloudnativePG/Clusters#Increasing_the_storage_size_of_a_cluster"
+        exp_labels:
+          namespace: postgresql-test
+          persistentvolumeclaim: postgresql-test-1
+          severity: critical
+          team: data-platform
+
+ # No replica is lagging
+  - input_series:
+    - series: cnpg_pg_stat_archiver_seconds_since_last_archival{cnpg_io_cluster="postgresql-test", kubernetes_namespace="postgresql-test", kubernetes_pod_name="postgresql-test-2"}
+      values: 30
+    - series: cnpg_pg_stat_archiver_seconds_since_last_archival{cnpg_io_cluster="postgresql-test", kubernetes_namespace="postgresql-test", kubernetes_pod_name="postgresql-test-3"}
+      values: 60
+    alert_rule_test:
+    - alertname: CloudnativePGLastArchiveAgeTooHighWarning
+      eval_time: 5m
+      exp_alerts: []
+
+  # One replica is lagging behind WAL uploads
+  - input_series:
+    - series: cnpg_pg_stat_archiver_seconds_since_last_archival{cnpg_io_cluster="postgresql-test", kubernetes_namespace="postgresql-test", kubernetes_pod_name="postgresql-test-2"}
+      values: 30
+    - series: cnpg_pg_stat_archiver_seconds_since_last_archival{cnpg_io_cluster="postgresql-test", kubernetes_namespace="postgresql-test", kubernetes_pod_name="postgresql-test-3"}
+      values: 1200
+    alert_rule_test:
+    - alertname: CloudnativePGLastArchiveAgeTooHighWarning
+      eval_time: 5m
+      exp_alerts:
+      - exp_annotations:
+          description: 'postgresql-test-3.postgresql-test is not archiving WALs'
+          summary: 'postgresql-test-3.postgresql-test is not archiving WALs'
+          dashboard: "https://grafana.wikimedia.org/d/cloudnative-pg/cloudnativepg?forceLogin=&from=now-15m&orgId=1&refresh=30s&to=now&var-DS_PROMETHEUS=eqiad%2Bprometheus%252Fk8s-dse&var-cluster=postgresql-test&var-instances=All&var-namespace=postgresql-test&var-operatorNamespace=cloudnative-pg-operator"
+          runbook: "TODO"
+        exp_labels:
+          kubernetes_namespace: postgresql-test
+          kubernetes_pod_name: postgresql-test-3
+          cnpg_io_cluster: postgresql-test
+          severity: warning
+          team: data-platform
+
+  # One replica is critically behind WAL uploads
+  - input_series:
+    - series: cnpg_pg_stat_archiver_seconds_since_last_archival{cnpg_io_cluster="postgresql-test", kubernetes_namespace="postgresql-test", kubernetes_pod_name="postgresql-test-2"}
+      values: 0
+    - series: cnpg_pg_stat_archiver_seconds_since_last_archival{cnpg_io_cluster="postgresql-test", kubernetes_namespace="postgresql-test", kubernetes_pod_name="postgresql-test-3"}
+      values: 4000
+    alert_rule_test:
+    - alertname: CloudnativePGLastArchiveAgeTooHighCritical
+      eval_time: 5m
+      exp_alerts:
+      - exp_annotations:
+          description: 'postgresql-test-3.postgresql-test is not archiving WALs'
+          summary: 'postgresql-test-3.postgresql-test is not archiving WALs'
+          dashboard: "https://grafana.wikimedia.org/d/cloudnative-pg/cloudnativepg?forceLogin=&from=now-15m&orgId=1&refresh=30s&to=now&var-DS_PROMETHEUS=eqiad%2Bprometheus%252Fk8s-dse&var-cluster=postgresql-test&var-instances=All&var-namespace=postgresql-test&var-operatorNamespace=cloudnative-pg-operator"
+          runbook: "TODO"
+        exp_labels:
+          kubernetes_namespace: postgresql-test
+          kubernetes_pod_name: postgresql-test-3
+          cnpg_io_cluster: postgresql-test
+          severity: critical
+          team: data-platform

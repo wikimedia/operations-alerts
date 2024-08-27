@@ -1,0 +1,137 @@
+# deploy-tag: k8s-dse
+# deploy-site: eqiad
+
+groups:
+  - name: cloudnative-pg
+    rules:
+
+    - alert: CloudnativePGPodUnavailable
+      annotations:
+        description: 'The cloudnative-pg-operator pod is not running'
+        summary: 'The cloudnative-pg-operator pod is not running'
+        dashboard: "https://grafana.wikimedia.org/d/cloudnative-pg/cloudnativepg?forceLogin=&from=now-15m&orgId=1&refresh=30s&to=now&var-DS_PROMETHEUS=eqiad%2Bprometheus%252Fk8s-dse&var-operatorNamespace=cloudnative-pg-operator"
+        runbook: "https://wikitech.wikimedia.org/wiki/Data_Platform/Systems/CloudnativePG#How_we_deploy_it"
+      expr: kube_deployment_status_replicas_available{deployment="cloudnative-pg", namespace="cloudnative-pg-operator"} < 1
+      labels:
+        severity: warning
+        team: data-platform
+
+    - alert: CloudnativePGConnectionCountIsHighWarning
+      annotations:
+        description: 'High number of connection on PG cluster {{$labels.cnpg_io_cluster}}.{{$labels.kubernetes_namespace}}'
+        summary: 'High number of connection on PG cluster {{$labels.cnpg_io_cluster}}.{{$labels.kubernetes_namespace}}'
+        dashboard: "https://grafana.wikimedia.org/d/cloudnative-pg/cloudnativepg?forceLogin=&from=now-15m&orgId=1&refresh=30s&to=now&var-DS_PROMETHEUS=eqiad%2Bprometheus%252Fk8s-dse&var-cluster={{$labels.cnpg_io_cluster}}&var-instances=All&var-namespace={{$labels.kubernetes_namespace}}&var-operatorNamespace=cloudnative-pg-operator"
+        runbook: "https://wikitech.wikimedia.org/wiki/Data_Platform/Systems/CloudnativePG/Clusters#Increasing_the_max_number_of_connections_on_PostgreSQL"
+      expr: sum by (cnpg_io_cluster, kubernetes_namespace, kubernetes_pod_name) (cnpg_backends_total{cnpg_io_podRole="instance"}) /  max by (kubernetes_namespace, kubernetes_pod_name, cnpg_io_cluster) (cnpg_pg_settings_setting{name="max_connections"}) * 100 > 80
+      for: 5m
+      labels:
+        severity: warning
+        team: data-platform
+
+    - alert: CloudnativePGConnectionCountIsHighCritical
+      annotations:
+        description: 'High number of connection on PG cluster {{$labels.cnpg_io_cluster}}.{{$labels.kubernetes_namespace}}'
+        summary: 'High number of connection on PG cluster {{$labels.cnpg_io_cluster}}.{{$labels.kubernetes_namespace}}'
+        dashboard: "https://grafana.wikimedia.org/d/cloudnative-pg/cloudnativepg?forceLogin=&from=now-15m&orgId=1&refresh=30s&to=now&var-DS_PROMETHEUS=eqiad%2Bprometheus%252Fk8s-dse&var-cluster={{$labels.cnpg_io_cluster}}&var-instances=All&var-namespace={{$labels.kubernetes_namespace}}&var-operatorNamespace=cloudnative-pg-operator"
+        runbook: "https://wikitech.wikimedia.org/wiki/Data_Platform/Systems/CloudnativePG/Clusters#Increasing_the_max_number_of_connections_on_PostgreSQL"
+      expr: sum by (cnpg_io_cluster, kubernetes_namespace, kubernetes_pod_name) (cnpg_backends_total{cnpg_io_podRole="instance"}) /  max by (kubernetes_namespace, kubernetes_pod_name, cnpg_io_cluster) (cnpg_pg_settings_setting{name="max_connections"}) * 100 > 90
+      for: 5m
+      labels:
+        severity: critical
+        team: data-platform
+
+    - alert: CloudnativePGNoReplicaCritical
+      annotations:
+        description: 'PG cluster {{$labels.cnpg_io_cluster}}.{{$labels.kubernetes_namespace}} has no standby replicas'
+        summary: 'PG cluster {{$labels.cnpg_io_cluster}}.{{$labels.kubernetes_namespace}} has no standby replicas'
+        dashboard: "https://grafana.wikimedia.org/d/cloudnative-pg/cloudnativepg?forceLogin=&from=now-15m&orgId=1&refresh=30s&to=now&var-DS_PROMETHEUS=eqiad%2Bprometheus%252Fk8s-dse&var-cluster={{$labels.cnpg_io_cluster}}&var-instances=All&var-namespace={{$labels.kubernetes_namespace}}&var-operatorNamespace=cloudnative-pg-operator"
+        runbook: "TODO"
+      expr:  (max by (cnpg_io_cluster, kubernetes_namespace) (cnpg_pg_replication_streaming_replicas{cnpg_io_instanceRole="primary"}) - sum by (kubernetes_namespace, cnpg_io_cluster) (cnpg_pg_replication_is_wal_receiver_up{cnpg_io_instanceRole="replica"})) > 0
+      for: 5m
+      labels:
+        severity: critical
+        team: data-platform
+
+    - alert: CloudnativePGReplicationLagWarning
+      annotations:
+        description: 'PG cluster {{$labels.cnpg_io_cluster}}.{{$labels.kubernetes_namespace}} has a lagging replica: {{$labels.kubernetes_pod_name}}'
+        summary: 'PG cluster {{$labels.cnpg_io_cluster}}.{{$labels.kubernetes_namespace}} has a lagging replica: {{$labels.kubernetes_pod_name}}'
+        dashboard: "https://grafana.wikimedia.org/d/cloudnative-pg/cloudnativepg?forceLogin=&from=now-15m&orgId=1&refresh=30s&to=now&var-DS_PROMETHEUS=eqiad%2Bprometheus%252Fk8s-dse&var-cluster={{$labels.cnpg_io_cluster}}&var-instances=All&var-namespace={{$labels.kubernetes_namespace}}&var-operatorNamespace=cloudnative-pg-operator"
+        runbook: "TODO"
+      expr: max by (cnpg_io_cluster, kubernetes_namespace, kubernetes_pod_name) (cnpg_pg_replication_lag{cnpg_io_instanceRole="replica"}) * 1000 > 500
+      for: 5m
+      labels:
+        severity: warning
+        team: data-platform
+
+    - alert: CloudnativePGReplicationLagCritical
+      annotations:
+        description: 'PG cluster {{$labels.cnpg_io_cluster}}.{{$labels.kubernetes_namespace}} has a lagging replica: {{$labels.kubernetes_pod_name}}'
+        summary: 'PG cluster {{$labels.cnpg_io_cluster}}.{{$labels.kubernetes_namespace}} has a lagging replica: {{$labels.kubernetes_pod_name}}'
+        dashboard: "https://grafana.wikimedia.org/d/cloudnative-pg/cloudnativepg?forceLogin=&from=now-15m&orgId=1&refresh=30s&to=now&var-DS_PROMETHEUS=eqiad%2Bprometheus%252Fk8s-dse&var-cluster={{$labels.cnpg_io_cluster}}&var-instances=All&var-namespace={{$labels.kubernetes_namespace}}&var-operatorNamespace=cloudnative-pg-operator"
+        runbook: "TODO"
+      expr: max by (cnpg_io_cluster, kubernetes_namespace, kubernetes_pod_name) (cnpg_pg_replication_lag{cnpg_io_instanceRole="replica"}) * 1000 > 1200
+      for: 5m
+      labels:
+        severity: critical
+        team: data-platform
+
+    - alert: CloudnativePGPodsOfSameClusterOnSameNode
+      annotations:
+        description: 'PG cluster {{$labels.cnpg_io_cluster}}.{{$labels.kubernetes_namespace}} has more than one pod per node'
+        summary: 'PG cluster {{$labels.cnpg_io_cluster}}.{{$labels.kubernetes_namespace}} has more than one pod per node'
+        dashboard: "https://grafana.wikimedia.org/d/cloudnative-pg/cloudnativepg?forceLogin=&from=now-15m&orgId=1&refresh=30s&to=now&var-DS_PROMETHEUS=eqiad%2Bprometheus%252Fk8s-dse&var-cluster={{$labels.cnpg_io_cluster}}&var-instances=All&var-namespace={{$labels.kubernetes_namespace}}&var-operatorNamespace=cloudnative-pg-operator"
+        runbook: "TODO"
+      expr: max by (node, kubernetes_namespace, cnpg_io_cluster) (max without(created_by_name) (label_replace(kube_pod_info{created_by_kind="Cluster", job="k8s-pods"}, "cnpg_io_cluster", "$1", "created_by_name", "(.+)"))) > 1
+      for: 5m
+      labels:
+        severity: warning
+        team: data-platform
+
+    - alert: CloudnativePGLowDiskSpaceWarning
+      annotations:
+        description: '{{$labels.persistentvolumeclaim}}.{{$labels.namespace}} has low available disk space'
+        summary: '{{$labels.persistentvolumeclaim}}.{{$labels.namespace}} has low available disk space'
+        dashboard: "https://grafana.wikimedia.org/d/cloudnative-pg/cloudnativepg?forceLogin=&from=now-15m&orgId=1&refresh=30s&to=now&var-DS_PROMETHEUS=eqiad%2Bprometheus%252Fk8s-dse&var-instances={{$labels.persistentvolumeclaim}}&var-namespace={{$labels.namespace}}&var-operatorNamespace=cloudnative-pg-operator"
+        runbook: "https://wikitech.wikimedia.org/wiki/Data_Platform/Systems/CloudnativePG/Clusters#Increasing_the_storage_size_of_a_cluster"
+      expr: max by(namespace, persistentvolumeclaim) (1 - kubelet_volume_stats_available_bytes{persistentvolumeclaim=~"postgresql.*"} / kubelet_volume_stats_capacity_bytes{persistentvolumeclaim=~"postgresql.*"} ) * 100 > 80
+      for: 5m
+      labels:
+        severity: warning
+        team: data-platform
+
+    - alert: CloudnativePGLowDiskSpaceCritical
+      annotations:
+        description: '{{$labels.persistentvolumeclaim}}.{{$labels.namespace}} has low available disk space'
+        summary: '{{$labels.persistentvolumeclaim}}.{{$labels.namespace}} has low available disk space'
+        dashboard: "https://grafana.wikimedia.org/d/cloudnative-pg/cloudnativepg?forceLogin=&from=now-15m&orgId=1&refresh=30s&to=now&var-DS_PROMETHEUS=eqiad%2Bprometheus%252Fk8s-dse&var-instances={{$labels.persistentvolumeclaim}}&var-namespace={{$labels.namespace}}&var-operatorNamespace=cloudnative-pg-operator"
+        runbook: "https://wikitech.wikimedia.org/wiki/Data_Platform/Systems/CloudnativePG/Clusters#Increasing_the_storage_size_of_a_cluster"
+      expr: max by(namespace, persistentvolumeclaim) (1 - kubelet_volume_stats_available_bytes{persistentvolumeclaim=~"postgresql.*"} / kubelet_volume_stats_capacity_bytes{persistentvolumeclaim=~"postgresql.*"} ) * 100 > 90
+      for: 5m
+      labels:
+        severity: critical
+        team: data-platform
+
+    - alert: CloudnativePGLastArchiveAgeTooHighWarning
+      annotations:
+        description: '{{$labels.kubernetes_pod_name}}.{{$labels.kubernetes_namespace}} is not archiving WALs'
+        summary: '{{$labels.kubernetes_pod_name}}.{{$labels.kubernetes_namespace}} is not archiving WALs'
+        dashboard: "https://grafana.wikimedia.org/d/cloudnative-pg/cloudnativepg?forceLogin=&from=now-15m&orgId=1&refresh=30s&to=now&var-DS_PROMETHEUS=eqiad%2Bprometheus%252Fk8s-dse&var-cluster={{$labels.cnpg_io_cluster}}&var-instances=All&var-namespace={{$labels.kubernetes_namespace}}&var-operatorNamespace=cloudnative-pg-operator"
+        runbook: "TODO"
+      expr: max by (cnpg_io_cluster, kubernetes_namespace, kubernetes_pod_name) (cnpg_pg_stat_archiver_seconds_since_last_archival) > 900
+      for: 5m
+      labels:
+        severity: warning
+        team: data-platform
+
+    - alert: CloudnativePGLastArchiveAgeTooHighCritical
+      annotations:
+        description: '{{$labels.kubernetes_pod_name}}.{{$labels.kubernetes_namespace}} is not archiving WALs'
+        summary: '{{$labels.kubernetes_pod_name}}.{{$labels.kubernetes_namespace}} is not archiving WALs'
+        dashboard: "https://grafana.wikimedia.org/d/cloudnative-pg/cloudnativepg?forceLogin=&from=now-15m&orgId=1&refresh=30s&to=now&var-DS_PROMETHEUS=eqiad%2Bprometheus%252Fk8s-dse&var-cluster={{$labels.cnpg_io_cluster}}&var-instances=All&var-namespace={{$labels.kubernetes_namespace}}&var-operatorNamespace=cloudnative-pg-operator"
+        runbook: "TODO"
+      expr: max by (cnpg_io_cluster, kubernetes_namespace, kubernetes_pod_name) (cnpg_pg_stat_archiver_seconds_since_last_archival) > 3600
+      for: 5m
+      labels:
+        severity: critical
+        team: data-platform
