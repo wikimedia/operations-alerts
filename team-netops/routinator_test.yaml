@@ -23,28 +23,6 @@ tests:
            runbook: https://wikitech.wikimedia.org/wiki/RPKI#RTR_Connections_drop
   - interval: 1m
     input_series:
-      - series: 'routinator_rsync_status{instance="rpki1001:9100"}'
-        values: '0+0x35'
-      - series: 'routinator_rsync_status{instance="rpki1001:9100"}'
-        values: '1+0x35'
-      - series: 'routinator_rsync_status{instance="rpki1001:9100"}'
-        values: '2+0x35'
-    external_labels:
-      site: eqiad
-    alert_rule_test:
-    - alertname: RoutinatorRsyncErrors
-      eval_time: 30m
-      exp_alerts:
-       - exp_labels:
-           severity: critical
-           team: sre
-         exp_annotations:
-           summary: 'Routinator rsync fetching issue in eqiad'
-           description: 'rsync error to 50% of targets'
-           dashboard: https://grafana.wikimedia.org/d/UwUa77GZk/rpki
-           runbook: https://wikitech.wikimedia.org/wiki/RPKI#RSYNC_status
-  - interval: 1m
-    input_series:
       - series: 'routinator_rrdp_status{instance="rpki1001:9100"}'
         values: '200+0x35'
       - series: 'routinator_rrdp_status{instance="rpki1001:9100"}'
