@@ -22,7 +22,8 @@ groups:
         runbook: https://wikitech.wikimedia.org/wiki/MariaDB/troubleshooting#Depooling_a_replica
         dashboard: https://grafana.wikimedia.org/d/000000273/mysql?orgId=1&refresh=1m&var-job=All&var-server={{ $labels.instance | reReplaceAll ":.*" "" }}&var-port={{ $labels.instance | reReplaceAll ".*:" "" }}
         summary: MySQL instance {{$labels.instance}} has replication issues.
-      expr: mysql_slave_status_slave_sql_running{role="slave"} + mysql_slave_status_slave_io_running{role="slave"} < 2
+      expr: mysql_slave_status_slave_sql_running{role="slave", instance!~".*:133.*"} + mysql_slave_status_slave_io_running{role="slave", instance!~".*:133.*"} < 2
+      # instance!~".*:133.*" comes from https://phabricator.wikimedia.org/T372991
       for: 50m
       labels:
         severity: critical
