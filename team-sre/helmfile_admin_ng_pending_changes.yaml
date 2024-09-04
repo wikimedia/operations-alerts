@@ -4,14 +4,14 @@
 groups:
   - name: helmfile_admin_ng_pending_changes
     rules:
-    - alert: HelmfileAdminNGPendingChangesDseEqiad
+    - alert: HelmfileAdminNGPendingChanges
       annotations:
-        description: 'Pending admin_ng changes on dse-k8s-eqiad'
-        summary: 'Pending admin_ng changes on dse-k8s-eqiad'
+        description: 'Pending admin_ng changes on {{ $labels.exported_cluster }}'
+        summary: 'Pending admin_ng changes on {{ $labels.exported_cluster }}'
         dashboard: "https://grafana.wikimedia.org/d/d15d3135-ff1c-4c6f-bebe-ee57b136df70/helmfile-admin-ng-pending-changes?orgId=1&var-kubernetes_cluster={{ $labels.exported_cluster }}"
         runbook: "https://wikitech.wikimedia.org/wiki/Kubernetes/Add_a_new_service#Deploy_changes_to_helmfile.d%2Fadmin_ng"
-      expr: helmfile_admin_ng_pending_changes{exported_cluster="dse-k8s-eqiad"} > 0
+      expr: helmfile_admin_ng_pending_changes{exported_cluster!="dse-k8s-eqiad"} > 0
       for: 1d
       labels:
         severity: warning
-        team: data-platform
+        team: sre
