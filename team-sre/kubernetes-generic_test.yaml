@@ -30,6 +30,8 @@ tests:
     values: "1+1x16"
   - series: 'apiserver_request_duration_seconds_bucket{verb="GET", resource="shoes", le="+0.6"}'
     values: "0+0x16"
+  - series: 'kube_node_spec_unschedulable{node="kubefakenode"}'
+    values: "1x1440"
   external_labels:
     site: moon
     prometheus: eagle
@@ -130,3 +132,16 @@ tests:
         summary: "High Kubernetes API latency (GET shoes) on eagle@moon"
         runbook: "https://wikitech.wikimedia.org/wiki/Kubernetes"
         dashboard: "https://grafana.wikimedia.org/d/ddNd-sLnk/kubernetes-api-details?var-site=moon&var-cluster=eagle&var-latency_percentile=0.95&var-verb=GET"
+
+  - alertname: KubernetesWorkerUnschedulable
+    eval_time: 24h
+    exp_alerts:
+    - exp_labels:
+        team: sre
+        severity: warning
+        node: kubefakenode
+      exp_annotations:
+        description: "Kubernetes worker kubefakenode has been unschedulable for >= 24h eagle@moon"
+        summary: "Kubernetes worker kubefakenode has been unschedulable for >= 24h eagle@moon"
+        runbook: "https://wikitech.wikimedia.org/wiki/Kubernetes"
+        dashboard: "https://grafana.wikimedia.org/d/G8zPL7-Wz/kubernetes-node?orgId=1&var-dc=moon%20prometheus%2Feagle&var-instance=kubefakenode"

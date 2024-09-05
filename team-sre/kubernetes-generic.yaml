@@ -78,6 +78,18 @@ groups:
       runbook: "https://wikitech.wikimedia.org/wiki/Kubernetes"
       dashboard: "https://grafana.wikimedia.org/d/ddNd-sLnk/kubernetes-api-details?var-site={{ $externalLabels.site }}&var-cluster={{ $externalLabels.prometheus }}&var-latency_percentile=0.95&var-verb={{ $labels.verb }}"
 
+  - alert: KubernetesWorkerUnschedulable
+    expr: sum by (node) (kube_node_spec_unschedulable) > 0
+    for: 24h
+    labels:
+      team: sre
+      severity: warning
+    annotations:
+      description: "Kubernetes worker {{ $labels.node }} has been unschedulable for >= 24h {{ $externalLabels.prometheus }}@{{ $externalLabels.site }}"
+      summary: "Kubernetes worker {{ $labels.node }} has been unschedulable for >= 24h {{ $externalLabels.prometheus }}@{{ $externalLabels.site }}"
+      runbook: "https://wikitech.wikimedia.org/wiki/Kubernetes"
+      dashboard: "https://grafana.wikimedia.org/d/G8zPL7-Wz/kubernetes-node?orgId=1&var-dc={{ $externalLabels.site }}%20prometheus%2F{{ $externalLabels.prometheus }}&var-instance={{ $labels.node }}"
+
 - name: certmanager
   rules:
   - alert: CertManagerCertNotReady
