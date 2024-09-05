@@ -31,7 +31,7 @@ groups:
         runbook: 'https://wikitech.wikimedia.org/wiki/Search#Pool_Counter_rejections_(search_is_currently_too_busy)'
         dashboard: 'https://grafana.wikimedia.org/d/qrOStmdGk/elasticsearch-pool-counters?viewPanel=4&orgId=1'
     - alert: CirrusSearchSaneitizerFixRateTooHigh
-      expr: sum(increase(mediawiki_CirrusSearch_sanitization_total{action="fixed"}[1w])) > 100000
+      expr: sum(increase(mediawiki_CirrusSearch_sanitization_total{action="fixed", problem!="oldDocument"}[1w])) > 100000
       for: 5m
       labels:
         team: search-platform
