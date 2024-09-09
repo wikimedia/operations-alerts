@@ -42,3 +42,24 @@ tests:
               summary: 'Elevated MediaWiki centrallogin failures (centralauth_error_badtoken)'
               dashboard: 'https://grafana.wikimedia.org/d/000000438/mediawiki-exceptions-alerts?viewPanel=3'
               runbook: 'https://wikitech.wikimedia.org/wiki/Application_servers/Runbook'
+
+  - interval: 1m
+    input_series:
+      - series: 'mediawiki_WikimediaEvents_authmanager_error_total{event="accountcreation"}'
+        values: '0+20x20'
+      - series: 'mediawiki_WikimediaEvents_authmanager_success_total{event="accountcreation"}'
+        values: '0+1x20'
+    external_labels:
+      site: codfw
+    alert_rule_test:
+      - alertname: MediaWikiAccountCreationFailures
+        eval_time: 9m
+        exp_alerts:
+          - exp_labels:
+              team: sre
+              severity: critical
+            exp_annotations:
+              description: 'Elevated MediaWiki account creation failures: 95.24%'
+              summary: 'Elevated MediaWiki account creation failures: 95.24%'
+              dashboard: 'https://grafana.wikimedia.org/d/000000438/mediawiki-exceptions-alerts?viewPanel=23'
+              runbook: 'https://wikitech.wikimedia.org/wiki/Application_servers/Runbook'
