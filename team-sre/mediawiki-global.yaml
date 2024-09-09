@@ -1,6 +1,6 @@
 # deploy-tag: global
 
-# Alerts with global aggregation needed
+# MW alerts with global aggregation needed (i.e. across baremetal and k8s)
 
 groups:
   - name: mediawiki
@@ -15,5 +15,20 @@ groups:
           severity: critical
           team: sre
         for: 2m
-        # sum across baremetal and k8s
         expr: sum by (cause, cluster) (rate(mediawiki_edit_failure_total[5m]) * 60) > 20
+
+      - alert: MediaWikiLoginFailures
+        annotations:
+          description: 'Elevated MediaWiki centrallogin failures ({{ $labels.reason }}): {{ $value }}/min'
+          summary: 'Elevated MediaWiki centrallogin failures ({{ $labels.reason }})'
+          dashboard: 'https://grafana.wikimedia.org/d/000000438/mediawiki-exceptions-alerts?viewPanel=3'
+          runbook: 'https://wikitech.wikimedia.org/wiki/Application_servers/Runbook'
+        labels:
+          severity: critical
+          team: sre
+        for: 2m
+        expr: |
+          sum by (reason) (
+            rate(mediawiki_WikimediaEvents_authmanager_error_total{event="centrallogin"}[5m])
+          ) * 60 # per minute
+          > 1
