@@ -29,7 +29,11 @@ groups:
           dashboard: https://grafana.wikimedia.org/d/000000489/wikidata-query-service
 
       - alert: ElevatedMaxLagWDQS
-        expr: max(time() - label_replace(blazegraph_lastupdated{cluster="wdqs", instance=~".*:9193"}, "host", "$1", "instance", "^([^:]+):.*") and on(host) label_replace(rate(org_wikidata_query_rdf_blazegraph_filters_QueryEventSenderFilter_event_sender_filter_StartedQueries{}[5m]) > 0.2, "host", "$1", "instance", "^([^:]+):.*"))/60 > 10
+        expr: >-
+          max(time() - label_replace(blazegraph_lastupdated{cluster="wdqs", instance=~".*:9193"}, "host", "$1", "instance", "^([^:]+):.*")
+          and on(host) label_replace(rate(org_wikidata_query_rdf_blazegraph_filters_QueryEventSenderFilter_event_sender_filter_StartedQueries{}[5m])
+          > 0.2, "host", "$1", "instance", "^([^:]+):.*"))/60 > 10
+
         for: 1m
         labels:
           cluster: wdqs
