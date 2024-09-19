@@ -21,7 +21,7 @@ tests:
             exp_annotations:
               summary: "Elasticsearch instance elastic1002-production-search-eqiad is showing memory pressure in the young pool"
               description: "Elasticsearch is out of memory and will have degraded latency, reject requests, and could OOM"
-              runbook: https://wikitech.wikimedia.org/wiki/Search#Stuck_in_old_GC_hell
+              runbook: https://wikitech.wikimedia.org/wiki/Search/Elasticsearch_Administration#Stuck_in_old_GC_hell
               dashboard: https://grafana.wikimedia.org/d/000000462/elasticsearch-memory
 
   - interval: 1m
@@ -41,7 +41,7 @@ tests:
             exp_annotations:
               summary: "Elasticsearch instance elastic1002-production-search-eqiad is running the old gc excessively"
               description: "Elasticsearch is out of memory and will have degraded latency"
-              runbook: https://wikitech.wikimedia.org/wiki/Search#Stuck_in_old_GC_hell
+              runbook: https://wikitech.wikimedia.org/wiki/Search/Elasticsearch_Administration#Stuck_in_old_GC_hell
               dashboard: https://grafana.wikimedia.org/d/000000462/elasticsearch-memory
 
   - interval: 1m
@@ -128,7 +128,7 @@ tests:
             exp_annotations:
               summary: "Elasticsearch instance elastic1337-production-search-eqiad is not indexing"
               description: "An Elasticsearch instance is not performing index work; find out why"
-              runbook: https://wikitech.wikimedia.org/wiki/Search#Indexing_hung_and_not_making_progress
+              runbook: https://wikitech.wikimedia.org/wiki/Search/Elasticsearch_Administration#Indexing_hung_and_not_making_progress
               dashboard: 'https://grafana.wikimedia.org/d/JLK3I_siz/elasticsearch-indexing?orgId=1&from=now-3d&to=now&viewPanel=57'
   - interval: 1m
     input_series:
@@ -146,7 +146,7 @@ tests:
             exp_annotations:
               summary: "Some search indices that power autocomplete have not been updated recently"
               description: "The daily build process for autocomplete indices is probably having issues and should be investigated."
-              runbook: https://wikitech.wikimedia.org/wiki/Search#CirrusSearch_titlesuggest_index_is_too_old
+              runbook: https://wikitech.wikimedia.org/wiki/Search/Elasticsearch_Administration#CirrusSearch_titlesuggest_index_is_too_old
               dashboard: 'TODO'
 
   - interval: 1m

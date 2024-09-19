@@ -28,7 +28,7 @@ groups:
       annotations:
         summary: 'MediaWiki CirrusSearch failing to obtain a token from the pool counter at a very high rate'
         description: "Rate of failures when obtaining a token from the pool counter is above 1000 errors/sec"
-        runbook: 'https://wikitech.wikimedia.org/wiki/Search#Pool_Counter_rejections_(search_is_currently_too_busy)'
+        runbook: 'https://wikitech.wikimedia.org/wiki/Search/Elasticsearch_Administration#Pool_Counter_rejections_(search_is_currently_too_busy)'
         dashboard: 'https://grafana.wikimedia.org/d/qrOStmdGk/elasticsearch-pool-counters?viewPanel=4&orgId=1'
     - alert: CirrusSearchSaneitizerFixRateTooHigh
       expr: sum(increase(mediawiki_CirrusSearch_sanitization_total{action="fixed", problem!="oldDocument"}[1w])) > 100000
@@ -39,7 +39,7 @@ groups:
       annotations:
         summary: 'MediaWiki CirrusSearch Saneitizer is fixing an abnormally high number of documents'
         description: "MediaWiki CirrusSearch Saneitizer Weekly Fix Rate is above 100000/week"
-        runbook: 'https://wikitech.wikimedia.org/wiki/Search#Saneitizer_(background_repair_process)'
+        runbook: 'https://wikitech.wikimedia.org/wiki/Search/CirrusStreamingUpdater#San(e)itizing'
         dashboard: 'https://grafana.wikimedia.org/d/JLK3I_siz/elasticsearch-indexing?viewPanel=35&orgId=1&from=now-6M&to=now'
     - alert: CirrusSearchFullTextLatencyTooHigh
       expr: histogram_quantile(0.95, sum by (le, search_cluster) (rate(mediawiki_CirrusSearch_request_time_seconds_bucket{type="full_text"}[5m]))) > 1.0
