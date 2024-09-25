@@ -1,0 +1,551 @@
+rule_files:
+  - ripeatlas.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    input_series:
+      - series: atlas_ping_received{measurement="1790945", dummy="1"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790945", dummy="1"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790945", dummy="2"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790945", dummy="2"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790945", dummy="3"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790945", dummy="3"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790945", dummy="4"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790945", dummy="4"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790945", dummy="5"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790945", dummy="5"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790945", dummy="6"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790945", dummy="6"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790945", dummy="7"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790945", dummy="7"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790945", dummy="8"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790945", dummy="8"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790945", dummy="9"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790945", dummy="9"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790945", dummy="10"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790945", dummy="10"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790945", dummy="11"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790945", dummy="11"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790945", dummy="12"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790945", dummy="12"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790945", dummy="13"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790945", dummy="13"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790945", dummy="14"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790945", dummy="14"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790945", dummy="15"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790945", dummy="15"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790945", dummy="16"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790945", dummy="16"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790945", dummy="17"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790945", dummy="17"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790945", dummy="18"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790945", dummy="18"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790945", dummy="19"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790945", dummy="19"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790945", dummy="20"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790945", dummy="20"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790945", dummy="21"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790945", dummy="21"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790945", dummy="22"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790945", dummy="22"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790945", dummy="23"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790945", dummy="23"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790945", dummy="24"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790945", dummy="24"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790945", dummy="25"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790945", dummy="25"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790945", dummy="26"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790945", dummy="26"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790945", dummy="27"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790945", dummy="27"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790945", dummy="28"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790945", dummy="28"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790945", dummy="29"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790945", dummy="29"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790945", dummy="30"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790945", dummy="30"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790945", dummy="31"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790945", dummy="31"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790945", dummy="32"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790945", dummy="32"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790945", dummy="33"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790945", dummy="33"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790945", dummy="34"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790945", dummy="34"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790945", dummy="35"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790945", dummy="35"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790945", dummy="36"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790945", dummy="36"}
+        values: '5x15 0'
+      - series: 'atlas_measurement_label{measurement="1790945", ip_version="ipv4", target_site="eqiad"}'
+        values: '1x15 1'
+    alert_rule_test:
+    - alertname: IPv4AnchorUnreachable
+      eval_time: 15m
+      exp_alerts:
+        - exp_labels:
+            measurement: 1790945
+            ip_version: ipv4
+            target_site: eqiad
+            team: sre
+            severity: critical
+          exp_annotations:
+            description: "ipv4 ping to eqiad RIPE Atlas anchor: failures over threshold"
+            summary: "ipv4 ping to eqiad RIPE Atlas anchor: failures over threshold"
+            dashboard: https://grafana.wikimedia.org/d/K1qm1j-Wz/ripe-atlas?orgId=1
+            runbook: https://wikitech.wikimedia.org/wiki/Network_monitoring#Atlas_alerts
+
+  - interval: 1m
+    input_series:
+      - series: atlas_ping_received{measurement="1790947", dummy="1"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="1"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="2"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="2"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="3"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="3"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="4"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="4"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="5"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="5"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="6"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="6"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="7"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="7"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="8"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="8"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="9"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="9"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="10"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="10"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="11"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="11"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="12"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="12"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="13"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="13"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="14"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="14"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="15"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="15"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="16"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="16"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="17"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="17"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="18"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="18"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="19"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="19"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="20"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="20"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="21"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="21"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="22"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="22"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="23"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="23"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="24"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="24"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="25"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="25"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="26"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="26"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="27"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="27"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="28"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="28"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="29"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="29"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="30"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="30"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="31"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="31"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="32"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="32"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="33"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="33"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="34"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="34"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="35"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="35"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="36"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="36"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="37"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="37"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="38"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="38"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="39"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="39"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="40"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="40"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="41"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="41"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="42"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="42"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="43"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="43"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="44"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="44"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="45"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="45"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="46"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="46"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="47"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="47"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="48"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="48"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="49"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="49"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="50"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="50"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="51"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="51"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="52"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="52"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="53"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="53"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="54"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="54"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="55"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="55"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="56"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="56"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="57"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="57"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="58"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="58"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="59"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="59"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="60"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="60"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="61"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="61"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="62"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="62"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="63"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="63"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="64"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="64"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="65"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="65"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="66"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="66"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="67"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="67"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="68"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="68"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="69"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="69"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="70"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="70"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="71"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="71"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="72"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="72"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="73"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="73"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="74"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="74"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="75"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="75"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="76"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="76"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="77"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="77"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="78"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="78"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="79"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="79"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="80"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="80"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="81"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="81"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="82"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="82"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="83"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="83"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="84"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="84"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="85"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="85"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="86"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="86"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="87"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="87"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="88"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="88"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="89"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="89"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="90"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="90"}
+        values: '5x15 0'
+      - series: atlas_ping_received{measurement="1790947", dummy="91"}
+        values: '1x15 0'
+      - series: atlas_ping_sent{measurement="1790947", dummy="91"}
+        values: '5x15 0'
+      - series: 'atlas_measurement_label{measurement="1790947", ip_version="ipv6", target_site="eqiad"}'
+        values: '1x15 1'
+    alert_rule_test:
+    - alertname: IPv6AnchorUnreachable
+      eval_time: 15m
+      exp_alerts:
+        - exp_labels:
+            measurement: 1790947
+            ip_version: ipv6
+            target_site: eqiad
+            team: sre
+            severity: critical
+          exp_annotations:
+            description: "ipv6 ping to eqiad RIPE Atlas anchor: failures over threshold"
+            summary: "ipv6 ping to eqiad RIPE Atlas anchor: failures over threshold"
+            dashboard: https://grafana.wikimedia.org/d/K1qm1j-Wz/ripe-atlas?orgId=1
+            runbook: https://wikitech.wikimedia.org/wiki/Network_monitoring#Atlas_alerts
