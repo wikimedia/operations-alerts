@@ -1,0 +1,20 @@
+# deploy-tag: ops
+# deploy-site: eqiad
+
+# Alerts for generic nodes being down
+groups:
+  - name: cloudvirt
+    rules:
+      - alert: CloudVirtDown
+        annotations:
+          summary: 'Cloudvirt node {{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }} is down. #page'
+          description: >
+            The cloudvirt node {{  $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }} is unreachable. This is a
+            major outage that requires you to either restore the server or evacuate manually the VMs on it.
+          dashboard: 'https://grafana.wikimedia.org/d/000000377/host-overview?orgId=1&var-server={{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}'
+          runbook: "https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/CloudVirtDown"
+        expr: up{job="node", cluster="wmcs", instance=~"cloudvirt(-wdqs|local)?1.*"} == 0
+        for: 5m
+        labels:
+          severity: page
+          team: wmcs
