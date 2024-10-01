@@ -30,3 +30,14 @@ groups:
         labels:
           severity: warning
           team: sre
+      - alert: PyBalBGPUnstable
+        expr: pybal_bgp_session_established != 1 and ignoring (local_asn, peer) pybal_bgp_enabled == 1
+        for: 2m
+        labels:
+          team: sre
+          severity: critical
+        annotations:
+          summary: 'PyBal BGP sessions on instance {{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }} with peer {{ $labels.peer }} are failing #page'
+          description: 'PyBal BGP session establishment with the peer {{ $labels.peer }} is unstable on host {{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}.'
+          dashboard: 'https://grafana.wikimedia.org/d/000000488/pybal-bgp?var-datasource={{ $externalLabels.site }}%20prometheus/ops&var-server={{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}'
+          runbook: 'https://wikitech.wikimedia.org/wiki/PyBal#Alerts'
