@@ -11,6 +11,7 @@ groups:
         dashboard: "https://grafana.wikimedia.org/d/hyl18XgMk/kubernetes-container-details?orgId=1&var-datasource=eqiad%2Bprometheus/k8s-dse&var-namespace=spark-history-test&var-container=All"
         runbook: "https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Spark_History#The_app_isn't_running"
       expr: kube_deployment_status_replicas_available{deployment="spark-history-analytics-test-hadoop", namespace="spark-history-test"} < 1
+      for: 5m
       labels:
         severity: warning
         team: data-platform
@@ -22,6 +23,7 @@ groups:
         dashboard: "https://grafana.wikimedia.org/d/hyl18XgMk/kubernetes-container-details?orgId=1&var-datasource=eqiad%2Bprometheus/k8s-dse&var-namespace=spark-history&var-container=All"
         runbook: "https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Spark_History#The_app_isn't_running"
       expr: kube_deployment_status_replicas_available{deployment="spark-history-analytics-hadoop", namespace="spark-history"} < 1
+      for: 5m
       labels:
         severity: critical
         team: data-platform

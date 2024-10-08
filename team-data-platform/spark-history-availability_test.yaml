@@ -1,12 +1,12 @@
 rule_files:
   - spark-history-availability.yaml
-evaluation_interval: 5m
 tests:
   - input_series:
     - series: kube_deployment_status_replicas_available{deployment="spark-history-analytics-test-hadoop", namespace="spark-history-test"}
       values: '0'
     alert_rule_test:
     - alertname: SparkHistoryTestServiceUnavailable
+      eval_time: 5m
       exp_alerts:
       - exp_annotations:
           description: spark-history-analytics-test-hadoop is unavailable on k8s-dse
@@ -23,6 +23,7 @@ tests:
       values: '0'
     alert_rule_test:
     - alertname: SparkHistoryServiceUnavailable
+      eval_time: 5m
       exp_alerts:
       - exp_annotations:
           description: spark-history-analytics-hadoop is unavailable on k8s-dse
