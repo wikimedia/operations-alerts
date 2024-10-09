@@ -1,12 +1,12 @@
 rule_files:
   - datahub-availability.yaml
-evaluation_interval: 5m
 tests:
   - input_series:
     - series: kube_deployment_status_replicas_available{deployment="datahub-gms-staging", namespace="datahub-next"}
       values: '0'
     alert_rule_test:
     - alertname: DatahubNextServiceUnavailable
+      eval_time: 5m
       exp_alerts:
       - exp_annotations:
           description: 'datahub-next is unavailable on k8s-dse'
@@ -23,6 +23,7 @@ tests:
       values: '0'
     alert_rule_test:
     - alertname: DatahubServiceUnavailable
+      eval_time: 5m
       exp_alerts:
       - exp_annotations:
           description: 'datahub is unavailable on k8s-dse'

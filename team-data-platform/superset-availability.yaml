@@ -11,6 +11,7 @@ groups:
         dashboard: "https://grafana.wikimedia.org/d/hyl18XgMk/kubernetes-container-details?orgId=1&var-datasource=thanos&var-site=eqiad&var-cluster=k8s-dse&var-namespace=superset-next&var-container=All"
         runbook: "https://wikitech.wikimedia.org/wiki/Analytics/Systems/Superset/Administration#Alerting"
       expr: kube_deployment_status_replicas_available{deployment="superset-staging", namespace="superset-next"} < 1
+      for: 5m
       labels:
         severity: warning
         team: data-platform
@@ -22,6 +23,7 @@ groups:
         dashboard: "https://grafana.wikimedia.org/d/hyl18XgMk/kubernetes-container-details?orgId=1&var-datasource=thanos&var-site=eqiad&var-cluster=k8s-dse&var-namespace=superset&var-container=All"
         runbook: "https://wikitech.wikimedia.org/wiki/Analytics/Systems/Superset/Administration#Alerting"
       expr: kube_deployment_status_replicas_available{deployment="superset-production", namespace="superset"} < 1
+      for: 5m
       labels:
         severity: critical
         team: data-platform

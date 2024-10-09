@@ -1,12 +1,12 @@
 rule_files:
   - superset-availability.yaml
-evaluation_interval: 5m
 tests:
   - input_series:
     - series: kube_deployment_status_replicas_available{deployment="superset-staging", namespace="superset-next"}
       values: '0'
     alert_rule_test:
     - alertname: SupersetNextServiceUnavailable
+      eval_time: 5m
       exp_alerts:
       - exp_annotations:
           description: 'superset-staging is unavailable on k8s-dse'
@@ -23,6 +23,7 @@ tests:
       values: '0'
     alert_rule_test:
     - alertname: SupersetServiceUnavailable
+      eval_time: 5m
       exp_alerts:
       - exp_annotations:
           description: 'superset-production is unavailable on k8s-dse'
