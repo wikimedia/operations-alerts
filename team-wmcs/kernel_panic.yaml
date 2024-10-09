@@ -1,0 +1,31 @@
+# deploy-tag: ops
+# deploy-site: eqiad
+
+groups:
+  - name: kernel_panic
+    rules:
+      - alert: Kernel panic
+        expr: kernel_dmesg_panic > 0
+        annotations: &annotations
+          summary: 'Server {{  $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }} may have kernel errors'
+          description: 'The server {{  $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }} had some kernel error messages showing up in dmesg recently. Check it out'
+          dashboard: 'https://grafana.wikimedia.org/d/b013af4c-d405-4d9f-85d4-985abb3dec0c/wmcs-kernel-panic-detector?orgId=1&var-instance={{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}'
+          runbook: "https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/Kernel_panic"
+        labels: &labels
+          severity: warning
+          team: wmcs
+
+      - alert: Kernel taint
+        expr: kernel_dmesg_taint > 0
+        annotations: *annotations
+        labels: *labels
+
+      - alert: Kernel warning
+        expr: kernel_dmesg_warning > 0
+        annotations: *annotations
+        labels: *labels
+
+      - alert: Kernel err priority
+        expr: kernel_dmesg_err_priority > 0
+        annotations: *annotations
+        labels: *labels
