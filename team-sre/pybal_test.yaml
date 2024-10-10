@@ -48,7 +48,7 @@ tests:
               instance: "lvs1234:9090"
               local_asn: "64600"
               peer: "192.0.2.1"
-              severity: critical
+              severity: page
               team: sre
             exp_annotations:
               summary: "PyBal BGP sessions on instance lvs1234 with peer 192.0.2.1 are failing #page"
