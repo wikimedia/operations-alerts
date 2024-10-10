@@ -49,8 +49,10 @@ tests:
               dashboard: 'https://grafana.wikimedia.org/d/qrOStmdGk/elasticsearch-pool-counters?viewPanel=4&orgId=1'
   - interval: '1d'
     input_series:
-      - series: mediawiki_CirrusSearch_sanitization_total{action="fixed"}
+      - series: mediawiki_CirrusSearch_sanitization_total{action="fixed", search_cluster="broken_cluster"}
         values: '0+20000x7'
+      - series: mediawiki_CirrusSearch_sanitization_total{action="fixed", search_cluster="sane_cluster"}
+        values: '0+20x7'
     external_labels:
       site: eqiad
     alert_rule_test:
@@ -60,11 +62,12 @@ tests:
           - exp_labels:
               severity: warning
               team: search-platform
+              search_cluster: broken_cluster
             exp_annotations:
-              summary: 'MediaWiki CirrusSearch Saneitizer is fixing an abnormally high number of documents'
-              description: "MediaWiki CirrusSearch Saneitizer Weekly Fix Rate is above 100000/week"
+              summary: 'MediaWiki CirrusSearch Saneitizer is fixing an abnormally high number of documents in broken_cluster'
+              description: "MediaWiki CirrusSearch Saneitizer Weekly Fix Rate is above 100000/week for broken_cluster"
               runbook: 'https://wikitech.wikimedia.org/wiki/Search/CirrusStreamingUpdater#San(e)itizing'
-              dashboard: 'https://grafana.wikimedia.org/d/JLK3I_siz/elasticsearch-indexing?viewPanel=35&orgId=1&from=now-6M&to=now'
+              dashboard: 'https://grafana.wikimedia.org/d/JLK3I_siz/elasticsearch-indexing?viewPanel=59&orgId=1&from=now-6M&to=now&var-search_cluster=broken_cluster'
   - interval: '1m'
     input_series:
       # histograms for full_text search to eqiad p95 is 1.238s
