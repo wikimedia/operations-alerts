@@ -35,7 +35,7 @@ groups:
         for: 2m
         labels:
           team: sre
-          severity: critical
+          severity: page
         annotations:
           summary: 'PyBal BGP sessions on instance {{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }} with peer {{ $labels.peer }} are failing #page'
           description: 'PyBal BGP session establishment with the peer {{ $labels.peer }} is unstable on host {{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}.'
