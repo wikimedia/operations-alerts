@@ -6,6 +6,8 @@ tests:
   input_series:
   - series: 'up{instance="kubefake1001.foo.bar:9091", job="calico-felix"}'
     values: "1 0 0 0 0 0 0"
+  - series: 'up{kubernetes_namespace="kube-system", k8s_app="calico-kube-controllers"}'
+    values: "1 0 0 0 0 0 0"
   - series: 'certmanager_certificate_ready_status{namespace="fakespace", name="fakename", condition="False"}'
     values: "0 1 1 1 1 1 1 1 1 1 1"
   - series: 'helm_release_status{namespace="pinkunicorn", name="main", status="pending-upgrade"}'
@@ -49,6 +51,18 @@ tests:
         description: "Prometheus has been unable to scrape metrics from calico on host kubefake1001.foo.bar:9091 job(calico-felix) for more than 5 minutes. Make sure the calico-node Pod is running on that node."
         runbook: https://wikitech.wikimedia.org/wiki/Calico#Operations
         dashboard: https://grafana.wikimedia.org/d/G8zPL7-Wz/?var-dc=moon%20prometheus%2Feagle&var-instance=kubefake1001.foo.bar
+
+  - alertname: CalicoKubeControllersDown
+    eval_time: 6m
+    exp_alerts:
+    - exp_labels:
+        severity: critical
+        team: sre
+      exp_annotations:
+        summary: "Calico Kubernetes Controllers not running"
+        description: "The calico-kube-controllers pod is not running in the eagle@moon kube-system namespace"
+        runbook: https://wikitech.wikimedia.org/wiki/Calico#Kube_Controllers"
+        dashboard: TODO
 
   - alertname: CertManagerCertNotReady
     eval_time: 11m
