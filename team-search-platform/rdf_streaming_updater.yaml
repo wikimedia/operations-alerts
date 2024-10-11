@@ -44,7 +44,7 @@ groups:
         # 10 mins in which case the WdqsStreamingUpdaterFlinkJobNotRunning alert should have been triggered a long time ago
         expr: |
           max by (job_name, release, kubernetes_namespace) (max_over_time(flink_jobmanager_job_uptime{kubernetes_namespace="rdf-streaming-updater"}[10m])) < 300000
-        for: 1m
+        for: 10m
         labels:
           team: search-platform
           severity: critical
@@ -57,7 +57,7 @@ groups:
       - alert: RdfStreamingUpdaterFlinkProcessingLatencyIsHigh
         expr: |
           avg by (job_name, release, kubernetes_namespace) (avg_over_time(flink_taskmanager_job_task_operator_processing_latency_ms{kubernetes_namespace="rdf-streaming-updater"}[5m]) > 600000)
-        for: 1m
+        for: 10m
         labels:
           team: search-platform
           severity: warning
