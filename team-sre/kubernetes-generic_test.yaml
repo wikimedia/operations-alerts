@@ -34,6 +34,10 @@ tests:
     values: "0+0x16"
   - series: 'kube_node_spec_unschedulable{node="kubefakenode"}'
     values: "1x1440"
+  - series: 'kube_pod_container_resource_requests{namespace="kube-system", container="calico-node", pod="calico-node-f00bar", resource="memory"}'
+    values: "500000000x11"
+  - series: 'container_memory_working_set_bytes{namespace="kube-system", container="calico-node", pod="calico-node-f00bar"}'
+    values: "1500000000x11"
   external_labels:
     site: moon
     prometheus: eagle
@@ -63,6 +67,20 @@ tests:
         description: "The calico-kube-controllers pod is not running in the eagle@moon kube-system namespace"
         runbook: https://wikitech.wikimedia.org/wiki/Calico#Kube_Controllers"
         dashboard: TODO
+
+  - alertname: CalicoHighMemoryUsage
+    eval_time: 11m
+    exp_alerts:
+    - exp_labels:
+        severity: critical
+        team: sre
+        container: calico-node
+        pod: calico-node-f00bar
+      exp_annotations:
+        summary: "Calico container calico-node-f00bar:calico-node is consistently using three times its memory request"
+        description: "Calico container calico-node-f00bar:calico-node is using at least three times its memory request over the last 10 minutes"
+        runbook: https://wikitech.wikimedia.org/wiki/Calico#Resource_Usage
+        dashboard: https://grafana.wikimedia.org/d/2AfU0X_Mz?var-site=moon&var-prometheus=eagle&var-container_name=calico-node
 
   - alertname: CertManagerCertNotReady
     eval_time: 11m

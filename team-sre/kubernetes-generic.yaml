@@ -28,6 +28,18 @@ groups:
       runbook: https://wikitech.wikimedia.org/wiki/Calico#Kube_Controllers"
       dashboard: TODO
 
+  - alert: CalicoHighMemoryUsage
+    expr: sum by (pod, container) (container_memory_working_set_bytes{namespace="kube-system", container=~"calico-.*"}) >= 3 * max by (pod, container) (kube_pod_container_resource_requests{namespace="kube-system", container=~"calico-.*", resource="memory"})
+    for: 10m
+    labels:
+      team: sre
+      severity: critical
+    annotations:
+      summary: "Calico container {{ $labels.pod }}:{{ $labels.container }} is consistently using three times its memory request"
+      description: "Calico container {{ $labels.pod }}:{{ $labels.container }} is using at least three times its memory request over the last 10 minutes"
+      runbook: https://wikitech.wikimedia.org/wiki/Calico#Resource_Usage
+      dashboard: https://grafana.wikimedia.org/d/2AfU0X_Mz?var-site={{ $externalLabels.site }}&var-prometheus={{ $externalLabels.prometheus }}&var-container_name={{ $labels.container }}
+
 - name: kubernetes
   rules:
   - &KubeletOperationalLatency
