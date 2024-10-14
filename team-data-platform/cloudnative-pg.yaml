@@ -135,3 +135,15 @@ groups:
       labels:
         severity: critical
         team: data-platform
+
+    - alert: CloudnativePGOutOfBandBackupsFailed
+      annotations:
+        description: 'RClone backup of PG s3 data has failed'
+        summary: 'RClone backup of PG s3 data has failed'
+        dashboard: "https://grafana.wikimedia.org/d/g-AaZRFWk/systemd-status"
+        runbook: "https://wikitech.wikimedia.org/wiki/Data_Platform/Systems/CloudnativePG/Clusters#Checking_the_status_of_the_out-of-band_backups_of_backups"
+      expr: instance_name:node_systemd_unit_state_failed:count1{instance="db1208:9100", name="backup_s3_postgresql.service"} > 0
+      for: 1h
+      labels:
+        severity: critical
+        team: data-platform
