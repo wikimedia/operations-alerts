@@ -118,7 +118,7 @@ groups:
         summary: '{{$labels.kubernetes_pod_name}}.{{$labels.kubernetes_namespace}} is not archiving WALs'
         dashboard: "https://grafana.wikimedia.org/d/cloudnative-pg/cloudnativepg?forceLogin=&from=now-15m&orgId=1&refresh=30s&to=now&var-DS_PROMETHEUS=eqiad%2Bprometheus%252Fk8s-dse&var-cluster={{$labels.cnpg_io_cluster}}&var-instances=All&var-namespace={{$labels.kubernetes_namespace}}&var-operatorNamespace=cloudnative-pg-operator"
         runbook: "TODO"
-      expr: max by (cnpg_io_cluster, kubernetes_namespace, kubernetes_pod_name) (cnpg_pg_stat_archiver_seconds_since_last_archival) > 900
+      expr: max by (cnpg_io_cluster, kubernetes_namespace, kubernetes_pod_name) (cnpg_pg_stat_archiver_seconds_since_last_archival{role="primary"}) > 900
       for: 5m
       labels:
         severity: warning
@@ -130,7 +130,7 @@ groups:
         summary: '{{$labels.kubernetes_pod_name}}.{{$labels.kubernetes_namespace}} is not archiving WALs'
         dashboard: "https://grafana.wikimedia.org/d/cloudnative-pg/cloudnativepg?forceLogin=&from=now-15m&orgId=1&refresh=30s&to=now&var-DS_PROMETHEUS=eqiad%2Bprometheus%252Fk8s-dse&var-cluster={{$labels.cnpg_io_cluster}}&var-instances=All&var-namespace={{$labels.kubernetes_namespace}}&var-operatorNamespace=cloudnative-pg-operator"
         runbook: "TODO"
-      expr: max by (cnpg_io_cluster, kubernetes_namespace, kubernetes_pod_name) (cnpg_pg_stat_archiver_seconds_since_last_archival) > 3600
+      expr: max by (cnpg_io_cluster, kubernetes_namespace, kubernetes_pod_name) (cnpg_pg_stat_archiver_seconds_since_last_archival{role="primary"}) > 3600
       for: 5m
       labels:
         severity: critical

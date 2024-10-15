@@ -229,11 +229,9 @@ tests:
       eval_time: 5m
       exp_alerts: []
 
-  # One replica is lagging behind WAL uploads
+  # The primary is lagging behind WAL uploads
   - input_series:
-    - series: cnpg_pg_stat_archiver_seconds_since_last_archival{cnpg_io_cluster="postgresql-test", kubernetes_namespace="postgresql-test", kubernetes_pod_name="postgresql-test-2"}
-      values: 30
-    - series: cnpg_pg_stat_archiver_seconds_since_last_archival{cnpg_io_cluster="postgresql-test", kubernetes_namespace="postgresql-test", kubernetes_pod_name="postgresql-test-3"}
+    - series: cnpg_pg_stat_archiver_seconds_since_last_archival{cnpg_io_cluster="postgresql-test", kubernetes_namespace="postgresql-test", kubernetes_pod_name="postgresql-test-3", role="primary"}
       values: 1200
     alert_rule_test:
     - alertname: CloudnativePGLastArchiveAgeTooHighWarning
@@ -251,11 +249,9 @@ tests:
           severity: warning
           team: data-platform
 
-  # One replica is critically behind WAL uploads
+  # The primary is critically behind WAL uploads
   - input_series:
-    - series: cnpg_pg_stat_archiver_seconds_since_last_archival{cnpg_io_cluster="postgresql-test", kubernetes_namespace="postgresql-test", kubernetes_pod_name="postgresql-test-2"}
-      values: 0
-    - series: cnpg_pg_stat_archiver_seconds_since_last_archival{cnpg_io_cluster="postgresql-test", kubernetes_namespace="postgresql-test", kubernetes_pod_name="postgresql-test-3"}
+    - series: cnpg_pg_stat_archiver_seconds_since_last_archival{cnpg_io_cluster="postgresql-test", kubernetes_namespace="postgresql-test", kubernetes_pod_name="postgresql-test-3", role="primary"}
       values: 4000
     alert_rule_test:
     - alertname: CloudnativePGLastArchiveAgeTooHighCritical
