@@ -241,7 +241,7 @@ tests:
           description: 'postgresql-test-3.postgresql-test is not archiving WALs'
           summary: 'postgresql-test-3.postgresql-test is not archiving WALs'
           dashboard: "https://grafana.wikimedia.org/d/cloudnative-pg/cloudnativepg?forceLogin=&from=now-15m&orgId=1&refresh=30s&to=now&var-DS_PROMETHEUS=eqiad%2Bprometheus%252Fk8s-dse&var-cluster=postgresql-test&var-instances=All&var-namespace=postgresql-test&var-operatorNamespace=cloudnative-pg-operator"
-          runbook: "TODO"
+          runbook: "https://wikitech.wikimedia.org/wiki/Data_Platform/Systems/CloudnativePG/Clusters#Investigate_why_WALs_are_not_being_archived"
         exp_labels:
           kubernetes_namespace: postgresql-test
           kubernetes_pod_name: postgresql-test-3
@@ -261,7 +261,7 @@ tests:
           description: 'postgresql-test-3.postgresql-test is not archiving WALs'
           summary: 'postgresql-test-3.postgresql-test is not archiving WALs'
           dashboard: "https://grafana.wikimedia.org/d/cloudnative-pg/cloudnativepg?forceLogin=&from=now-15m&orgId=1&refresh=30s&to=now&var-DS_PROMETHEUS=eqiad%2Bprometheus%252Fk8s-dse&var-cluster=postgresql-test&var-instances=All&var-namespace=postgresql-test&var-operatorNamespace=cloudnative-pg-operator"
-          runbook: "TODO"
+          runbook: "https://wikitech.wikimedia.org/wiki/Data_Platform/Systems/CloudnativePG/Clusters#Investigate_why_WALs_are_not_being_archived"
         exp_labels:
           kubernetes_namespace: postgresql-test
           kubernetes_pod_name: postgresql-test-3

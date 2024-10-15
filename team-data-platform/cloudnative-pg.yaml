@@ -117,7 +117,7 @@ groups:
         description: '{{$labels.kubernetes_pod_name}}.{{$labels.kubernetes_namespace}} is not archiving WALs'
         summary: '{{$labels.kubernetes_pod_name}}.{{$labels.kubernetes_namespace}} is not archiving WALs'
         dashboard: "https://grafana.wikimedia.org/d/cloudnative-pg/cloudnativepg?forceLogin=&from=now-15m&orgId=1&refresh=30s&to=now&var-DS_PROMETHEUS=eqiad%2Bprometheus%252Fk8s-dse&var-cluster={{$labels.cnpg_io_cluster}}&var-instances=All&var-namespace={{$labels.kubernetes_namespace}}&var-operatorNamespace=cloudnative-pg-operator"
-        runbook: "TODO"
+        runbook: "https://wikitech.wikimedia.org/wiki/Data_Platform/Systems/CloudnativePG/Clusters#Investigate_why_WALs_are_not_being_archived"
       expr: max by (cnpg_io_cluster, kubernetes_namespace, kubernetes_pod_name) (cnpg_pg_stat_archiver_seconds_since_last_archival{role="primary"}) > 900
       for: 5m
       labels:
@@ -129,7 +129,7 @@ groups:
         description: '{{$labels.kubernetes_pod_name}}.{{$labels.kubernetes_namespace}} is not archiving WALs'
         summary: '{{$labels.kubernetes_pod_name}}.{{$labels.kubernetes_namespace}} is not archiving WALs'
         dashboard: "https://grafana.wikimedia.org/d/cloudnative-pg/cloudnativepg?forceLogin=&from=now-15m&orgId=1&refresh=30s&to=now&var-DS_PROMETHEUS=eqiad%2Bprometheus%252Fk8s-dse&var-cluster={{$labels.cnpg_io_cluster}}&var-instances=All&var-namespace={{$labels.kubernetes_namespace}}&var-operatorNamespace=cloudnative-pg-operator"
-        runbook: "TODO"
+        runbook: "https://wikitech.wikimedia.org/wiki/Data_Platform/Systems/CloudnativePG/Clusters#Investigate_why_WALs_are_not_being_archived"
       expr: max by (cnpg_io_cluster, kubernetes_namespace, kubernetes_pod_name) (cnpg_pg_stat_archiver_seconds_since_last_archival{role="primary"}) > 3600
       for: 5m
       labels:
