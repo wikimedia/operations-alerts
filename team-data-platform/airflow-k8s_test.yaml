@@ -1,0 +1,24 @@
+rule_files:
+  - airflow-k8s.yaml
+tests:
+  - input_series:
+    - series: kube_deployment_status_replicas_available{deployment="airflow-webserver", namespace="airflow-test-k8s"}
+      values: 0
+    - series: kube_deployment_status_replicas_available{deployment="airflow-scheduler", namespace="airflow-test-k8s"}
+      values: 1
+    - series: kube_deployment_status_replicas_available{deployment="airflow-kerberos", namespace="airflow-test-k8s"}
+      values: 1
+    alert_rule_test:
+    - alertname: AirflowDeploymentUnavailable
+      eval_time: 5m
+      exp_alerts:
+      - exp_annotations:
+          description: airflow-webserver.airflow-test-k8s is unavailable on dse-k8s-eqiad
+          summary: airflow-webserver.airflow-test-k8s is unavailable on dse-k8s-eqiad
+          dashboard: "https://grafana.wikimedia.org/d/hyl18XgMk/kubernetes-container-details?orgId=1&var-datasource=eqiad%2Bprometheus/k8s-dse&var-namespace=spark-history-test&var-container=All"
+          runbook: "https://wikitech.wikimedia.org/wiki/Data_Platform/Systems/Airflow/Kubernetes#Pods_are_not_running"
+        exp_labels:
+          namespace: airflow-test-k8s
+          deployment: airflow-webserver
+          severity: critical
+          team: data-platform
