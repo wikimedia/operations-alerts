@@ -5,17 +5,17 @@ tests:
   - interval: 1m
     input_series:
       - series: 'flink_jobmanager_job_uptime{job_name="WDQS_Streaming_Updater", kubernetes_namespace="rdf-streaming-updater", pod="1", release="wikidata"}'
-        values: "2000000 0 60000 120000 180000 0 0 0 0 0 0 0"
+        values: "2000000 0 60000 120000 180000 0 0 0 0 0 0 0 0 10 20 0 10 20 0 10 20 0 10 20"
       - series: 'flink_jobmanager_job_uptime{job_name="WDQS_Streaming_Updater", kubernetes_namespace="rdf-streaming-updater", pod="2", release="wikidata"}'
-        values: "0 0 0 0 0 0 60000 120000 180000 240000 0 60000"
+        values: "0 0 0 0 0 0 60000 120000 180000 240000 0 60000 60100 60200 60300 60400 60500 60600 60700"
       - series: 'flink_taskmanager_job_task_operator_processing_latency_ms{kubernetes_namespace="rdf-streaming-updater", job_name="WCQS_Streaming_Updater", release="commons"}'
-        values: "600001"
+        values: "600001+0x20"
     external_labels:
       site: codfw
       prometheus: k8s
     alert_rule_test:
       - alertname: RdfStreamingUpdaterFlinkJobUnstable
-        eval_time: 12m
+        eval_time: 21m
         exp_alerts:
           - exp_labels:
               severity: critical
@@ -29,7 +29,7 @@ tests:
               runbook: https://wikitech.wikimedia.org/wiki/Wikidata_Query_Service/Streaming_Updater
               dashboard: https://grafana.wikimedia.org/d/K9x0c4aVk/flink-app?var-datasource=codfw+prometheus%2Fk8s&var-namespace=rdf-streaming-updater&var-helm_release=wikidata
       - alertname: RdfStreamingUpdaterFlinkProcessingLatencyIsHigh
-        eval_time: 1m
+        eval_time: 10m
         exp_alerts:
           - exp_labels:
               severity: warning
