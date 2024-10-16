@@ -15,7 +15,7 @@ tests:
       - exp_annotations:
           description: airflow-webserver.airflow-test-k8s is unavailable on dse-k8s-eqiad
           summary: airflow-webserver.airflow-test-k8s is unavailable on dse-k8s-eqiad
-          dashboard: "https://grafana.wikimedia.org/d/hyl18XgMk/kubernetes-container-details?orgId=1&var-datasource=eqiad%2Bprometheus/k8s-dse&var-namespace=spark-history-test&var-container=All"
+          dashboard: "https://grafana.wikimedia.org/d/hyl18XgMk/kubernetes-container-details?orgId=1&var-datasource=eqiad%2Bprometheus/k8s-dse&var-namespace=airflow-test-k8s&var-container=All"
           runbook: "https://wikitech.wikimedia.org/wiki/Data_Platform/Systems/Airflow/Kubernetes#Pods_are_not_running"
         exp_labels:
           namespace: airflow-test-k8s
