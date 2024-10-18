@@ -2,38 +2,67 @@ rule_files:
   - mail.yaml
 evaluation_interval: 1m
 tests:
-  - interval: 1m
-    input_series:
-      - series: 'exim_queue_length{cluster="misc", instance="mx1001:9100"}'
-        values: '0+512x90'
-    alert_rule_test:
-    - alertname: MXQueueHigh
+  - alert_rule_test:
+    - alertname: InboundMXQueueHigh
       eval_time: 70m
       exp_alerts:
        - exp_labels:
            team: sre
            severity: page
-           cluster: misc
-           instance: mx1001:9100
+           instance: mx-in1001:9154
          exp_annotations:
-           description: 'The mail exchanger mx1001:9100 has a lot of messages in its queues. Check the runbook for further troubleshooting.'
-           summary: 'MX host mx1001:9100 has many queued messages: 35840 #page'
-           dashboard: 'https://grafana.wikimedia.org/d/000000451/mail'
-           runbook: 'https://wikitech.wikimedia.org/wiki/Exim'
-
-  - interval: 1m
+           description: 'The inbound postfix mail exchanger mx-in1001:9154 has a lot of messages in its queues. Check the runbook for further troubleshooting.'
+           summary: 'MX host mx-in1001:9154 has many queued messages: 2380 #page'
+           dashboard: 'https://grafana.wikimedia.org/d/h36Havfik/mail-postfix-servers'
+           runbook: 'https://wikitech.wikimedia.org/wiki/Postfix'
+    interval: 1m
     input_series:
-      - series: 'dummy'
-        values: '0+512x90'
-    alert_rule_test:
-    - alertname: MXQueueNoMetrics
+      - series: 'postfix_showq_message_size_bytes_count{cluster="misc", instance="mx-in1001:9154", job="postfix", prometheus="ops", queue="active", site="eqiad"}'
+        values: '490+10x90'
+      - series: 'postfix_showq_message_size_bytes_count{cluster="misc", instance="mx-in1001:9154", job="postfix", prometheus="ops", queue="incoming", site="eqiad"}'
+        values: '490+10x90'
+  - alert_rule_test:
+    - alertname: InboundMXQueueNoMetrics
       eval_time: 70m
       exp_alerts:
        - exp_labels:
            team: sre
            severity: critical
          exp_annotations:
-           description: 'Metrics used for exim queue length cannot be found. Check the runbook for further troubleshooting.'
+           description: 'Metric, postfix_showq_message_size_bytes_count, used for the inbound postfix queue length cannot be found'
            summary: 'Queue length metrics not found'
-           dashboard: 'https://grafana.wikimedia.org/d/000000451/mail'
-           runbook: 'https://wikitech.wikimedia.org/wiki/Exim'
+           dashboard: 'https://grafana.wikimedia.org/d/h36Havfik/mail-postfix-servers'
+           runbook: 'https://wikitech.wikimedia.org/wiki/Postfix'
+    interval: 1m
+  - alert_rule_test:
+    - alertname: OutboundMXQueueHigh
+      eval_time: 70m
+      exp_alerts:
+       - exp_labels:
+           team: sre
+           severity: page
+           instance: mx-out1001:9154
+         exp_annotations:
+           description: 'The outbound postfix mail exchanger mx-out1001:9154 has a lot of messages in its queues. Check the runbook for further troubleshooting.'
+           summary: 'MX host mx-out1001:9154 has many queued messages: 2380 #page'
+           dashboard: 'https://grafana.wikimedia.org/d/h36Havfik/mail-postfix-servers'
+           runbook: 'https://wikitech.wikimedia.org/wiki/Postfix'
+    interval: 1m
+    input_series:
+      - series: 'postfix_showq_message_size_bytes_count{cluster="misc", instance="mx-out1001:9154", job="postfix", prometheus="ops", queue="active", site="eqiad"}'
+        values: '490+10x90'
+      - series: 'postfix_showq_message_size_bytes_count{cluster="misc", instance="mx-out1001:9154", job="postfix", prometheus="ops", queue="incoming", site="eqiad"}'
+        values: '490+10x90'
+  - alert_rule_test:
+    - alertname: OutboundMXQueueNoMetrics
+      eval_time: 70m
+      exp_alerts:
+       - exp_labels:
+           team: sre
+           severity: critical
+         exp_annotations:
+           description: 'Metric, postfix_showq_message_size_bytes_count, used for the outbound postfix queue length cannot be found'
+           summary: 'Queue length metrics not found'
+           dashboard: 'https://grafana.wikimedia.org/d/h36Havfik/mail-postfix-servers'
+           runbook: 'https://wikitech.wikimedia.org/wiki/Postfix'
+    interval: 1m

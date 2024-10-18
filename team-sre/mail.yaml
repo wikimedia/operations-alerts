@@ -2,31 +2,53 @@
 # deploy-site: eqiad, codfw
 
 # Due to absent() usage below, we need to "pin" these alerts to sites and
-# Prometheus instances that do have exim_queue_length metrics
+# Prometheus instances that do have postfix_showq_message_size_bytes_count
+# metrics
 
 groups:
- - name: exim
+ - name: postfix
    rules:
    # monitor mail queue size (T133110)
-   - alert: MXQueueHigh
+   - alert: InboundMXQueueHigh
      annotations:
-       description: 'The mail exchanger {{ $labels.instance }} has a lot of messages in its queues. Check the runbook for further troubleshooting.'
+       description: 'The inbound postfix mail exchanger {{ $labels.instance }} has a lot of messages in its queues. Check the runbook for further troubleshooting.'
        summary: 'MX host {{ $labels.instance }} has many queued messages: {{ $value }} #page'
-       dashboard: 'https://grafana.wikimedia.org/d/000000451/mail'
-       runbook: 'https://wikitech.wikimedia.org/wiki/Exim'
-     expr: exim_queue_length{instance=~"mx.*"} >= 4000
+       dashboard: 'https://grafana.wikimedia.org/d/h36Havfik/mail-postfix-servers'
+       runbook: 'https://wikitech.wikimedia.org/wiki/Postfix'
+     expr: '(sum by (instance) (postfix_showq_message_size_bytes_count{instance=~"mx-in.*", queue=~"active|incoming"})) > 1000'
      for: 1h
      labels:
        severity: page
        team: sre
-
-   - alert: MXQueueNoMetrics
+   - alert: InboundMXQueueNoMetrics
      annotations:
-       description: 'Metrics used for exim queue length cannot be found. Check the runbook for further troubleshooting.'
+       description: 'Metric, postfix_showq_message_size_bytes_count, used for the inbound postfix queue length cannot be found'
        summary: 'Queue length metrics not found'
-       dashboard: 'https://grafana.wikimedia.org/d/000000451/mail'
-       runbook: 'https://wikitech.wikimedia.org/wiki/Exim'
-     expr: absent(exim_queue_length{instance=~"mx.*"})
+       dashboard: 'https://grafana.wikimedia.org/d/h36Havfik/mail-postfix-servers'
+       runbook: 'https://wikitech.wikimedia.org/wiki/Postfix'
+     expr: 'absent(sum by (instance) (postfix_showq_message_size_bytes_count{instance=~"mx-in.*", queue=~"active|incoming"}))'
+     for: 1h
+     labels:
+       severity: critical
+       team: sre
+   - alert: OutboundMXQueueHigh
+     annotations:
+       description: 'The outbound postfix mail exchanger {{ $labels.instance }} has a lot of messages in its queues. Check the runbook for further troubleshooting.'
+       summary: 'MX host {{ $labels.instance }} has many queued messages: {{ $value }} #page'
+       dashboard: 'https://grafana.wikimedia.org/d/h36Havfik/mail-postfix-servers'
+       runbook: 'https://wikitech.wikimedia.org/wiki/Postfix'
+     expr: '(sum by (instance) (postfix_showq_message_size_bytes_count{instance=~"mx-out.*", queue=~"active|incoming"})) > 1000'
+     for: 1h
+     labels:
+       severity: page
+       team: sre
+   - alert: OutboundMXQueueNoMetrics
+     annotations:
+       description: 'Metric, postfix_showq_message_size_bytes_count, used for the outbound postfix queue length cannot be found'
+       summary: 'Queue length metrics not found'
+       dashboard: 'https://grafana.wikimedia.org/d/h36Havfik/mail-postfix-servers'
+       runbook: 'https://wikitech.wikimedia.org/wiki/Postfix'
+     expr: 'absent(sum by (instance) (postfix_showq_message_size_bytes_count{instance=~"mx-out.*", queue=~"active|incoming"}))'
      for: 1h
      labels:
        severity: critical
