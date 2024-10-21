@@ -31,7 +31,7 @@ groups:
     # this alert file is deployed to all k8s prometheus, though mw-mcrouter exists only on wikikube
     # thus ignore "metric not found" lint alert
     # pint disable promql/series
-    expr: (container_memory_working_set_bytes{container!~"POD|", namespace="mw-mcrouter"} / (container_spec_memory_limit_bytes{container!~"POD|", namespace="mw-mcrouter"} > 0)) > 0.99
+    expr: (container_memory_working_set_bytes{container!~"POD|", namespace="mw-mcrouter"} / (container_spec_memory_limit_bytes{container!~"POD|", namespace="mw-mcrouter"} > 0)) > 0.997
 
 
 - name: certmanager
