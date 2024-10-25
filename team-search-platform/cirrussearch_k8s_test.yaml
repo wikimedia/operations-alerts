@@ -139,7 +139,7 @@ tests:
               summary: 'CirrusSearch full_text 95th percentiles latency is too high (mw@eqiad to eqiad)'
               description: "CirrusSearch full_text eqiad 95th percentile latency"
               runbook: 'https://wikitech.wikimedia.org/wiki/Search#Health/Activity_Monitoring'
-              dashboard: 'https://grafana.wikimedia.org/d/000000455/elasticsearch-percentiles?orgId=1&var-cirrus_group=eqiad&var-cluster=elasticsearch&var-exported_cluster=production-search&var-smoothing=1'
+              dashboard: 'https://grafana.wikimedia.org/d/dc04b9f2-b8d5-4ab6-9482-5d9a75728951/elasticsearch-percentiles?orgId=1'
       - alertname: CirrusSearchCompletionLatencyTooHigh
         eval_time: '6m'
         exp_alerts:
@@ -151,7 +151,7 @@ tests:
               summary: 'CirrusSearch comp_suggest 95th percentiles latency is too high (mw@eqiad to eqiad)'
               description: "CirrusSearch comp_suggest eqiad 95th percentile latency"
               runbook: 'https://wikitech.wikimedia.org/wiki/Search#Health/Activity_Monitoring'
-              dashboard: 'https://grafana.wikimedia.org/d/000000455/elasticsearch-percentiles?orgId=1&var-cirrus_group=eqiad&var-cluster=elasticsearch&var-exported_cluster=production-search&var-smoothing=1'
+              dashboard: 'https://grafana.wikimedia.org/d/dc04b9f2-b8d5-4ab6-9482-5d9a75728951/elasticsearch-percentiles?orgId=1'
       - alertname: CirrusSearchMoreLikeLatencyTooHigh
         eval_time: '6m'
         exp_alerts:
@@ -163,7 +163,7 @@ tests:
               summary: 'CirrusSearch more_like 95th percentiles latency is too high (mw@eqiad to eqiad)'
               description: "CirrusSearch more_like eqiad 95th percentile latency"
               runbook: 'https://wikitech.wikimedia.org/wiki/Search#Health/Activity_Monitoring'
-              dashboard: 'https://grafana.wikimedia.org/d/000000455/elasticsearch-percentiles?orgId=1&var-cirrus_group=eqiad&var-cluster=elasticsearch&var-exported_cluster=production-search&var-smoothing=1'
+              dashboard: 'https://grafana.wikimedia.org/d/dc04b9f2-b8d5-4ab6-9482-5d9a75728951/elasticsearch-percentiles?orgId=1'
   - interval: '1m'
     input_series:
       - series: mediawiki_CirrusSearch_backend_failures_total{type="memory_issue", search_cluster="eqiad"}
@@ -184,4 +184,4 @@ tests:
               summary: 'CirrusSearch backend failed 30 times in the last 10 minutes due to memory usage (mw@eqiad to eqiad)'
               description: 'Number of requests triggering circuit breakers due to excessive memory usage'
               runbook: 'https://wikitech.wikimedia.org/wiki/Search#Health/Activity_Monitoring'
-              dashboard: 'https://grafana.wikimedia.org/d/000000455/elasticsearch-percentiles?orgId=1&var-cirrus_group=eqiad&var-cluster=elasticsearch&var-exported_cluster=production-search&var-smoothing=1'
+              dashboard: 'https://grafana.wikimedia.org/d/dc04b9f2-b8d5-4ab6-9482-5d9a75728951/elasticsearch-percentiles?orgId=1'
