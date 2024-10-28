@@ -1,0 +1,28 @@
+# deploy-tag: k8s
+groups:
+- name: jobqueue
+  rules:
+  - alert: JobQueueLowTrafficConsumerWidespreadHighLatency
+    # Detects when > 50% of recently processed job types on the low-traffic
+    # rule have a p95 processing delay > 2m.
+    expr: |
+      count(
+        histogram_quantile(0.95, sum by (rule, le) (
+          rate(cpjobqueue_normal_rule_processing_delay_bucket{rule=~"low-traffic-jobs-.*"}[10m]))
+        )
+          > 120
+      )
+        /
+      count(
+        sum by (rule) (rate(cpjobqueue_normal_rule_processing_delay_count{rule=~"low-traffic-jobs-.*"}[10m])) > 0
+      )
+        > 0.5
+    for: 1h
+    labels:
+      team: sre
+      severity: warning  # TODO: T378385 - make critical
+    annotations:
+      summary: "Processing delay times for low-traffic consumer rules are unusually high"
+      description: "Processing delay times for low-traffic consumer rules are unusually high in site {{ $externalLabels.site }} for at least 50% of active job types for 1h."
+      runbook: TODO  # TODO: T378385 - Add to either 'Changeprop' or 'MediaWiki_JobQueue' pages
+      dashboard: "https://grafana.wikimedia.org/d/LSeAShkGz/jobqueue?var-dc={{ $externalLabels.site }}%20prometheus/k8s"
