@@ -1,0 +1,15 @@
+# deploy-tag: ops
+
+groups:
+  - name: netbox
+    rules:
+      - alert: NetboxAccounting
+        annotations:
+          description: 'Netbox - Accounting job failed'
+          summary: 'Netbox - Accounting job failed'
+          dashboard: 'TODO'
+          runbook: 'https://netbox.wikimedia.org/extras/scripts/12/jobs/'
+        expr: sum(delta(netbox_reports_total{name="Accounting"}[10m])) > 0
+        labels:
+          severity: warning
+          team: infrastructure-foundations
