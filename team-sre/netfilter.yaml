@@ -13,7 +13,7 @@ groups:
         expr: 90 > node_nf_conntrack_entries / node_nf_conntrack_entries_limit * 100 >= 80
         labels:
           severity: warning
-          team: 'sre'
+          team: "{{ if eq .Labels.cluster \"wmcs\" }}wmcs{{ else }}sre{{ end }}"
 
       - <<: *max_conn_track
         annotations:
@@ -24,4 +24,4 @@ groups:
         expr: node_nf_conntrack_entries / node_nf_conntrack_entries_limit * 100 >= 90
         labels:
           severity: critical
-          team: 'sre'
+          team: "{{ if eq .Labels.cluster \"wmcs\" }}wmcs{{ else }}sre{{ end }}"
