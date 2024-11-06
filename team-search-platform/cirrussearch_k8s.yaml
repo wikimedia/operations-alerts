@@ -20,7 +20,7 @@ groups:
         runbook: TODO
         dashboard: 'https://grafana.wikimedia.org/d/CbmStnlGk/jobqueue-job?orgId=1&var-dc={{ $externalLabels.site }}%20prometheus/k8s&var-job={{ $labels.rule | reReplaceAll ".*-([^-]*$)" "${1}" }}'
     - alert: CirrusSearchPoolCounterRejectionTooHigh
-      expr: sum(rate(mediawiki_CirrusSearch_pool_counter_seconds_count{status="failure"}[5m])) > 1000
+      expr: sum(rate(mediawiki_CirrusSearch_pool_counter_seconds_count{status="failure", type!="Automated"}[5m])) > 1000
       for: 1m
       labels:
         team: search-platform
