@@ -2,15 +2,15 @@
 # deploy-site: eqiad, codfw
 
 groups:
-  - name: irc-echo
+  - name: irc-stream
     rules:
-      - alert: UdpMxIrcEchoThroughput
+      - alert: UdpIRCStreamThroughput
         annotations:
           summary: "{{ $labels.instance }} has relayed less than 100 messages over past 5 minutes }}"
           description: "{{ $labels.instance }} has relayed less than 100 messages for the irc.wikimedia.org service over past 5 minutes }}"
-          dashboard: https://grafana.wikimedia.org/d/XyXn_CPMz/ircecho
+          dashboard: https://grafana.wikimedia.org/d/eb101795-c69e-4b9c-b848-f042d604f234/ircstream
           runbook: https://wikitech.wikimedia.org/wiki/Irc.wikimedia.org
-        expr: sum by (instance) (increase(udpmxircecho_messages_relayed_total[5m])) < 100
+        expr: sum by (instance) (increase(ircstream_messages_total[5m])) < 100
         labels:
           severity: critical
           team: sre
