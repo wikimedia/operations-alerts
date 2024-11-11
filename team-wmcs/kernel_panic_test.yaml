@@ -5,41 +5,67 @@ tests:
   - interval: 1m
     input_series:
       - series: kernel_dmesg_panic{instance="dummynode1:9000"}
-        values: "1+0x300"
+        values: "1+0x30"
       - series: kernel_dmesg_taint{instance="dummynode1:9000"}
-        values: "1+0x300"
+        values: "1+0x30"
       - series: kernel_dmesg_warning{instance="dummynode1:9000"}
-        values: "1+0x300"
+        values: "1+0x30"
       - series: kernel_dmesg_err_priority{instance="dummynode1:9000"}
-        values: "1+0x300"
+        values: "1+0x30"
     alert_rule_test:
+
+      # Alerts should fire immediately
       - alertname: Kernel panic
         eval_time: 0m
         exp_alerts:
-          - exp_labels: &exp_labels
+          - exp_labels:
               team: wmcs
-              severity: warning
+              severity: critical
               instance: dummynode1:9000
             exp_annotations: &exp_annotations
               summary: Server dummynode1 may have kernel errors
-              description: The server dummynode1 had some kernel error messages showing up in dmesg recently. Check it out
+              description: The server dummynode1 logged some kernel errors in the past 24h
               dashboard: https://grafana.wikimedia.org/d/b013af4c-d405-4d9f-85d4-985abb3dec0c/wmcs-kernel-panic-detector?orgId=1&var-instance=dummynode1
               runbook: https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/Kernel_panic
+
+      - alertname: Kernel error
+        eval_time: 0m
+        exp_alerts:
+          - exp_annotations: *exp_annotations
+            exp_labels:
+              team: wmcs
+              severity: critical
+              instance: dummynode1:9000
 
       - alertname: Kernel taint
         eval_time: 0m
         exp_alerts:
-          - exp_labels: *exp_labels
-            exp_annotations: *exp_annotations
+          - exp_annotations: *exp_annotations
+            exp_labels:
+              team: wmcs
+              severity: warning
+              instance: dummynode1:9000
 
       - alertname: Kernel warning
         eval_time: 0m
         exp_alerts:
-          - exp_labels: *exp_labels
-            exp_annotations: *exp_annotations
+          - exp_annotations: *exp_annotations
+            exp_labels:
+              team: wmcs
+              severity: warning
+              instance: dummynode1:9000
 
-      - alertname: Kernel err priority
-        eval_time: 0m
+      # Alerts should still be firing after 23h
+      - alertname: Kernel panic
+        eval_time: 23h
         exp_alerts:
-          - exp_labels: *exp_labels
-            exp_annotations: *exp_annotations
+          - exp_annotations: *exp_annotations
+            exp_labels:
+              team: wmcs
+              severity: critical
+              instance: dummynode1:9000
+
+      # Alerts should no longer be firing after 25h
+      - alertname: Kernel panic
+        eval_time: 25h
+        exp_alerts: []
