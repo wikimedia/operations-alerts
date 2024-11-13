@@ -6,6 +6,8 @@ tests:
     input_series:
       - series: 'netbox_reports_total{cluster="misc", instance="netbox1003:443", job="netbox_global", name="Accounting", status="failed"}'
         values: '16+1x300 17+0x1140'
+      - series: 'netbox_reports_total{cluster="misc", instance="netbox1003:443", job="netbox_global", name="PhysicalHosts", status="failed"}'
+        values: '16+1x300 17+0x1140'
     external_labels:
       site: eqiad
     alert_rule_test:
@@ -18,5 +20,16 @@ tests:
             exp_annotations:
               description: 'Netbox - Accounting job failed'
               summary: 'Netbox - Accounting job failed'
-              dashboard: 'TODO'
-              runbook: 'https://netbox.wikimedia.org/extras/scripts/12/jobs/'
+              dashboard: 'https://netbox.wikimedia.org/extras/scripts/12/jobs/'
+              runbook: 'https://wikitech.wikimedia.org/wiki/Netbox#Report_Alert'
+      - alertname: NetboxPhysicalHosts
+        eval_time: 300m
+        exp_alerts:
+          - exp_labels:
+              team: infrastructure-foundations
+              severity: warning
+            exp_annotations:
+              description: 'Netbox - PhysicalHosts job failed'
+              summary: 'Netbox - Report parity errors between PuppetDB and Netbox for physical devices.'
+              dashboard: 'https://netbox.wikimedia.org/extras/scripts/18/jobs/'
+              runbook: 'https://wikitech.wikimedia.org/wiki/Netbox#Report_Alert'

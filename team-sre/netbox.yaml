@@ -3,13 +3,23 @@
 groups:
   - name: netbox
     rules:
-      - alert: NetboxAccounting
+      - &netbox_accounting
+        alert: NetboxAccounting
         annotations:
           description: 'Netbox - Accounting job failed'
           summary: 'Netbox - Accounting job failed'
-          dashboard: 'TODO'
-          runbook: 'https://netbox.wikimedia.org/extras/scripts/12/jobs/'
+          dashboard: 'https://netbox.wikimedia.org/extras/scripts/12/jobs/'
+          runbook: 'https://wikitech.wikimedia.org/wiki/Netbox#Report_Alert'
         expr: sum(delta(netbox_reports_total{name="Accounting"}[10m])) > 0
         labels:
           severity: warning
           team: infrastructure-foundations
+
+      - <<: *netbox_accounting
+        alert: NetboxPhysicalHosts
+        annotations:
+          description: 'Netbox - PhysicalHosts job failed'
+          summary: 'Netbox - Report parity errors between PuppetDB and Netbox for physical devices.'
+          dashboard: 'https://netbox.wikimedia.org/extras/scripts/18/jobs/'
+          runbook: 'https://wikitech.wikimedia.org/wiki/Netbox#Report_Alert'
+        expr: sum(delta(netbox_reports_total{name="PhysicalHosts"}[10m])) > 0
