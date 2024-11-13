@@ -1,0 +1,22 @@
+rule_files:
+  - netbox.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    input_series:
+      - series: 'netbox_reports_total{cluster="misc", instance="netbox1003:443", job="netbox_global", name="Accounting", status="failed"}'
+        values: '16+1x300 17+0x1140'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: NetboxAccounting
+        eval_time: 300m
+        exp_alerts:
+          - exp_labels:
+              team: infrastructure-foundations
+              severity: warning
+            exp_annotations:
+              description: 'Netbox - Accounting job failed'
+              summary: 'Netbox - Accounting job failed'
+              dashboard: 'TODO'
+              runbook: 'https://netbox.wikimedia.org/extras/scripts/12/jobs/'
