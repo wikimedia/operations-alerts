@@ -1,0 +1,17 @@
+# deploy-tag: ops
+# deploy-site: eqiad, codfw
+
+groups:
+- name: thumbor
+  rules:
+  - alert: ThumborHighHaproxyErrorRate
+    expr: sum(rate(haproxy_backend_http_responses_total{kubernetes_namespace="thumbor", code="5xx"}[5m])) by (kubernetes_pod_name) / sum(rate(haproxy_backend_http_responses_total{kubernetes_namespace="thumbor"}[5m])) by (kubernetes_pod_name) > 0.9
+    for: 15m
+    labels:
+      severity: critical
+      team: sre
+    annotations:
+      summary: "Thumbor haproxy error rate - {{ $externalLabels.site }}"
+      description: "HAProxy on thumbor pod {{ $labels.kubernetes_pod_name }} reporting a sustained high error rate. This pod should be investigated or deleted."
+      dashboard: https://grafana.wikimedia.org/d/Pukjw6cWk/thumbor
+      runbook: https://wikitech.wikimedia.org/wiki/Thumbor
