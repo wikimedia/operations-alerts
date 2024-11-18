@@ -1,0 +1,28 @@
+rule_files:
+  - thumbor.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    input_series:
+      - series: 'haproxy_backend_http_responses_total{kubernetes_namespace="thumbor", code="5xx", kubernetes_pod_name="test1"}'
+        values: '100+10x100'
+      - series: 'haproxy_backend_http_responses_total{kubernetes_namespace="thumbor", kubernetes_pod_name="test1", code="2xx"}'
+        values: '80+0x100'
+    external_labels:
+      site: staging
+    alert_rule_test:
+      - alertname: ThumborHighHaproxyErrorRate
+        eval_time: 5m
+        exp_alerts: []
+      - alertname: ThumborHighHaproxyErrorRate
+        eval_time: 20m
+        exp_alerts:
+          - exp_labels:
+              team: sre
+              severity: critical
+              kubernetes_pod_name: test1
+            exp_annotations:
+              summary: "Thumbor haproxy error rate - staging"
+              description: "HAProxy on thumbor pod test1 reporting a sustained high error rate. This pod should be investigated or deleted."
+              dashboard: https://grafana.wikimedia.org/d/Pukjw6cWk/thumbor
+              runbook: https://wikitech.wikimedia.org/wiki/Thumbor
