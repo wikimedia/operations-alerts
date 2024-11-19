@@ -8,6 +8,16 @@ tests:
         values: '16+1x300 17+0x1140'
       - series: 'netbox_reports_total{cluster="misc", instance="netbox1003:443", job="netbox_global", name="PhysicalHosts", status="failed"}'
         values: '16+1x300 17+0x1140'
+      - series: 'netbox_reports_total{cluster="misc", instance="netbox2003:443", job="netbox_global", name="Network", status="failed"}'
+        values: '16+1x300 17+0x1140'
+      - series: 'netbox_reports_total{cluster="misc", instance="netbox2003:443", job="netbox_global", name="ManagementConsole", status="failed"}'
+        values: '16+1x300 17+0x1140'
+      - series: 'netbox_reports_total{cluster="misc", instance="netbox2003:443", job="netbox_global", name="LibreNMS", status="failed"}'
+        values: '16+1x300 17+0x1140'
+      - series: 'netbox_reports_total{cluster="misc", instance="netbox2003:443", job="netbox_global", name="Rack", status="failed"}'
+        values: '16+1x300 17+0x1140'
+      - series: 'netbox_reports_total{cluster="misc", instance="netbox2003:443", job="netbox_global", name="Cables", status="failed"}'
+        values: '16+1x300 17+0x1140'
     external_labels:
       site: eqiad
     alert_rule_test:
@@ -32,4 +42,59 @@ tests:
               description: 'Netbox - PhysicalHosts job failed'
               summary: 'Netbox - Report parity errors between PuppetDB and Netbox for physical devices.'
               dashboard: 'https://netbox.wikimedia.org/extras/scripts/18/jobs/'
+              runbook: 'https://wikitech.wikimedia.org/wiki/Netbox#Report_Alert'
+      - alertname: NetboxNetwork
+        eval_time: 300m
+        exp_alerts:
+          - exp_labels:
+              team: infrastructure-foundations
+              severity: warning
+            exp_annotations:
+              description: 'Netbox - Network test job failed'
+              summary: 'Netbox - Report on various network-related errors.'
+              dashboard: 'https://netbox.wikimedia.org/extras/scripts/16/jobs/'
+              runbook: 'https://wikitech.wikimedia.org/wiki/Netbox#Report_Alert'
+      - alertname: NetboxManagementConsole
+        eval_time: 300m
+        exp_alerts:
+          - exp_labels:
+              team: infrastructure-foundations
+              severity: warning
+            exp_annotations:
+              description: 'Netbox - Management Console job failed'
+              summary: 'Netbox - All checks related to management/console.'
+              dashboard: 'https://netbox.wikimedia.org/extras/scripts/15/jobs/'
+              runbook: 'https://wikitech.wikimedia.org/wiki/Netbox#Report_Alert'
+      - alertname: NetboxLibreNMS
+        eval_time: 300m
+        exp_alerts:
+          - exp_labels:
+              team: infrastructure-foundations
+              severity: warning
+            exp_annotations:
+              description: 'Netbox - LibreNMS job failed'
+              summary: 'Netbox - All checks related to LibreNMS.'
+              dashboard: 'https://netbox.wikimedia.org/extras/scripts/3/jobs/'
+              runbook: 'https://wikitech.wikimedia.org/wiki/Netbox#Report_Alert'
+      - alertname: NetboxRack
+        eval_time: 300m
+        exp_alerts:
+          - exp_labels:
+              team: infrastructure-foundations
+              severity: warning
+            exp_annotations:
+              description: 'Netbox - Rack coherence job failed'
+              summary: 'Netbox - Several integrity/coherence checks against the rack related data.'
+              dashboard: 'https://netbox.wikimedia.org/extras/scripts/14/jobs/'
+              runbook: 'https://wikitech.wikimedia.org/wiki/Netbox#Report_Alert'
+      - alertname: NetboxCables
+        eval_time: 300m
+        exp_alerts:
+          - exp_labels:
+              team: infrastructure-foundations
+              severity: warning
+            exp_annotations:
+              description: 'Netbox - Cable/cable termination job failed'
+              summary: 'Netbox - Check that Cables and CableTermination have proper name.'
+              dashboard: 'https://netbox.wikimedia.org/extras/scripts/13/jobs/'
               runbook: 'https://wikitech.wikimedia.org/wiki/Netbox#Report_Alert'
