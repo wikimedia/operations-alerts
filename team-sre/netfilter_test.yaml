@@ -12,6 +12,10 @@ tests:
         values: '250000x100'
       - series: 'node_nf_conntrack_entries_limit{cluster="api_appserver",instance="mw2002:9100",job="node",site="codfw"}'
         values: '262144x100'
+      - series: 'node_nf_conntrack_entries{cluster="wmcs",instance="cloud2002:9100",job="node",site="codfw"}'
+        values: '250000x100'
+      - series: 'node_nf_conntrack_entries_limit{cluster="wmcs",instance="cloud2002:9100",job="node",site="codfw"}'
+        values: '262144x100'
     external_labels:
       site: codfw
     alert_rule_test:
@@ -40,5 +44,17 @@ tests:
             exp_annotations:
               description: 'Netfilter: Maximum number of allowed connection tracking entries alert on mw2002:9100'
               summary: 'Max conntrack at 95.37% on mw2002:9100'
+              dashboard: 'https://grafana.wikimedia.org/d/oITUqwKIk/netfilter-connection-tracking'
+              runbook: 'https://wikitech.wikimedia.org/wiki/Monitoring/check_conntrack'
+          - exp_labels:
+              team: wmcs
+              severity: critical
+              job: node
+              instance: cloud2002:9100
+              cluster: wmcs
+              site: codfw
+            exp_annotations:
+              description: 'Netfilter: Maximum number of allowed connection tracking entries alert on cloud2002:9100'
+              summary: 'Max conntrack at 95.37% on cloud2002:9100'
               dashboard: 'https://grafana.wikimedia.org/d/oITUqwKIk/netfilter-connection-tracking'
               runbook: 'https://wikitech.wikimedia.org/wiki/Monitoring/check_conntrack'
