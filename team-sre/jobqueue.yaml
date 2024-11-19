@@ -17,12 +17,12 @@ groups:
         sum by (rule) (rate(cpjobqueue_normal_rule_processing_delay_count{rule=~"low-traffic-jobs-.*"}[10m])) > 0
       )
         > 0.5
-    for: 1h
+    for: 6h
     labels:
       team: sre
-      severity: warning  # TODO: T378385 - make critical
+      severity: critical
     annotations:
       summary: "Processing delay times for low-traffic consumer rules are unusually high"
-      description: "Processing delay times for low-traffic consumer rules are unusually high in site {{ $externalLabels.site }} for at least 50% of active job types for 1h."
-      runbook: TODO  # TODO: T378385 - Add to either 'Changeprop' or 'MediaWiki_JobQueue' pages
-      dashboard: "https://grafana.wikimedia.org/d/LSeAShkGz/jobqueue?var-dc={{ $externalLabels.site }}%20prometheus/k8s"
+      description: "Processing delay times for low-traffic consumer rules are unusually high in site {{ $externalLabels.site }} for at least 50% of active job types for 6h."
+      runbook: "https://wikitech.wikimedia.org/wiki/MediaWiki_JobQueue/Operations#JobQueueLowTrafficConsumerWidespreadHighLatency"
+      dashboard: "https://grafana.wikimedia.org/d/fe130675-0c2d-4991-9dec-f54cf6a9c4d8/jobqueue-low-traffic-jobs?var-site={{ $externalLabels.site }}"
