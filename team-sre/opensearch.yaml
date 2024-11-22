@@ -28,7 +28,7 @@ groups:
           * on(cluster, nodename) group_left(team)
           label_replace(
             max by(cluster, instance, team) (
-              last_over_time(role_owner{team!="unknown"}[1d])
+              last_over_time(role_owner{cluster=~"(datahubsearch|logstash)", team!="unknown"}[1d])
             )
           , "nodename", "$1", "instance", "(.*):.*"))
            < 1
@@ -48,7 +48,7 @@ groups:
         expr: >
           max without (nodename) ( max (label_replace(elasticsearch_cluster_health_status{color="yellow", exported_cluster=~"(datahub|(production-elk7-.+))"}, "nodename", "$1", "instance", "(.*):.*")) by (cluster, exported_cluster, nodename, color)
           * on(cluster, nodename) group_left(team)
-          label_replace(role_owner{team!="unknown"}, "nodename", "$1", "instance", "(.*):.*"))
+          label_replace(role_owner{cluster=~"(datahubsearch|logstash)", team!="unknown"}, "nodename", "$1", "instance", "(.*):.*"))
           > 0
         for: 5m
         labels:
@@ -58,7 +58,7 @@ groups:
         expr: >
           max without (nodename) ( sum (label_replace(elasticsearch_cluster_health_status{color="red", exported_cluster=~"(datahub|(production-elk7-.+))"}, "nodename", "$1", "instance", "(.*):.*")) by (cluster, exported_cluster, nodename, color)
           * on(cluster, nodename) group_left(team)
-          label_replace(role_owner{team!="unknown"}, "nodename", "$1", "instance", "(.*):.*"))
+          label_replace(role_owner{cluster=~"(datahubsearch|logstash)", team!="unknown"}, "nodename", "$1", "instance", "(.*):.*"))
           > 0
         for: 5m
         labels:
@@ -78,14 +78,14 @@ groups:
               (label_replace({__name__=~"elasticsearch_cluster_health_(unassigned|initializing)_shards", exported_cluster=~"(datahub|(production-elk7-.+))"}, "nodename", "$1", "instance", "(.*):.*"))
             by (cluster, exported_cluster, nodename)
             * on(cluster, nodename) group_left(team)
-              label_replace(role_owner{team!="unknown"}, "nodename", "$1", "instance", "(.*):.*"))
+              label_replace(role_owner{cluster=~"(datahubsearch|logstash)", team!="unknown"}, "nodename", "$1", "instance", "(.*):.*"))
           /
           max by (cluster, exported_cluster, team)
             (sum
               (label_replace({__name__=~"elasticsearch_cluster_health_(unassigned|initializing|active|relocating|active_primary|delayed_unassigned)_shards"}, "nodename", "$1", "instance", "(.*):.*"))
             by (cluster, exported_cluster, nodename)
             * on(cluster, nodename) group_left(team)
-              label_replace(role_owner{team!="unknown"}, "nodename", "$1", "instance", "(.*):.*"))
+              label_replace(role_owner{cluster=~"(datahubsearch|logstash)", team!="unknown"}, "nodename", "$1", "instance", "(.*):.*"))
           ) * 100
           > 5
         for: 12h
