@@ -1,4 +1,4 @@
-# deploy-tag: cephosd
+# deploy-tag: analytics
 # deploy-site: eqiad
 
 # Alerts ceph cluster wide issues

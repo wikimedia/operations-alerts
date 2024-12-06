@@ -1,4 +1,5 @@
-# deploy-tag: codfw
+# deploy-site: codfw
+# deploy-tag: ops
 # Alerts for too many openstack nodes being down
 # The split between eqiad/codfw is to be able to set different severities for the same alerts on different sites
 groups:

@@ -1,4 +1,5 @@
-# deploy-tag: eqiad
+# deploy-site: eqiad
+# deploy-tag: ops
 
 groups:
   - name: rabbitmq_network_partition

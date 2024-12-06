@@ -20,6 +20,7 @@
 # - each non-test *.yaml file is an alerting rule file, validate it with promtool
 # - additionally, each alerting rule file is checked for missing labels and annotations
 
+import fnmatch
 import os
 import pathlib
 import re
@@ -40,6 +41,19 @@ SUBDIRS = [
     if os.path.isdir(x) and not x.startswith(".")
 ]
 EXT_LABELS_RE = re.compile(r"{.*(prometheus|site)\s*[=!~]")
+
+PROMETHEUS_INSTANCES = [
+    "analytics",
+    "cloud",
+    "ext",
+    "k8s",
+    "k8s-aux",
+    "k8s-dse",
+    "k8s-mlserve",
+    "k8s-staging",
+    "ops",
+    "services",
+]
 
 
 def all_testfiles(paths):
@@ -154,7 +168,7 @@ def test_rule_metadata(rulefile):
 
 @pytest.mark.parametrize("rulefile", all_rulefiles(SUBDIRS), ids=str)
 def test_deploy_metadata(rulefile):
-    """Ensure the file 'deploy-tag' metadata is valid"""
+    """Ensure the file's 'deploy-tag' metadata is valid"""
 
     tag = _get_tag(rulefile.read_text(), "deploy-tag")
     assert (
@@ -166,6 +180,16 @@ def test_deploy_metadata(rulefile):
     if len(tags) > 1:
         for value in ("global", "local"):
             assert value not in tags, "%r not allowed with multiple tags" % value
+
+    for t in tags:
+        if t in ("global", "local"):
+            continue
+        if fnmatch.filter(PROMETHEUS_INSTANCES, t):
+            continue
+        assert False, (
+            "%r is not a valid value for deploy-tag. See docs at https://wikitech.wikimedia.org/wiki/Alertmanager#deploy-tag"
+            % t
+        )
 
 
 @pytest.mark.parametrize("rulefile", all_rulefiles(SUBDIRS), ids=str)
