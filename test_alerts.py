@@ -287,7 +287,7 @@ def _validate_rule_metadata(rule):
             rule["labels"]["severity"] == "page"
         ), "summary contains #page but severity is not 'page'"
 
-    assert string.whitespace not in alertname, (
+    assert all([x not in alertname for x in string.whitespace]), (
         "Alert names with spaces are hard to address and silence: %r" % alertname
     )
 

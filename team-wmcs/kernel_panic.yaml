@@ -4,7 +4,7 @@
 groups:
   - name: kernel_panic
     rules:
-      - alert: Kernel panic
+      - alert: KernelPanic
         expr: max_over_time(kernel_dmesg_panic[24h]) > 0
         annotations: &annotations
           summary: 'Server {{  $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }} may have kernel errors'
@@ -15,21 +15,21 @@ groups:
           severity: critical
           team: wmcs
 
-      - alert: Kernel error
+      - alert: KernelError
         expr: max_over_time(kernel_dmesg_err_priority[24h]) > 0
         annotations: *annotations
         labels:
           severity: critical
           team: wmcs
 
-      - alert: Kernel taint
+      - alert: KernelTaint
         expr: max_over_time(kernel_dmesg_taint[24h]) > 0
         annotations: *annotations
         labels:
           severity: warning
           team: wmcs
 
-      - alert: Kernel warning
+      - alert: KernelWarning
         expr: max_over_time(kernel_dmesg_warning[24h]) > 0
         annotations: *annotations
         labels:

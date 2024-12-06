@@ -15,7 +15,7 @@ tests:
     alert_rule_test:
 
       # Alerts should fire immediately
-      - alertname: Kernel panic
+      - alertname: KernelPanic
         eval_time: 0m
         exp_alerts:
           - exp_labels:
@@ -28,7 +28,7 @@ tests:
               dashboard: https://grafana.wikimedia.org/d/b013af4c-d405-4d9f-85d4-985abb3dec0c/wmcs-kernel-panic-detector?orgId=1&var-instance=dummynode1
               runbook: https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/Kernel_panic
 
-      - alertname: Kernel error
+      - alertname: KernelError
         eval_time: 0m
         exp_alerts:
           - exp_annotations: *exp_annotations
@@ -37,7 +37,7 @@ tests:
               severity: critical
               instance: dummynode1:9000
 
-      - alertname: Kernel taint
+      - alertname: KernelTaint
         eval_time: 0m
         exp_alerts:
           - exp_annotations: *exp_annotations
@@ -46,7 +46,7 @@ tests:
               severity: warning
               instance: dummynode1:9000
 
-      - alertname: Kernel warning
+      - alertname: KernelWarning
         eval_time: 0m
         exp_alerts:
           - exp_annotations: *exp_annotations
@@ -56,7 +56,7 @@ tests:
               instance: dummynode1:9000
 
       # Alerts should still be firing after 23h
-      - alertname: Kernel panic
+      - alertname: KernelPanic
         eval_time: 23h
         exp_alerts:
           - exp_annotations: *exp_annotations
@@ -66,6 +66,6 @@ tests:
               instance: dummynode1:9000
 
       # Alerts should no longer be firing after 25h
-      - alertname: Kernel panic
+      - alertname: KernelPanic
         eval_time: 25h
         exp_alerts: []
