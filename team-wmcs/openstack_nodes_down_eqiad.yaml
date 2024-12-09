@@ -24,7 +24,7 @@ groups:
           summary: "#page No availability for CloudVPS {{ $externalLabels.site }}"
           dashboard: "https://grafana.wikimedia.org/d/000000579/wmcs-openstack-eqiad1?orgId=1&refresh=15m"
           runbook: "https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/TooManyCloudcontrolsDown"
-        expr: 3 <= count(up{job="node", instance=~"cloudcontrol.*"})
+        expr: sum(up{job="node", instance=~"cloudcontrol.*"}) or on() vector(-1) < 1
         for: 5m
         labels:
           severity: page
@@ -37,7 +37,7 @@ groups:
           summary: "#page No availability for CloudVPS {{ $externalLabels.site }}"
           dashboard: "https://grafana.wikimedia.org/d/000000579/wmcs-openstack-eqiad1?orgId=1&refresh=15m"
           runbook: "https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/TooManyCloudnetsDown"
-        expr: 2 <= count(up{job="node", instance=~"cloudnet.*"})
+        expr: sum(up{job="node", instance=~"cloudnet.*"}) or on() vector(-1) < 1
         for: 5m
         labels:
           severity: page
@@ -50,7 +50,7 @@ groups:
           summary: "#page No availability for CloudVPS {{ $externalLabels.site }}"
           dashboard: "https://grafana.wikimedia.org/d/000000579/wmcs-openstack-eqiad1?orgId=1&refresh=15m"
           runbook: "https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/TooManyCloudgwsDown"
-        expr: 2 <= count(up{job="node", instance=~"cloudgw.*"})
+        expr: sum(up{job="node", instance=~"cloudgw.*"}) or on() vector(-1) < 1
         for: 5m
         labels:
           severity: page
