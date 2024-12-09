@@ -36,12 +36,12 @@ tests:
       - series: 'up{job="node", instance="cloudcontrol02"}'
         values: "1 1 0+0x7"
       - series: 'up{job="node", instance="cloudcontrol03"}'
-        values: "1+0x9"
+        values: "1 0+0x9"
     external_labels:
       site: eqiad
     alert_rule_test:
       - alertname: TooManyCloudcontrolsDown
-        eval_time: 5m
+        eval_time: 7m
         exp_alerts:
           - exp_labels:
               team: wmcs
@@ -62,7 +62,7 @@ tests:
       site: eqiad
     alert_rule_test:
       - alertname: TooManyCloudnetsDown
-        eval_time: 5m
+        eval_time: 7m
         exp_alerts:
           - exp_labels:
               team: wmcs
@@ -83,7 +83,7 @@ tests:
       site: eqiad
     alert_rule_test:
       - alertname: TooManyCloudgwsDown
-        eval_time: 5m
+        eval_time: 7m
         exp_alerts:
           - exp_labels:
               team: wmcs
