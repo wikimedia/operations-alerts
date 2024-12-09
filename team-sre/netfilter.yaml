@@ -10,10 +10,10 @@ groups:
           summary: 'Max conntrack at {{humanize $value}}% on {{$labels.instance}}'
           dashboard: 'https://grafana.wikimedia.org/d/oITUqwKIk/netfilter-connection-tracking'
           runbook: 'https://wikitech.wikimedia.org/wiki/Monitoring/check_conntrack'
-        expr: 90 > node_nf_conntrack_entries / node_nf_conntrack_entries_limit * 100 >= 80
+        expr: (90 > node_nf_conntrack_entries / node_nf_conntrack_entries_limit * 100 >= 80)
+                * on (instance) group_left(team) role_owner
         labels:
           severity: warning
-          team: "{{ if eq .Labels.cluster \"wmcs\" }}wmcs{{ else }}sre{{ end }}"
 
       - <<: *max_conn_track
         annotations:
@@ -21,7 +21,7 @@ groups:
           summary: 'Max conntrack at {{ humanize $value}}% on {{$labels.instance}}'
           dashboard: 'https://grafana.wikimedia.org/d/oITUqwKIk/netfilter-connection-tracking'
           runbook: 'https://wikitech.wikimedia.org/wiki/Monitoring/check_conntrack'
-        expr: node_nf_conntrack_entries / node_nf_conntrack_entries_limit * 100 >= 90
+        expr: (node_nf_conntrack_entries / node_nf_conntrack_entries_limit * 100 >= 90)
+                * on (instance) group_left(team) role_owner
         labels:
           severity: critical
-          team: "{{ if eq .Labels.cluster \"wmcs\" }}wmcs{{ else }}sre{{ end }}"
