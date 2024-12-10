@@ -1,0 +1,92 @@
+# https://prometheus.io/docs/prometheus/latest/configuration/unit_testing_rules/
+# Test locally using `promtool test rules mw--content-history-reconcile-enrich_test.yaml`
+rule_files:
+  - mw-content-history-reconcile-enrich.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 5m
+    input_series:
+      - series: 'flink_jobmanager_job_uptime{job_name="Some_Job", kubernetes_namespace="some-ns"}'
+        values: "2000000"
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: MediawikiContentHistoryReconcileEnrichJobManagerNotRunning
+        eval_time: 5m
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              team: data-engineering
+              kubernetes_namespace: mw-content-history-reconcile-enrich
+              release: production
+              job_name: "mw_content_history_reconcile_enrich"
+            exp_annotations:
+              summary: "mw_content_history_reconcile_enrich in eqiad is not running"
+              description: "The mw_content_history_reconcile_enrich job is not running"
+              dashboard: 'https://grafana.wikimedia.org/d/K9x0c4aVk/flink-app?orgId=1&var-datasource=eqiad%20prometheus/k8s&var-namespace=mw-content-history-reconcile-enrich&var-helm_release=production&var-operator_name=All&var-flink_job_name=mw_content_history_reconcile_enrich'
+              runbook: TODO
+  - interval: 1m
+    input_series:
+      - series: 'flink_jobmanager_numRegisteredTaskManagers{kubernetes_namespace="mw-content-history-reconcile-enrich", release="production"}'
+        values: 0
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: MediawikiContentHistoryReconcileEnrichTaskManagerNotRunning
+        eval_time: 5m
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              team: data-engineering
+              kubernetes_namespace: mw-content-history-reconcile-enrich
+              release: production
+            exp_annotations:
+              summary: "The mw-content-history-reconcile-enrich Flink cluster in eqiad has no registered TaskManagers"
+              description: "The mw-content-history-reconcile-enrich Flink cluster in eqiad has no registered TaskManagers"
+              dashboard: 'https://grafana.wikimedia.org/d/K9x0c4aVk/flink-app?orgId=1&var-datasource=eqiad%20prometheus/k8s&var-namespace=mw-content-history-reconcile-enrich&var-helm_release=production&var-operator_name=All&var-flink_job_name=All'
+              runbook: TODO
+
+  - interval: 1m
+    input_series:
+      - series: 'flink_taskmanager_job_task_operator_KafkaSourceReader_KafkaConsumer_records_lag_max{kubernetes_namespace="mw-content-history-reconcile-enrich", release="production", job_name="mw_content_history_reconcile_enrich"}'
+        values: 2000
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: MediawikiContentHistoryReconcileEnrichHighKafkaConsumerLag
+        eval_time: 5m
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              team: data-engineering
+              kubernetes_namespace: mw-content-history-reconcile-enrich
+              release: production
+              job_name: "mw_content_history_reconcile_enrich"
+            exp_annotations:
+              summary: "High Kafka consumer lag for mw_content_history_reconcile_enrich in eqiad"
+              description: "Maximum lag of the consumed Kafka topic partition excedes SLO threshold"
+              dashboard: 'https://grafana.wikimedia.org/d/K9x0c4aVk/flink-app?orgId=1&var-datasource=eqiad%20prometheus/k8s&var-namespace=mw-content-history-reconcile-enrich&var-helm_release=production&var-operator_name=All&var-flink_job_name=mw_content_history_reconcile_enrich'
+              runbook: TODO
+  - interval: 1h
+    input_series:
+      - series: 'flink_taskmanager_job_task_operator_KafkaProducer_record_send_total{job_name="mw_content_history_reconcile_enrich", kubernetes_namespace="mw-content-history-reconcile-enrich", operator_name="kafka__mediawiki_content_history_reconcile_enrich_v1:_Writer", release="production"}'
+        values: '0+380x24'
+      - series: 'flink_taskmanager_job_task_operator_KafkaSourceReader_KafkaConsumer_records_consumed_total{job_name="mw_content_history_reconcile_enrich", kubernetes_namespace="mw-content-history-reconcile-enrich", operator_name="Source:_kafka__mediawiki_content_history_reconcile_v1", release="production"}'
+        values: '0+500x24'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: MediawikiContentHistoryReconcileEnrichAvailabilityDaily
+        eval_time: 24h
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              team: data-engineering
+              kubernetes_namespace: mw-content-history-reconcile-enrich
+              release: production
+              job_name: "mw_content_history_reconcile_enrich"
+            exp_annotations:
+              summary: "Daily low percentage of enriched events produced by mw_content_history_reconcile_enrich in eqiad"
+              description: "The daily percentage of enriched events produced is below SLO threshold"
+              dashboard: 'https://grafana.wikimedia.org/d/K9x0c4aVk/flink-app?orgId=1&var-datasource=eqiad%20prometheus/k8s&var-namespace=mw-content-history-reconcile-enrich&var-helm_release=production&var-operator_name=All&var-flink_job_name=mw_content_history_reconcile_enrich'
+              runbook: TODO

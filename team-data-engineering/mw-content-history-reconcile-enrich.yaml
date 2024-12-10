@@ -1,0 +1,78 @@
+# deploy-tag: k8s-dse
+# deploy-site: eqiad
+# Alerts are enabled only on main k8s.
+groups:
+  - name: mw-content-history-reconcile-enrich
+    rules:
+      - alert: MediawikiContentHistoryReconcileEnrichJobManagerNotRunning
+        # The job manager is not running. This indicates there is no valid deployment of the application.
+        expr: |
+          absent(flink_jobmanager_job_uptime{kubernetes_namespace="mw-content-history-reconcile-enrich", release="production", job_name="mw_content_history_reconcile_enrich"})
+        for: 5m
+        labels:
+          team: data-engineering
+          severity: critical
+        annotations:
+          summary: "{{ $labels.job_name }} in {{$externalLabels.site}} is not running"
+          description: "The {{ $labels.job_name }} job is not running"
+          dashboard: 'https://grafana.wikimedia.org/d/K9x0c4aVk/flink-app?orgId=1&var-datasource={{ $externalLabels.site }}%20prometheus/k8s&var-namespace={{ $labels.kubernetes_namespace }}&var-helm_release={{ $labels.release }}&var-operator_name=All&var-flink_job_name={{ $labels.job_name }}'
+          runbook: TODO
+
+      - alert: MediawikiContentHistoryReconcileEnrichTaskManagerNotRunning
+        # Task managers (workers) are not running. There is a valid deployment, but the application is not operating properly.
+        expr: |
+          flink_jobmanager_numRegisteredTaskManagers{kubernetes_namespace="mw-content-history-reconcile-enrich", release="production"} == 0
+        for: 5m
+        labels:
+          team: data-engineering
+          severity: critical
+        annotations:
+          summary: "The {{ $labels.kubernetes_namespace }} Flink cluster in {{$externalLabels.site}} has no registered TaskManagers"
+          description: "The {{ $labels.kubernetes_namespace }} Flink cluster in {{$externalLabels.site}} has no registered TaskManagers"
+          dashboard: 'https://grafana.wikimedia.org/d/K9x0c4aVk/flink-app?orgId=1&var-datasource={{ $externalLabels.site }}%20prometheus/k8s&var-namespace={{ $labels.kubernetes_namespace }}&var-helm_release={{ $labels.release }}&var-operator_name=All&var-flink_job_name=All'
+          runbook: TODO
+
+      - alert: MediawikiContentHistoryReconcileEnrichHighKafkaConsumerLag
+        # The application is experiencing latency in consuming from Kafka brokers.
+        # This threshold and duration should match target SLO values
+        expr: |
+          flink_taskmanager_job_task_operator_KafkaSourceReader_KafkaConsumer_records_lag_max{kubernetes_namespace="mw-content-history-reconcile-enrich", release="production", job_name="mw_content_history_reconcile_enrich"} > 600
+        for: 5m
+        labels:
+          team: data-engineering
+          severity: warning
+        annotations:
+          summary: "High Kafka consumer lag for {{$labels.job_name}} in {{ $externalLabels.site }}"
+          description: "Maximum lag of the consumed Kafka topic partition excedes SLO threshold"
+          dashboard: 'https://grafana.wikimedia.org/d/K9x0c4aVk/flink-app?orgId=1&var-datasource={{ $externalLabels.site }}%20prometheus/k8s&var-namespace={{ $labels.kubernetes_namespace }}&var-helm_release={{ $labels.release }}&var-operator_name=All&var-flink_job_name={{ $labels.job_name }}'
+          runbook: TODO
+
+      - alert: MediawikiContentHistoryReconcileEnrichAvailabilityDaily
+        # The application is failing to enrich reconciliation events.
+        # Alert on degradation of availability SLI:
+        # 80% of processed messages are enriched over a 24-hour period, with no particular upper bound of latency.
+        # pint disable promql/series
+        # pint disable promql/rate
+        expr: |
+          sum by (kubernetes_namespace, release, job_name) (
+            increase(
+              flink_taskmanager_job_task_operator_KafkaProducer_record_send_total{job_name="mw_content_history_reconcile_enrich", kubernetes_namespace="mw-content-history-reconcile-enrich", operator_name="kafka__mediawiki_content_history_reconcile_enrich_v1:_Writer", release="production"}[24h]
+              )
+          ) /
+          sum by (kubernetes_namespace, release, job_name) (
+            clamp_min(
+              increase(
+                flink_taskmanager_job_task_operator_KafkaSourceReader_KafkaConsumer_records_consumed_total{job_name="mw_content_history_reconcile_enrich", kubernetes_namespace="mw-content-history-reconcile-enrich", operator_name="Source:_kafka__mediawiki_content_history_reconcile_v1", release="production"}[24h]),1e-10) ) <= 0.8
+          and on()
+          sum by (kubernetes_namespace, release, job_name) (
+            rate(
+              flink_taskmanager_job_task_operator_KafkaSourceReader_KafkaConsumer_records_consumed_total{job_name="mw_content_history_reconcile_enrich", kubernetes_namespace="mw-content-history-reconcile-enrich", operator_name="Source:_kafka__mediawiki_content_history_reconcile_v1", release="production"}[24h])) > 0
+        for: 5m
+        labels:
+          team: data-engineering
+          severity: warning
+        annotations:
+          summary: "Daily low percentage of enriched events produced by {{ $labels.job_name }} in {{$externalLabels.site}}"
+          description: "The daily percentage of enriched events produced is below SLO threshold"
+          dashboard: 'https://grafana.wikimedia.org/d/K9x0c4aVk/flink-app?orgId=1&var-datasource={{ $externalLabels.site }}%20prometheus/k8s&var-namespace={{ $labels.kubernetes_namespace }}&var-helm_release={{ $labels.release }}&var-operator_name=All&var-flink_job_name={{ $labels.job_name }}'
+          runbook: TODO
