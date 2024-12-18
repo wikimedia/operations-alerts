@@ -27,16 +27,3 @@ groups:
           description: "Blazegraph will soon be unable to apply updates"
           runbook: https://wikitech.wikimedia.org/wiki/Wikidata_Query_Service/Runbook
           dashboard: https://grafana.wikimedia.org/d/000000489/wikidata-query-service
-
-      - alert: ElevatedMaxLagWDQS
-        expr: max(time() - label_replace(blazegraph_lastupdated{cluster="wdqs"}, "host", "$1", "instance", "^([^:]+):.*") and on(host) label_replace(rate(org_wikidata_query_rdf_blazegraph_filters_QueryEventSenderFilter_event_sender_filter_StartedQueries{}[5m]) > 0.2, "host", "$1", "instance", "^([^:]+):.*"))/60 > 10
-        for: 1m
-        labels:
-          cluster: wdqs
-          team: data-platform
-          severity: critical
-        annotations:
-          summary: "WDQS lag is above 10 minutes"
-          description: "WDQS cluster in {{ $externalLabels.site }} is throttling all connections due to high lag"
-          runbook: https://wikitech.wikimedia.org/wiki/Wikidata_Query_Service/Runbook
-          dashboard: https://grafana.wikimedia.org/d/000000489/wikidata-query-service
