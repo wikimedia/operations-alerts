@@ -151,7 +151,7 @@ tests:
       - series: 'atlas_measurement_label{measurement="1790945", ip_version="ipv4", target_site="eqiad"}'
         values: '1x15 1'
     alert_rule_test:
-    - alertname: IPv4AnchorUnreachable
+    - alertname: RipeAtlasAnchorUnreachable
       eval_time: 15m
       exp_alerts:
         - exp_labels:
@@ -161,10 +161,11 @@ tests:
             team: sre
             severity: critical
           exp_annotations:
-            description: "ipv4 ping to eqiad RIPE Atlas anchor: failures over threshold"
-            summary: "ipv4 ping to eqiad RIPE Atlas anchor: failures over threshold"
+            description: "ipv4 ping to eqiad RIPE Atlas anchor: failures over threshold for measurement 1790945"
+            summary: "ipv4 ping to eqiad RIPE Atlas anchor: failures over threshold for measurement 1790945"
             dashboard: https://grafana.wikimedia.org/d/K1qm1j-Wz/ripe-atlas?orgId=1
             runbook: https://wikitech.wikimedia.org/wiki/Network_monitoring#Atlas_alerts
+            atlasdashboard: https://atlas.ripe.net/measurements/1790945/overview
 
   - interval: 1m
     input_series:
@@ -535,7 +536,7 @@ tests:
       - series: 'atlas_measurement_label{measurement="1790947", ip_version="ipv6", target_site="eqiad"}'
         values: '1x15 1'
     alert_rule_test:
-    - alertname: IPv6AnchorUnreachable
+    - alertname: RipeAtlasAnchorUnreachable
       eval_time: 15m
       exp_alerts:
         - exp_labels:
@@ -545,7 +546,8 @@ tests:
             team: sre
             severity: critical
           exp_annotations:
-            description: "ipv6 ping to eqiad RIPE Atlas anchor: failures over threshold"
-            summary: "ipv6 ping to eqiad RIPE Atlas anchor: failures over threshold"
+            description: "ipv6 ping to eqiad RIPE Atlas anchor: failures over threshold for measurement 1790947" 
+            summary: "ipv6 ping to eqiad RIPE Atlas anchor: failures over threshold for measurement 1790947" 
             dashboard: https://grafana.wikimedia.org/d/K1qm1j-Wz/ripe-atlas?orgId=1
             runbook: https://wikitech.wikimedia.org/wiki/Network_monitoring#Atlas_alerts
+            atlasdashboard: https://atlas.ripe.net/measurements/1790947/overview

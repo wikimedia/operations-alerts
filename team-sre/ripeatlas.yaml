@@ -8,44 +8,45 @@ groups:
   - name: ripeatlas
     rules:
     - &anchor_unreachable
-      alert: IPv4AnchorUnreachable
+      alert: RipeAtlasAnchorUnreachable
       annotations:
-        description: '{{ $labels.ip_version }} ping to {{ $labels.target_site }} RIPE Atlas anchor: failures over threshold'
-        summary: '{{ $labels.ip_version }} ping to {{ $labels.target_site }} RIPE Atlas anchor: failures over threshold'
+        description: '{{ $labels.ip_version }} ping to {{ $labels.target_site }} RIPE Atlas anchor: failures over threshold for measurement {{ $labels.measurement }}'
+        summary: '{{ $labels.ip_version }} ping to {{ $labels.target_site }} RIPE Atlas anchor: failures over threshold for measurement {{ $labels.measurement }}'
         dashboard: https://grafana.wikimedia.org/d/K1qm1j-Wz/ripe-atlas?orgId=1
         runbook: https://wikitech.wikimedia.org/wiki/Network_monitoring#Atlas_alerts
+        atlasdashboard: 'https://atlas.ripe.net/measurements/{{ $labels.measurement }}/overview'
       expr: |
-        (max by (measurement) (
-          count by (measurement, instance) (
-            (
+        (
               (
-                atlas_ping_sent{measurement=~"(1790945|32390538|59935536|11645085)"} - atlas_ping_received
+                  sum by (measurement) (
+                    count by (measurement) (((atlas_ping_sent - atlas_ping_received) / atlas_ping_sent) > 0.5)
+                  )
+                /
+                  count by (measurement) (atlas_ping_sent)
               )
-              /
-                atlas_ping_sent
-            ) > 0.5
-          )
-        ) * on (measurement) group_left(ip_version, target_site) max without(instance, site) (
-          atlas_measurement_label)
-        ) > 35
+            * on (measurement) group_left (ip_version, target_site)
+              max without (instance, site) (atlas_measurement_label{ip_version="ipv4"})
+          *
+            100
+        ) > 5
       for: 15m
       labels:
         severity: critical
         team: sre
 
     - <<: *anchor_unreachable
-      alert: IPv6AnchorUnreachable
+      # In case of ipv6, we double the threshold
       expr: |
-        (max by (measurement) (
-          count by (measurement, instance) (
-            (
+        (
               (
-                atlas_ping_sent{measurement=~"(1790947|32390541|59935539|11645088)"} - atlas_ping_received
+                  sum by (measurement) (
+                    count by (measurement) (((atlas_ping_sent - atlas_ping_received) / atlas_ping_sent) > 0.5)
+                  )
+                /
+                  count by (measurement) (atlas_ping_sent)
               )
-              /
-                atlas_ping_sent
-            ) > 0.5
-          )
-        ) * on (measurement) group_left(ip_version, target_site) max without(instance, site) (
-          atlas_measurement_label)
-        ) > 90
+            * on (measurement) group_left (ip_version, target_site)
+              max without (instance, site) (atlas_measurement_label{ip_version="ipv6"})
+          *
+            100
+        ) > 12
