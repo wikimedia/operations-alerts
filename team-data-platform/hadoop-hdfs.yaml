@@ -62,7 +62,7 @@ groups:
         summary: Total files on the {{ $labels.hadoop_cluster }} HDFS cluster are more than the heap can support.
         dashboard: https://grafana.wikimedia.org/d/000000585/hadoop?var-hadoop_cluster={{ $labels.hadoop_cluster }}&orgId=1&panelId=28&fullscreen
         runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#HDFS_total_files_and_heap_size
-      expr: max by (hadoop_cluster) (Hadoop_NameNode_FilesTotal) > 110000000
+      expr: max by (hadoop_cluster) (Hadoop_NameNode_FilesTotal) > 130000000
       for: 5m
       labels:
         severity: critical
@@ -74,7 +74,7 @@ groups:
         summary: Total files on the {{ $labels.hadoop_cluster }} HDFS cluster are more than the heap can support.
         dashboard: https://grafana.wikimedia.org/d/000000585/hadoop?var-hadoop_cluster={{ $labels.hadoop_cluster }}&orgId=1&panelId=28&fullscreen
         runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#HDFS_total_files_and_heap_size
-      expr: max by (hadoop_cluster) (Hadoop_NameNode_FilesTotal) > 105000000
+      expr: max by (hadoop_cluster) (Hadoop_NameNode_FilesTotal) > 125000000
       for: 5m
       labels:
         severity: warning
