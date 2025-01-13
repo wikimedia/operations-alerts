@@ -1,0 +1,24 @@
+# deploy-tag: global
+
+groups:
+  - name: thanos-rule-global
+    rules:
+    - alert: ThanosRecordingRuleGaps
+      annotations:
+        description: Gap in metrics rendered from Thanos Rule
+        summary: Thanos recording rule has stopped working correctly, check thanos-rule service.
+        dashboard: https://grafana.wikimedia.org/d/35da848f5f92b2dc612e0c3a0577b8a1/thanos-rule
+        runbook: https://wikitech.wikimedia.org/wiki/Thanos#Alerts
+      # https://w.wiki/Ch$$
+      # It fire only if ALL recording rules stop working simultaneously.
+      # The ':' is required in the regexp; otherwise, the tests will not pass. Could this be a bug?
+      expr: |
+        (
+          absent({__name__=~".*:.*", recorder="thanos-rule"})
+          or
+          label_replace(vector(0), "recorder", "thanos-rule", "__name__", ".*")
+        ) > 0
+      for: 5m
+      labels:
+        severity: critical
+        team: o11y

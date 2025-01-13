@@ -1,0 +1,23 @@
+rule_files:
+  - thanos-rule-global.yaml
+evaluation_interval: 1m
+tests:
+ - interval: 1m
+   input_series:
+     - series: 'serie:1{recorder="thanos-rule"}'
+       values: '_x15'
+     - series: 'serie:2{recorder="thanos-rule"}'
+       values: '_x15'
+   alert_rule_test:
+     - alertname: ThanosRecordingRuleGaps
+       eval_time: 15m
+       exp_alerts:
+         - exp_labels:
+             severity: critical
+             team: o11y
+             recorder: thanos-rule
+           exp_annotations:
+             description: Gap in metrics rendered from Thanos Rule
+             summary: Thanos recording rule has stopped working correctly, check thanos-rule service.
+             dashboard: https://grafana.wikimedia.org/d/35da848f5f92b2dc612e0c3a0577b8a1/thanos-rule
+             runbook: https://wikitech.wikimedia.org/wiki/Thanos#Alerts
