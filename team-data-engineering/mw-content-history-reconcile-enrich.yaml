@@ -15,7 +15,7 @@ groups:
         annotations:
           summary: "{{ $labels.job_name }} in {{$externalLabels.site}} is not running"
           description: "The {{ $labels.job_name }} job is not running"
-          dashboard: 'https://grafana.wikimedia.org/d/K9x0c4aVk/flink-app?orgId=1&var-datasource={{ $externalLabels.site }}%20prometheus/k8s&var-namespace={{ $labels.kubernetes_namespace }}&var-helm_release={{ $labels.release }}&var-operator_name=All&var-flink_job_name={{ $labels.job_name }}'
+          dashboard: 'https://grafana.wikimedia.org/d/K9x0c4aVk/flink-app?orgId=1&var-datasource={{ $externalLabels.site }}%20prometheus/k8s-dse&var-namespace={{ $labels.kubernetes_namespace }}&var-helm_release={{ $labels.release }}&var-operator_name=All&var-flink_job_name={{ $labels.job_name }}'
           runbook: TODO
 
       - alert: MediawikiContentHistoryReconcileEnrichTaskManagerNotRunning
@@ -29,7 +29,7 @@ groups:
         annotations:
           summary: "The {{ $labels.kubernetes_namespace }} Flink cluster in {{$externalLabels.site}} has no registered TaskManagers"
           description: "The {{ $labels.kubernetes_namespace }} Flink cluster in {{$externalLabels.site}} has no registered TaskManagers"
-          dashboard: 'https://grafana.wikimedia.org/d/K9x0c4aVk/flink-app?orgId=1&var-datasource={{ $externalLabels.site }}%20prometheus/k8s&var-namespace={{ $labels.kubernetes_namespace }}&var-helm_release={{ $labels.release }}&var-operator_name=All&var-flink_job_name=All'
+          dashboard: 'https://grafana.wikimedia.org/d/K9x0c4aVk/flink-app?orgId=1&var-datasource={{ $externalLabels.site }}%20prometheus/k8s-dse&var-namespace={{ $labels.kubernetes_namespace }}&var-helm_release={{ $labels.release }}&var-operator_name=All&var-flink_job_name=All'
           runbook: TODO
 
       - alert: MediawikiContentHistoryReconcileEnrichHighKafkaConsumerLag
@@ -44,7 +44,7 @@ groups:
         annotations:
           summary: "High Kafka consumer lag for {{$labels.job_name}} in {{ $externalLabels.site }}"
           description: "Maximum lag of the consumed Kafka topic partition excedes SLO threshold"
-          dashboard: 'https://grafana.wikimedia.org/d/K9x0c4aVk/flink-app?orgId=1&var-datasource={{ $externalLabels.site }}%20prometheus/k8s&var-namespace={{ $labels.kubernetes_namespace }}&var-helm_release={{ $labels.release }}&var-operator_name=All&var-flink_job_name={{ $labels.job_name }}'
+          dashboard: 'https://grafana.wikimedia.org/d/K9x0c4aVk/flink-app?orgId=1&var-datasource={{ $externalLabels.site }}%20prometheus/k8s-dse&var-namespace={{ $labels.kubernetes_namespace }}&var-helm_release={{ $labels.release }}&var-operator_name=All&var-flink_job_name={{ $labels.job_name }}'
           runbook: TODO
 
       - alert: MediawikiContentHistoryReconcileEnrichAvailabilityDaily
@@ -74,5 +74,5 @@ groups:
         annotations:
           summary: "Daily low percentage of enriched events produced by {{ $labels.job_name }} in {{$externalLabels.site}}"
           description: "The daily percentage of enriched events produced is below SLO threshold"
-          dashboard: 'https://grafana.wikimedia.org/d/K9x0c4aVk/flink-app?orgId=1&var-datasource={{ $externalLabels.site }}%20prometheus/k8s&var-namespace={{ $labels.kubernetes_namespace }}&var-helm_release={{ $labels.release }}&var-operator_name=All&var-flink_job_name={{ $labels.job_name }}'
+          dashboard: 'https://grafana.wikimedia.org/d/K9x0c4aVk/flink-app?orgId=1&var-datasource={{ $externalLabels.site }}%20prometheus/k8s-dse&var-namespace={{ $labels.kubernetes_namespace }}&var-helm_release={{ $labels.release }}&var-operator_name=All&var-flink_job_name={{ $labels.job_name }}'
           runbook: TODO

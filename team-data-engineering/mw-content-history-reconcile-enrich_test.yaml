@@ -23,7 +23,7 @@ tests:
             exp_annotations:
               summary: "mw_content_history_reconcile_enrich in eqiad is not running"
               description: "The mw_content_history_reconcile_enrich job is not running"
-              dashboard: 'https://grafana.wikimedia.org/d/K9x0c4aVk/flink-app?orgId=1&var-datasource=eqiad%20prometheus/k8s&var-namespace=mw-content-history-reconcile-enrich&var-helm_release=production&var-operator_name=All&var-flink_job_name=mw_content_history_reconcile_enrich'
+              dashboard: 'https://grafana.wikimedia.org/d/K9x0c4aVk/flink-app?orgId=1&var-datasource=eqiad%20prometheus/k8s-dse&var-namespace=mw-content-history-reconcile-enrich&var-helm_release=production&var-operator_name=All&var-flink_job_name=mw_content_history_reconcile_enrich'
               runbook: TODO
   - interval: 1m
     input_series:
@@ -43,7 +43,7 @@ tests:
             exp_annotations:
               summary: "The mw-content-history-reconcile-enrich Flink cluster in eqiad has no registered TaskManagers"
               description: "The mw-content-history-reconcile-enrich Flink cluster in eqiad has no registered TaskManagers"
-              dashboard: 'https://grafana.wikimedia.org/d/K9x0c4aVk/flink-app?orgId=1&var-datasource=eqiad%20prometheus/k8s&var-namespace=mw-content-history-reconcile-enrich&var-helm_release=production&var-operator_name=All&var-flink_job_name=All'
+              dashboard: 'https://grafana.wikimedia.org/d/K9x0c4aVk/flink-app?orgId=1&var-datasource=eqiad%20prometheus/k8s-dse&var-namespace=mw-content-history-reconcile-enrich&var-helm_release=production&var-operator_name=All&var-flink_job_name=All'
               runbook: TODO
 
   - interval: 1m
@@ -65,7 +65,7 @@ tests:
             exp_annotations:
               summary: "High Kafka consumer lag for mw_content_history_reconcile_enrich in eqiad"
               description: "Maximum lag of the consumed Kafka topic partition excedes SLO threshold"
-              dashboard: 'https://grafana.wikimedia.org/d/K9x0c4aVk/flink-app?orgId=1&var-datasource=eqiad%20prometheus/k8s&var-namespace=mw-content-history-reconcile-enrich&var-helm_release=production&var-operator_name=All&var-flink_job_name=mw_content_history_reconcile_enrich'
+              dashboard: 'https://grafana.wikimedia.org/d/K9x0c4aVk/flink-app?orgId=1&var-datasource=eqiad%20prometheus/k8s-dse&var-namespace=mw-content-history-reconcile-enrich&var-helm_release=production&var-operator_name=All&var-flink_job_name=mw_content_history_reconcile_enrich'
               runbook: TODO
   - interval: 1h
     input_series:
@@ -88,5 +88,5 @@ tests:
             exp_annotations:
               summary: "Daily low percentage of enriched events produced by mw_content_history_reconcile_enrich in eqiad"
               description: "The daily percentage of enriched events produced is below SLO threshold"
-              dashboard: 'https://grafana.wikimedia.org/d/K9x0c4aVk/flink-app?orgId=1&var-datasource=eqiad%20prometheus/k8s&var-namespace=mw-content-history-reconcile-enrich&var-helm_release=production&var-operator_name=All&var-flink_job_name=mw_content_history_reconcile_enrich'
+              dashboard: 'https://grafana.wikimedia.org/d/K9x0c4aVk/flink-app?orgId=1&var-datasource=eqiad%20prometheus/k8s-dse&var-namespace=mw-content-history-reconcile-enrich&var-helm_release=production&var-operator_name=All&var-flink_job_name=mw_content_history_reconcile_enrich'
               runbook: TODO
