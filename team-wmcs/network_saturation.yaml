@@ -1,0 +1,66 @@
+# deploy-tag: ops
+# deploy-site: eqiad
+
+# Alerts for network saturation
+# The threshold for outgoing and incoming network saturation is 7.5Gbps.
+groups:
+  - name: network_monitoring
+    rules:
+      - alert: NetworkOutSaturated
+        annotations:
+          description: "Outgoing network saturation detected on {{ $labels.instance }}."
+          summary: "Outgoing network saturation detected on {{ $labels.instance }}."
+          dashboard: "https://grafana.wikimedia.org/d/000000568/wmcs-dumps-general-view"
+          runbook: "https://wikitech.wikimedia.org/wiki/Portal:Data_Services/Admin/Shared_storage#Dumps"
+        expr: |
+          sum by (instance) (irate(node_network_transmit_bytes_total{device!="lo", instance=~"clouddumps.*"}[5m])) >= 937500000
+        for: 10m
+        labels:
+          severity: warning
+          team: wmcs
+          service: network
+
+      - alert: NetworkOutSaturated
+        annotations:
+          description: "Outgoing network saturation detected on {{ $labels.instance }}."
+          summary: "Outgoing network saturation detected on {{ $labels.instance }}."
+          dashboard: "https://grafana.wikimedia.org/d/000000568/wmcs-dumps-general-view"
+          runbook: "https://wikitech.wikimedia.org/wiki/Portal:Data_Services/Admin/Shared_storage#Dumps"
+
+        expr: |
+          sum by (instance) (irate(node_network_transmit_bytes_total{device!="lo", instance=~"clouddumps.*"}[5m])) >= 937500000
+        for: 2h
+        labels:
+          severity: critical
+          team: wmcs
+          service: network
+
+      - alert: NetworkInSaturated
+        annotations:
+          description: "Incoming network saturation detected on {{ $labels.instance }}."
+          summary: "Incoming network saturation detected on {{ $labels.instance }}."
+          dashboard: "https://grafana.wikimedia.org/d/000000568/wmcs-dumps-general-view"
+          runbook: "https://wikitech.wikimedia.org/wiki/Portal:Data_Services/Admin/Shared_storage#Dumps"
+
+        expr: |
+          sum by (instance) (irate(node_network_receive_bytes_total{device!="lo", instance=~"clouddumps.*"}[5m])) >= 937500000
+        for: 10m
+        labels:
+          severity: warning
+          team: wmcs
+          service: network
+
+      - alert: NetworkInSaturated
+        annotations:
+          description: "Incoming network saturation detected on {{ $labels.instance }}."
+          summary: "Incoming network saturation detected on {{ $labels.instance }}."
+          dashboard: "https://grafana.wikimedia.org/d/000000568/wmcs-dumps-general-view"
+          runbook: "https://wikitech.wikimedia.org/wiki/Portal:Data_Services/Admin/Shared_storage#Dumps"
+
+        expr: |
+          sum by (instance) (irate(node_network_receive_bytes_total{device!="lo", instance=~"clouddumps.*"}[5m])) >= 937500000
+        for: 2h
+        labels:
+          severity: critical
+          team: wmcs
+          service: network
