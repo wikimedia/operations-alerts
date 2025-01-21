@@ -1,0 +1,34 @@
+# deploy-tag: ops
+# deploy-site: eqiad
+
+# Alerts for high iowait stalling
+groups:
+  - name: system_monitoring
+    rules:
+      - alert: HighIOWaitStalling
+        annotations:
+          description: "Persistent high iowait on {{ $labels.instance }}."
+          summary: "High iowait detected on {{ $labels.instance }}."
+          dashboard: "https://grafana.wikimedia.org/d/000000568/wmcs-dumps-general-view"
+          runbook: "https://wikitech.wikimedia.org/wiki/Portal:Data_Services/Admin/Shared_storage#Dumps"
+        expr: |
+          100 * sum by (instance) (irate(node_cpu_seconds_total{mode="iowait", instance=~"clouddumps.*"}[5m]))
+          / scalar(count(node_cpu_seconds_total{mode="idle", instance=~"clouddumps.*"})) >= 5
+        for: 10m
+        labels:
+          severity: warning
+          team: wmcs
+
+      - alert: HighIOWaitStalling
+        annotations:
+          description: "Persistent high iowait on {{ $labels.instance }}."
+          summary: "High iowait detected on {{ $labels.instance }}."
+          dashboard: "https://grafana.wikimedia.org/d/000000568/wmcs-dumps-general-view"
+          runbook: "https://wikitech.wikimedia.org/wiki/Portal:Data_Services/Admin/Shared_storage#Dumps"
+        expr: |
+          100 * sum by (instance) (irate(node_cpu_seconds_total{mode="iowait", instance=~"clouddumps.*"}[5m]))
+          / scalar(count(node_cpu_seconds_total{mode="idle", instance=~"clouddumps.*"})) >= 5
+        for: 2h
+        labels:
+          severity: critical
+          team: wmcs
