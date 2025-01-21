@@ -86,5 +86,30 @@ groups:
           description: "Updates are either not flowing, or flowing at a greatly reduced rate."
           runbook: https://wikitech.wikimedia.org/wiki/Search#Streaming_Updater
           dashboard: https://grafana.wikimedia.org/d/jKqki4MSk/cirrus-streaming-updater
-
       # TODO: alert for CirrusConsumerFlinkJobNotRunning once we are running the consumer in eqiad/codfw
+
+      - alert: CirrusStreamingUpdaterSetWeightedTagsTooLow
+        expr: |
+          sum by (release)(increase(flink_taskmanager_job_task_operator_weighted_tags_tag_prefix_set{job_name=~"cirrus_streaming_updater_consumer_.*", release !~ ".*backfill"}[10m])) < 10
+        for: 10m
+        labels:
+          team: search-platform
+          severity: critical
+        annotations:
+          summary: "CirrusSearch {{$labels.release}}@{{$externalLabels.site}} is setting too few weighted tags"
+          description: "The number of weighted_tags set is too low in the last 10 minutes"
+          runbook: https://wikitech.wikimedia.org/wiki/Search#Streaming_Updater
+          dashboard: https://grafana.wikimedia.org/d/fe251f4f-f6cf-4010-8d78-5f482255b16f/cirrussearch-update-pipeline-weighted-tags?orgId=1&var-tag_prefix=All&var-search_cluster_site={{$externalLabels.site}}&var-search_cluster={{$labels.release}}
+
+      - alert: CirrusStreamingUpdaterClearWeightedTagsTooLow
+        expr: |
+          sum by (release)(increase(flink_taskmanager_job_task_operator_weighted_tags_tag_prefix_clear{job_name=~"cirrus_streaming_updater_consumer_.*", release !~ ".*backfill"}[10m])) < 10
+        for: 10m
+        labels:
+          team: search-platform
+          severity: critical
+        annotations:
+          summary: "CirrusSearch {{$labels.release}}@{{$externalLabels.site}} is clearing too few weighted tags"
+          description: "The number of weighted_tags cleared is too low in the last 10 minutes"
+          runbook: https://wikitech.wikimedia.org/wiki/Search#Streaming_Updater
+          dashboard: https://grafana.wikimedia.org/d/fe251f4f-f6cf-4010-8d78-5f482255b16f/cirrussearch-update-pipeline-weighted-tags?orgId=1&var-tag_prefix=All&var-search_cluster_site={{$externalLabels.site}}&var-search_cluster={{$labels.release}}
