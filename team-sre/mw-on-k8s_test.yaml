@@ -24,4 +24,124 @@ tests:
               description: 'The MediaWiki k8s deployment mw-web/main in eqiad is experiencing saturation of PHP-FPM workers 2.326%'
               runbook: 'https://bit.ly/wmf-fpmsat'
               summary: 'Not enough idle PHP-FPM workers for Mediawiki mw-web/main at eqiad: 2.326% idle'
+  - interval: 1m
+    input_series:
+      - series: 'apache_up{app="mediawiki", deployment="mw-web", release="main", instance="1"}'
+        values: '1x2 0x7'
+      - series: 'apache_up{app="mediawiki", deployment="mw-web", release="main", instance="2"}'
+        values: '1x10'
+      - series: 'apache_up{app="mediawiki", deployment="mw-web", release="main", instance="3"}'
+        values: '1x10'
+      - series: 'apache_up{app="mediawiki", deployment="mw-web", release="main", instance="4"}'
+        values: '1x10'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: HttpdUnreachable
+        eval_time: 5m
+        exp_alerts: []  # Not firing (too short)
+      - alertname: HttpdUnreachable
+        eval_time: 10m
+        exp_alerts:
+          - exp_labels:
+              team: sre
+              severity: critical
+              deployment: mw-web
+              release: main
+            exp_annotations:
+              dashboard: 'https://grafana.wikimedia.org/d/U7JT--knk/mw-on-k8s?orgId=1&viewPanel=257&var-dc=eqiad%20prometheus/k8s&var-service=mediawiki&var-namespace=mw-web&var-release=main'
+              description: 'httpd is unresponsive on 75% of MediaWiki k8s deployment mw-web/main.'
+              summary: 'httpd unavailable for deployment mw-web/main at eqiad'
+              runbook: 'https://wikitech.wikimedia.org/wiki/Application_servers'
+  - interval: 1m
+    input_series:
+      # 400 rps, p50 = 800ms, p100 = 1000ms
+      - series: 'envoy_cluster_upstream_rq_time_bucket{app="mediawiki", envoy_cluster_name="LOCAL_mw-web", deployment="mw-web", release="main", le="800"}'
+        values: '0x2 0+12000x7'
+      - series: 'envoy_cluster_upstream_rq_time_bucket{app="mediawiki", envoy_cluster_name="LOCAL_mw-web", deployment="mw-web", release="main", le="1000"}'
+        values: '0x2 0+24000x7'
+      - series: 'envoy_cluster_upstream_rq_time_bucket{app="mediawiki", envoy_cluster_name="LOCAL_mw-web", deployment="mw-web", release="main", le="+Inf"}'
+        values: '0x2 0+24000x7'
+      - series: 'envoy_cluster_upstream_rq_time_count{app="mediawiki", envoy_cluster_name="LOCAL_mw-web", deployment="mw-web", release="main"}'
+        values: '0x2 0+24000x7'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: MediaWikiLatencyExceeded
+        eval_time: 5m
+        exp_alerts: []  # Not firing (too short)
+      - alertname: MediaWikiLatencyExceeded
+        eval_time: 10m
+        exp_alerts:
+          - exp_labels:
+              team: sre
+              severity: critical
+              deployment: mw-web
+              release: main
+            exp_annotations:
+              description: 'The MediaWiki k8s deployment mw-web/main in eqiad is experiencing slowness. 75th percentile latency: 900ms'
+              summary: 'p75 latency high: eqiad mw-web/main (k8s) 900ms'
+              dashboard: 'https://grafana.wikimedia.org/d/U7JT--knk/mw-on-k8s?orgId=1&viewPanel=55&var-dc=eqiad%20prometheus/k8s&var-service=mediawiki&var-namespace=mw-web&var-release=main'
+              runbook: 'https://wikitech.wikimedia.org/wiki/Application_servers/Runbook#Average_latency_exceeded'
+  - interval: 1m
+    input_series:
+      # 400 rps, p50 = 800ms, p100 = 1000ms
+      - series: 'envoy_cluster_upstream_rq_time_bucket{app="mediawiki", envoy_cluster_name="LOCAL_mw-jobrunner", deployment="mw-jobrunner", release="main", le="800"}'
+        values: '0x2 0+12000x7'
+      - series: 'envoy_cluster_upstream_rq_time_bucket{app="mediawiki", envoy_cluster_name="LOCAL_mw-jobrunner", deployment="mw-jobrunner", release="main", le="1000"}'
+        values: '0x2 0+24000x7'
+      - series: 'envoy_cluster_upstream_rq_time_bucket{app="mediawiki", envoy_cluster_name="LOCAL_mw-jobrunner", deployment="mw-jobrunner", release="main", le="+Inf"}'
+        values: '0x2 0+24000x7'
+      - series: 'envoy_cluster_upstream_rq_time_count{app="mediawiki", envoy_cluster_name="LOCAL_mw-jobrunner", deployment="mw-jobrunner", release="main"}'
+        values: '0x2 0+24000x7'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: MediaWikiLatencyExceeded
+        eval_time: 5m
+        exp_alerts: []  # Not firing (mw-jobrunner is excluded)
+  - interval: 1m
+    input_series:
+      # 200 rps, p50 = 800ms, p100 = 1000ms
+      - series: 'envoy_cluster_upstream_rq_time_bucket{app="mediawiki", envoy_cluster_name="LOCAL_mw-web", deployment="mw-web", release="main", le="800"}'
+        values: '0x2 0+6000x7'
+      - series: 'envoy_cluster_upstream_rq_time_bucket{app="mediawiki", envoy_cluster_name="LOCAL_mw-web", deployment="mw-web", release="main", le="1000"}'
+        values: '0x2 0+12000x7'
+      - series: 'envoy_cluster_upstream_rq_time_bucket{app="mediawiki", envoy_cluster_name="LOCAL_mw-web", deployment="mw-web", release="main", le="+Inf"}'
+        values: '0x2 0+12000x7'
+      - series: 'envoy_cluster_upstream_rq_time_count{app="mediawiki", envoy_cluster_name="LOCAL_mw-web", deployment="mw-web", release="main"}'
+        values: '0x2 0+12000x7'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: MediaWikiLatencyExceeded
+        eval_time: 10m
+        exp_alerts: []  # Not firing (rps too low for p75=800ms threshold)
+  - interval: 1m
+    input_series:
+      # 200 rps, p50 = 1000ms, p100 = 1500ms
+      - series: 'envoy_cluster_upstream_rq_time_bucket{app="mediawiki", envoy_cluster_name="LOCAL_mw-web", deployment="mw-web", release="main", le="1000"}'
+        values: '0x2 0+6000x7'
+      - series: 'envoy_cluster_upstream_rq_time_bucket{app="mediawiki", envoy_cluster_name="LOCAL_mw-web", deployment="mw-web", release="main", le="1500"}'
+        values: '0x2 0+12000x7'
+      - series: 'envoy_cluster_upstream_rq_time_bucket{app="mediawiki", envoy_cluster_name="LOCAL_mw-web", deployment="mw-web", release="main", le="+Inf"}'
+        values: '0x2 0+12000x7'
+      - series: 'envoy_cluster_upstream_rq_time_count{app="mediawiki", envoy_cluster_name="LOCAL_mw-web", deployment="mw-web", release="main"}'
+        values: '0x2 0+12000x7'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: MediaWikiLatencyExceeded
+        eval_time: 10m
+        exp_alerts:
+          - exp_labels:
+              team: sre
+              severity: critical
+              deployment: mw-web
+              release: main
+            exp_annotations:
+              description: 'The MediaWiki k8s deployment mw-web/main in eqiad is experiencing slowness. 75th percentile latency: 1.25s'
+              summary: 'p75 latency high: eqiad mw-web/main (k8s) 1.25s'
+              dashboard: 'https://grafana.wikimedia.org/d/U7JT--knk/mw-on-k8s?orgId=1&viewPanel=55&var-dc=eqiad%20prometheus/k8s&var-service=mediawiki&var-namespace=mw-web&var-release=main'
+              runbook: 'https://wikitech.wikimedia.org/wiki/Application_servers/Runbook#Average_latency_exceeded'
 
