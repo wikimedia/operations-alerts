@@ -4,9 +4,9 @@ evaluation_interval: 1m
 tests:
   - interval: 1m
     input_series:
-      - series: 'phpfpm_processes_total{app="mediawiki", deployment="mw-debug", state="idle"}'
+      - series: 'phpfpm_processes_total{app="mediawiki", deployment="mw-web", state="idle", release="main"}'
         values: '0+1x60'
-      - series: 'phpfpm_processes_total{app="mediawiki", deployment="mw-debug", state="active"}'
+      - series: 'phpfpm_processes_total{app="mediawiki", deployment="mw-web", state="active", release="main"}'
         values: '0+42x60'
     external_labels:
       site: eqiad
@@ -17,10 +17,11 @@ tests:
           - exp_labels:
               team: sre
               severity: critical
-              deployment: mw-debug
+              deployment: mw-web
+              release: main
             exp_annotations:
-              dashboard: 'https://grafana.wikimedia.org/d/U7JT--knk/mw-on-k8s?orgId=1&viewPanel=84&var-dc=eqiad%20prometheus/k8s&var-service=mediawiki&var-namespace=mw-debug&var-container_name=All'
-              description: 'The MediaWiki k8s deployment mw-debug in eqiad is experiencing saturation of PHP-FPM workers 2.326%'
+              dashboard: 'https://grafana.wikimedia.org/d/U7JT--knk/mw-on-k8s?orgId=1&viewPanel=84&var-dc=eqiad%20prometheus/k8s&var-service=mediawiki&var-namespace=mw-web&var-container_name=All&var-release=main'
+              description: 'The MediaWiki k8s deployment mw-web/main in eqiad is experiencing saturation of PHP-FPM workers 2.326%'
               runbook: 'https://bit.ly/wmf-fpmsat'
-              summary: 'Not enough idle PHP-FPM workers for Mediawiki mw-debug at eqiad: 2.326% idle'
+              summary: 'Not enough idle PHP-FPM workers for Mediawiki mw-web/main at eqiad: 2.326% idle'
 
