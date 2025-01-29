@@ -4,7 +4,7 @@ groups:
   - name: lvs
     rules:
       - alert: LVSHighRX
-        expr: (rate(node_network_receive_bytes_total{device!="lo",cluster="lvs"}[5m]) * 8 / 1024 / 1024) >= 3200
+        expr: (rate(node_network_receive_bytes_total{device!="lo",cluster=~"(lvs|liberica)"}[5m]) * 8 / 1024 / 1024) >= 3200
         for: 1m
         labels:
           team: traffic
@@ -16,7 +16,7 @@ groups:
           runbook: 'https://bit.ly/wmf-lvsrx'
 
       - alert: LVSHighCPU
-        expr: sum by (instance, cpu) (irate(node_cpu_seconds_total{mode!="idle",cluster="lvs"}[5m])) > 0.7
+        expr: sum by (instance, cpu) (irate(node_cpu_seconds_total{mode!="idle",cluster=~"(lvs|liberica)"}[5m])) > 0.7
         for: 1m
         labels:
           team: traffic
