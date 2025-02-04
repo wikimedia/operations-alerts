@@ -27,3 +27,15 @@ groups:
         labels:
           severity: critical
           team: sre
+
+      - alert: PoolcounterDown
+        annotations:
+          description: 'The poolcounter instance {{ $labels.instance }} in {{ $externalLabels.site }} is down'
+          summary: 'Unreachable Poolcounter on {{ $labels.instance }}'
+          dashboard: 'https://grafana.wikimedia.org/d/aIcYxuxZk/poolcounter?orgId=1&viewPanel=6&from=now-1h&to=now&var-dc={{ $externalLabels.site }}%20prometheus/ops'
+          runbook: 'https://www.mediawiki.org/wiki/PoolCounter#Request_tracing_in_production'
+        expr: poolcounter_up < 1
+        for: 2m
+        labels:
+          severity: critical
+          team: sre

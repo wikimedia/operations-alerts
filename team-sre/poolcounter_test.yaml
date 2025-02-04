@@ -47,3 +47,26 @@ tests:
               summary: 'Full queues for pool1:9106 poolcounter'
               dashboard: 'https://grafana.wikimedia.org/d/aIcYxuxZk/poolcounter?orgId=1&viewPanel=6&from=now-1h&to=now&var-dc=eqiad%20prometheus/ops'
               runbook: 'https://www.mediawiki.org/wiki/PoolCounter#Request_tracing_in_production'
+
+  - interval: 1m
+    input_series:
+      - series: 'poolcounter_up{job="poolcounter_exporter", instance="pool1:9106", cluster="test"}'
+        values: '0+0x20'
+
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: PoolcounterDown
+        eval_time: 10m
+        exp_alerts:
+          - exp_labels:
+              team: sre
+              severity: critical
+              cluster: test
+              instance: 'pool1:9106'
+              job: poolcounter_exporter
+            exp_annotations:
+              description: 'The poolcounter instance pool1:9106 in eqiad is down'
+              summary: 'Unreachable Poolcounter on pool1:9106'
+              dashboard: 'https://grafana.wikimedia.org/d/aIcYxuxZk/poolcounter?orgId=1&viewPanel=6&from=now-1h&to=now&var-dc=eqiad%20prometheus/ops'
+              runbook: 'https://www.mediawiki.org/wiki/PoolCounter#Request_tracing_in_production'
