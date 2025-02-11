@@ -1,0 +1,18 @@
+# deploy-tag: ops
+# deploy-site: eqiad
+
+groups:
+  - name: cloudvps_bastionlessusers
+    rules:
+      - alert: CloudVPSBastionlessUsers
+        expr: cloudvps_bastionlessusers != 0
+        for: 20m
+        labels:
+          team: wmcs
+          severity: warning
+          service: cloudvps
+        annotations:
+          summary: "Detected {{ $value }} cloud-vps users not in Bastion project"
+          description: "All human cloud-vps users should be members of the Bastion project. Look for keystonehook errors in keystone logs."
+          runbook: https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Users_not_in_bastion_project
+          dashboard: https://logstash.wikimedia.org/app/dashboards#/view/3ef008b0-c871-11eb-ad54-8bb5fcb640c0?_g=h@e78830b&_a=h@21715bf
