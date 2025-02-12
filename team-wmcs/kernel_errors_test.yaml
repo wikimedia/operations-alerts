@@ -4,10 +4,8 @@ evaluation_interval: 1m
 tests:
   - interval: 1m
     input_series:
-      - series: kernel_messages{category="priority_warning",instance="dummynode1:9000"}
-        values: "1+0x30"
       - series: kernel_messages{category="keyword_panic",instance="dummynode1:9000"}
-        values: "0x9 1+0x20"
+        values: "1+0x20"
     alert_rule_test:
       # Alerts should fire immediately
       - alertname: KernelErrors
@@ -15,42 +13,19 @@ tests:
         exp_alerts:
           - exp_labels:
               team: wmcs
-              severity: warning
+              severity: critical
               instance: dummynode1:9000
-              category: priority_warning
+              category: keyword_panic
             exp_annotations: &exp_annotations
               summary: Server dummynode1 logged kernel errors
               description: The server dummynode1 logged some kernel errors in the past 24h
               dashboard: https://grafana.wikimedia.org/d/b013af4c-d405-4d9f-85d4-985abb3dec0c/wmcs-kernel-errors?orgId=1&var-instance=dummynode1
               runbook: https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/KernelErrors
 
-      # Severity should escalate to "critical" after a "keyword_panic"
-      - alertname: KernelErrors
-        eval_time: 10m
-        exp_alerts:
-          - exp_annotations: *exp_annotations
-            exp_labels:
-              team: wmcs
-              severity: warning
-              instance: dummynode1:9000
-              category: priority_warning
-          - exp_annotations: *exp_annotations
-            exp_labels:
-              team: wmcs
-              severity: critical
-              instance: dummynode1:9000
-              category: keyword_panic
-
       # Alerts should still be firing after 23h
       - alertname: KernelErrors
         eval_time: 23h
         exp_alerts:
-          - exp_annotations: *exp_annotations
-            exp_labels:
-              team: wmcs
-              severity: warning
-              instance: dummynode1:9000
-              category: priority_warning
           - exp_annotations: *exp_annotations
             exp_labels:
               team: wmcs

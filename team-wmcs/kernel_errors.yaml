@@ -5,7 +5,7 @@ groups:
   - name: kernel_errors
     rules:
       - alert: KernelErrors
-        expr: max_over_time(kernel_messages{category=~"keyword_panic|priority_(emerg|alert|crit|err)"}[24h]) > 0
+        expr: max_over_time(kernel_messages{category=~"keyword_(panic|error|taint)|priority_(emerg|alert|crit|err)"}[24h]) > 0
         annotations: &annotations
           summary: 'Server {{  $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }} logged kernel errors'
           description: 'The server {{  $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }} logged some kernel errors in the past 24h'
@@ -13,11 +13,4 @@ groups:
           runbook: "https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/KernelErrors"
         labels:
           severity: critical
-          team: wmcs
-
-      - alert: KernelErrors
-        expr: max_over_time(kernel_messages{category=~"keyword_(taint|warning)|priority_warning"}[24h]) > 0
-        annotations: *annotations
-        labels:
-          severity: warning
           team: wmcs
