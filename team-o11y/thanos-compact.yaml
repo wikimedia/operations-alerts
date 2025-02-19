@@ -15,7 +15,7 @@ groups:
       expr: thanos_compact_halted{job=~".*thanos-compact.*"} == 1
       for: 5m
       labels:
-        severity: warning
+        severity: critical
         team: o11y
 
     - alert: ThanosCompactHighCompactionFailures
@@ -65,7 +65,7 @@ groups:
       expr: (time() - max by (job) (max_over_time(thanos_objstore_bucket_last_successful_upload_time{job=~".*thanos-compact.*"}[24h])))
         / 60 / 60 > 24
       labels:
-        severity: warning
+        severity: critical
         team: o11y
 
     - alert: ThanosCompactDownsampleStalled
