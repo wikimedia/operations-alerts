@@ -1,0 +1,16 @@
+# deploy-tag: ops
+
+groups:
+  - name: liberica
+    rules:
+      - alert: LibericaDiffFPCheck
+        expr: liberica_cp_match_fp != 1
+        for: 2m
+        labels:
+          team: sre
+          severity: critical
+        annotations:
+          summary: "Liberica instance {{ $labels.instance }} control plane status doesn't match with forwarding plane status"
+          description: "At least one service shows discrepancies between control plane and forwarding plane on {{ $labels.instance }}"
+          dashboard: 'https://grafana.wikimedia.org/d/fa4de97a-7114-48c7-a91a-f56089ef554f/liberica?var-site={{ $externalLabels.site }}&var-instance={{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}'
+          runbook: 'https://wikitech.wikimedia.org/wiki/Liberica#LibericaDiffFPCheck'
