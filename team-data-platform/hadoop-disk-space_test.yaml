@@ -4,7 +4,7 @@ evaluation_interval: 1m
 tests:
   - interval: 1m
     input_series:
-      - series: 'role_owner{instance="an-worker1176:9100",role="sretest",site="eqiad",team="team-data-platform"}'
+      - series: 'role_owner{instance="an-worker1176:9100",role="hadoop",site="eqiad",team="data-platform"}'
         values: '1'
       - series: 'node_filesystem_avail_bytes{device="/dev/sda",fstype="ext4",instance="an-worker1176:9100",mountpoint="/"}'
         values: '5'
@@ -16,7 +16,7 @@ tests:
         exp_alerts:
           - exp_labels:
               severity: warning
-              team: team-data-platform
+              team: data-platform
               instance: an-worker1176:9100
               fstype: ext4
               device: /dev/sda
