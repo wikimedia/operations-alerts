@@ -1,0 +1,28 @@
+rule_files:
+  - hadoop-disk-space.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    input_series:
+      - series: 'role_owner{instance="an-worker1176:9100",role="sretest",site="eqiad",team="team-data-platform"}'
+        values: '1'
+      - series: 'node_filesystem_avail_bytes{device="/dev/sda",fstype="ext4",instance="an-worker1176:9100",mountpoint="/"}'
+        values: '5'
+      - series: 'node_filesystem_size_bytes{device="/dev/sda",fstype="ext4",instance="an-worker1176:9100",mountpoint="/"}'
+        values: '100'
+    alert_rule_test:
+      - alertname: DiskSpace
+        eval_time: 5m
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              team: team-data-platform
+              instance: an-worker1176:9100
+              fstype: ext4
+              device: /dev/sda
+              mountpoint: '/'
+            exp_annotations:
+              summary: "Disk space an-worker1176:9100:/ 5% free"
+              description: "Disk space an-worker1176:9100:/ (ext4)"
+              dashboard: 'https://grafana.wikimedia.org/d/000000377/host-overview?orgId=1&viewPanel=12&var-server=an-worker1176'
+              runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Administration
