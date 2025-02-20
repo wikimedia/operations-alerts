@@ -1,0 +1,22 @@
+# deploy-tag: analytics
+# deploy-site: eqiad
+
+groups:
+  - name: hadoop-disk-space
+    rules:
+      - alert: DiskSpace
+        expr: |
+          (node_filesystem_avail_bytes{
+            fstype!~"(tmpfs)",
+          }
+          / node_filesystem_size_bytes)
+          * on (instance) group_left(team) role_owner < 0.06
+        for: 5m
+        labels:
+          severity: warning
+          team: "{{$labels.team}}"
+        annotations:
+          summary: "Disk space {{$labels.instance}}:{{$labels.mountpoint}} {{ $value | humanizePercentage }} free"
+          description: "Disk space {{$labels.instance}}:{{$labels.mountpoint}} ({{$labels.fstype}})"
+          dashboard: 'https://grafana.wikimedia.org/d/000000377/host-overview?orgId=1&viewPanel=12&var-server={{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}'
+          runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Administration
