@@ -1,0 +1,24 @@
+rule_files:
+  - liberica.yaml
+evaluation_interval: 2m
+tests:
+  - interval: 2m
+    external_labels:
+      site: ulsfo
+    input_series:
+      - series: 'liberica_cp_match_fp{cluster="liberica", instance="lvs4008:9100"}'
+        values: '0 0'
+    alert_rule_test:
+      - alertname: LibericaDiffFPCheck
+        eval_time: 2m
+        exp_alerts:
+          - exp_labels:
+              cluster: liberica
+              instance: lvs4008:9100
+              severity: critical
+              team: sre
+            exp_annotations:
+              summary: "Liberica instance lvs4008:9100 control plane status doesn't match with forwarding plane status"
+              description: "At least one service shows discrepancies between control plane and forwarding plane on lvs4008:9100"
+              dashboard: 'https://grafana.wikimedia.org/d/fa4de97a-7114-48c7-a91a-f56089ef554f/liberica?var-site=ulsfo&var-instance=lvs4008'
+              runbook: 'https://wikitech.wikimedia.org/wiki/Liberica#LibericaDiffFPCheck'
