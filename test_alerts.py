@@ -50,6 +50,7 @@ PROMETHEUS_INSTANCES = [
     "k8s-aux",
     "k8s-dse",
     "k8s-mlserve",
+    "k8s-mlstaging",
     "k8s-staging",
     "ops",
     "services",
