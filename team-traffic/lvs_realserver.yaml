@@ -12,7 +12,7 @@ groups:
           sum by (hostname, protocol, cluster) (
             label_replace(tcp_mss_clamper_mss_cfg{interface="lo"}, "hostname", "$1", "instance", "(.*):.*")
           ) != 1
-        for: 1m
+        for: 3m
         labels:
           team: traffic
           severity: critical
