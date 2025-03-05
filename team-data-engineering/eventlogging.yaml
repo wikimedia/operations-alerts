@@ -4,20 +4,6 @@
 groups:
   - name: eventlogging
     rules:
-    - alert: EventloggingErrorsHigh
-      annotations:
-        description: Median event logging throughput above 30 events/s over past 15 minutes
-        summary: Event logging throughput above 30 events/s over past 15 minutes
-        dashboard: https://grafana.wikimedia.org/d/000000505/eventlogging?orgId=1&viewPanel=13
-        runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/EventLogging/Administration
-      expr: |
-        quantile(0.50,
-          sum(rate(kafka_server_BrokerTopicMetrics_MessagesIn_total{cluster="kafka_jumbo",topic="eventlogging_EventError"}[15m]))
-        ) > 30
-      labels:
-        severity: critical
-        team: data-engineering
-
     - alert: EventloggingNavigationTimingEventsLow
       annotations:
         description: p50 of Navigation Timing event throughput has been under 1 req/sec over past 15m
@@ -28,32 +14,6 @@ groups:
         quantile(0.50,
           sum(rate(kafka_server_BrokerTopicMetrics_MessagesIn_total{cluster="kafka_jumbo",topic="eventlogging_NavigationTiming"}[15m]))
         ) == 0
-      labels:
-        severity: critical
-        team: data-engineering
-
-    - alert: EventloggingEventsHigh
-      annotations:
-        description: Event logging p50 of overall event throughput above 1500 events/s for past 15 min
-        summary: p50 of overall event throughput above 1500 events/s
-        dashboard: https://grafana.wikimedia.org/d/000000505/eventlogging?orgId=1&viewPanel=6
-        runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/EventLogging/Administration
-      expr: |
-        quantile(0.50,
-          sum(rate(kafka_server_BrokerTopicMetrics_MessagesIn_total{cluster="kafka_jumbo",topic="eventlogging-client-side"}[15m]))
-        ) > 8000
-      labels:
-        severity: critical
-        team: data-engineering
-
-    - alert: EventLoggingKafkaLag
-      annotations:
-        description: Kafka consumer lag for event logging over threshold for past 15 min, event logging may not be processing events, or has slowed down.
-        summary: Kafka consumer lag for event logging over threshold for past 15 min.
-        dashboard: https://grafana.wikimedia.org/d/000000484/kafka-consumer-lag?orgId=1&prometheus=ops&var-cluster=jumbo-eqiad&var-topic=All&var-consumer_group=eventlogging_processor_client_side_00
-        runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/EventLogging/Administration
-      expr: sum(kafka_burrow_partition_lag{exported_cluster="jumbo-eqiad",topic="eventlogging-client-side",group="eventlogging_processor_client_side_00"}) > 500000
-      for: 15m
       labels:
         severity: critical
         team: data-engineering
