@@ -1,4 +1,4 @@
-# deploy-tag: ops
+# deploy-tag: k8s
 # deploy-site: eqiad, codfw
 
 groups:
