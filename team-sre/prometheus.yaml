@@ -27,7 +27,8 @@ groups:
         severity: critical
         team: sre
 
-    - alert: AlertLintProblem
+    - &lint_problem
+      alert: AlertLintProblem
       annotations:
         description: 'Pint reporter {{ $labels.reporter }} found problem(s) in {{ $labels.filename }}: {{ $labels.problem }}'
         summary: Linting problems found for {{ $labels.name }}
@@ -38,4 +39,11 @@ groups:
       for: 30m
       labels:
         severity: warning
+        team: sre
+
+    # Open tasks for alerts with lingering lint problems
+    - <<: *lint_problem
+      for: 14d
+      labels:
+        severity: task
         team: sre
