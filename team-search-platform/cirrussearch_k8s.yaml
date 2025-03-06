@@ -3,22 +3,6 @@
 groups:
  - name: cirrussearch
    rules:
-    - alert: CirrusSearchJobQueueLagTooHigh
-      expr: >
-          histogram_quantile(0.95, sum by (rule,le) (rate(cpjobqueue_normal_rule_processing_delay_bucket{
-            rule=~".*cirrusSearch(DeleteArchive|DeletePages|ElasticaWrite|LinksUpdate*|OtherIndex)",
-            rule!~".*-partitioner-mediawiki-job-.*",
-            service="cpjobqueue"}[15m]))) > 6*60*60
-      for: 1m
-      labels:
-        team: search-platform
-        severity: warning
-        site: eqiad
-      annotations:
-        summary: 'CirrusSearch job {{$labels.rule | reReplaceAll ".*-([^-]*$)" "${1}"}} lag is too high: {{ $value | humanizeDuration }}'
-        description: "CirrusSearch job lag is too high"
-        runbook: TODO
-        dashboard: 'https://grafana.wikimedia.org/d/CbmStnlGk/jobqueue-job?orgId=1&var-dc={{ $externalLabels.site }}%20prometheus/k8s&var-job={{ $labels.rule | reReplaceAll ".*-([^-]*$)" "${1}" }}'
     - alert: CirrusSearchPoolCounterRejectionTooHigh
       expr: sum(rate(mediawiki_CirrusSearch_pool_counter_seconds_count{status="failure", type!="Automated"}[5m])) > 1000
       for: 1m
