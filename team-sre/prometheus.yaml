@@ -34,16 +34,20 @@ groups:
         summary: Linting problems found for {{ $labels.name }}
         dashboard: TODO
         runbook: https://wikitech.wikimedia.org/wiki/Alertmanager#Alert_linting_found_problems
-          #expr: count without (severity) (pint_problem) > 0
-      expr: pint_problem > 0
+
+      # Gnarly!! Extract 'team' label from alert filename, a bit hacky and working
+      # https://phabricator.wikimedia.org/T354762
+      expr: |
+        label_replace(pint_problem, "team", "$1", "filename", ".*/team-(.*)_.*")
+          > 0
       for: 30m
       labels:
         severity: warning
-        team: sre
+        team: '{{ $labels.team }}'
 
     # Open tasks for alerts with lingering lint problems
     - <<: *lint_problem
       for: 14d
       labels:
         severity: task
-        team: sre
+        team: '{{ $labels.team }}'

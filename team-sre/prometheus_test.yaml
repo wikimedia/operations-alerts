@@ -55,7 +55,7 @@ tests:
            name: NavtimingInvalidsHigh
            problem: 'prometheus "ext" at http://127.0.0.1:9908/ext did not have any series for "webperf_navigationtiming_invalid_events_total" metric in the last 1w'
            reporter: 'promql/series'
-           team: sre
+           team: perf
            severity: warning
          exp_annotations:
            description: 'Pint reporter promql/series found problem(s) in /srv/alerts/ext/team-perf_webperf.yaml: prometheus "ext" at http://127.0.0.1:9908/ext did not have any series for "webperf_navigationtiming_invalid_events_total" metric in the last 1w'
