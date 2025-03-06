@@ -38,7 +38,7 @@ groups:
       # Gnarly!! Extract 'team' label from alert filename, a bit hacky and working
       # https://phabricator.wikimedia.org/T354762
       expr: |
-        label_replace(pint_problem, "team", "$1", "filename", ".*/team-(.*)_.*")
+        label_replace(pint_problem, "team", "$1", "filename", ".*/team-(.*?)_.*")
           > 0
       for: 30m
       labels:
