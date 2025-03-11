@@ -106,7 +106,7 @@ groups:
     - alert: PrometheusLowRetention
       expr: |
         (
-         time() - (prometheus_tsdb_lowest_timestamp{job="prometheus"} / 1000)
+         (time() - (prometheus_tsdb_lowest_timestamp{job="prometheus"} / 1000))
            /
          86400
         ) < 20
@@ -116,5 +116,5 @@ groups:
       annotations:
         summary: "Prometheus {{ $externalLabels.prometheus }} is storing less than 20 days of data on {{ $labels.instance }}."
         description: "The stored data in Prometheus {{ $externalLabels.prometheus }} is less than 20 days."
-        dashboard: https://grafana.wikimedia.org/d/GWvEXWDZk/prometheus-server?var-datasource={{ $externalLabels.site }}%20prometheus%2F{{ $externalLabels.prometheus }}
+        dashboard: https://grafana.wikimedia.org/d/GWvEXWDZk/prometheus-server?var-Prometheus={{ $labels.instance }}
         runbook: https://wikitech.wikimedia.org/wiki/Prometheus
