@@ -1,0 +1,27 @@
+rule_files:
+  - interfaces.yaml
+evaluation_interval: 2m
+tests:
+  - interval: 2m
+    external_labels:
+      site: eqiad
+    input_series:
+      - series: 'gnmi_interfaces_interface_state_oper_status{instance="cr3-ulsfo:9804", interface_name="xe-0/1/7", interface_description="Core: cr4-ulsfo:xe-0/1/7 {#1074}"}'
+        values: '2 2'
+      - series: 'gnmi_interfaces_interface_state_enabled{instance="cr3-ulsfo:9804", interface_name="xe-0/1/7", interface_description="Core: cr4-ulsfo:xe-0/1/7 {#1074}"}'
+        values: '1 1'
+    alert_rule_test:
+      - alertname: CoreRouterInterfaceDown
+        eval_time: 2m
+        exp_alerts:
+          - exp_labels:
+              instance: cr3-ulsfo:9804
+              interface_name: xe-0/1/7
+              interface_description: "Core: cr4-ulsfo:xe-0/1/7 {#1074}"
+              team: sre
+              severity: warning
+            exp_annotations:
+              summary: "Core router interface down - cr3-ulsfo:xe-0/1/7 (Core: cr4-ulsfo:xe-0/1/7 {#1074})"
+              description: ""
+              dashboard: 'https://grafana.wikimedia.org/d/fb403d62-5f03-434a-9dff-bd02b9fff504/network-device-overview?var-instance=cr3-ulsfo:9804'
+              runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#Router_interface_down'

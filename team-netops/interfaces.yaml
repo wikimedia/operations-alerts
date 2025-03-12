@@ -1,0 +1,19 @@
+# deploy-tag: ops
+
+groups:
+  - name: bgp
+    rules:
+      - alert: CoreRouterInterfaceDown
+        expr: |
+          (gnmi_interfaces_interface_state_oper_status{instance =~ "cr.*"} == 2)
+            * on (instance, interface_name, interface_description)
+          (gnmi_interfaces_interface_state_enabled{instance =~ "cr.*"} == 1)
+        for: 2m
+        labels:
+          team: sre
+          severity: warning  # TODO: move to critical once tested
+        annotations:
+          summary: 'Core router interface down - {{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}:{{ $labels.interface_name }} ({{ $labels.interface_description }})'
+          description: ''  # Not needed
+          dashboard: 'https://grafana.wikimedia.org/d/fb403d62-5f03-434a-9dff-bd02b9fff504/network-device-overview?var-instance={{ $labels.instance }}'
+          runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#Router_interface_down'
