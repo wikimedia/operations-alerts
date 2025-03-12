@@ -1,0 +1,26 @@
+rule_files:
+  - cloud.yaml
+evaluation_interval: 2m
+tests:
+  - interval: 2m
+    external_labels:
+      site: eqiad
+    input_series:
+      - series: 'gnmi_bgp_neighbor_session_state{peer_group="prod_ebgp6", instance="cloudsw1-e4-eqiad:9804", peer_descr="cloudsw1-d5", address="2620:0:861:fe0e::1"}'
+        values: '3 3'
+    alert_rule_test:
+      - alertname: CloudCoreBGPDown
+        eval_time: 2m
+        exp_alerts:
+          - exp_labels:
+              peer_group: prod_ebgp6
+              instance: cloudsw1-e4-eqiad:9804
+              peer_descr: cloudsw1-d5
+              address: 2620:0:861:fe0e::1
+              severity: warning
+              team: sre
+            exp_annotations:
+              summary: "Cloud (WMCS) BGP session down between cloudsw1-e4-eqiad and cloudsw1-d5 (2620:0:861:fe0e::1)"
+              description: ""
+              dashboard: 'https://grafana.wikimedia.org/d/ed8da087-4bcb-407d-9596-d158b8145d45/bgp-neighbors-detail?orgId=1&var-site=eqiad&var-device=cloudsw1-e4-eqiad:9804&var-bgp_group=prod_ebgp6&var-bgp_neighbor=cloudsw1-d5'
+              runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#BGP_status'
