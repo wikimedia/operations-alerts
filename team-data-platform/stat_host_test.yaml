@@ -22,5 +22,5 @@ tests:
             exp_annotations:
               description: 'Very high load average on stat1010:9100'
               summary: 'Very high load average on stat1010:9100 load: 201'
-              dashboard: 'https://grafana.wikimedia.org/d/000000342/node-exporter-server-metrics?orgId=1&var-node=stat1010%3A9100&var-datasource=eqiad%2Bprometheus%252Fops&var-disk_device=All&var-net_dev=All'
+              dashboard: https://grafana.wikimedia.org/d/000000342/node-exporter-server-metrics?var-node=stat1010%3A9100&var-disk_device=All&var-net_dev=All
               runbook: 'TODO'
