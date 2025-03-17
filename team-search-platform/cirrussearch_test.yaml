@@ -168,3 +168,29 @@ tests:
                   description: "Envoy reports 5xx rate over 5 minutes of more than .5%"
                   runbook: 'TODO'
                   dashboard: 'https://grafana.wikimedia.org/d/VTCkm29Wz/envoy-telemetry?orgId=1&var-datasource=eqiad%20prometheus-ops&var-origin=appserver&var-origin_instance=All&var-destination=search-https_eqiad'
+
+
+  - interval: 1m
+    input_series:
+      - series: 'elasticsearch_thread_pool_rejected_count{type="search", job="elasticsearch", exported_cluster="production-search-eqiad", name="elastic1066-production-search-eqiad", instance="elastic1066:9108"}'
+        values: 0+100x10000
+    external_labels:
+      site: eqiad
+      prometheus: ops
+    alert_rule_test:
+      - alertname: CirrusSearchThreadPoolRejectionsTooHigh
+        eval_time: 10m
+        exp_alerts:
+          - exp_labels:
+              team: search-platform
+              exported_cluster: production-search-eqiad
+              instance: elastic1066:9108
+              job: elasticsearch
+              name: elastic1066-production-search-eqiad
+              severity: critical
+              type: search
+            exp_annotations:
+              summary: "elastic1066-production-search-eqiad is rejecting excessive amounts of queries due to a full thread pool"
+              description: "Check hot shards and consider banning the node to force shard reallocation"
+              runbook: 'https://w.wiki/DTaY'
+              dashboard: 'https://grafana.wikimedia.org/goto/aoZBw8pNR?orgId=1'
