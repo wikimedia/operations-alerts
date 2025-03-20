@@ -1,0 +1,25 @@
+rule_files:
+  - statsv.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    input_series:
+      - series: 'statsv_messages_handled_total{format="dogstatsd",instance="host1:1234"}'
+        values: '10+10x60 10000x60'
+      - series: 'statsv_messages_handled_total{format="statsd",instance="host1:1234"}'
+        values: '10+10x60 10000x60'
+    external_labels:
+      site: eqiad
+      prometheus: ext
+    alert_rule_test:
+      - alertname: StatsvThroughput
+        eval_time: 90m
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              team: o11y
+            exp_annotations:
+              summary: StatsV is not ingesting metrics
+              description: StatsV should report a non-zero rate of messages handled broken down by format to statsd-exporter
+              dashboard: https://grafana.wikimedia.org/d/ba06cb37-dfab-40ae-8e61-0710522881e0/statsv
+              runbook: https://wikitech.wikimedia.org/wiki/Performance.wikimedia.org/Runbook#statsv
