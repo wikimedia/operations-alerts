@@ -93,7 +93,7 @@ tests:
 
   - interval: 1m
     input_series:
-      - series: kafka_server_BrokerTopicMetrics_MessagesIn_total{topic="eqiad.cirrussearch.update_pipeline.update.rc0"}
+      - series: kafka_server_BrokerTopicMetrics_MessagesIn_total{topic="eqiad.cirrussearch.update_pipeline.update.v1"}
         values: '0x11'
     external_labels:
       site: eqiad
@@ -106,10 +106,10 @@ tests:
               severity: critical
               team: search-platform
             exp_annotations:
-                  summary: 'The summed message update rate of `(eqiad|codfw).cirrussearch.update_pipeline.update.rc0` is too low'
+                  summary: 'The summed message update rate of `(eqiad|codfw).cirrussearch.update_pipeline.update.v1` is too low'
                   description: "Unexpectedly low Kafka topic message-in rate for the last 5 minutes"
                   runbook: 'TODO'
-                  dashboard: 'https://grafana.wikimedia.org/d/000000234/kafka-by-topic?orgId=1&var-dc=eqiad%2520prometheus%252Fops&var-kafka_cluster=main-eqiad&var-kafka_broker=All&from=now-1h&to=now&refresh=5m&var-topic=codfw.cirrussearch.update_pipeline.update.rc0&var-topic=eqcodfw.cirrussearch.update_pipeline.update.rc0&var-topic=eqiad.cirrussearch.update_pipeline.update.rc0&viewPanel=6'
+                  dashboard: 'https://grafana.wikimedia.org/d/000000234/kafka-by-topic?orgId=1&var-dc=eqiad%2520prometheus%252Fops&var-kafka_cluster=main-eqiad&var-kafka_broker=All&from=now-1h&to=now&refresh=5m&var-topic=codfw.cirrussearch.update_pipeline.update.v1&var-topic=eqiad.cirrussearch.update_pipeline.update.v1&viewPanel=6'
 
 
   - interval: 1m
