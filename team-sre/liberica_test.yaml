@@ -22,3 +22,31 @@ tests:
               description: "At least one service shows discrepancies between control plane and forwarding plane on lvs4008:9100"
               dashboard: 'https://grafana.wikimedia.org/d/fa4de97a-7114-48c7-a91a-f56089ef554f/liberica?var-site=ulsfo&var-instance=lvs4008'
               runbook: 'https://wikitech.wikimedia.org/wiki/Liberica#LibericaDiffFPCheck'
+  - interval: 1m
+    external_labels:
+      site: ulsfo
+    input_series:
+      # Should pass
+      - series: 'node_file_age_timestamp_seconds_total{cluster="liberica", instance="lvs4010:9100", job="node", path="/etc/liberica/config.yaml", prometheus="ops", site="ulsfo"}'
+        values: '1742226643 1742226643'
+      - series: 'liberica_cp_configuration_reload_timestamp_seconds{cluster="liberica", instance="lvs4010:3003", job="liberica", prometheus="ops", result="ok", site="ulsfo"}'
+        values: '1742226671 1742226671'
+      # Should fail
+      - series: 'node_file_age_timestamp_seconds_total{cluster="liberica", instance="lvs4009:9100", job="node", path="/etc/liberica/config.yaml", prometheus="ops", site="ulsfo"}'
+        values: '1842219443 1842219443'
+      - series: 'liberica_cp_configuration_reload_timestamp_seconds{cluster="liberica", instance="lvs4009:3003", job="liberica", prometheus="ops", result="ok", site="ulsfo"}'
+        values: '1742226671 1742226671'
+    alert_rule_test:
+      - alertname: LibericaStaleConfig
+        eval_time: 2m
+        exp_alerts:
+         - exp_labels:
+             hostname: 'lvs4009'
+             cluster: "liberica"
+             severity: critical
+             team: sre
+           exp_annotations:
+             summary: "Liberica instance lvs4009 is running a stale configuration"
+             description: "Liberica control plane daemon isn't using the latest configuration deployed by puppet on lvs4009"
+             dashboard: 'https://grafana.wikimedia.org/d/fa4de97a-7114-48c7-a91a-f56089ef554f/liberica?orgId=1&viewPanel=10&var-site=ulsfo&var-instance=lvs4009'
+             runbook: 'https://wikitech.wikimedia.org/wiki/Liberica#LibericaStaleConfig'
