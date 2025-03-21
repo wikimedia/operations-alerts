@@ -3,17 +3,16 @@
 groups:
   - name: rdf-streaming-updater
     rules:
-
-## Swift usage alerts, alert if > 100GiB is used
+## Swift usage alerts, alert if > 200GiB is used
 ## the metric is pushed only in a site at a time, hence 'global' deployment
       - alert: RdfStreamingUpdaterSpaceUsageTooHigh
-        expr: swift_account_stats_bytes_total{account="AUTH_wdqs"} > 107374182400
+        expr: swift_account_stats_bytes_total{account="AUTH_wdqs"} > 214748364800
         for: 1m
         labels:
           team: data-platform
           severity: task
         annotations:
-          summary: "The RDF Streaming Updater is using more than 100GiB of storage"
+          summary: "The RDF Streaming Updater is using more than 200GiB of storage"
           description: "The containers owned by {{$labels.account}} are using {{ $value | humanize1024 }}, this is more than expected."
           runbook: https://wikitech.wikimedia.org/wiki/Wikidata_Query_Service/Streaming_Updater#Clean_up_object_storage
           dashboard: https://grafana.wikimedia.org/d/fdU5Zx-Mk/wdqs-streaming-updater
