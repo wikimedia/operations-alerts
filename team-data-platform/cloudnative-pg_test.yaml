@@ -268,23 +268,3 @@ tests:
           cnpg_io_cluster: postgresql-test
           severity: critical
           team: data-platform
-
-  # The rclone backup of s3 PG data has failed
-  - input_series:
-    - series: instance_name:node_systemd_unit_state_failed:count1{instance="db1208:9100", name="backup_s3_postgresql.service"}
-      values: '1 1 1 1 1 1 1 1 1 1 1 1'
-    interval: 5m
-    alert_rule_test:
-    - alertname: CloudnativePGOutOfBandBackupsFailed
-      eval_time: 1h
-      exp_alerts:
-      - exp_annotations:
-          description: 'RClone backup of PG s3 data has failed'
-          summary: 'RClone backup of PG s3 data has failed'
-          dashboard: "https://grafana.wikimedia.org/d/g-AaZRFWk/systemd-status"
-          runbook: "https://wikitech.wikimedia.org/wiki/Data_Platform/Systems/CloudnativePG/Clusters#Checking_the_status_of_the_out-of-band_backups_of_backups"
-        exp_labels:
-          instance: db1208:9100
-          name: backup_s3_postgresql.service
-          severity: critical
-          team: data-platform
