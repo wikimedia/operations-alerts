@@ -16,6 +16,12 @@ tests:
         values: '0+4x4'
       - series: 'gnmi_interfaces_interface_state_counters_out_errors{instance="cr3-ulsfo:9804", interface_name="xe-0/1/7", interface_description="Core: cr4-ulsfo:xe-0/1/7 {#1074}"}'
         values: '0+4x4'
+      - series: 'gnmi_interfaces_interface_state_counters_out_octets{instance="cr2-esams:9804", interface_description="Peering: Test peering", interface_name="xe-0/1/0"}'
+        values: '0+1200000000x5'
+      - series: 'gnmi_interfaces_interface_state_counters_in_octets{instance="cr2-esams:9804", interface_description="Peering: Test peering", interface_name="xe-0/1/0"}'
+        values: '0+1200000000x5'
+      - series: 'gnmi_interfaces_interface_state_high_speed{instance="cr2-esams:9804", interface_description="Peering: Test peering", interface_name="xe-0/1/0"}'
+        values: '10000x5'
     alert_rule_test:
       - alertname: CoreRouterInterfaceDown
         eval_time: 2m
@@ -62,3 +68,33 @@ tests:
               description: ""
               dashboard: 'https://grafana.wikimedia.org/d/fb403d62-5f03-434a-9dff-bd02b9fff504/network-device-overview?var-instance=cr3-ulsfo:9804'
               runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#Inbound/outbound_interface_errors'
+      - alertname: TransitPeeringOutboundSaturation
+        eval_time: 10m
+        exp_alerts:
+          - exp_labels:
+              instance: cr2-esams:9804
+              interface_name: xe-0/1/0
+              interface_description: "Peering: Test peering"
+              team: sre
+              severity: warning
+              scope: network
+            exp_annotations:
+              summary: "Transit or peering outbound traffic above 90% capacity - cr2-esams:xe-0/1/0 (Peering: Test peering)"
+              description: ""
+              dashboard: 'https://grafana.wikimedia.org/d/fb403d62-5f03-434a-9dff-bd02b9fff504/network-device-overview?var-instance=cr2-esams:9804'
+              runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#Primary_outbound_port_utilization_over_90%'
+      - alertname: TransitPeeringInboundSaturation
+        eval_time: 10m
+        exp_alerts:
+          - exp_labels:
+              instance: cr2-esams:9804
+              interface_name: xe-0/1/0
+              interface_description: "Peering: Test peering"
+              team: sre
+              severity: warning
+              scope: network
+            exp_annotations:
+              summary: "Transit or peering inbound traffic above 90% capacity - cr2-esams:xe-0/1/0 (Peering: Test peering)"
+              description: ""
+              dashboard: 'https://grafana.wikimedia.org/d/fb403d62-5f03-434a-9dff-bd02b9fff504/network-device-overview?var-instance=cr2-esams:9804'
+              runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#Primary_inbound_port_utilization_over_90%'
