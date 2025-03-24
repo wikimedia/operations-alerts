@@ -10,16 +10,16 @@ tests:
     external_labels:
       site: codfw
     alert_rule_test:
-      - alertname: GatewayBackendErrorsHigh
+      - alertname: GatewayBackendErrorsElevated
         eval_time: 20m
         exp_alerts:
           - exp_labels:
-              severity: page
+              severity: critical
               team: sre
               envoy_cluster_name: 'pinkunicorn_cluster'
               kubernetes_namespace: 'rest-gateway'
             exp_annotations:
-              summary: 'rest-gateway: elevated 5xx errors from pinkunicorn_cluster in codfw #page'
-              description: 'High number of 5xx responses from pinkunicorn_cluster via rest-gateway in codfw'
+              summary: 'rest-gateway: elevated 5xx errors from pinkunicorn_cluster in codfw'
+              description: 'Elevated number of 5xx responses from pinkunicorn_cluster via rest-gateway in codfw'
               runbook: https://wikitech.wikimedia.org/wiki/API_Gateway#How_to_debug_it
               dashboard: https://grafana.wikimedia.org/d/UOH-5IDMz/api-and-rest-gateway?orgId=1&refresh=30s&viewPanel=57&var-datasource=codfw%20prometheus/k8s&var-instance=rest-gateway
