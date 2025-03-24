@@ -39,35 +39,3 @@ groups:
           description: ''  # Not needed
           dashboard: 'https://grafana.wikimedia.org/d/fb403d62-5f03-434a-9dff-bd02b9fff504/network-device-overview?var-instance={{ $labels.instance }}'
           runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#Inbound/outbound_interface_errors'
-      - alert: TransitPeeringOutboundSaturation
-        expr: |
-          (
-          irate(gnmi_interfaces_interface_state_counters_out_octets{instance=~"cr.*", interface_description=~"(Transit|Peering).*"}[5m])
-          /
-          (gnmi_interfaces_interface_state_high_speed{instance=~"cr.*", interface_description=~"(Transit|Peering).*"}/8*1000000)
-          ) > 0.9
-        for: 5m
-        labels:
-          team: sre
-          severity: warning  # TODO: move to paging once tested
-        annotations:
-          summary: 'Transit or peering outbound traffic above 90% capacity - {{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}:{{ $labels.interface_name }} ({{ $labels.interface_description }})'
-          description: ''  # Not needed
-          dashboard: 'https://grafana.wikimedia.org/d/fb403d62-5f03-434a-9dff-bd02b9fff504/network-device-overview?var-instance={{ $labels.instance }}'
-          runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#Primary_outbound_port_utilization_over_90%'
-      - alert: TransitPeeringInboundSaturation
-        expr: |
-          (
-          irate(gnmi_interfaces_interface_state_counters_in_octets{instance=~"cr.*", interface_description=~"(Transit|Peering).*"}[5m])
-          /
-          (gnmi_interfaces_interface_state_high_speed{instance=~"cr.*", interface_description=~"(Transit|Peering).*"}/8*1000000)
-          ) > 0.9
-        for: 5m
-        labels:
-          team: sre
-          severity: warning  # TODO: move to paging once tested
-        annotations:
-          summary: 'Transit or peering inbound traffic above 90% capacity - {{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}:{{ $labels.interface_name }} ({{ $labels.interface_description }})'
-          description: ''  # Not needed
-          dashboard: 'https://grafana.wikimedia.org/d/fb403d62-5f03-434a-9dff-bd02b9fff504/network-device-overview?var-instance={{ $labels.instance }}'
-          runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#Primary_inbound_port_utilization_over_90%'
