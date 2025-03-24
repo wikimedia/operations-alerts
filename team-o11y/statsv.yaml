@@ -1,0 +1,16 @@
+# deploy-tag: ext
+
+groups:
+  - name: statsv
+    rules:
+      - alert: StatsvThroughput
+        expr: sum(rate(statsv_messages_handled_total[10m])) < 1
+        for: 10m
+        labels:
+          severity: critical
+          team: o11y
+        annotations:
+          summary: "StatsV is not ingesting metrics"
+          description: "StatsV should report a non-zero rate of messages handled broken down by format to statsd-exporter"
+          dashboard: https://grafana.wikimedia.org/d/ba06cb37-dfab-40ae-8e61-0710522881e0/statsv
+          runbook: https://wikitech.wikimedia.org/wiki/Performance.wikimedia.org/Runbook#statsv
