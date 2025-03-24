@@ -8,7 +8,7 @@ groups:
         for: 2m
         labels:
           team: sre
-          severity: warning  # TODO: move to critical once tested
+          severity: critical
         annotations:
           summary: 'Transit BGP session down between {{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }} and {{ $labels.peer_descr }} ({{ $labels.address }})'
           description: ''  # Not needed
@@ -19,7 +19,7 @@ groups:
         for: 2m
         labels:
           team: sre
-          severity: warning  # TODO: move to critical once tested
+          severity: critical
         annotations:
           summary: 'Core BGP session down between {{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }} and {{ $labels.peer_descr }} ({{ $labels.address }}) - group {{ $labels.peer_group }}'
           description: ''  # Not needed

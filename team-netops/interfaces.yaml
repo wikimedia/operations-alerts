@@ -11,7 +11,7 @@ groups:
         for: 2m
         labels:
           team: sre
-          severity: warning  # TODO: move to critical once tested
+          severity: critical
         annotations:
           summary: 'Core router interface down - {{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}:{{ $labels.interface_name }} ({{ $labels.interface_description }})'
           description: ''  # Not needed

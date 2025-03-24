@@ -25,7 +25,7 @@ tests:
               interface_name: xe-0/1/7
               interface_description: "Core: cr4-ulsfo:xe-0/1/7 {#1074}"
               team: sre
-              severity: warning
+              severity: critical
             exp_annotations:
               summary: "Core router interface down - cr3-ulsfo:xe-0/1/7 (Core: cr4-ulsfo:xe-0/1/7 {#1074})"
               description: ""
