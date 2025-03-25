@@ -12,6 +12,7 @@ groups:
         labels:
           team: sre
           severity: critical
+          scope: network
         annotations:
           summary: 'Core router interface down - {{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}:{{ $labels.interface_name }} ({{ $labels.interface_description }})'
           description: ''  # Not needed
@@ -23,6 +24,7 @@ groups:
         labels:
           team: dcops
           severity: task
+          scope: network
         annotations:
           summary: 'Inbound errors on interface {{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}:{{ $labels.interface_name }} ({{ $labels.interface_description }})'
           description: ''  # Not needed
@@ -34,6 +36,7 @@ groups:
         labels:
           team: dcops
           severity: task
+          scope: network
         annotations:
           summary: 'Outbound errors on interface {{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}:{{ $labels.interface_name }} ({{ $labels.interface_description }})'
           description: ''  # Not needed

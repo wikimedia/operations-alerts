@@ -9,6 +9,7 @@ groups:
         labels:
           team: sre
           severity: critical
+          scope: network
         annotations:
           summary: 'Transit BGP session down between {{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }} and {{ $labels.peer_descr }} ({{ $labels.address }})'
           description: ''  # Not needed
@@ -20,6 +21,7 @@ groups:
         labels:
           team: sre
           severity: critical
+          scope: network
         annotations:
           summary: 'Core BGP session down between {{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }} and {{ $labels.peer_descr }} ({{ $labels.address }}) - group {{ $labels.peer_group }}'
           description: ''  # Not needed

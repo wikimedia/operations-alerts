@@ -21,6 +21,7 @@ tests:
               address: 192.80.17.185
               team: sre
               severity: critical
+              scope: network
             exp_annotations:
               summary: "Transit BGP session down between cr1-eqiad and NTT (192.80.17.185)"
               description: ""
@@ -36,6 +37,7 @@ tests:
               address: 10.66.0.9
               team: sre
               severity: critical
+              scope: network
             exp_annotations:
               summary: "Core BGP session down between cr1-eqiad and ssw1-e1-eqiad (10.66.0.9) - group Switch"
               description: ""
