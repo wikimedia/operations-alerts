@@ -1,0 +1,53 @@
+rule_files:
+  - mirrors.yaml
+evaluation_interval: 10m
+tests:
+  - interval: 1m
+    input_series:
+      # time() will return eval_time in seconds, not UNIX epoch
+      # thus eval far enough in the future to have data for the ">" threshold
+      # and "for" clause
+      # https://github.com/prometheus/prometheus/issues/4817#issuecomment-514765285
+      - series: 'node_file_age_timestamp_seconds_total{path="/srv/mirrors/debian"}'
+        values: '0+0x600'
+      - series: 'node_file_age_timestamp_seconds_total{path="/srv/mirrors/debian"}'
+        values: '0+0x600000'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: MirrorHighLag
+        eval_time: 10m
+        exp_alerts: []
+      - alertname: MirrorHighLag
+        eval_time: 8h20m
+        exp_alerts:
+          - exp_labels:
+              team: infrastructure-foundations
+              path: /srv/mirrors/debian
+              severity: warning
+            exp_annotations:
+              summary: 'Mirrors - /srv/mirrors/debian synchronization lag'
+              description: 'Mirrors - /srv/mirrors/debian synchronization lag is behind 8h 20m 0s'
+              dashboard: 'https://grafana.wikimedia.org/d/dbd8a904-eab2-48d1-a3b9-fa1851ef3ed2/mirrors?orgId=1'
+              runbook: 'https://wikitech.wikimedia.org/wiki/Mirrors'
+      - alertname: MirrorHighLag
+        eval_time: 14h20m
+        exp_alerts:
+          - exp_labels:
+              team: infrastructure-foundations
+              path: /srv/mirrors/debian
+              severity: warning
+            exp_annotations:
+              summary: 'Mirrors - /srv/mirrors/debian synchronization lag'
+              description: 'Mirrors - /srv/mirrors/debian synchronization lag is behind 14h 20m 0s'
+              dashboard: 'https://grafana.wikimedia.org/d/dbd8a904-eab2-48d1-a3b9-fa1851ef3ed2/mirrors?orgId=1'
+              runbook: 'https://wikitech.wikimedia.org/wiki/Mirrors'
+          - exp_labels:
+              team: infrastructure-foundations
+              path: /srv/mirrors/debian
+              severity: critical
+            exp_annotations:
+              summary: 'Mirrors - /srv/mirrors/debian synchronization lag'
+              description: 'Mirrors - /srv/mirrors/debian synchronization lag is behind 14h 20m 0s'
+              dashboard: 'https://grafana.wikimedia.org/d/dbd8a904-eab2-48d1-a3b9-fa1851ef3ed2/mirrors?orgId=1'
+              runbook: 'https://wikitech.wikimedia.org/wiki/Mirrors'
