@@ -1,0 +1,69 @@
+rule_files:
+  - mediawiki-dumps-v1.yaml
+evaluation_interval: 1m
+
+tests:
+  # Test 1: Normal space usage (above thresholds)
+  - interval: 1m
+    input_series:
+      - series: 'kubelet_volume_stats_available_bytes{namespace="mediawiki-dumps-legacy", persistentvolumeclaim="mediawiki-dumps-legacy-fs"}'
+        values: '100+0x12'  # Keep constant value
+      - series: 'kubelet_volume_stats_capacity_bytes{namespace="mediawiki-dumps-legacy", persistentvolumeclaim="mediawiki-dumps-legacy-fs"}'
+        values: '100+0x12'  # Keep capacity constant
+    alert_rule_test:
+      - eval_time: 5m
+        alertname: MediawikiDumpsV1PVCAvailableSpaceWarning
+        exp_alerts: []  # No alerts firing
+      - eval_time: 5m
+        alertname: MediawikiDumpsV1PVCAvailableSpaceCritical
+        exp_alerts: []  # No alerts firing
+
+  # Test 2: Space usage crossing warning threshold (86% full)
+  - interval: 1m
+    input_series:
+      - series: 'kubelet_volume_stats_available_bytes{namespace="mediawiki-dumps-legacy", persistentvolumeclaim="mediawiki-dumps-legacy-fs"}'
+        values: '14+0x12'  # Available space = 14 units
+      - series: 'kubelet_volume_stats_capacity_bytes{namespace="mediawiki-dumps-legacy", persistentvolumeclaim="mediawiki-dumps-legacy-fs"}'
+        values: '100+0x12'  # Capacity = 100 units (14% available = 86% full)
+    alert_rule_test:
+      - eval_time: 4m
+        alertname: MediawikiDumpsV1PVCAvailableSpaceWarning
+        exp_alerts: []
+      - eval_time: 9m
+        alertname: MediawikiDumpsV1PVCAvailableSpaceWarning
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              team: data-platform
+              namespace: mediawiki-dumps-legacy
+              persistentvolumeclaim: mediawiki-dumps-legacy-fs
+            exp_annotations:
+              summary: 'PVC mediawiki-dumps-legacy-fs.mediawiki-dumps-legacy is 85% full'
+              description: 'PVC mediawiki-dumps-legacy-fs.mediawiki-dumps-legacy is 85% full'
+              dashboard: "https://thanos.wikimedia.org/graph?g0.expr%3Dkubelet_volume_stats_available_bytes%257Bnamespace%253D%2527mediawiki-dumps-legacy%2527%252C%2520persistentvolumeclaim%253D%2522mediawiki-dumps-legacy-fs%2522%257D%2520%252F%2520kubelet_volume_stats_capacity_bytes%257Bnamespace%253D%2527mediawiki-dumps-legacy%2527%252C%2520persistentvolumeclaim%253D%2522mediawiki-dumps-legacy-fs%2522%257D%2520%2A%2520100%26g0.tab%3D0%26g0.stacked%3D0%26g0.range_input%3D1w%26g0.max_source_resolution%3D0s%26g0.deduplicate%3D1%26g0.partial_response%3D0%26g0.store_matches%3D%255B%255D"
+              runbook: "https://wikitech.wikimedia.org/wiki/Dumps/Airflow/Operations#The_dumps_CephFS_volume_is_filling_up"
+
+  # Test 3: Space usage crossing critical threshold (91% full)
+  - interval: 1m
+    input_series:
+      - series: 'kubelet_volume_stats_available_bytes{namespace="mediawiki-dumps-legacy", persistentvolumeclaim="mediawiki-dumps-legacy-fs"}'
+        values: '9+0x12'  # Available space = 9 units
+      - series: 'kubelet_volume_stats_capacity_bytes{namespace="mediawiki-dumps-legacy", persistentvolumeclaim="mediawiki-dumps-legacy-fs"}'
+        values: '100+0x12'  # Capacity = 100 units (9% available = 91% full)
+    alert_rule_test:
+      - eval_time: 4m
+        alertname: MediawikiDumpsV1PVCAvailableSpaceCritical
+        exp_alerts: []
+      - eval_time: 9m
+        alertname: MediawikiDumpsV1PVCAvailableSpaceCritical
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              team: data-platform
+              namespace: mediawiki-dumps-legacy
+              persistentvolumeclaim: mediawiki-dumps-legacy-fs
+            exp_annotations:
+              summary: 'PVC mediawiki-dumps-legacy-fs.mediawiki-dumps-legacy is 90% full'
+              description: 'PVC mediawiki-dumps-legacy-fs.mediawiki-dumps-legacy is 90% full'
+              dashboard: "https://thanos.wikimedia.org/graph?g0.expr%3Dkubelet_volume_stats_available_bytes%257Bnamespace%253D%2527mediawiki-dumps-legacy%2527%252C%2520persistentvolumeclaim%253D%2522mediawiki-dumps-legacy-fs%2522%257D%2520%252F%2520kubelet_volume_stats_capacity_bytes%257Bnamespace%253D%2527mediawiki-dumps-legacy%2527%252C%2520persistentvolumeclaim%253D%2522mediawiki-dumps-legacy-fs%2522%257D%2520%2A%2520100%26g0.tab%3D0%26g0.stacked%3D0%26g0.range_input%3D1w%26g0.max_source_resolution%3D0s%26g0.deduplicate%3D1%26g0.partial_response%3D0%26g0.store_matches%3D%255B%255D"
+              runbook: "https://wikitech.wikimedia.org/wiki/Dumps/Airflow/Operations#The_dumps_CephFS_volume_is_filling_up"
