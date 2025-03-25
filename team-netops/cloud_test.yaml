@@ -17,8 +17,9 @@ tests:
               instance: cloudsw1-e4-eqiad:9804
               peer_descr: cloudsw1-d5
               address: 2620:0:861:fe0e::1
-              severity: warning
+              severity: critical
               team: sre
+              scope: network
             exp_annotations:
               summary: "Cloud (WMCS) BGP session down between cloudsw1-e4-eqiad and cloudsw1-d5 (2620:0:861:fe0e::1)"
               description: ""
