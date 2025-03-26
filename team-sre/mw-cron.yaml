@@ -1,0 +1,18 @@
+# deploy-tag: k8s
+groups:
+  - name: mw-cron
+    rules:
+      - alert: MediaWikiCronJobFailed
+        annotations:
+          description: 'Use `kubectl get jobs -L team={{ $labels.label_team }},cronjob={{ $labels.label_cronjob }} -A --field-selector status.successful=0` to see failures'
+          summary: 'MediaWiki periodic job {{ $labels.label_cronjob }} failed'
+          runbook: 'https://wikitech.wikimedia.org/wiki/Periodic_jobs#Troubleshooting'
+          dashboard: 'https://w.wiki/Dak6'
+        expr: sum by (label_cronjob, label_team) (
+          kube_job_status_failed{namespace='mw-cron'} * on (namespace, job_name)
+          group_left(label_cronjob,label_team) kube_job_labels{namespace="mw-cron"}
+          ) > 0
+        for: 5m
+        labels:
+          severity: task
+          team: '{{ $labels.label_team }}'

@@ -1,0 +1,26 @@
+rule_files:
+  - mw-cron.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    input_series:
+      - series: 'kube_job_status_failed{namespace="mw-cron", job_name="mw-cron-test"}'
+        values: '1x10'
+      - series: 'kube_job_labels{namespace="mw-cron", job_name="mw-cron-test", label_cronjob="mw-cron-test", label_team="sre-serviceops"}'
+        values: '1x10'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: MediaWikiCronJobFailed
+        eval_time: 10m
+        exp_alerts:
+          - exp_labels:
+              team: sre-serviceops
+              severity: task
+              label_cronjob: mw-cron-test
+              label_team: sre-serviceops
+            exp_annotations:
+              dashboard: 'https://w.wiki/Dak6'
+              description: "Use `kubectl get jobs -L team=sre-serviceops,cronjob=mw-cron-test -A --field-selector status.successful=0` to see failures"
+              runbook: 'https://wikitech.wikimedia.org/wiki/Periodic_jobs#Troubleshooting'
+              summary: 'MediaWiki periodic job mw-cron-test failed'
