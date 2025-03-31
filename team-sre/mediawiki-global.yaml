@@ -7,10 +7,10 @@ groups:
     rules:
       - alert: MediaWikiEditFailures
         annotations:
-          description: 'Elevated MediaWiki edit failures ({{ $labels.cause }}): {{ $value }}/min'
-          summary: 'Elevated MediaWiki edit failures ({{ $labels.cause }}) for cluster {{ $labels.cluster }}'
-          dashboard: 'https://grafana.wikimedia.org/d/000000208/edit-count?orgId=1&viewPanel=13'
-          runbook: 'https://wikitech.wikimedia.org/wiki/Application_servers/Runbook'
+          description: "Elevated MediaWiki edit failures ({{ $labels.cause }}): {{ $value }}/min"
+          summary: "Elevated MediaWiki edit failures ({{ $labels.cause }}) for cluster {{ $labels.cluster }}"
+          dashboard: "https://grafana.wikimedia.org/d/000000208/edit-count?orgId=1&viewPanel=13"
+          runbook: "https://wikitech.wikimedia.org/wiki/Application_servers/Runbook"
         labels:
           severity: critical
           team: sre
@@ -19,10 +19,10 @@ groups:
 
       - alert: MediaWikiLoginFailures
         annotations:
-          description: 'Elevated MediaWiki centrallogin failures ({{ $labels.reason }}): {{ $value }}/min'
-          summary: 'Elevated MediaWiki centrallogin failures ({{ $labels.reason }})'
-          dashboard: 'https://grafana.wikimedia.org/d/000000438/mediawiki-exceptions-alerts?viewPanel=3'
-          runbook: 'https://wikitech.wikimedia.org/wiki/Application_servers/Runbook'
+          description: "Elevated MediaWiki centrallogin failures ({{ $labels.reason }}): {{ $value }}/min"
+          summary: "Elevated MediaWiki centrallogin failures ({{ $labels.reason }})"
+          dashboard: "https://grafana.wikimedia.org/d/000000438/mediawiki-exceptions-alerts?viewPanel=3"
+          runbook: "https://wikitech.wikimedia.org/wiki/Application_servers/Runbook"
         labels:
           severity: critical
           team: sre
@@ -33,12 +33,72 @@ groups:
           ) * 60 # per minute
           > 3
 
+      # Are we getting an elevated number of unknown logins? either attempts or successes
+      - &MediaWikiElevatedUnknownLogins
+        alert: MediaWikiElevatedUnknownLogins
+        annotations:
+          description: "Elevated, sustained number of login attempts from an unknown source via {{ $labels.kubernetes_namespace }}: {{ $value }}/s"
+          summary: "Elevated number of failed login attempts (unknown device and IP) via {{ $labels.kubernetes_namespace }}"
+          dashboard: https://grafana.wikimedia.org/d/000000438/mediawiki-exceptions-alerts?from=now-6h&orgId=1&to=now&viewPanel=26
+          runbook: TODO
+        labels:
+          severity: critical
+          team: sre # TODO: add paging to security team in the future?
+        for: 30m
+        # mw-web
+        expr: |
+          sum by (kubernetes_namespace) (
+            rate(mediawiki_loginnotify_failures_total{
+              kind=~"unknown|noaccount",
+              kubernetes_namespace="mw-web"}[5m]
+          )) > 1
+
+      - <<: *MediaWikiElevatedUnknownLogins
+        # mw-api-ext
+        expr: |
+          sum by (kubernetes_namespace) (
+            rate(mediawiki_loginnotify_failures_total{
+              kind=~"unknown|noaccount",
+              kubernetes_namespace="mw-api-ext"}[5m]
+          )) > 0.1
+
+      # Same as above, but for *successful* logins as opposed to attempts
+      - <<: *MediaWikiElevatedUnknownLogins
+        annotations:
+          description: "Elevated, sustained number of login successes from an unknown source via {{ $labels.kubernetes_namespace }}: {{ $value }}/s"
+          summary: "Elevated number of login successes (source unknown) via {{ $labels.kubernetes_namespace }}"
+          dashboard: https://grafana.wikimedia.org/d/000000438/mediawiki-exceptions-alerts?from=now-6h&orgId=1&to=now&viewPanel=26
+          runbook: TODO
+        for: 5m
+        # mw-web
+        expr: |
+          sum by (kubernetes_namespace) (
+            rate(mediawiki_loginnotify_successes_total{
+              kind=~"unknown|LoginNotifyUseCheckUser",
+              kubernetes_namespace="mw-web"}[5m]
+          )) > 0.25
+
+      - <<: *MediaWikiElevatedUnknownLogins
+        annotations:
+          description: "Elevated, sustained number of login successes from an unknown source via {{ $labels.kubernetes_namespace }}: {{ $value }}/s"
+          summary: "Elevated number of login successes (source unknown) via {{ $labels.kubernetes_namespace }}"
+          dashboard: https://grafana.wikimedia.org/d/000000438/mediawiki-exceptions-alerts?from=now-6h&orgId=1&to=now&viewPanel=26
+          runbook: TODO
+        for: 5m
+        # mw-api-ext
+        expr: |
+          sum by (kubernetes_namespace) (
+            rate(mediawiki_loginnotify_successes_total{
+              kind=~"unknown|LoginNotifyUseCheckUser",
+              kubernetes_namespace="mw-api-ext"}[5m]
+          )) > 0.05
+
       - alert: MediaWikiAccountCreationFailures
         annotations:
-          description: 'Elevated MediaWiki account creation failures: {{ $value | humanizePercentage }}'
-          summary: 'Elevated MediaWiki account creation failures: {{ $value | humanizePercentage }}'
-          dashboard: 'https://grafana.wikimedia.org/d/000000438/mediawiki-exceptions-alerts?viewPanel=23'
-          runbook: 'https://wikitech.wikimedia.org/wiki/Application_servers/Runbook'
+          description: "Elevated MediaWiki account creation failures: {{ $value | humanizePercentage }}"
+          summary: "Elevated MediaWiki account creation failures: {{ $value | humanizePercentage }}"
+          dashboard: "https://grafana.wikimedia.org/d/000000438/mediawiki-exceptions-alerts?viewPanel=23"
+          runbook: "https://wikitech.wikimedia.org/wiki/Application_servers/Runbook"
         labels:
           severity: critical
           team: sre
