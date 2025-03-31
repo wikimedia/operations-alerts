@@ -51,7 +51,7 @@ Build an image from `.pipeline/blubber.yaml` with:
 
 Run the test container with:
 
-    docker run --entrypoint tox alerts-tests
+    docker run -u $(id -u) --entrypoint tox -v .:/srv/app alerts-tests
 
 Deploying
 ----
