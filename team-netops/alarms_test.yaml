@@ -1,0 +1,26 @@
+rule_files:
+  - alarms.yaml
+evaluation_interval: 2m
+tests:
+  - interval: 2m
+    external_labels:
+      site: codfw
+    input_series:
+      - series: 'gnmi_system_alarms_alarm_state_id{alarm_id="123456789", instance="cr2-eqdfw:9804"}'
+        values: '123456789 123456789'
+      - series: 'gnmi_system_alarms_alarm_state_id{alarm_id="111111111", instance="cr2-eqdfw:9804"}'
+        values: '111111111 111111111'
+    alert_rule_test:
+      - alertname: NetworkDeviceAlarmActive
+        eval_time: 2m
+        exp_alerts:
+          - exp_labels:
+              instance: cr2-eqdfw:9804
+              team: sre
+              severity: critical
+              scope: network
+            exp_annotations:
+              summary: "Alarm active on cr2-eqdfw"
+              description: ""
+              dashboard: 'https://grafana.wikimedia.org/d/fb403d62-5f03-434a-9dff-bd02b9fff504/network-device-overview?var-instance=cr2-eqdfw:9804'
+              runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#Juniper_alarm'
