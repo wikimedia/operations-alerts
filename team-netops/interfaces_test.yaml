@@ -17,9 +17,9 @@ tests:
       - series: 'gnmi_interfaces_interface_state_counters_out_errors{instance="cr3-ulsfo:9804", interface_name="xe-0/1/7", interface_description="Core: cr4-ulsfo:xe-0/1/7 {#1074}"}'
         values: '0+4x15'
       - series: 'gnmi_interfaces_interface_state_counters_out_octets{instance="cr2-esams:9804", interface_description="Peering: Test peering", interface_name="xe-0/1/0"}'
-        values: '0+1200000000x5'
+        values: '0+144000000000x5' # 1200000000 * 2 * 60
       - series: 'gnmi_interfaces_interface_state_counters_in_octets{instance="cr2-esams:9804", interface_description="Peering: Test peering", interface_name="xe-0/1/0"}'
-        values: '0+1200000000x5'
+        values: '0+144000000000x5' # 1200000000 * 2 * 60
       - series: 'gnmi_interfaces_interface_state_high_speed{instance="cr2-esams:9804", interface_description="Peering: Test peering", interface_name="xe-0/1/0"}'
         values: '10000x5'
     alert_rule_test:

@@ -45,7 +45,7 @@ groups:
       - alert: TransitPeeringOutboundSaturation
         expr: |
           (
-          increase(gnmi_interfaces_interface_state_counters_out_octets{instance=~"cr.*", interface_description=~"(Transit|Peering).*"}[5m])
+          irate(gnmi_interfaces_interface_state_counters_out_octets{instance=~"cr.*", interface_description=~"(Transit|Peering).*"}[5m])
           /
           (gnmi_interfaces_interface_state_high_speed{instance=~"cr.*", interface_description=~"(Transit|Peering).*"}/8*1000000)
           ) > 0.9
@@ -62,7 +62,7 @@ groups:
       - alert: TransitPeeringInboundSaturation
         expr: |
           (
-          increase(gnmi_interfaces_interface_state_counters_in_octets{instance=~"cr.*", interface_description=~"(Transit|Peering).*"}[5m])
+          irate(gnmi_interfaces_interface_state_counters_in_octets{instance=~"cr.*", interface_description=~"(Transit|Peering).*"}[5m])
           /
           (gnmi_interfaces_interface_state_high_speed{instance=~"cr.*", interface_description=~"(Transit|Peering).*"}/8*1000000)
           ) > 0.9
