@@ -20,7 +20,7 @@ groups:
           runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#Router_interface_down'
       - alert: InboundInterfaceErrors
         expr: increase(gnmi_interfaces_interface_state_counters_in_errors[5m]) > 2 or increase(gnmi_interfaces_interface_state_counters_in_fcs_errors[5m]) > 2
-        for: 2m
+        for: 15m
         labels:
           team: dcops
           severity: task
@@ -32,7 +32,7 @@ groups:
           runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#Inbound/outbound_interface_errors'
       - alert: OutboundInterfaceErrors
         expr: increase(gnmi_interfaces_interface_state_counters_out_errors[5m]) > 2
-        for: 2m
+        for: 15m
         labels:
           team: dcops
           severity: task
