@@ -6,7 +6,8 @@ groups:
   rules:
 
   - alert: GobblinLastSuccessfulRunTooLongAgo
-    expr: time() - gobblin_job_last_successful_run_epoch_seconds > 7200
+    # The webrequest_test gobblin job is deprecated and therefore Removed from the alerts
+    expr: time() - gobblin_job_last_successful_run_epoch_seconds{job != "webrequest_test"} > 7200
     for: 10m
     labels:
       severity: critical
