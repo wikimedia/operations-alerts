@@ -1,0 +1,16 @@
+# deploy-tag: ops
+groups:
+  - name: disk
+    rules:
+      - alert: SessionStoreDiskSpaceUtilizationTooHigh
+        expr: |
+          1.0 - node_filesystem_avail_bytes{cluster="sessionstore", mountpoint="/srv"} / node_filesystem_size_bytes{cluster="sessionstore", mountpoint="/srv"} > 0.7
+        for: 10m
+        labels:
+          severity: page
+          team: data-persistence
+        annotations:
+          description: "Session storage disk space utilization on {{ $labels.instance | stripPort }} is too high: {{ $value | humanizePercentage }} on {{ $labels.mountpoint }}"
+          summary: "Session storage disk space utilization on {{ $labels.instance | stripPort }} is too high #page"
+          dashboard: 'https://grafana.wikimedia.org/d/000000377/host-overview?orgId=1&viewPanel=12&var-server={{ $labels.instance | stripPort }}'
+          runbook: "https://wikitech.wikimedia.org/wiki/SessionStorage/Runbook#High_Storage_Utilization"
