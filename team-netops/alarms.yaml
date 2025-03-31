@@ -1,0 +1,19 @@
+# deploy-tag: ops
+
+groups:
+  - name: alarms
+    rules:
+      - alert: NetworkDeviceAlarmActive
+        # When no active alarms, the devices don't expose that metric
+        # pint disable promql/series
+        expr: count by (instance) (gnmi_system_alarms_alarm_state_id) > 0
+        for: 2m
+        labels:
+          team: sre
+          severity: critical
+          scope: network
+        annotations:
+          summary: 'Alarm active on {{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}'
+          description: ''  # Not needed
+          dashboard: 'https://grafana.wikimedia.org/d/fb403d62-5f03-434a-9dff-bd02b9fff504/network-device-overview?var-instance={{ $labels.instance }}'
+          runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#Juniper_alarm'
