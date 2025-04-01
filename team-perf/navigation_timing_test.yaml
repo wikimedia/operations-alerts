@@ -1,0 +1,77 @@
+rule_files:
+  - navigation_timing.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    input_series:
+      - series: 'webperf_navigationtiming_responsestart_seconds_bucket{is_oversample="False", mw_context="anonymous_mainspace_view", mw_skin="minerva", le="0.5"}'
+        values: '0+1x20159'
+      - series: 'webperf_navigationtiming_responsestart_seconds_bucket{is_oversample="False", mw_context="anonymous_mainspace_view", mw_skin="minerva", le="0.8"}'
+        values: '0+1x20159'
+      - series: 'webperf_navigationtiming_responsestart_seconds_bucket{is_oversample="False", mw_context="anonymous_mainspace_view", mw_skin="minerva", le="+Inf"}'
+        values: '0+1x10079 10080+10000x10079'
+      - series: 'webperf_navigationtiming_responsestart_seconds_bucket{is_oversample="False", mw_context="anonymous_mainspace_view", mw_skin="vector-2022", le="0.5"}'
+        values: '0+1x20159'
+      - series: 'webperf_navigationtiming_responsestart_seconds_bucket{is_oversample="False", mw_context="anonymous_mainspace_view", mw_skin="vector-2022", le="0.8"}'
+        values: '0+1x20159'
+      - series: 'webperf_navigationtiming_responsestart_seconds_bucket{is_oversample="False", mw_context="anonymous_mainspace_view", mw_skin="vector-2022", le="+Inf"}'
+        values: '0+1x10079 10080+10000x10079'
+    alert_rule_test:
+      - alertname: NavtimingTTFBRegression
+        eval_time: 20160m
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              team: perf
+              metric: timeToFirstByte
+              tool: rum
+              bucket: 0.5
+              client: mobile
+              mw_skin: minerva
+            exp_annotations:
+              summary: "Increased % of mobile users with TTFB slower than 0.5 s"
+              description: "The difference in time to first byte on mobile is larger than 2% for users that have a faster experience than 0.5 seconds."
+              dashboard: "https://grafana.wikimedia.org/d/000000326/navigation-timing-alerts?orgId=1&from=now-15d&to=now"
+              runbook: https://wikitech.wikimedia.org/wiki/Performance/Guides/RUM_Alert
+
+          - exp_labels:
+              severity: critical
+              team: perf
+              metric: timeToFirstByte
+              tool: rum
+              bucket: 0.5
+              client: desktop
+              mw_skin: vector-2022
+            exp_annotations:
+              summary: "Increased % of desktop users with TTFB slower than 0.5 s"
+              description: "The difference in time to first byte on desktop is larger than 2% for users that have a faster experience than 0.5 seconds."
+              dashboard: "https://grafana.wikimedia.org/d/000000326/navigation-timing-alerts?orgId=1&from=now-15d&to=now"
+              runbook: https://wikitech.wikimedia.org/wiki/Performance/Guides/RUM_Alert
+
+          - exp_labels:
+              severity: critical
+              team: perf
+              metric: timeToFirstByte
+              tool: rum
+              bucket: 0.8
+              client: mobile
+              mw_skin: minerva
+            exp_annotations:
+              summary: "Increased % of mobile users with TTFB slower than 0.8 s"
+              description: "The difference in time to first byte on mobile is larger than 2% for users that have a faster experience than 0.8 seconds."
+              dashboard: "https://grafana.wikimedia.org/d/000000326/navigation-timing-alerts?orgId=1&from=now-15d&to=now"
+              runbook: https://wikitech.wikimedia.org/wiki/Performance/Guides/RUM_Alert
+
+          - exp_labels:
+              severity: critical
+              team: perf
+              metric: timeToFirstByte
+              tool: rum
+              bucket: 0.8
+              client: desktop
+              mw_skin: vector-2022
+            exp_annotations:
+              summary: "Increased % of desktop users with TTFB slower than 0.8 s"
+              description: "The difference in time to first byte on desktop is larger than 2% for users that have a faster experience than 0.8 seconds."
+              dashboard: "https://grafana.wikimedia.org/d/000000326/navigation-timing-alerts?orgId=1&from=now-15d&to=now"
+              runbook: https://wikitech.wikimedia.org/wiki/Performance/Guides/RUM_Alert
