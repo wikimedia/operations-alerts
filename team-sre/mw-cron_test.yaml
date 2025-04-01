@@ -21,7 +21,7 @@ tests:
               label_team: sre-serviceops
             exp_annotations:
               dashboard: 'https://w.wiki/Dak6'
-              description: "Use `kubectl get jobs -L team=sre-serviceops,cronjob=mw-cron-test -A --field-selector status.successful=0` to see failures"
+              description: "Use `kubectl get jobs -l team=sre-serviceops,cronjob=mw-cron-test --field-selector status.successful=0` to see failures"
               runbook: 'https://wikitech.wikimedia.org/wiki/Periodic_jobs#Troubleshooting'
               summary: 'MediaWiki periodic job mw-cron-test failed'
           - exp_labels:
@@ -31,6 +31,6 @@ tests:
               label_team: sre-serviceops
             exp_annotations:
               dashboard: 'https://w.wiki/Dak6'
-              description: "Use `kubectl get jobs -L team=sre-serviceops,cronjob=mw-cron-test -A --field-selector status.successful=0` to see failures"
+              description: "Use `kubectl get jobs -l team=sre-serviceops,cronjob=mw-cron-test --field-selector status.successful=0` to see failures"
               runbook: 'https://wikitech.wikimedia.org/wiki/Periodic_jobs#Troubleshooting'
               summary: 'MediaWiki periodic job mw-cron-test failed'
