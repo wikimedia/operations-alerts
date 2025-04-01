@@ -1,0 +1,30 @@
+rule_files:
+  - sessionstore-resources.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    input_series:
+      - series: 'node_filesystem_avail_bytes{cluster="sessionstore", instance="sessionstore1004:9100", mountpoint="/srv"}'
+        values: '50x5 20x15'
+      - series: 'node_filesystem_size_bytes{cluster="sessionstore", instance="sessionstore1004:9100", mountpoint="/srv"}'
+        values: '100x20'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: SessionStoreDiskSpaceUtilizationTooHigh
+        eval_time: 10m
+        exp_alerts: []  # Not firing (too short)
+      - alertname: SessionStoreDiskSpaceUtilizationTooHigh
+        eval_time: 20m
+        exp_alerts:
+          - exp_labels:
+              team: data-persistence
+              severity: page
+              cluster: sessionstore
+              instance: sessionstore1004:9100
+              mountpoint: /srv
+            exp_annotations:
+              summary: "Session storage disk space utilization on sessionstore1004 is too high #page"
+              description: "Session storage disk space utilization on sessionstore1004 is too high: 80% on /srv"
+              dashboard: "https://grafana.wikimedia.org/d/000000377/host-overview?orgId=1&viewPanel=12&var-server=sessionstore1004"
+              runbook: "https://wikitech.wikimedia.org/wiki/SessionStorage/Runbook#High_Storage_Utilization"
