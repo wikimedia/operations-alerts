@@ -41,6 +41,15 @@ tests:
             summary: Alarmingly low free space on the analytics-hadoop HDFS cluster.
             dashboard: https://grafana.wikimedia.org/d/000000585/hadoop?var-hadoop_cluster=analytics-hadoop&orgId=1&panelId=106&fullscreen
             runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#HDFS_Capacity_Remaining
+        - exp_labels:
+            severity: warning
+            team: data-engineering
+            hadoop_cluster: analytics-hadoop
+          exp_annotations:
+            description: Free space on the analytics-hadoop HDFS cluster is below the warning threshold of 20%.
+            summary: Alarmingly low free space on the analytics-hadoop HDFS cluster.
+            dashboard: https://grafana.wikimedia.org/d/000000585/hadoop?var-hadoop_cluster=analytics-hadoop&orgId=1&panelId=106&fullscreen
+            runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#HDFS_Capacity_Remaining
 
 ## HDFS Namenode RPC Call Queue Length tests
     - interval: 1m
