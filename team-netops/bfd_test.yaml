@@ -1,0 +1,25 @@
+rule_files:
+  - bfd.yaml
+evaluation_interval: 2m
+tests:
+  - interval: 2m
+    external_labels:
+      site: ulsfo
+    input_series:
+      - series: 'gnmi_bfd_peer_session_state{instance="cr4-ulsfo:9804", remote_address="10.128.0.6"}'
+        values: '3 3 3 3'
+    alert_rule_test:
+      - alertname: BFDdown
+        eval_time: 2m
+        exp_alerts:
+          - exp_labels:
+              instance: cr4-ulsfo:9804
+              remote_address: 10.128.0.6
+              team: sre
+              severity: critical
+              scope: network
+            exp_annotations:
+              summary: "BFD session down between cr4-ulsfo and 10.128.0.6"
+              description: ""
+              dashboard: 'https://grafana.wikimedia.org/d/fb403d62-5f03-434a-9dff-bd02b9fff504/network-device-overview?var-instance=cr4-ulsfo:9804'
+              runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#BFD_status'
