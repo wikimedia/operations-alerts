@@ -50,3 +50,23 @@ tests:
              description: "Liberica control plane daemon isn't using the latest configuration deployed by puppet on lvs4009"
              dashboard: 'https://grafana.wikimedia.org/d/fa4de97a-7114-48c7-a91a-f56089ef554f/liberica?orgId=1&viewPanel=10&var-site=ulsfo&var-instance=lvs4009'
              runbook: 'https://wikitech.wikimedia.org/wiki/Liberica#LibericaStaleConfig'
+  - interval: 1m
+    external_labels:
+      site: esams
+    input_series:
+      - series: 'liberica_etcd_errors_total{cluster="liberica", instance="lvs3008:3003", job="liberica", key="/conftool/v1/pools/esams/ncredir/nginx", prometheus="ops", site="esams"}'
+        values: '0 10 20 30 40 50 60'
+    alert_rule_test:
+      - alertname: LibericaEtcdErrors
+        eval_time: 6m
+        exp_alerts:
+          - exp_labels:
+              instance: 'lvs3008:3003'
+              key: '/conftool/v1/pools/esams/ncredir/nginx'
+              severity: critical
+              team: sre
+            exp_annotations:
+              summary: "Liberica instance lvs3008:3003 is experiencing etcd issues"
+              description: "Liberica control plane daemon is failing to watch etcd key /conftool/v1/pools/esams/ncredir/nginx on lvs3008:3003"
+              dashboard: 'https://grafana.wikimedia.org/d/fa4de97a-7114-48c7-a91a-f56089ef554f/liberica?orgId=1&var-site=esams&var-instance=lvs3008&viewPanel=11'
+              runbook: 'https://wikitech.wikimedia.org/wiki/Liberica#LibericaEtcdErrors'
