@@ -75,3 +75,89 @@ tests:
               description: "The difference in time to first byte on desktop is larger than 2% for users that have a faster experience than 0.8 seconds."
               dashboard: "https://grafana.wikimedia.org/d/000000326/navigation-timing-alerts?orgId=1&from=now-15d&to=now"
               runbook: https://wikitech.wikimedia.org/wiki/Performance/Guides/RUM_Alert
+  - interval: 1m
+    input_series:
+      - series: 'webperf_painttiming_firstcontentfulpaint_seconds_bucket{mw_skin="minerva", le="1.0", is_oversample="False", mw_context="anonymous_mainspace_view"}'
+        values: '0+1x20159'
+      - series: 'webperf_painttiming_firstcontentfulpaint_seconds_bucket{mw_skin="minerva", le="3.0", is_oversample="False", mw_context="anonymous_mainspace_view"}'
+        values: '0+1x20159'
+      - series: 'webperf_painttiming_firstcontentfulpaint_seconds_bucket{mw_skin="minerva", le="+Inf", is_oversample="False", mw_context="anonymous_mainspace_view"}'
+        values: '0+1x10079 10080+10000x10079'
+      - series: 'webperf_painttiming_firstcontentfulpaint_seconds_bucket{mw_skin="vector-2022", le="1.0", is_oversample="False", mw_context="anonymous_mainspace_view"}'
+        values: '0+1x20159'
+      - series: 'webperf_painttiming_firstcontentfulpaint_seconds_bucket{mw_skin="vector-2022", le="3.0", is_oversample="False", mw_context="anonymous_mainspace_view"}'
+        values: '0+1x20159'
+      - series: 'webperf_painttiming_firstcontentfulpaint_seconds_bucket{mw_skin="vector-2022", le="+Inf", is_oversample="False", mw_context="anonymous_mainspace_view"}'
+        values: '0+1x10079 10080+10000x10079'
+      - series: 'webperf_painttiming_firstcontentfulpaint_seconds_bucket{mw_skin="minerva", le="1.0", is_oversample="False", mw_context="anonymous_mainspace_view"}'
+        values: '0+1x10079 10080+9700x10079'
+      - series: 'webperf_painttiming_firstcontentfulpaint_seconds_bucket{mw_skin="minerva", le="3.0", is_oversample="False", mw_context="anonymous_mainspace_view"}'
+        values: '0+1x10079 10080+9700x10079'
+      - series: 'webperf_painttiming_firstcontentfulpaint_seconds_bucket{mw_skin="minerva", le="+Inf", is_oversample="False", mw_context="anonymous_mainspace_view"}'
+        values: '0+1x10079 10080+10000x10079'
+      - series: 'webperf_painttiming_firstcontentfulpaint_seconds_bucket{mw_skin="vector-2022", le="1.0", is_oversample="False", mw_context="anonymous_mainspace_view"}'
+        values: '0+1x10079 10080+9700x10079'
+      - series: 'webperf_painttiming_firstcontentfulpaint_seconds_bucket{mw_skin="vector-2022", le="3.0", is_oversample="False", mw_context="anonymous_mainspace_view"}'
+        values: '0+1x10079 10080+9700x10079'
+      - series: 'webperf_painttiming_firstcontentfulpaint_seconds_bucket{mw_skin="vector-2022", le="+Inf", is_oversample="False", mw_context="anonymous_mainspace_view"}'
+        values: '0+1x10079 10080+10000x10079'
+
+    alert_rule_test:
+      - alertname: NavtimingFCPRegression
+        eval_time: 20160m
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              team: perf
+              metric: firstContentfulPaint
+              tool: rum
+              bucket: 1.0
+              client: mobile
+              mw_skin: minerva
+            exp_annotations:
+              summary: "Increased % of mobile users with FCP slower than 1.0 s"
+              description: "The difference in first contentful paint on mobile is larger than 2% for users that have a faster experience than 1.0 seconds."
+              dashboard: "https://grafana.wikimedia.org/d/000000326/navigation-timing-alerts?orgId=1&from=now-15d&to=now"
+              runbook: "https://wikitech.wikimedia.org/wiki/Performance/Guides/RUM_Alert"
+
+          - exp_labels:
+              severity: critical
+              team: perf
+              metric: firstContentfulPaint
+              tool: rum
+              bucket: 1.0
+              client: desktop
+              mw_skin: vector-2022
+            exp_annotations:
+              summary: "Increased % of desktop users with FCP slower than 1.0 s"
+              description: "The difference in first contentful paint on desktop is larger than 2% for users that have a faster experience than 1.0 seconds."
+              dashboard: "https://grafana.wikimedia.org/d/000000326/navigation-timing-alerts?orgId=1&from=now-15d&to=now"
+              runbook: "https://wikitech.wikimedia.org/wiki/Performance/Guides/RUM_Alert"
+
+          - exp_labels:
+              severity: critical
+              team: perf
+              metric: firstContentfulPaint
+              tool: rum
+              bucket: 3.0
+              client: mobile
+              mw_skin: minerva
+            exp_annotations:
+              summary: "Increased % of mobile users with FCP slower than 3.0 s"
+              description: "The difference in first contentful paint on mobile is larger than 2% for users that have a faster experience than 3.0 seconds."
+              dashboard: "https://grafana.wikimedia.org/d/000000326/navigation-timing-alerts?orgId=1&from=now-15d&to=now"
+              runbook: "https://wikitech.wikimedia.org/wiki/Performance/Guides/RUM_Alert"
+
+          - exp_labels:
+              severity: critical
+              team: perf
+              metric: firstContentfulPaint
+              tool: rum
+              bucket: 3.0
+              client: desktop
+              mw_skin: vector-2022
+            exp_annotations:
+              summary: "Increased % of desktop users with FCP slower than 3.0 s"
+              description: "The difference in first contentful paint on desktop is larger than 2% for users that have a faster experience than 3.0 seconds."
+              dashboard: "https://grafana.wikimedia.org/d/000000326/navigation-timing-alerts?orgId=1&from=now-15d&to=now"
+              runbook: "https://wikitech.wikimedia.org/wiki/Performance/Guides/RUM_Alert"

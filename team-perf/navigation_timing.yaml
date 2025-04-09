@@ -118,3 +118,116 @@ groups:
             "__name__",
             ".*"
           ) > 0.02
+      - &anchor_NavtimingFCPRegression
+        alert: NavtimingFCPRegression
+        # ignore missing metrics from the passive site
+        # pint disable promql/series
+        expr: |
+          label_replace(
+            label_replace(
+              label_replace(
+                -(
+                    (
+                        sum by (mw_skin) (
+                          increase(
+                            webperf_painttiming_firstcontentfulpaint_seconds_bucket{is_oversample="False",le="1.0",mw_context="anonymous_mainspace_view",mw_skin=~"(minerva|vector-2022)"}[1d]
+                          )
+                        )
+                      /
+                        sum by (mw_skin) (
+                          increase(
+                            webperf_painttiming_firstcontentfulpaint_seconds_bucket{is_oversample="False",le="+Inf",mw_context="anonymous_mainspace_view",mw_skin=~"(minerva|vector-2022)"}[1d]
+                          )
+                        )
+                    )
+                  -
+                    (
+                        sum by (mw_skin) (
+                          increase(
+                            webperf_painttiming_firstcontentfulpaint_seconds_bucket{is_oversample="False",le="1.0",mw_context="anonymous_mainspace_view",mw_skin=~"(minerva|vector-2022)"}[1d] offset 1w
+                          )
+                        )
+                      /
+                        sum by (mw_skin) (
+                          increase(
+                            webperf_painttiming_firstcontentfulpaint_seconds_bucket{is_oversample="False",le="+Inf",mw_context="anonymous_mainspace_view",mw_skin=~"(minerva|vector-2022)"}[1d] offset 1w
+                          )
+                        )
+                    )
+                ),
+                "client",
+                "mobile",
+                "mw_skin",
+                "minerva"
+              ),
+              "client",
+              "desktop",
+              "mw_skin",
+              "vector-2022"
+            ),
+            "bucket",
+            "1.0",
+            "__name__",
+            ".*"
+          ) > 0.02
+        for: 1h
+        labels:
+          severity: critical
+          team: perf
+          metric: firstContentfulPaint
+          tool: rum
+        annotations:
+          summary: "Increased % of {{ $labels.client }} users with FCP slower than {{ $labels.bucket }} s"
+          description: "The difference in first contentful paint on {{ $labels.client }} is larger than 2% for users that have a faster experience than {{ $labels.bucket }} seconds."
+          dashboard: "https://grafana.wikimedia.org/d/000000326/navigation-timing-alerts?orgId=1&from=now-15d&to=now"
+          runbook: "https://wikitech.wikimedia.org/wiki/Performance/Guides/RUM_Alert"
+
+      - <<: *anchor_NavtimingFCPRegression
+        expr: |
+          label_replace(
+            label_replace(
+              label_replace(
+                -(
+                    (
+                        sum by (mw_skin) (
+                          increase(
+                            webperf_painttiming_firstcontentfulpaint_seconds_bucket{is_oversample="False",le="3.0",mw_context="anonymous_mainspace_view",mw_skin=~"(minerva|vector-2022)"}[1d]
+                          )
+                        )
+                      /
+                        sum by (mw_skin) (
+                          increase(
+                            webperf_painttiming_firstcontentfulpaint_seconds_bucket{is_oversample="False",le="+Inf",mw_context="anonymous_mainspace_view",mw_skin=~"(minerva|vector-2022)"}[1d]
+                          )
+                        )
+                    )
+                  -
+                    (
+                        sum by (mw_skin) (
+                          increase(
+                            webperf_painttiming_firstcontentfulpaint_seconds_bucket{is_oversample="False",le="3.0",mw_context="anonymous_mainspace_view",mw_skin=~"(minerva|vector-2022)"}[1d] offset 1w
+                          )
+                        )
+                      /
+                        sum by (mw_skin) (
+                          increase(
+                            webperf_painttiming_firstcontentfulpaint_seconds_bucket{is_oversample="False",le="+Inf",mw_context="anonymous_mainspace_view",mw_skin=~"(minerva|vector-2022)"}[1d] offset 1w
+                          )
+                        )
+                    )
+                ),
+                "client",
+                "mobile",
+                "mw_skin",
+                "minerva"
+              ),
+              "client",
+              "desktop",
+              "mw_skin",
+              "vector-2022"
+            ),
+            "bucket",
+            "3.0",
+            "__name__",
+            ".*"
+          ) > 0.02
