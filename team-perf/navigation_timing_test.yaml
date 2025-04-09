@@ -1,24 +1,24 @@
 rule_files:
   - navigation_timing.yaml
-evaluation_interval: 1m
+evaluation_interval: 1h
 tests:
-  - interval: 1m
+  - interval: 1h
     input_series:
       - series: 'webperf_navigationtiming_responsestart_seconds_bucket{is_oversample="False", mw_context="anonymous_mainspace_view", mw_skin="minerva", le="0.5"}'
-        values: '0+1x20159'
+        values: '0+1x335'
       - series: 'webperf_navigationtiming_responsestart_seconds_bucket{is_oversample="False", mw_context="anonymous_mainspace_view", mw_skin="minerva", le="0.8"}'
-        values: '0+1x20159'
+        values: '0+1x335'
       - series: 'webperf_navigationtiming_responsestart_seconds_bucket{is_oversample="False", mw_context="anonymous_mainspace_view", mw_skin="minerva", le="+Inf"}'
-        values: '0+1x10079 10080+10000x10079'
+        values: '0+1x167 169+10000x167'
       - series: 'webperf_navigationtiming_responsestart_seconds_bucket{is_oversample="False", mw_context="anonymous_mainspace_view", mw_skin="vector-2022", le="0.5"}'
-        values: '0+1x20159'
+        values: '0+1x335'
       - series: 'webperf_navigationtiming_responsestart_seconds_bucket{is_oversample="False", mw_context="anonymous_mainspace_view", mw_skin="vector-2022", le="0.8"}'
-        values: '0+1x20159'
+        values: '0+1x335'
       - series: 'webperf_navigationtiming_responsestart_seconds_bucket{is_oversample="False", mw_context="anonymous_mainspace_view", mw_skin="vector-2022", le="+Inf"}'
-        values: '0+1x10079 10080+10000x10079'
+        values: '0+1x167 169+10000x167'
     alert_rule_test:
       - alertname: NavtimingTTFBRegression
-        eval_time: 20160m
+        eval_time: 336h
         exp_alerts:
           - exp_labels:
               severity: critical
@@ -76,36 +76,36 @@ tests:
               dashboard: "https://grafana.wikimedia.org/d/000000326/navigation-timing-alerts?orgId=1&from=now-15d&to=now"
               runbook: https://wikitech.wikimedia.org/wiki/Performance/Guides/RUM_Alert
 
-  - interval: 1m
+  - interval: 1h
     input_series:
       - series: 'webperf_painttiming_firstcontentfulpaint_seconds_bucket{mw_skin="minerva", le="1.0", is_oversample="False", mw_context="anonymous_mainspace_view"}'
-        values: '0+1x20159'
+        values: '0+1x335'
       - series: 'webperf_painttiming_firstcontentfulpaint_seconds_bucket{mw_skin="minerva", le="3.0", is_oversample="False", mw_context="anonymous_mainspace_view"}'
-        values: '0+1x20159'
+        values: '0+1x335'
       - series: 'webperf_painttiming_firstcontentfulpaint_seconds_bucket{mw_skin="minerva", le="+Inf", is_oversample="False", mw_context="anonymous_mainspace_view"}'
-        values: '0+1x10079 10080+10000x10079'
+        values: '0+1x167 169+600000x167'
       - series: 'webperf_painttiming_firstcontentfulpaint_seconds_bucket{mw_skin="vector-2022", le="1.0", is_oversample="False", mw_context="anonymous_mainspace_view"}'
-        values: '0+1x20159'
+        values: '0+1x335'
       - series: 'webperf_painttiming_firstcontentfulpaint_seconds_bucket{mw_skin="vector-2022", le="3.0", is_oversample="False", mw_context="anonymous_mainspace_view"}'
-        values: '0+1x20159'
+        values: '0+1x335'
       - series: 'webperf_painttiming_firstcontentfulpaint_seconds_bucket{mw_skin="vector-2022", le="+Inf", is_oversample="False", mw_context="anonymous_mainspace_view"}'
-        values: '0+1x10079 10080+10000x10079'
+        values: '0+1x167 169+600000x167'
       - series: 'webperf_painttiming_firstcontentfulpaint_seconds_bucket{mw_skin="minerva", le="1.0", is_oversample="False", mw_context="anonymous_mainspace_view"}'
-        values: '0+1x10079 10080+9700x10079'
+        values: '0+1x167 169+582000x167'
       - series: 'webperf_painttiming_firstcontentfulpaint_seconds_bucket{mw_skin="minerva", le="3.0", is_oversample="False", mw_context="anonymous_mainspace_view"}'
-        values: '0+1x10079 10080+9700x10079'
+        values: '0+1x167 169+582000x167'
       - series: 'webperf_painttiming_firstcontentfulpaint_seconds_bucket{mw_skin="minerva", le="+Inf", is_oversample="False", mw_context="anonymous_mainspace_view"}'
-        values: '0+1x10079 10080+10000x10079'
+        values: '0+1x167 169+600000x167'
       - series: 'webperf_painttiming_firstcontentfulpaint_seconds_bucket{mw_skin="vector-2022", le="1.0", is_oversample="False", mw_context="anonymous_mainspace_view"}'
-        values: '0+1x10079 10080+9700x10079'
+        values: '0+1x167 169+582000x167'
       - series: 'webperf_painttiming_firstcontentfulpaint_seconds_bucket{mw_skin="vector-2022", le="3.0", is_oversample="False", mw_context="anonymous_mainspace_view"}'
-        values: '0+1x10079 10080+9700x10079'
+        values: '0+1x167 169+582000x167'
       - series: 'webperf_painttiming_firstcontentfulpaint_seconds_bucket{mw_skin="vector-2022", le="+Inf", is_oversample="False", mw_context="anonymous_mainspace_view"}'
-        values: '0+1x10079 10080+10000x10079'
+        values: '0+1x167 169+600000x167'
 
     alert_rule_test:
       - alertname: NavtimingFCPRegression
-        eval_time: 20160m
+        eval_time: 336h
         exp_alerts:
           - exp_labels:
               severity: critical
@@ -163,36 +163,36 @@ tests:
               dashboard: "https://grafana.wikimedia.org/d/000000326/navigation-timing-alerts?orgId=1&from=now-15d&to=now"
               runbook: "https://wikitech.wikimedia.org/wiki/Performance/Guides/RUM_Alert"
 
-  - interval: 1m
+  - interval: 1h
     input_series:
       - series: 'webperf_navigationtiming_loadeventend_seconds{mw_skin="minerva", le="1.0", is_oversample="False", mw_context="anonymous_mainspace_view"}'
-        values: '0+1x20159'
+        values: '0+1x335'
       - series: 'webperf_navigationtiming_loadeventend_seconds{mw_skin="minerva", le="3.0", is_oversample="False", mw_context="anonymous_mainspace_view"}'
-        values: '0+1x20159'
+        values: '0+1x335'
       - series: 'webperf_navigationtiming_loadeventend_seconds{mw_skin="minerva", le="+Inf", is_oversample="False", mw_context="anonymous_mainspace_view"}'
-        values: '0+1x10079 10080+10000x10079'
+        values: '0+1x167 169+600000x167'
       - series: 'webperf_navigationtiming_loadeventend_seconds{mw_skin="vector-2022", le="1.0", is_oversample="False", mw_context="anonymous_mainspace_view"}'
-        values: '0+1x20159'
+        values: '0+1x335'
       - series: 'webperf_navigationtiming_loadeventend_seconds_bucket{mw_skin="vector-2022", le="3.0", is_oversample="False", mw_context="anonymous_mainspace_view"}'
-        values: '0+1x20159'
+        values: '0+1x335'
       - series: 'webperf_navigationtiming_loadeventend_seconds_bucket{mw_skin="vector-2022", le="+Inf", is_oversample="False", mw_context="anonymous_mainspace_view"}'
-        values: '0+1x10079 10080+10000x10079'
+        values: '0+1x167 169+600000x167'
       - series: 'webperf_navigationtiming_loadeventend_seconds_bucket{mw_skin="minerva", le="1.0", is_oversample="False", mw_context="anonymous_mainspace_view"}'
-        values: '0+1x10079 10080+9700x10079'
+        values: '0+1x167 169+582000x167'
       - series: 'webperf_navigationtiming_loadeventend_seconds_bucket{mw_skin="minerva", le="3.0", is_oversample="False", mw_context="anonymous_mainspace_view"}'
-        values: '0+1x10079 10080+9700x10079'
+        values: '0+1x167 169+582000x167'
       - series: 'webperf_navigationtiming_loadeventend_seconds_bucket{mw_skin="minerva", le="+Inf", is_oversample="False", mw_context="anonymous_mainspace_view"}'
-        values: '0+1x10079 10080+10000x10079'
+        values: '0+1x167 169+600000x167'
       - series: 'webperf_navigationtiming_loadeventend_seconds_bucket{mw_skin="vector-2022", le="1.0", is_oversample="False", mw_context="anonymous_mainspace_view"}'
-        values: '0+1x10079 10080+9700x10079'
+        values: '0+1x167 169+582000x167'
       - series: 'webperf_navigationtiming_loadeventend_seconds_bucket{mw_skin="vector-2022", le="3.0", is_oversample="False", mw_context="anonymous_mainspace_view"}'
-        values: '0+1x10079 10080+9700x10079'
+        values: '0+1x167 169+582000x167'
       - series: 'webperf_navigationtiming_loadeventend_seconds_bucket{mw_skin="vector-2022", le="+Inf", is_oversample="False", mw_context="anonymous_mainspace_view"}'
-        values: '0+1x10079 10080+10000x10079'
+        values: '0+1x167 169+600000x167'
 
     alert_rule_test:
       - alertname: NavtimingLoadEventEndRegression
-        eval_time: 20160m
+        eval_time: 336h
         exp_alerts:
           - exp_labels:
               severity: critical
@@ -247,5 +247,80 @@ tests:
             exp_annotations:
               summary: "Increased % of desktop users with load event end slower than 3.0 s"
               description: "The difference in load event end on desktop is larger than 2% for users that have a faster experience than 3.0 seconds."
+              dashboard: "https://grafana.wikimedia.org/d/000000326/navigation-timing-alerts?orgId=1&from=now-15d&to=now"
+              runbook: "https://wikitech.wikimedia.org/wiki/Performance/Guides/RUM_Alert"
+
+  - interval: 1h
+    input_series:
+      - series: 'webperf_longtask_totalduration_seconds_bucket{is_oversample="False", mw_context="anonymous_mainspace_view", mw_skin="minerva", le="0.5"}'
+        values: '0+1x335'
+      - series: 'webperf_longtask_totalduration_seconds_bucket{is_oversample="False", mw_context="anonymous_mainspace_view", mw_skin="minerva", le="1.0"}'
+        values: '0+1x335'
+      - series: 'webperf_longtask_totalduration_seconds_bucket{is_oversample="False", mw_context="anonymous_mainspace_view", mw_skin="minerva", le="+Inf"}'
+        values: '0+1x167 169+10000x167'
+      - series: 'webperf_longtask_totalduration_seconds_bucket{is_oversample="False", mw_context="anonymous_mainspace_view", mw_skin="vector-2022", le="0.5"}'
+        values: '0+1x335'
+      - series: 'webperf_longtask_totalduration_seconds_bucket{is_oversample="False", mw_context="anonymous_mainspace_view", mw_skin="vector-2022", le="1.0"}'
+        values: '0+1x335'
+      - series: 'webperf_longtask_totalduration_seconds_bucket{is_oversample="False", mw_context="anonymous_mainspace_view", mw_skin="vector-2022", le="+Inf"}'
+        values: '0+1x167 169+10000x167'
+
+    alert_rule_test:
+      - alertname: NavtimingCPULongTaskRegression
+        eval_time: 336h
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              team: perf
+              metric: cpuLongTask
+              tool: rum
+              bucket: 0.5
+              client: mobile
+              mw_skin: minerva
+            exp_annotations:
+              summary: "Increased % of mobile users with CPU long tasks slower than 0.5 s"
+              description: "The difference in CPU long tasks on mobile is larger than 2% for users that have a faster experience than 0.5 seconds."
+              dashboard: "https://grafana.wikimedia.org/d/000000326/navigation-timing-alerts?orgId=1&from=now-15d&to=now"
+              runbook: "https://wikitech.wikimedia.org/wiki/Performance/Guides/RUM_Alert"
+
+          - exp_labels:
+              severity: critical
+              team: perf
+              metric: cpuLongTask
+              tool: rum
+              bucket: 0.5
+              client: desktop
+              mw_skin: vector-2022
+            exp_annotations:
+              summary: "Increased % of desktop users with CPU long tasks slower than 0.5 s"
+              description: "The difference in CPU long tasks on desktop is larger than 2% for users that have a faster experience than 0.5 seconds."
+              dashboard: "https://grafana.wikimedia.org/d/000000326/navigation-timing-alerts?orgId=1&from=now-15d&to=now"
+              runbook: "https://wikitech.wikimedia.org/wiki/Performance/Guides/RUM_Alert"
+
+          - exp_labels:
+              severity: critical
+              team: perf
+              metric: cpuLongTask
+              tool: rum
+              bucket: 1.0
+              client: mobile
+              mw_skin: minerva
+            exp_annotations:
+              summary: "Increased % of mobile users with CPU long tasks slower than 1.0 s"
+              description: "The difference in CPU long tasks on mobile is larger than 2% for users that have a faster experience than 1.0 seconds."
+              dashboard: "https://grafana.wikimedia.org/d/000000326/navigation-timing-alerts?orgId=1&from=now-15d&to=now"
+              runbook: "https://wikitech.wikimedia.org/wiki/Performance/Guides/RUM_Alert"
+
+          - exp_labels:
+              severity: critical
+              team: perf
+              metric: cpuLongTask
+              tool: rum
+              bucket: 1.0
+              client: desktop
+              mw_skin: vector-2022
+            exp_annotations:
+              summary: "Increased % of desktop users with CPU long tasks slower than 1.0 s"
+              description: "The difference in CPU long tasks on desktop is larger than 2% for users that have a faster experience than 1.0 seconds."
               dashboard: "https://grafana.wikimedia.org/d/000000326/navigation-timing-alerts?orgId=1&from=now-15d&to=now"
               runbook: "https://wikitech.wikimedia.org/wiki/Performance/Guides/RUM_Alert"
