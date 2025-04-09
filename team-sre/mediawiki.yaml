@@ -4,45 +4,6 @@
 groups:
   - name: appservers
     rules:
-      - alert: VideoscalerPHPBusyWorkers
-        annotations:
-          description: 'Videoscalers in {{ $externalLabels.site }} is experiencing saturation of php-fpm workers: {{ $value | humanizePercentage }} for more than 10 minutes.'
-          summary: 'Not enough idle {{ $labels.service }} workers for Mediawiki {{ $labels.cluster }} at {{ $externalLabels.site }}'
-          dashboard: 'https://grafana.wikimedia.org/d/wqj6s-unk/jobrunners?fullscreen&orgId=1&from=now-3h&to=now&var-datasource={{ $externalLabels.site }}%20prometheus/ops&viewPanel=54'
-          runbook: 'https://bit.ly/wmf-fpmsat'
-        expr: sum by (cluster, service) (phpfpm_statustext_processes{cluster="jobrunner", state="idle"})
-          /
-          sum by (cluster, service) (phpfpm_statustext_processes{cluster="jobrunner"})
-          <= 0.1
-        for: 30m
-        labels:
-          severity: critical
-          team: sre
-
-      - &AppserversUnreachable
-        alert: AppserversUnreachable
-        annotations:
-          description: 'Prometheus in {{ $externalLabels.site }} is unable to scrape metrics for {{ $value | humanizePercentage }} of cluster {{ $labels.cluster }}.'
-          summary: 'Appserver unavailable for cluster {{ $labels.cluster }} at {{ $externalLabels.site }}'
-          dashboard: 'https://grafana.wikimedia.org/d/RIA1lzDZk/application-servers-red-dashboard?orgId=1&var-site={{ $externalLabels.site }}&var-cluster={{ $labels.cluster }}'
-          runbook: 'https://wikitech.wikimedia.org/wiki/Application_servers'
-        expr: sum(up{job="apache",cluster="jobrunner"}) by (cluster)
-          /
-          count(up{job="apache",cluster="jobrunner"}) by (cluster)
-          <= 0.9
-        for: 4m
-        labels:
-          severity: critical
-          team: sre
-
-      # Re-use the alert above and check that apache-exporter can actually talk
-      # to apache itself (i.e. apache_up =1)
-      - <<: *AppserversUnreachable
-        expr: sum(apache_up{job="apache",cluster="jobrunner"}) by (cluster)
-          /
-          count(apache_up{job="apache",cluster="jobrunner"}) by (cluster)
-          <= 0.9
-
       # Mediawiki error channels related alerts
       # TODO: set to paging?
       - alert: MediaWikiMemcachedHighErrorRate

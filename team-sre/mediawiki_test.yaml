@@ -2,32 +2,6 @@ rule_files:
   - mediawiki.yaml
 evaluation_interval: 1m
 tests:
-  - interval: 1m
-    input_series:
-      - series: 'phpfpm_statustext_processes{cluster="jobrunner", state="active", service="php7.2-fpm.service"}'
-        values: '0+100x60'
-      - series: 'phpfpm_statustext_processes{cluster="jobrunner", state="idle", service="php7.2-fpm.service"}'
-        values: '0+1x60'
-      - series: 'phpfpm_statustext_processes{cluster="jobrunner", state="active", service="php7.4-fpm.service"}'
-        values: '0+100x60'
-      - series: 'phpfpm_statustext_processes{cluster="jobrunner", state="idle", service="php7.4-fpm.service"}'
-        values: '0+60x60'
-    external_labels:
-      site: eqiad
-    alert_rule_test:
-      - alertname: VideoscalerPHPBusyWorkers
-        eval_time: 45m
-        exp_alerts:
-          - exp_labels:
-              team: sre
-              severity: critical
-              cluster: jobrunner
-              service: php7.2-fpm.service
-            exp_annotations:
-              dashboard: 'https://grafana.wikimedia.org/d/wqj6s-unk/jobrunners?fullscreen&orgId=1&from=now-3h&to=now&var-datasource=eqiad%20prometheus/ops&viewPanel=54'
-              description: 'Videoscalers in eqiad is experiencing saturation of php-fpm workers: 0.9901% for more than 10 minutes.'
-              runbook: 'https://bit.ly/wmf-fpmsat'
-              summary: 'Not enough idle php7.2-fpm.service workers for Mediawiki jobrunner at eqiad'
 
   # Test case for memcached errors
   - interval: 1m
