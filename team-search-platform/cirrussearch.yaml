@@ -96,20 +96,6 @@ groups:
         runbook: https://wikitech.wikimedia.org/wiki/Search/Elasticsearch_Administration#CirrusSearch_titlesuggest_index_is_too_old
         dashboard: 'TODO'
 
-    - alert: CirrusBackendErrorRateTooHigh
-      expr: >
-            sum(rate(envoy_cluster_upstream_rq{envoy_cluster_name=~"search-https_(eqiad|codfw)", cluster="appserver", envoy_response_code!~"2.."}[5m]))
-            / sum(rate(envoy_cluster_upstream_rq{envoy_cluster_name=~"search-https_(eqiad|codfw)", cluster="appserver"}[5m])) > .005
-      for: 5m
-      labels:
-        team: search-platform
-        severity: critical
-      annotations:
-        summary: 'CirrusSearch getting over 0.5% error responses from elasticsearch'
-        description: "Envoy reports 5xx rate over 5 minutes of more than .5%"
-        runbook: 'TODO'
-        dashboard: 'https://grafana.wikimedia.org/d/VTCkm29Wz/envoy-telemetry?orgId=1&var-datasource={{ $externalLabels.site }}%20prometheus-ops&var-origin=appserver&var-origin_instance=All&var-destination=search-https_{{ $externalLabels.site }}'
-
     - alert: CirrusSearchThreadPoolRejectionsTooHigh
       expr: >
             rate(elasticsearch_thread_pool_rejected_count{type="search",job="elasticsearch", exported_cluster=~"production-search-(codfw|eqiad|omega-codfw|omega-eqiad|psi-codfw|psi-eqiad)"}[5m]) > 1

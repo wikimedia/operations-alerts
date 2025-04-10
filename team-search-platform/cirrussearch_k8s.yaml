@@ -71,3 +71,17 @@ groups:
         description: 'Number of requests triggering circuit breakers due to excessive memory usage'
         runbook: 'https://wikitech.wikimedia.org/wiki/Search#Health/Activity_Monitoring'
         dashboard: 'https://grafana.wikimedia.org/d/dc04b9f2-b8d5-4ab6-9482-5d9a75728951/elasticsearch-percentiles?orgId=1'
+
+    - alert: CirrusBackendErrorRateTooHigh
+      expr: >
+            sum(rate(envoy_cluster_upstream_rq{envoy_cluster_name=~"search-(omega-|psi-)?https_(eqiad|codfw)", app="mediawiki", envoy_response_code!~"2.."}[5m]))
+            / sum(rate(envoy_cluster_upstream_rq{envoy_cluster_name=~"search-(omega-|psi-)?https_(eqiad|codfw)", app="mediawiki"}[5m])) > .005
+      for: 5m
+      labels:
+        team: search-platform
+        severity: critical
+      annotations:
+        summary: 'CirrusSearch getting over 0.5% error responses from elasticsearch'
+        description: "Envoy reports 5xx rate over 5 minutes of more than .5%"
+        runbook: 'TODO'
+        dashboard: 'https://grafana.wikimedia.org/d/b1jttnFMz/envoy-telemetry-k8s?orgId=1&var-datasource=thanos&var-site={{ $externalLabels.site }}&var-prometheus=k8s&var-app=mediawiki&var-destination=search-chi-eqiad&var-destination=search-omega-eqiad&var-destination=search-psi-eqiad&var-destination=search-chi-codfw&var-destination=search-omega-codfw&var-destination=search-psi-codfw'
