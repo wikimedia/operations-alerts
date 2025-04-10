@@ -1,5 +1,4 @@
-# deploy-tag: ops
-# deploy-site: eqiad, codfw
+# deploy-tag: global
 
 groups:
   - name: netbox
@@ -11,7 +10,13 @@ groups:
           summary: 'Netbox - Accounting job failed'
           dashboard: 'https://netbox.wikimedia.org/extras/scripts/12/jobs/'
           runbook: 'https://wikitech.wikimedia.org/wiki/Netbox#Report_Alert'
-        expr: sum(delta(netbox_reports_total{name="Accounting"}[10m])) > 0
+        # The "error ratio" between errored reports and all reports (successful
+        # or not) over the given time span
+        expr: |
+          sum (sum_over_time(netbox_reports_total{name="Accounting",status=~"(failed|errored)"}[1d]))
+            /
+          scalar(sum(sum_over_time(netbox_reports_total{name="Accounting"}[1d])))
+          > 0
         labels:
           severity: warning
           team: infrastructure-foundations
@@ -23,4 +28,8 @@ groups:
           summary: 'Netbox - Report parity errors between PuppetDB and Netbox for physical devices.'
           dashboard: 'https://netbox.wikimedia.org/extras/scripts/18/jobs/'
           runbook: 'https://wikitech.wikimedia.org/wiki/Netbox#Report_Alert'
-        expr: sum(delta(netbox_reports_total{name="PhysicalHosts"}[10m])) > 0
+        expr: |
+          sum (sum_over_time(netbox_reports_total{name="PhysicalHosts",status=~"(failed|errored)"}[1d]))
+            /
+          scalar(sum(sum_over_time(netbox_reports_total{name="PhysicalHosts"}[1d])))
+          > 0

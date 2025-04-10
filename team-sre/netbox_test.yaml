@@ -4,10 +4,14 @@ evaluation_interval: 1m
 tests:
   - interval: 1m
     input_series:
-      - series: 'netbox_reports_total{cluster="misc", instance="netbox1003:443", job="netbox_global", name="Accounting", status="failed"}'
-        values: '16+1x300 17+0x1140'
-      - series: 'netbox_reports_total{cluster="misc", instance="netbox1003:443", job="netbox_global", name="PhysicalHosts", status="failed"}'
-        values: '16+1x300 17+0x1140'
+      - series: 'netbox_reports_total{instance="netbox1003:443", name="Accounting", status="failed"}'
+        values: '100x300 101x300'
+      - series: 'netbox_reports_total{instance="netbox1003:443", name="Accounting", status="completed"}'
+        values: '400x600'
+      - series: 'netbox_reports_total{instance="netbox1003:443", name="PhysicalHosts", status="errored"}'
+        values: '100x200 101x200 102x200'
+      - series: 'netbox_reports_total{instance="netbox1003:443", name="PhysicalHosts", status="completed"}'
+        values: '100x200 101x200 102x200'
     external_labels:
       site: eqiad
     alert_rule_test:
