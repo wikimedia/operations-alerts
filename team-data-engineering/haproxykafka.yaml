@@ -1,0 +1,54 @@
+# deploy-tag: ops
+
+groups:
+  - name: haproxykafka
+    rules:
+      # If Haproxy is receiving requests, but HaproxyKfakfa is not sending enough messages to Kafka, fire the alert.
+      # We fire a warning if the rate of haproxykafka messages is less than 20% of the rate of haproxy requests over a 5 minutes period.
+      # These values have been chosen in order to avoid false alerts from stop/start events.
+      # The label_replace function is used to generate hostnames from instance, so that we can match the two series from different exporters.
+      # This has been copied from previous VarnishKafka alert
+      - alert: HaproxykafkaNoMessages
+        expr: sum by (hostname, cluster) (label_replace (rate(haproxykafka_valid_messages_total[5m]), "hostname", "$1", "instance", "(.*):.*")) / sum by (cluster, hostname) (label_replace(rate(haproxy_frontend_http_requests_total[5m]), "hostname","$1", "instance", "(.*):.*")) < 0.2
+        for: 5m
+        labels:
+          team: data-engineering
+          severity: warning
+        annotations: &haproxykafka-nomessages-annotations
+          summary: '[WARNING] - Haproxykafka on {{ $labels.hostname }} is not sending enough {{ $labels.cluster }} requests'
+          description: '[WARNING] - Haproxy on {{ $labels.hostname }} is receiving requests, but Haproxykafka is not sending enough {{ $labels.cluster }} requests'
+          dashboard: 'https://grafana.wikimedia.org/d/d3e4e37c-c1d9-47af-9aad-a08dae2b3fd5/haproxykafka?orgId=1&var-datasource={{ $externalLabels.site }}%20prometheus/ops&var-cp_cluster={{ $labels.cluster }}&var-instance={{ $labels.hostname }}'
+          runbook: 'https://wikitech.wikimedia.org/wiki/HAProxyKafka'
+
+      # Fire a critical alert if fewer than 10% of the requests are logged to kafka over the same 5 minutes window.
+      - alert: HaproxykafkaNoMessages
+        expr: sum by (hostname, cluster) (label_replace (rate(haproxykafka_valid_messages_total[5m]), "hostname", "$1", "instance", "(.*):.*")) / sum by (cluster, hostname) (label_replace(rate(haproxy_frontend_http_requests_total[5m]), "hostname","$1", "instance", "(.*):.*")) < 0.1
+        for: 5m
+        labels:
+          team: data-engineering
+          severity: critical
+        annotations:
+          <<: *haproxykafka-nomessages-annotations
+          summary: '[CRITICAL] - Haproxykafka on {{ $labels.hostname }} is not sending enough {{ $labels.cluster }} requests'
+          description: '[CRITICAL] - Haproxy on {{ $labels.hostname }} is receiving requests, but Haproxykafka is not sending enough {{ $labels.cluster }} requests'
+
+      # Let's get concerned when we average more than 1 saturation error per second per
+      # caching method, instance, and datacenter.
+      - alert: HaproxyKafkaDeliveryErrors
+        expr: sum by (cluster, instance, site) (irate(haproxykafka_saturation_errors{channel='kafka-msg'}[5m])) >= 1
+        labels:
+          team: data-engineering
+          severity: warning
+        annotations: &haproxykafka-annotations
+          summary: 'haproxykafka has {{ $labels.cluster }} saturation errors on {{ $labels.instance }}'
+          description: 'haproxykafka is experiencing {{ $labels.cluster }} saturation errors on the instance {{ $labels.instance }} in the {{ $externalLabels.site }} datacenter.'
+          dashboard: 'https://grafana.wikimedia.org/d/d3e4e37c-c1d9-47af-9aad-a08dae2b3fd5/haproxykafka?orgId=1&viewPanel=15&var-datasource={{ $externalLabels.site }}%20prometheus/ops&var-cp_cluster={{ $labels.cluster }}&var-instance={{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}'
+          runbook: 'https://wikitech.wikimedia.org/wiki/HAProxyKafka'
+
+      # Yell a little louder when enough errors become a concern.
+      - alert: HaproxyKafkaDeliveryErrors
+        expr: sum by (cluster, instance, site) (irate(haproxykafka_saturation_errors{channel='kafka-msg'}[5m])) >= 5
+        labels:
+          team: data-engineering
+          severity: critical
+        annotations: *haproxykafka-annotations
