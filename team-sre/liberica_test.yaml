@@ -70,3 +70,24 @@ tests:
               description: "Liberica control plane daemon is failing to watch etcd key /conftool/v1/pools/esams/ncredir/nginx on lvs3008:3003"
               dashboard: 'https://grafana.wikimedia.org/d/fa4de97a-7114-48c7-a91a-f56089ef554f/liberica?orgId=1&var-site=esams&var-instance=lvs3008&viewPanel=11'
               runbook: 'https://wikitech.wikimedia.org/wiki/Liberica#LibericaEtcdErrors'
+  - interval: 1m
+    external_labels:
+      site: eqsin
+    input_series:
+      - series: 'liberica_cp_unhealthy_pooled_realservers_total{instance="lvs5005:3003", service="upload-httpslb6_443", site="eqsin"}'
+        values: '2 2 2 2 2'
+    alert_rule_test:
+      - alertname: LibericaUnhealthyRealserverPooled
+        eval_time: 5m
+        exp_alerts:
+          - exp_labels:
+              instance: 'lvs5005:3003'
+              service: 'upload-httpslb6_443'
+              severity: critical
+              team: sre
+              site: eqsin
+            exp_annotations:
+              summary: "Liberica service upload-httpslb6_443 has 2 unhealthy realservers pooled on lvs5005:3003"
+              description: "Liberica control plane is keeping one or more unhealthy realservers pooled, this is likely triggered by the depool threshold being enforced"
+              dashboard: 'https://grafana.wikimedia.org/d/d70d14db-4a71-414d-8425-7a30d7127ca6/liberica-services?orgId=1&var-site=eqsin&var-service=upload-httpslb6_443&var-instance=lvs5005'
+              runbook: 'https://wikitech.wikimedia.org/wiki/Liberica#LibericaUnhealthyRealserverPooled'
