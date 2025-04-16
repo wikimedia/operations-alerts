@@ -5,9 +5,9 @@ tests:
   - interval: 1m
     input_series:
       - series: 'netbox_reports_total{instance="netbox1003:443", name="Accounting", status="failed"}'
-        values: '100x300 101x300'
+        values: '100x300 101+1x300'
       - series: 'netbox_reports_total{instance="netbox1003:443", name="Accounting", status="completed"}'
-        values: '400x600'
+        values: '0+1x600'
       - series: 'netbox_reports_total{instance="netbox1003:443", name="PhysicalHosts", status="errored"}'
         values: '100x200 101x200 102x200'
       - series: 'netbox_reports_total{instance="netbox1003:443", name="PhysicalHosts", status="completed"}'
@@ -24,7 +24,7 @@ tests:
             exp_annotations:
               description: 'Netbox - Accounting job failed'
               summary: 'Netbox - Accounting job failed'
-              dashboard: 'https://netbox.wikimedia.org/extras/scripts/12/jobs/'
+              dashboard: 'https://netbox.wikimedia.org/core/jobs/'
               runbook: 'https://wikitech.wikimedia.org/wiki/Netbox#Report_Alert'
       - alertname: NetboxPhysicalHosts
         eval_time: 300m
@@ -35,5 +35,5 @@ tests:
             exp_annotations:
               description: 'Netbox - PhysicalHosts job failed'
               summary: 'Netbox - Report parity errors between PuppetDB and Netbox for physical devices.'
-              dashboard: 'https://netbox.wikimedia.org/extras/scripts/18/jobs/'
+              dashboard: 'https://netbox.wikimedia.org/core/jobs/'
               runbook: 'https://wikitech.wikimedia.org/wiki/Netbox#Report_Alert'
