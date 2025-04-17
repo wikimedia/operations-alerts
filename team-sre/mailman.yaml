@@ -1,0 +1,17 @@
+# deploy-tag: ops
+# deploy-site: eqiad, codfw
+
+groups:
+  - name: mailman
+    rules:
+      - alert: MailmanBounceQueueHigh
+        annotations:
+          summary: 'Mailman bounce queue on {{ $labels.instance }} has more than 50 messages'
+          description: 'The Mailman bounce queue at {{ $labels.path }} on {{ $labels.instance }} contains {{ $value }} files.'
+          dashboard: 'https://grafana.wikimedia.org/d/GvuAmuuGk/mailman3?forceLogin&from=now-3h&orgId=1&to=now&viewPanel=2'
+          runbook: 'https://wikitech.wikimedia.org/wiki/Mailman/Runbooks#MailmanBounceQueueHigh'
+        expr: 'node_files_total{instance=~"lists.*", path=~".*/mailman3/queue/bounces"} > 50'
+        for: 30m
+        labels:
+          severity: task
+          team: collaboration-services
