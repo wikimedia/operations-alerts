@@ -1,0 +1,221 @@
+rule_files:
+  - kubernetes-resources.yaml
+evaluation_interval: 1m
+
+tests:
+
+  # Case 1: requests.cpu under control
+  - interval: 1m
+    input_series:
+      - series: 'kube_resourcequota{resource="requests.cpu", type="used", namespace="test"}'
+        values: '20x30'
+      - series: 'kube_resourcequota{resource="requests.cpu", type="hard", namespace="test"}'
+        values: '100x30'
+    alert_rule_test:
+      - eval_time: 30m
+        alertname: ResourceQuotaCpuRequestsWarning
+        exp_alerts: []
+
+  # Case 2: requests.cpu warning
+  - interval: 1m
+    input_series:
+      - series: 'kube_resourcequota{resource="requests.cpu", type="used", namespace="test"}'
+        values: '85x30'
+      - series: 'kube_resourcequota{resource="requests.cpu", type="hard", namespace="test"}'
+        values: '100x30'
+    alert_rule_test:
+      - eval_time: 30m
+        alertname: ResourceQuotaCpuRequestsWarning
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              team: data-platform
+              namespace: test
+            exp_annotations:
+              description: 'Namespace test has reached 85% of its requests.cpu resources'
+              summary: 'Namespace test has reached 85% of its requests.cpu resources'
+              dashboard: "https://grafana.wikimedia.org/d/ca9c0221-4a0d-4833-865b-f14a3e813c97/kubernetes-resource-quotas?var-ds=thanos&var-namespace=test&var-prometheus=k8s-dse&var-site=eqiad"
+              runbook: "https://wikitech.wikimedia.org/wiki/Data_Platform/Systems/Airflow/Kubernetes#A_namespace_is_nearing_its_resources_quota"
+
+  # Case 3: requests.cpu critical
+  - interval: 1m
+    input_series:
+      - series: 'kube_resourcequota{resource="requests.cpu", type="used", namespace="test"}'
+        values: '95x30'
+      - series: 'kube_resourcequota{resource="requests.cpu", type="hard", namespace="test"}'
+        values: '100x30'
+    alert_rule_test:
+      - eval_time: 30m
+        alertname: ResourceQuotaCpuRequestsCritical
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              team: data-platform
+              namespace: test
+            exp_annotations:
+              description: 'Namespace test has reached 95% of its requests.cpu resources'
+              summary: 'Namespace test has reached 95% of its requests.cpu resources'
+              dashboard: "https://grafana.wikimedia.org/d/ca9c0221-4a0d-4833-865b-f14a3e813c97/kubernetes-resource-quotas?var-ds=thanos&var-namespace=test&var-prometheus=k8s-dse&var-site=eqiad"
+              runbook: "https://wikitech.wikimedia.org/wiki/Data_Platform/Systems/Airflow/Kubernetes#A_namespace_is_nearing_its_resources_quota"
+
+  # Case 4: requests.memory under control
+  - interval: 1m
+    input_series:
+      - series: 'kube_resourcequota{resource="requests.memory", type="used", namespace="test"}'
+        values: '20x30'
+      - series: 'kube_resourcequota{resource="requests.memory", type="hard", namespace="test"}'
+        values: '100x30'
+    alert_rule_test:
+      - eval_time: 30m
+        alertname: ResourceQuotaMemoryRequestsWarning
+        exp_alerts: []
+
+  # Case 5: requests.memory warning
+  - interval: 1m
+    input_series:
+      - series: 'kube_resourcequota{resource="requests.memory", type="used", namespace="test"}'
+        values: '85x30'
+      - series: 'kube_resourcequota{resource="requests.memory", type="hard", namespace="test"}'
+        values: '100x30'
+    alert_rule_test:
+      - eval_time: 30m
+        alertname: ResourceQuotaMemoryRequestsWarning
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              team: data-platform
+              namespace: test
+            exp_annotations:
+              description: 'Namespace test has reached 85% of its requests.memory resources'
+              summary: 'Namespace test has reached 85% of its requests.memory resources'
+              dashboard: "https://grafana.wikimedia.org/d/ca9c0221-4a0d-4833-865b-f14a3e813c97/kubernetes-resource-quotas?var-ds=thanos&var-namespace=test&var-prometheus=k8s-dse&var-site=eqiad"
+              runbook: "https://wikitech.wikimedia.org/wiki/Data_Platform/Systems/Airflow/Kubernetes#A_namespace_is_nearing_its_resources_quota"
+
+  # Case 6: requests.memory critical
+  - interval: 1m
+    input_series:
+      - series: 'kube_resourcequota{resource="requests.memory", type="used", namespace="test"}'
+        values: '95x30'
+      - series: 'kube_resourcequota{resource="requests.memory", type="hard", namespace="test"}'
+        values: '100x30'
+    alert_rule_test:
+      - eval_time: 30m
+        alertname: ResourceQuotaMemoryRequestsCritical
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              team: data-platform
+              namespace: test
+            exp_annotations:
+              description: 'Namespace test has reached 95% of its requests.memory resources'
+              summary: 'Namespace test has reached 95% of its requests.memory resources'
+              dashboard: "https://grafana.wikimedia.org/d/ca9c0221-4a0d-4833-865b-f14a3e813c97/kubernetes-resource-quotas?var-ds=thanos&var-namespace=test&var-prometheus=k8s-dse&var-site=eqiad"
+              runbook: "https://wikitech.wikimedia.org/wiki/Data_Platform/Systems/Airflow/Kubernetes#A_namespace_is_nearing_its_resources_quota"
+
+  # Case 7: CPU limits under control
+  - interval: 1m
+    input_series:
+      - series: 'kube_resourcequota{resource="limits.cpu", type="used", namespace="test"}'
+        values: '20x30'
+      - series: 'kube_resourcequota{resource="limits.cpu", type="hard", namespace="test"}'
+        values: '100x30'
+    alert_rule_test:
+      - eval_time: 30m
+        alertname: ResourceQuotaCpuLimitsWarning
+        exp_alerts: []
+
+  # Case 8: CPU limits warning
+  - interval: 1m
+    input_series:
+      - series: 'kube_resourcequota{resource="limits.cpu", type="used", namespace="test"}'
+        values: '85x30'
+      - series: 'kube_resourcequota{resource="limits.cpu", type="hard", namespace="test"}'
+        values: '100x30'
+    alert_rule_test:
+      - eval_time: 30m
+        alertname: ResourceQuotaCpuLimitsWarning
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              team: data-platform
+              namespace: test
+            exp_annotations:
+              description: 'Namespace test has reached 85% of its limits.cpu resources'
+              summary: 'Namespace test has reached 85% of its limits.cpu resources'
+              dashboard: "https://grafana.wikimedia.org/d/ca9c0221-4a0d-4833-865b-f14a3e813c97/kubernetes-resource-quotas?var-ds=thanos&var-namespace=test&var-prometheus=k8s-dse&var-site=eqiad"
+              runbook: "https://wikitech.wikimedia.org/wiki/Data_Platform/Systems/Airflow/Kubernetes#A_namespace_is_nearing_its_resources_quota"
+
+  # Case 9: CPU limits critical
+  - interval: 1m
+    input_series:
+      - series: 'kube_resourcequota{resource="limits.cpu", type="used", namespace="test"}'
+        values: '95x30'
+      - series: 'kube_resourcequota{resource="limits.cpu", type="hard", namespace="test"}'
+        values: '100x30'
+    alert_rule_test:
+      - eval_time: 30m
+        alertname: ResourceQuotaCpuLimitsCritical
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              team: data-platform
+              namespace: test
+            exp_annotations:
+              description: 'Namespace test has reached 95% of its limits.cpu resources'
+              summary: 'Namespace test has reached 95% of its limits.cpu resources'
+              dashboard: "https://grafana.wikimedia.org/d/ca9c0221-4a0d-4833-865b-f14a3e813c97/kubernetes-resource-quotas?var-ds=thanos&var-namespace=test&var-prometheus=k8s-dse&var-site=eqiad"
+              runbook: "https://wikitech.wikimedia.org/wiki/Data_Platform/Systems/Airflow/Kubernetes#A_namespace_is_nearing_its_resources_quota"
+
+  # Case 10: Memory limits under control
+  - interval: 1m
+    input_series:
+      - series: 'kube_resourcequota{resource="limits.memory", type="used", namespace="test"}'
+        values: '20x30'
+      - series: 'kube_resourcequota{resource="limits.memory", type="hard", namespace="test"}'
+        values: '100x30'
+    alert_rule_test:
+      - eval_time: 30m
+        alertname: ResourceQuotaMemoryLimitsWarning
+        exp_alerts: []
+
+  # Case 11: Memory limits warning
+  - interval: 1m
+    input_series:
+      - series: 'kube_resourcequota{resource="limits.memory", type="used", namespace="test"}'
+        values: '85x30'
+      - series: 'kube_resourcequota{resource="limits.memory", type="hard", namespace="test"}'
+        values: '100x30'
+    alert_rule_test:
+      - eval_time: 30m
+        alertname: ResourceQuotaMemoryLimitsWarning
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              team: data-platform
+              namespace: test
+            exp_annotations:
+              description: 'Namespace test has reached 85% of its limits.memory resources'
+              summary: 'Namespace test has reached 85% of its limits.memory resources'
+              dashboard: "https://grafana.wikimedia.org/d/ca9c0221-4a0d-4833-865b-f14a3e813c97/kubernetes-resource-quotas?var-ds=thanos&var-namespace=test&var-prometheus=k8s-dse&var-site=eqiad"
+              runbook: "https://wikitech.wikimedia.org/wiki/Data_Platform/Systems/Airflow/Kubernetes#A_namespace_is_nearing_its_resources_quota"
+
+  # Case 12: Memory limits under control
+  - interval: 1m
+    input_series:
+      - series: 'kube_resourcequota{resource="limits.memory", type="used", namespace="test"}'
+        values: '95x30'
+      - series: 'kube_resourcequota{resource="limits.memory", type="hard", namespace="test"}'
+        values: '100x30'
+    alert_rule_test:
+      - eval_time: 30m
+        alertname: ResourceQuotaMemoryLimitsCritical
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              team: data-platform
+              namespace: test
+            exp_annotations:
+              description: 'Namespace test has reached 95% of its limits.memory resources'
+              summary: 'Namespace test has reached 95% of its limits.memory resources'
+              dashboard: "https://grafana.wikimedia.org/d/ca9c0221-4a0d-4833-865b-f14a3e813c97/kubernetes-resource-quotas?var-ds=thanos&var-namespace=test&var-prometheus=k8s-dse&var-site=eqiad"
+              runbook: "https://wikitech.wikimedia.org/wiki/Data_Platform/Systems/Airflow/Kubernetes#A_namespace_is_nearing_its_resources_quota"
