@@ -8,15 +8,9 @@ groups:
         annotations:
           description: 'Netbox - Accounting job failed'
           summary: 'Netbox - Accounting job failed'
-          dashboard: 'https://netbox.wikimedia.org/extras/scripts/12/jobs/'
+          dashboard: 'https://netbox.wikimedia.org/core/jobs/'
           runbook: 'https://wikitech.wikimedia.org/wiki/Netbox#Report_Alert'
-        # The "error ratio" between errored reports and all reports (successful
-        # or not) over the given time span
-        expr: |
-          sum (sum_over_time(netbox_reports_total{name="Accounting",status=~"(failed|errored)"}[1d]))
-            /
-          scalar(sum(sum_over_time(netbox_reports_total{name="Accounting"}[1d])))
-          > 0
+        expr: sum(rate(netbox_reports_total{name="Accounting", status=~"(failed|errored)"}[1h]))
         labels:
           severity: warning
           team: infrastructure-foundations
@@ -26,10 +20,6 @@ groups:
         annotations:
           description: 'Netbox - PhysicalHosts job failed'
           summary: 'Netbox - Report parity errors between PuppetDB and Netbox for physical devices.'
-          dashboard: 'https://netbox.wikimedia.org/extras/scripts/18/jobs/'
+          dashboard: 'https://netbox.wikimedia.org/core/jobs/'
           runbook: 'https://wikitech.wikimedia.org/wiki/Netbox#Report_Alert'
-        expr: |
-          sum (sum_over_time(netbox_reports_total{name="PhysicalHosts",status=~"(failed|errored)"}[1d]))
-            /
-          scalar(sum(sum_over_time(netbox_reports_total{name="PhysicalHosts"}[1d])))
-          > 0
+        expr: sum(rate(netbox_reports_total{name="PhysicalHosts", status=~"(failed|errored)"}[1h]))
