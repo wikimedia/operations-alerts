@@ -15,3 +15,20 @@ groups:
           summary: "Session storage disk space utilization on {{ $labels.instance | stripPort }} is too high #page"
           dashboard: 'https://grafana.wikimedia.org/d/000000377/host-overview?orgId=1&viewPanel=12&var-server={{ $labels.instance | stripPort }}'
           runbook: "https://wikitech.wikimedia.org/wiki/SessionStorage/Runbook#High_Storage_Utilization"
+      - record: sessionstore_instance:node_filesystem_avail_bytes:max_over_time90m
+        # Takes the maximum available bytes over a rolling 90m window in order
+        # to suppress transient growth due to compactions.
+        expr: max_over_time(node_filesystem_avail_bytes{cluster="sessionstore"}[90m])
+      - alert: SessionStoreDiskSpaceRunwayTooLow
+        # Uses linear regression (predict_linear) to project available bytes
+        # 259200 seconds (3 days) into the future using the last 6h of data.
+        expr: predict_linear(sessionstore_instance:node_filesystem_avail_bytes:max_over_time90m{mountpoint="/srv"}[6h], 259200) <= 0
+        for: 1h
+        labels:
+          severity: warning
+          team: data-persistence
+        annotations:
+          description: "Session storage {{ $labels.mountpoint }} disk space on {{ $labels.instance | stripPort }} will be exhausted in less than 3 days at its current growth rate."
+          summary: "Session storage disk space runway on {{ $labels.instance | stripPort }} is too low"
+          dashboard: 'https://grafana.wikimedia.org/d/000000377/host-overview?orgId=1&viewPanel=12&var-server={{ $labels.instance | stripPort }}'
+          runbook: "https://wikitech.wikimedia.org/wiki/SessionStorage/Runbook#High_Storage_Utilization"

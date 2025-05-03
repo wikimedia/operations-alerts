@@ -28,3 +28,44 @@ tests:
               description: "Session storage disk space utilization on sessionstore1004 is too high: 80% on /srv"
               dashboard: "https://grafana.wikimedia.org/d/000000377/host-overview?orgId=1&viewPanel=12&var-server=sessionstore1004"
               runbook: "https://wikitech.wikimedia.org/wiki/SessionStorage/Runbook#High_Storage_Utilization"
+  - interval: 1m
+    input_series:
+      - series: 'node_filesystem_avail_bytes{cluster="sessionstore", instance="sessionstore1004:9100", mountpoint="/srv"}'
+        # There are 1440 minutes in a day. We are losing 1 byte of capacity per
+        # minute and we start with 4 days of runway.
+        values: '5760-1x5760'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: SessionStoreDiskSpaceRunwayTooLow
+        eval_time: 12h
+        exp_alerts: []  # Not firing (too short)
+      - alertname: SessionStoreDiskSpaceRunwayTooLow
+        eval_time: 27h  # We've crossed into day 2 and have < 3 days of runway.
+        exp_alerts:
+          - exp_labels:
+              team: data-persistence
+              severity: warning
+              cluster: sessionstore
+              instance: sessionstore1004:9100
+              mountpoint: /srv
+            exp_annotations:
+              description: "Session storage /srv disk space on sessionstore1004 will be exhausted in less than 3 days at its current growth rate."
+              summary: "Session storage disk space runway on sessionstore1004 is too low"
+              dashboard: 'https://grafana.wikimedia.org/d/000000377/host-overview?orgId=1&viewPanel=12&var-server=sessionstore1004'
+              runbook: "https://wikitech.wikimedia.org/wiki/SessionStorage/Runbook#High_Storage_Utilization"
+  - interval: 1m
+    input_series:
+      - series: 'node_filesystem_avail_bytes{cluster="sessionstore", instance="sessionstore1004:9100", mountpoint="/srv"}'
+        # Similar setup to before, with one exception: the 11h hour of the
+        # series constains a transient 10x excursion in growth rate, which
+        # simulates the effect of a compaction.
+        # Note: This test will fail if SessionStoreDiskSpaceRunwayTooLow is
+        # changed to use instantaneous available bytes.
+        values: '5760-1x660 5100-10x60 5040-1x5040'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: SessionStoreDiskSpaceRunwayTooLow
+        eval_time: 12h30m
+        exp_alerts: []  # Not firing (max_over_time suppresses the "compaction")
