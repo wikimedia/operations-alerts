@@ -1,0 +1,29 @@
+rule_files:
+  - prometheus-global.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    input_series:
+      - series: 'up{instance="prometheus1005:9900", job="prometheus", prometheus="ops", site="eqiad"}'
+        values: '0+0x90'
+      - series: 'up{instance="prometheus1006:9900", job="prometheus", prometheus="ops", site="eqiad"}'
+        values: '0+0x90'
+      # Simulate Prometheus 'ext' up
+      - series: 'up{instance="prometheus1005:9903", job="prometheus", prometheus="ext", site="eqiad"}'
+        values: '0+0x90'
+      - series: 'up{instance="prometheus1006:9903", job="prometheus", prometheus="ext", site="eqiad"}'
+        values: '1+0x90'
+    alert_rule_test:
+    - alertname: PrometheusDown
+      eval_time: 6m
+      exp_alerts:
+       - exp_labels:
+           prometheus: ops
+           site: eqiad
+           team: sre
+           severity: critical
+         exp_annotations:
+           description: All hosts running Prometheus instance ops in eqiad are down.
+           summary: Prometheus ops in eqiad is down
+           dashboard: 'https://grafana.wikimedia.org/d/000000607/cluster-overview?var-site=eqiad&var-cluster=prometheus'
+           runbook: 'https://wikitech.wikimedia.org/wiki/Prometheus#PrometheusDown'
