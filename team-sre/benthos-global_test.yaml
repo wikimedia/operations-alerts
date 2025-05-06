@@ -1,0 +1,18 @@
+rule_files:
+  - benthos-global.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    alert_rule_test:
+    - alertname: WebrequestSampledDown
+      eval_time: 12m
+      exp_alerts:
+       - exp_labels:
+           label: webrequest_sampled_out
+           team: sre
+           severity: critical
+         exp_annotations:
+           description: Benthos metrics for webrequest_sampled are not reported. Make sure centrallog hosts are up and running.
+           summary: Benthos metrics for webrequest_sampled are not reported from eqiad and codfw
+           dashboard: 'https://grafana.wikimedia.org/d/V0TSK7O4z/benthos?var-port=4151'
+           runbook: 'https://wikitech.wikimedia.org/wiki/Benthos#Benthos_on_centrallog'

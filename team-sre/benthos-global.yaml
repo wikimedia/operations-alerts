@@ -1,0 +1,19 @@
+# deploy-tag: global
+
+# Global Benthos alerts, i.e. checked by thanos-rule to assess health of
+# benthos-backed SRE systems.
+
+groups:
+  - name: benthos
+    rules:
+    - alert: WebrequestSampledDown
+      annotations:
+        description: Benthos metrics for webrequest_sampled are not reported. Make sure centrallog hosts are up and running.
+        summary: Benthos metrics for webrequest_sampled are not reported from eqiad and codfw
+        dashboard: 'https://grafana.wikimedia.org/d/V0TSK7O4z/benthos?var-port=4151'
+        runbook: 'https://wikitech.wikimedia.org/wiki/Benthos#Benthos_on_centrallog'
+      expr: absent(benthos_output_sent{label="webrequest_sampled_out"})
+      for: 10m
+      labels:
+        severity: critical
+        team: sre
