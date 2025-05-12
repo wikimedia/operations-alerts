@@ -46,9 +46,9 @@ tests:
     external_labels:
       site: eqiad
     input_series:
-      - series: 'blazegraph_lastupdated{site="eqiad", cluster="wdqs", instance="wdqs3050:9193"}'
+      - series: 'blazegraph_lastupdated{site="eqiad", cluster="wdqs-main", instance="wdqs3050:9193"}'
         values: "0x10"
-      - series: org_wikidata_query_rdf_blazegraph_filters_QueryEventSenderFilter_event_sender_filter_StartedQueries{instance="wdqs3050:9102", site="eqiad"}
+      - series: org_wikidata_query_rdf_blazegraph_filters_QueryEventSenderFilter_event_sender_filter_StartedQueries{instance="wdqs3050:9102", cluster="wdqs-main", site="eqiad"}
         values: "10000+10000x10"
     alert_rule_test:
       - alertname: ElevatedMaxLagWDQS
@@ -57,7 +57,6 @@ tests:
           - exp_labels:
               team: search-platform
               severity: critical
-              cluster: wdqs
             exp_annotations:
               summary: "WDQS lag is above 10 minutes"
               description: "WDQS cluster in eqiad is throttling all connections due to high lag"
