@@ -38,6 +38,19 @@ groups:
           runbook: https://wikitech.wikimedia.org/wiki/Search#Streaming_Updater
           dashboard: https://grafana.wikimedia.org/d/K9x0c4aVk/flink-app?var-datasource={{$externalLabels.site}}+prometheus%2F{{$externalLabels.prometheus}}&var-namespace=cirrus-streaming-updater&var-helm_release=producer
 
+      - alert: CirrusStreamingUpdaterFlinkNoRegisteredTask
+        expr: |
+           flink_jobmanager_numRegisteredTaskManagers{kubernetes_namespace="cirrus-streaming-updater"} < 1
+        for: 5m
+        labels:
+          team: search-platform
+          severity: critical
+        annotations:
+          summary: "cirrus-streaming-updater job {{ $labels.job_name }} in {{$externalLabels.site}} ({{$externalLabels.prometheus}}) is running without any taskmanagers"
+          description: "The flink job is running but without any taskmanagers (probably doing nothing)"
+          runbook: https://wikitech.wikimedia.org/wiki/Search#Streaming_Updater
+          dashboard: https://grafana.wikimedia.org/d/K9x0c4aVk/flink-app?var-datasource={{$externalLabels.site}}+prometheus%2F{{$externalLabels.prometheus}}&var-namespace=cirrus-streaming-updater&var-helm_release={{$labels.release}}
+
       - alert: CirrusConsumerFetchErrorRate
         # flink_taskmanager_job_task_operator_numRecordsOut is reported as a
         # gauge, though rate() should be applied to counters only
