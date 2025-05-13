@@ -1,5 +1,5 @@
 # deploy-tag: ops
-# deploy-site: eqiad
+# deploy-site: eqiad, codfw
 
 groups:
   - name: bgp
