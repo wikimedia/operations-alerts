@@ -6,7 +6,7 @@ tests:
     external_labels:
       site: eqiad
     input_series:
-      - series: 'gnmi_bgp_neighbor_session_state{peer_group="Transit4", instance="cr1-eqiad:9804", peer_descr="NTT", address="192.80.17.185"}'
+      - series: 'gnmi_bgp_neighbor_session_state{peer_group="Transit4", instance="cr1-eqiad:9804", peer_descr="Hurricane Electric", address="192.80.17.185"}'
         values: '0 0'
       - series: 'gnmi_bgp_neighbor_session_state{peer_group="Switch", instance="cr1-eqiad:9804", peer_descr="ssw1-e1-eqiad", address="10.66.0.9"}'
         values: '1 1'
@@ -17,15 +17,15 @@ tests:
           - exp_labels:
               peer_group: Transit4
               instance: cr1-eqiad:9804
-              peer_descr: NTT
+              peer_descr: Hurricane Electric
               address: 192.80.17.185
               team: sre
               severity: critical
               scope: network
             exp_annotations:
-              summary: "Transit BGP session down between cr1-eqiad and NTT (192.80.17.185)"
+              summary: "Transit BGP session down between cr1-eqiad and Hurricane Electric (192.80.17.185)"
               description: ""
-              dashboard: 'https://grafana.wikimedia.org/d/ed8da087-4bcb-407d-9596-d158b8145d45/bgp-neighbors-detail?orgId=1&var-site=eqiad&var-device=cr1-eqiad:9804&var-bgp_group=Transit4&var-bgp_neighbor=NTT'
+              dashboard: 'https://grafana.wikimedia.org/d/ed8da087-4bcb-407d-9596-d158b8145d45/bgp-neighbors-detail?orgId=1&var-site=eqiad&var-device=cr1-eqiad:9804&var-bgp_group=Transit4&var-bgp_neighbor=Hurricane+Electric'
               runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#BGP_status'
       - alertname: CoreBGPDown
         eval_time: 2m
