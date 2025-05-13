@@ -1,0 +1,27 @@
+rule_files:
+  - fundraising.yaml
+evaluation_interval: 2m
+tests:
+  - interval: 2m
+    external_labels:
+      site: eqiad
+    input_series:
+      - series: 'gnmi_bgp_neighbor_session_state{peer_group="Production", instance="pfw1-eqiad:9804", peer_descr="cr1-eqiad", address="208.80.154.200"}'
+        values: '3 3'
+    alert_rule_test:
+      - alertname: PfwCoreBGPDown
+        eval_time: 2m
+        exp_alerts:
+          - exp_labels:
+              peer_group: Production
+              instance: pfw1-eqiad:9804
+              peer_descr: cr1-eqiad
+              address: 208.80.154.200
+              severity: critical
+              team: infrastructure-foundations
+              scope: network
+            exp_annotations:
+              summary: "Fundraising Firewall core BGP session down between pfw1-eqiad and cr1-eqiad (208.80.154.200) - group Production"
+              description: ""
+              dashboard: 'https://grafana.wikimedia.org/d/ed8da087-4bcb-407d-9596-d158b8145d45/bgp-neighbors-detail?orgId=1&var-site=eqiad&var-device=pfw1-eqiad:9804&var-bgp_group=Production&var-bgp_neighbor=cr1-eqiad'
+              runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#BGP_status'
