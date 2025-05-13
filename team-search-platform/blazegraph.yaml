@@ -42,3 +42,15 @@ groups:
           description: "WDQS cluster in {{ $externalLabels.site }} is throttling all connections due to high lag"
           runbook: https://wikitech.wikimedia.org/wiki/Wikidata_Query_Service/Runbook
           dashboard: https://grafana.wikimedia.org/d/000000489/wikidata-query-service
+
+      - alert: CategoriesQueryServiceUpdateLagTooHigh
+        expr: (time() - blazegraph_lastupdated{instance=~".*:9194"})/60 > 2880
+        for: 1m
+        labels:
+          team: search-platform
+          severity: critical
+        annotations:
+          summary: "Categories Query service lag is above 2 days"
+          description: "Categories Query service lag on {{$labels.instance}} is above 2 days"
+          runbook: https://wikitech.wikimedia.org/wiki/Wikidata_Query_Service/Runbook
+          dashboard: https://grafana.wikimedia.org/d/000000489/wikidata-query-service

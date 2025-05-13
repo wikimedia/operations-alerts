@@ -62,3 +62,23 @@ tests:
               description: "WDQS cluster in eqiad is throttling all connections due to high lag"
               runbook: https://wikitech.wikimedia.org/wiki/Wikidata_Query_Service/Runbook
               dashboard: https://grafana.wikimedia.org/d/000000489/wikidata-query-service
+
+  - interval: 1m
+    external_labels:
+      site: eqiad
+    input_series:
+      - series: 'blazegraph_lastupdated{instance="wdqs3050:9194"}'
+        values: "-1000000x10"
+    alert_rule_test:
+      - alertname: CategoriesQueryServiceUpdateLagTooHigh
+        eval_time: 12m
+        exp_alerts:
+          - exp_labels:
+              team: search-platform
+              severity: critical
+              instance: wdqs3050:9194
+            exp_annotations:
+              summary: "Categories Query service lag is above 2 days"
+              description: "Categories Query service lag on wdqs3050:9194 is above 2 days"
+              runbook: https://wikitech.wikimedia.org/wiki/Wikidata_Query_Service/Runbook
+              dashboard: https://grafana.wikimedia.org/d/000000489/wikidata-query-service
