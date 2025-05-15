@@ -4,22 +4,24 @@ evaluation_interval: 1m
 tests:
   - interval: 1m
     input_series:
-      - series: envoy_cluster_upstream_rq{envoy_cluster_name="pinkunicorn_cluster", kubernetes_namespace="rest-gateway", envoy_response_code="504"}
-        values: '0+400x20'
+      - series: envoy_cluster_upstream_rq{envoy_cluster_name="mobileapps_cluster", kubernetes_namespace="rest-gateway", envoy_response_code="504"}
+        values: '1+5x600'
+      - series: envoy_cluster_upstream_rq{envoy_cluster_name="mobileapps_cluster", kubernetes_namespace="rest-gateway", envoy_response_code="200"}
+        values: '1x600'
 
     external_labels:
       site: codfw
     alert_rule_test:
-      - alertname: GatewayBackendErrorsElevated
+      - alertname: RESTGatewayBackendErrorsHigh
         eval_time: 20m
         exp_alerts:
           - exp_labels:
-              severity: critical
+              severity: page
               team: sre
-              envoy_cluster_name: 'pinkunicorn_cluster'
+              envoy_cluster_name: 'mobileapps_cluster'
               kubernetes_namespace: 'rest-gateway'
             exp_annotations:
-              summary: 'rest-gateway: elevated 5xx errors from pinkunicorn_cluster in codfw'
-              description: 'Elevated number of 5xx responses from pinkunicorn_cluster via rest-gateway in codfw'
+              summary: 'rest-gateway: high 5xx errors from mobileapps_cluster in codfw #page'
+              description: 'High number of 5xx responses from mobileapps_cluster via rest-gateway in codfw'
               runbook: https://wikitech.wikimedia.org/wiki/API_Gateway#How_to_debug_it
               dashboard: https://grafana.wikimedia.org/d/UOH-5IDMz/api-and-rest-gateway?orgId=1&refresh=30s&viewPanel=57&var-datasource=codfw%20prometheus/k8s&var-instance=rest-gateway
