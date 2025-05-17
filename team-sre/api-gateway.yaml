@@ -9,7 +9,7 @@ groups:
           dashboard: 'https://grafana.wikimedia.org/d/UOH-5IDMz/api-and-rest-gateway?orgId=1&refresh=30s&viewPanel=57&var-datasource={{ $externalLabels.site }}%20prometheus/k8s&var-instance={{ $labels.kubernetes_namespace }}'
           runbook: 'https://wikitech.wikimedia.org/wiki/API_Gateway#How_to_debug_it'
         # Only page if error rate is high over 10 minute for core API services
-        expr: sum(irate(envoy_cluster_upstream_rq{kubernetes_namespace="rest-gateway", envoy_cluster_name=~"(mobileapps_cluster|mw-api-int_cluster)", envoy_response_code=~"5[0-9]+"}[5m])) by (kubernetes_namespace, envoy_cluster_name) / sum(irate(envoy_cluster_upstream_rq{envoy_cluster_name=~"(mobileapps_cluster|mw-api-int_cluster)", kubernetes_namespace="rest-gateway"}[5m])) by (kubernetes_namespace, envoy_cluster_name) > 0.02
+        expr: sum(irate(envoy_cluster_upstream_rq{kubernetes_namespace="rest-gateway", envoy_cluster_name=~"(mobileapps_cluster|mw-api-int_cluster)", envoy_response_code=~"5[0-9]+"}[5m])) by (kubernetes_namespace, envoy_cluster_name) / sum(irate(envoy_cluster_upstream_rq{envoy_cluster_name=~"(mobileapps_cluster|mw-api-int_cluster)", kubernetes_namespace="rest-gateway"}[5m])) by (kubernetes_namespace, envoy_cluster_name) > 0.04
         for: 10m
         labels:
           severity: page
