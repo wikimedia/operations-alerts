@@ -10,7 +10,7 @@ groups:
         summary: '{{ $labels.deployment }}.{{ $labels.namespace }} is unavailable on dse-k8s-eqiad'
         dashboard: "https://grafana.wikimedia.org/d/hyl18XgMk/kubernetes-container-details?orgId=1&var-datasource=eqiad%2Bprometheus/k8s-dse&var-namespace={{ $labels.namespace }}&var-container=All"
         runbook: "https://wikitech.wikimedia.org/wiki/Data_Platform/Systems/Airflow/Kubernetes#Pods_are_not_running"
-      expr: max by (namespace, deployment) (kube_deployment_status_replicas_available{namespace=~"airflow-.*", deployment=~"airflow-.*"}) < 1
+      expr: max by (namespace, deployment) (kube_deployment_status_replicas_available{namespace=~"airflow-.*", namespace!="airflow-dev", deployment=~"airflow-.*"}) < 1
       for: 5m
       labels:
         severity: critical
