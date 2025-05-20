@@ -19,6 +19,8 @@ groups:
           dashboard: 'https://grafana.wikimedia.org/d/fb403d62-5f03-434a-9dff-bd02b9fff504/network-device-overview?var-instance={{ $labels.instance }}'
           runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#Router_interface_down'
       - alert: InboundInterfaceErrors
+        # When the counter is at 0, the devices don't expose the fcs_errors metric
+        # pint disable promql/series
         expr: increase(gnmi_interfaces_interface_state_counters_in_errors[5m]) > 2 or increase(gnmi_interfaces_interface_state_counters_in_fcs_errors[5m]) > 2
         for: 15m
         labels:
