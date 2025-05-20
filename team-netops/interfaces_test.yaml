@@ -76,7 +76,7 @@ tests:
               interface_name: xe-0/1/0
               interface_description: "Peering: Test peering"
               team: sre
-              severity: warning
+              severity: critical
               scope: network
             exp_annotations:
               summary: "Transit or peering outbound traffic above 90% capacity - cr2-esams:xe-0/1/0 (Peering: Test peering)"
@@ -91,7 +91,7 @@ tests:
               interface_name: xe-0/1/0
               interface_description: "Peering: Test peering"
               team: sre
-              severity: warning
+              severity: critical
               scope: network
             exp_annotations:
               summary: "Transit or peering inbound traffic above 90% capacity - cr2-esams:xe-0/1/0 (Peering: Test peering)"

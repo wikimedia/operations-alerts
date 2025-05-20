@@ -52,7 +52,7 @@ groups:
         for: 5m
         labels:
           team: sre
-          severity: warning  # TODO: move to paging once tested
+          severity: critical  # TODO: move to paging once tested
           scope: network
         annotations:
           summary: 'Transit or peering outbound traffic above 90% capacity - {{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}:{{ $labels.interface_name }} ({{ $labels.interface_description }})'
@@ -69,7 +69,7 @@ groups:
         for: 5m
         labels:
           team: sre
-          severity: warning  # TODO: move to paging once tested
+          severity: critical  # TODO: move to paging once tested
           scope: network
         annotations:
           summary: 'Transit or peering inbound traffic above 90% capacity - {{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}:{{ $labels.interface_name }} ({{ $labels.interface_description }})'
