@@ -15,3 +15,14 @@ groups:
       labels:
         severity: critical
         team: data-platform
+    - alert: AirflowDagBagEmpty
+      annotations:
+        description: 'DagBag is empty on {{ $labels.namespace }}.dse-k8s-eqiad'
+        summary: 'DagBag is empty on {{ $labels.namespace }}.dse-k8s-eqiad'
+        dashboard: "https://grafana.wikimedia.org/d/lFXqBGxWk/airflow-instance?&var-airflow_instance={{ $labels.namespace }}"
+        runbook: "https://wikitech.wikimedia.org/wiki/Data_Platform/Systems/Airflow/Kubernetes#An_instance_DAG_Bag_is_empty"
+      expr: avg by (namespace) (airflow_dagbag_size{namespace=~"airflow-.*", namespace!="airflow-dev"}) == 0
+      for: 2m
+      labels:
+        severity: critical
+        team: data-platform

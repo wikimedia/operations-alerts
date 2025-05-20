@@ -22,3 +22,19 @@ tests:
           deployment: airflow-webserver
           severity: critical
           team: data-platform
+  - input_series:
+    - series: airflow_dagbag_size{namespace="airflow-test-k8s"}
+      values: 0
+    alert_rule_test:
+    - alertname: AirflowDagBagEmpty
+      eval_time: 5m
+      exp_alerts:
+      - exp_annotations:
+          description: DagBag is empty on airflow-test-k8s.dse-k8s-eqiad
+          summary: DagBag is empty on airflow-test-k8s.dse-k8s-eqiad
+          dashboard: "https://grafana.wikimedia.org/d/lFXqBGxWk/airflow-instance?&var-airflow_instance=airflow-test-k8s"
+          runbook: "https://wikitech.wikimedia.org/wiki/Data_Platform/Systems/Airflow/Kubernetes#An_instance_DAG_Bag_is_empty"
+        exp_labels:
+          namespace: airflow-test-k8s
+          severity: critical
+          team: data-platform
