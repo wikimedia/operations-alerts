@@ -22,6 +22,10 @@ tests:
         values: '0+144000000000x5' # 1200000000 * 2 * 60
       - series: 'gnmi_interfaces_interface_state_high_speed{instance="cr2-esams:9804", interface_description="Peering: Test peering", interface_name="xe-0/1/0"}'
         values: '10000x5'
+      - series: 'gnmi_interfaces_interface_state_oper_status{instance="asw1-b12-drmrs:9804", interface_name="et-0/0/48", interface_description="Core: cr1-drmrs:et-0/0/1 {#D0100}"}'
+        values: '2 2'
+      - series: 'gnmi_interfaces_interface_state_enabled{instance="asw1-b12-drmrs:9804", interface_name="et-0/0/48", interface_description="Core: cr1-drmrs:et-0/0/1 {#D0100}"}'
+        values: '1 1'
     alert_rule_test:
       - alertname: CoreRouterInterfaceDown
         eval_time: 2m
@@ -98,3 +102,18 @@ tests:
               description: ""
               dashboard: 'https://grafana.wikimedia.org/d/fb403d62-5f03-434a-9dff-bd02b9fff504/network-device-overview?var-instance=cr2-esams:9804'
               runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#Primary_inbound_port_utilization_over_90%'
+      - alertname: SwitchCoreInterfaceDown
+        eval_time: 2m
+        exp_alerts:
+          - exp_labels:
+              instance: asw1-b12-drmrs:9804
+              interface_name: et-0/0/48
+              interface_description: "Core: cr1-drmrs:et-0/0/1 {#D0100}"
+              team: sre
+              severity: critical
+              scope: network
+            exp_annotations:
+              summary: "Switch core interface down - asw1-b12-drmrs:et-0/0/48 (Core: cr1-drmrs:et-0/0/1 {#D0100})"
+              description: ""
+              dashboard: 'https://grafana.wikimedia.org/d/fb403d62-5f03-434a-9dff-bd02b9fff504/network-device-overview?var-instance=asw1-b12-drmrs:9804'
+              runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#Switch_interface_down'

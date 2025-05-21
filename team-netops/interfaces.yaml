@@ -78,3 +78,18 @@ groups:
           description: ''  # Not needed
           dashboard: 'https://grafana.wikimedia.org/d/fb403d62-5f03-434a-9dff-bd02b9fff504/network-device-overview?var-instance={{ $labels.instance }}'
           runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#Primary_inbound_port_utilization_over_90%'
+      - alert: SwitchCoreInterfaceDown
+        expr: |
+          (gnmi_interfaces_interface_state_oper_status{instance =~ "[lsa]sw.*", interface_description=~"(Core|Transport):.*"} == 2)
+            * on (instance, interface_name, interface_description)
+          (gnmi_interfaces_interface_state_enabled{instance =~ "[lsa]sw.*", interface_description=~"(Core|Transport):.*"} == 1)
+        for: 2m
+        labels:
+          team: sre
+          severity: critical
+          scope: network
+        annotations:
+          summary: 'Switch core interface down - {{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}:{{ $labels.interface_name }} ({{ $labels.interface_description }})'
+          description: ''  # Not needed
+          dashboard: 'https://grafana.wikimedia.org/d/fb403d62-5f03-434a-9dff-bd02b9fff504/network-device-overview?var-instance={{ $labels.instance }}'
+          runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#Switch_interface_down'
