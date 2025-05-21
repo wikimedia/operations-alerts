@@ -1,5 +1,4 @@
 # deploy-tag: ops
-# deploy-site: eqiad, drmrs, eqsin, esams, magru, ulsfo
 
 groups:
   - name: bfd
