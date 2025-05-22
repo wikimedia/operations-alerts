@@ -1,0 +1,50 @@
+rule_files:
+  - pdus.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    input_series:
+      - series: 'pdu_measurementsOverCurrentProtectorSensorValue{instance="ps1-b3-magru.mgmt.magru.wmnet", job="pdu_pro4x", overCurrentProtectorIndex="1", pduId="1", row="b3", sensorType="rmsCurrent"}'
+        values: 13800x240
+      - series:  'pdu_inletSensorDecimalDigits{inletId="1", instance="ps1-b3-magru.mgmt.magru.wmnet", job="pdu_pro4x", pduId="1", row="b3", sensorType="rmsCurrent"}'
+        values: 3x240
+      - series: 'pdu_overCurrentProtectorSensorUpperWarningThreshold{instance="ps1-b3-magru.mgmt.magru.wmnet", job="pdu_pro4x", overCurrentProtectorIndex="1", pduId="1", row="b3", sensorType="rmsCurrent"}'
+        values: 10400x240
+      - series: 'pdu_overCurrentProtectorSensorUpperCriticalThreshold{instance="ps1-b3-magru.mgmt.magru.wmnet", job="pdu_pro4x", overCurrentProtectorIndex="1", pduId="1", row="b3", sensorType="rmsCurrent"}'
+        values: 12800x240
+      - series: 'pdu_overCurrentProtectorSensorDecimalDigits{instance="ps1-b3-magru.mgmt.magru.wmnet", job="pdu_pro4x", overCurrentProtectorIndex="1", pduId="1", row="b3", sensorType="rmsCurrent"}'
+        values: 3x240
+    alert_rule_test:
+      - alertname: pduOverCurrentProtector
+        eval_time: 4m
+        exp_alerts:
+          - exp_labels:
+              instance: "ps1-b3-magru.mgmt.magru.wmnet"
+              job: "pdu_pro4x"
+              overCurrentProtectorIndex: 1
+              pduId: 1
+              row: "b3"
+              sensorType: "rmsCurrent"
+              severity: "task"
+              team: "dcops"
+              threshold: "warning"
+            exp_annotations:
+              summary: "Over Current Protector sensor 1 value over warning threshold - issue on ps1-b3-magru.mgmt.magru.wmnet (pduid: 1)"
+              description: "Over Current Protector sensor 1 value over warning threshold - issue on ps1-b3-magru.mgmt.magru.wmnet (pduid: 1)"
+              dashboard: https%3A%2F%2Fgrafana.wikimedia.org%2Fd%2Ff64mmDzMz%2Fpower-usage%3ForgId%3D1%26from%3Dnow-2d%26to%3Dnow%26timezone%3Dutc%26var-datasource%3DPA7DE9A562EF40E24%26var-site%3Deqiad%26var-instance%3D%24__all%26var-row%3D%24__all
+              runbook: https://wikitech.wikimedia.org/wiki/SRE/Dc-operations/Hardware_Troubleshooting_Runbook
+          - exp_labels:
+              instance: "ps1-b3-magru.mgmt.magru.wmnet"
+              job: "pdu_pro4x"
+              overCurrentProtectorIndex: 1
+              pduId: 1
+              row: "b3"
+              sensorType: "rmsCurrent"
+              severity: "task"
+              team: "dcops"
+              threshold: "critical"
+            exp_annotations:
+              summary: "Over Current Protector sensor 1 value over critical threshold - issue on ps1-b3-magru.mgmt.magru.wmnet (pduid: 1)"
+              description: "Over Current Protector sensor 1 value over critical threshold - issue on ps1-b3-magru.mgmt.magru.wmnet (pduid: 1)"
+              dashboard: https%3A%2F%2Fgrafana.wikimedia.org%2Fd%2Ff64mmDzMz%2Fpower-usage%3ForgId%3D1%26from%3Dnow-2d%26to%3Dnow%26timezone%3Dutc%26var-datasource%3DPA7DE9A562EF40E24%26var-site%3Deqiad%26var-instance%3D%24__all%26var-row%3D%24__all
+              runbook: https://wikitech.wikimedia.org/wiki/SRE/Dc-operations/Hardware_Troubleshooting_Runbook
