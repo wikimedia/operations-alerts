@@ -25,7 +25,7 @@ groups:
     annotations:
       summary: "Calico Kubernetes Controllers not running"
       description: "The calico-kube-controllers pod is not running in the {{ $externalLabels.prometheus }}@{{ $externalLabels.site }} kube-system namespace"
-      runbook: https://wikitech.wikimedia.org/wiki/Calico#Kube_Controllers"
+      runbook: https://wikitech.wikimedia.org/wiki/Calico#Kube_Controllers
       dashboard: TODO
 
   - alert: CalicoHighMemoryUsage
