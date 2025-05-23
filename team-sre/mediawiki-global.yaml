@@ -43,7 +43,7 @@ groups:
           runbook: TODO
         labels:
           severity: critical
-          team: sre # TODO: add paging to security team in the future?
+          team: trust-and-safety-product # TODO: add paging to security team in the future?
         for: 30m
         # mw-web
         expr: |
