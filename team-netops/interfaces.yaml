@@ -5,9 +5,9 @@ groups:
     rules:
       - alert: CoreRouterInterfaceDown
         expr: |
-          (gnmi_interfaces_interface_state_oper_status{instance =~ "cr.*"} == 2)
+          (gnmi_interfaces_interface_state_oper_status{instance =~ "(cr|pfw).*"} == 2)
             * on (instance, interface_name, interface_description)
-          (gnmi_interfaces_interface_state_enabled{instance =~ "cr.*"} == 1)
+          (gnmi_interfaces_interface_state_enabled{instance =~ "(cr|pfw).*"} == 1)
         for: 2m
         labels:
           team: sre
@@ -83,9 +83,9 @@ groups:
         # To be removed after they're upgraded FY2526
         # pint disable promql/series
         expr: |
-          (gnmi_interfaces_interface_state_oper_status{instance =~ "[lsa]sw.*", interface_description=~"(Core|Transport):.*"} == 2)
+          (gnmi_interfaces_interface_state_oper_status{instance =~ "f?[lsa]sw.*", interface_description=~"(Core|Transport):.*"} == 2)
             * on (instance, interface_name, interface_description)
-          (gnmi_interfaces_interface_state_enabled{instance =~ "[lsa]sw.*", interface_description=~"(Core|Transport):.*"} == 1)
+          (gnmi_interfaces_interface_state_enabled{instance =~ "f?[lsa]sw.*", interface_description=~"(Core|Transport):.*"} == 1)
         for: 2m
         labels:
           team: sre
