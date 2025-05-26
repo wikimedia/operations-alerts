@@ -1,0 +1,60 @@
+# deploy-tag: ops
+
+groups:
+  - name: pdus
+    rules:
+      - &anchor_pduOverCurrentProtector
+        alert: pduOverCurrentProtector
+        # pint disable promql/series
+        expr: |
+          label_replace(
+            (
+                pdu_measurementsOverCurrentProtectorSensorValue{sensorType="rmsCurrent"}
+              /
+                (10 ^ pdu_overCurrentProtectorSensorDecimalDigits{sensorType="rmsCurrent"})
+            )
+            >
+            (
+                pdu_overCurrentProtectorSensorUpperWarningThreshold{sensorType="rmsCurrent"}
+              /
+                (10 ^ pdu_overCurrentProtectorSensorDecimalDigits{sensorType="rmsCurrent"})
+            ),
+            "threshold",
+            "warning",
+            "__name__",
+            ".*"
+          )
+        for: 2m
+        labels:
+          severity: task
+          team: dcops
+        annotations:
+          summary: 'Over Current Protector sensor {{ $labels.overCurrentProtectorIndex }} value over {{ $labels.threshold }} threshold - issue on {{ $labels.instance }} (pduid: {{ $labels.pduId }})'
+          description: 'Over Current Protector sensor {{ $labels.overCurrentProtectorIndex }} value over {{ $labels.threshold }} threshold - issue on {{ $labels.instance }} (pduid: {{ $labels.pduId }})'
+          dashboard: https%3A%2F%2Fgrafana.wikimedia.org%2Fd%2Ff64mmDzMz%2Fpower-usage%3ForgId%3D1%26from%3Dnow-2d%26to%3Dnow%26timezone%3Dutc%26var-datasource%3DPA7DE9A562EF40E24%26var-site%3Deqiad%26var-instance%3D%24__all%26var-row%3D%24__all
+          runbook: https://wikitech.wikimedia.org/wiki/SRE/Dc-operations/Hardware_Troubleshooting_Runbook
+
+      - <<: *anchor_pduOverCurrentProtector
+        # pint disable promql/series
+        expr: |
+          label_replace(
+            (
+                pdu_measurementsOverCurrentProtectorSensorValue{sensorType="rmsCurrent"}
+              /
+                (10 ^ pdu_overCurrentProtectorSensorDecimalDigits{sensorType="rmsCurrent"})
+            )
+            >
+            (
+                pdu_overCurrentProtectorSensorUpperCriticalThreshold{sensorType="rmsCurrent"}
+              /
+                (10 ^ pdu_overCurrentProtectorSensorDecimalDigits{sensorType="rmsCurrent"})
+            ),
+            "threshold",
+            "critical",
+            "__name__",
+            ".*"
+          )
+        labels:
+          severity: task
+          threshold: critical
+          team: dcops
