@@ -20,3 +20,17 @@ groups:
         labels:
           severity: critical
           team: 'infrastructure-foundations'
+      - alert: GanetiBGPDown
+        # To be removed once we have Routed Ganeti running in all the sites
+        # pint disable promql/series
+        expr: remote_instance:gnmi_bgp_neighbor_session_state{instance=~"ganeti.*"} < 6
+        for: 2m
+        labels:
+          team: sre
+          severity: critical
+          scope: network
+        annotations:
+          summary: 'BGP session down between {{ $labels.instance | stripPort }} and {{ $labels.remote_instance | stripPort }} - group {{ $labels.peer_group }}'
+          description: ''  # Not needed
+          dashboard: 'https://grafana.wikimedia.org/d/ed8da087-4bcb-407d-9596-d158b8145d45/bgp-neighbors-detail?orgId=1&var-site={{ $labels.site }}&var-device={{ $labels.remote_instance }}&var-bgp_group={{ $labels.peer_group }}&var-bgp_neighbor={{ $labels.instance | stripPort }}'
+          runbook: 'https://wikitech.wikimedia.org/wiki/Ganeti#GanetiBGPDown'
