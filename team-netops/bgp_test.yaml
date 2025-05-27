@@ -10,6 +10,8 @@ tests:
         values: '0 0'
       - series: 'gnmi_bgp_neighbor_session_state{peer_group="Switch", instance="cr1-eqiad:9804", peer_descr="ssw1-e1-eqiad", address="10.66.0.9"}'
         values: '1 1'
+      - series: 'gnmi_bgp_neighbor_session_state{peer_group="IX6", instance="cr1-eqiad:9804", peer_descr="Test peer", address="3fff::1234:1", peer_as="1234"}'
+        values: '1x10'
     alert_rule_test:
       - alertname: TransitBGPDown
         eval_time: 2m
@@ -43,3 +45,20 @@ tests:
               description: ""
               dashboard: 'https://grafana.wikimedia.org/d/ed8da087-4bcb-407d-9596-d158b8145d45/bgp-neighbors-detail?orgId=1&var-site=eqiad&var-device=cr1-eqiad:9804&var-bgp_group=Switch&var-bgp_neighbor=ssw1-e1-eqiad'
               runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#BGP_status'
+      - alertname: PeeringBGPIdle
+        eval_time: 10m
+        exp_alerts:
+          - exp_labels:
+              peer_group: IX6
+              instance: cr1-eqiad:9804
+              peer_descr: Test peer
+              peer_as: 1234
+              address: 3fff::1234:1
+              team: sre
+              severity: warning
+              scope: network
+            exp_annotations:
+              summary: 'Idle peering BGP session to Test peer (3fff::1234:1 - AS1234)'
+              description: 'This usually means hitting the prefix limit.'
+              dashboard: 'https://grafana.wikimedia.org/d/ed8da087-4bcb-407d-9596-d158b8145d45/bgp-neighbors-detail?orgId=1&var-site=eqiad&var-device=cr1-eqiad:9804&var-bgp_group=IX6&var-bgp_neighbor=Test+peer'
+              runbook: 'https://wikitech.wikimedia.org/wiki/Peering_management#PeeringBGPIdle'

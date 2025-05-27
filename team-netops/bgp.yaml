@@ -27,3 +27,15 @@ groups:
           description: ''  # Not needed
           dashboard: 'https://grafana.wikimedia.org/d/ed8da087-4bcb-407d-9596-d158b8145d45/bgp-neighbors-detail?orgId=1&var-site={{ $externalLabels.site }}&var-device={{ $labels.instance }}&var-bgp_group={{ $labels.peer_group }}&var-bgp_neighbor={{ $labels.peer_descr | urlquery }}'
           runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#BGP_status'
+      - alert: PeeringBGPIdle
+        expr: gnmi_bgp_neighbor_session_state{peer_group=~"IX[46]"} == 1
+        for: 10m
+        labels:
+          team: sre
+          severity: warning
+          scope: network
+        annotations:
+          summary: 'Idle peering BGP session to {{ $labels.peer_descr }} ({{ $labels.address }} - AS{{ $labels.peer_as }})'
+          description: 'This usually means hitting the prefix limit.'
+          dashboard: 'https://grafana.wikimedia.org/d/ed8da087-4bcb-407d-9596-d158b8145d45/bgp-neighbors-detail?orgId=1&var-site={{ $externalLabels.site }}&var-device={{ $labels.instance }}&var-bgp_group={{ $labels.peer_group }}&var-bgp_neighbor={{ $labels.peer_descr | urlquery }}'
+          runbook: 'https://wikitech.wikimedia.org/wiki/Peering_management#PeeringBGPIdle'
