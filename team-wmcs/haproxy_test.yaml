@@ -4,14 +4,14 @@ evaluation_interval: 1m
 tests:
   - interval: 1m
     input_series:
-      - series: 'haproxy_server_status{instance="cloudlb1001:9900",job="cloudlb-haproxy",proxy="heat_backend",server="cloudcontrol1005.eqiad.wmnet"}'
-        values: "1x10 0x20"
-      - series: 'haproxy_server_status{instance="cloudlb1002:9900",job="cloudlb-haproxy",proxy="heat_backend",server="cloudcontrol1005.eqiad.wmnet"}'
-        values: "1x20 0x10"
-      - series: 'haproxy_server_status{instance="cloudlb1003:9900",job="cloudlb-haproxy",proxy="heat_backend",server="cloudcontrol1005.eqiad.wmnet"}'
-        values: "1x30"
-      - series: 'haproxy_server_status{instance="cloudlb1001:9900",job="cloudlb-haproxy",proxy="wikireplica-db-web-s1",server="clouddb1013.eqiad.wmnet"}'
-        values: "1x20 0x10"
+      - series: 'haproxy_server_status{instance="cloudlb1001:9900",job="cloudlb-haproxy",proxy="heat_backend",server="cloudcontrol1005.eqiad.wmnet",state="DOWN"}'
+        values: "0x10 1x20"
+      - series: 'haproxy_server_status{instance="cloudlb1002:9900",job="cloudlb-haproxy",proxy="heat_backend",server="cloudcontrol1005.eqiad.wmnet",state="DOWN"}'
+        values: "0x20 1x10"
+      - series: 'haproxy_server_status{instance="cloudlb1003:9900",job="cloudlb-haproxy",proxy="heat_backend",server="cloudcontrol1005.eqiad.wmnet",state="DOWN"}'
+        values: "0x30"
+      - series: 'haproxy_server_status{instance="cloudlb1001:9900",job="cloudlb-haproxy",proxy="wikireplica-db-web-s1",server="clouddb1013.eqiad.wmnet",state="DOWN"}'
+        values: "0x20 1x10"
     alert_rule_test:
       - alertname: HAProxyBackendUnavailable
         eval_time: 15m
@@ -22,9 +22,10 @@ tests:
               service: cloudvps
               proxy: heat_backend
               server: cloudcontrol1005.eqiad.wmnet
+              state: DOWN
             exp_annotations:
-              summary: "HAProxy service heat_backend backend cloudcontrol1005.eqiad.wmnet is down"
-              description: "HAProxy service heat_backend backend cloudcontrol1005.eqiad.wmnet is down according to 1 LB servers"
+              summary: "HAProxy service heat_backend backend cloudcontrol1005.eqiad.wmnet is DOWN"
+              description: "HAProxy service heat_backend backend cloudcontrol1005.eqiad.wmnet is DOWN according to 1 LB servers"
               runbook: https://wikitech.wikimedia.org/wiki/HAProxy
               dashboard: TODO
       - alertname: HAProxyBackendUnavailable
@@ -32,8 +33,8 @@ tests:
         exp_alerts:
           - exp_labels: *warning_labels
             exp_annotations:
-              summary: "HAProxy service heat_backend backend cloudcontrol1005.eqiad.wmnet is down"
-              description: "HAProxy service heat_backend backend cloudcontrol1005.eqiad.wmnet is down according to 2 LB servers"
+              summary: "HAProxy service heat_backend backend cloudcontrol1005.eqiad.wmnet is DOWN"
+              description: "HAProxy service heat_backend backend cloudcontrol1005.eqiad.wmnet is DOWN according to 2 LB servers"
               runbook: https://wikitech.wikimedia.org/wiki/HAProxy
               dashboard: TODO
           - exp_labels:
@@ -42,9 +43,10 @@ tests:
               service: cloudvps
               proxy: wikireplica-db-web-s1
               server: clouddb1013.eqiad.wmnet
+              state: DOWN
             exp_annotations:
-              summary: "HAProxy service wikireplica-db-web-s1 backend clouddb1013.eqiad.wmnet is down"
-              description: "HAProxy service wikireplica-db-web-s1 backend clouddb1013.eqiad.wmnet is down according to 1 LB servers"
+              summary: "HAProxy service wikireplica-db-web-s1 backend clouddb1013.eqiad.wmnet is DOWN"
+              description: "HAProxy service wikireplica-db-web-s1 backend clouddb1013.eqiad.wmnet is DOWN according to 1 LB servers"
               runbook: https://wikitech.wikimedia.org/wiki/HAProxy
               dashboard: TODO
 

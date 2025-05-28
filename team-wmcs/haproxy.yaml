@@ -7,15 +7,15 @@ groups:
       - alert: HAProxyBackendUnavailable
         # Most likely cause of such an alert is a single backend being down. Aggregate the alert
         # to only show a single alert even when multiple load balancer servers see it as down.
-        expr: count by (server, proxy) (haproxy_server_status{job="cloudlb-haproxy"} == 0) >= 1
+        expr: count by (server, proxy, state) (haproxy_server_status{job="cloudlb-haproxy",state!="UP"} > 0) >= 1
         for: 1m
         labels:
           team: wmcs
           severity: warning
           service: cloudvps
         annotations:
-          summary: "HAProxy service {{ $labels.proxy }} backend {{ $labels.server }} is down"
-          description: "HAProxy service {{ $labels.proxy }} backend {{ $labels.server }} is down according to {{ $value }} LB servers"
+          summary: "HAProxy service {{ $labels.proxy }} backend {{ $labels.server }} is {{ $labels.state }}"
+          description: "HAProxy service {{ $labels.proxy }} backend {{ $labels.server }} is {{ $labels.state }} according to {{ $value }} LB servers"
           runbook: https://wikitech.wikimedia.org/wiki/HAProxy
           dashboard: TODO
 
