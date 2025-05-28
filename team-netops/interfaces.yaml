@@ -14,7 +14,7 @@ groups:
           severity: critical
           scope: network
         annotations:
-          summary: 'Core router interface down - {{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}:{{ $labels.interface_name }} ({{ $labels.interface_description }})'
+          summary: 'Core router interface down - {{ $labels.instance | stripPort }}:{{ $labels.interface_name }} ({{ $labels.interface_description }})'
           description: ''  # Not needed
           dashboard: 'https://grafana.wikimedia.org/d/fb403d62-5f03-434a-9dff-bd02b9fff504/network-device-overview?var-instance={{ $labels.instance }}'
           runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#Router_interface_down'
@@ -28,7 +28,7 @@ groups:
           severity: task
           scope: network
         annotations:
-          summary: 'Inbound errors on interface {{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}:{{ $labels.interface_name }} ({{ $labels.interface_description }})'
+          summary: 'Inbound errors on interface {{ $labels.instance | stripPort }}:{{ $labels.interface_name }} ({{ $labels.interface_description }})'
           description: ''  # Not needed
           dashboard: 'https://grafana.wikimedia.org/d/fb403d62-5f03-434a-9dff-bd02b9fff504/network-device-overview?var-instance={{ $labels.instance }}'
           runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#Inbound/outbound_interface_errors'
@@ -40,7 +40,7 @@ groups:
           severity: task
           scope: network
         annotations:
-          summary: 'Outbound errors on interface {{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}:{{ $labels.interface_name }} ({{ $labels.interface_description }})'
+          summary: 'Outbound errors on interface {{ $labels.instance | stripPort }}:{{ $labels.interface_name }} ({{ $labels.interface_description }})'
           description: ''  # Not needed
           dashboard: 'https://grafana.wikimedia.org/d/fb403d62-5f03-434a-9dff-bd02b9fff504/network-device-overview?var-instance={{ $labels.instance }}'
           runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#Inbound/outbound_interface_errors'
@@ -57,7 +57,7 @@ groups:
           severity: critical  # TODO: move to paging once tested
           scope: network
         annotations:
-          summary: 'Transit or peering outbound traffic above 90% capacity - {{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}:{{ $labels.interface_name }} ({{ $labels.interface_description }})'
+          summary: 'Transit or peering outbound traffic above 90% capacity - {{ $labels.instance | stripPort }}:{{ $labels.interface_name }} ({{ $labels.interface_description }})'
           description: ''  # Not needed
           dashboard: 'https://grafana.wikimedia.org/d/fb403d62-5f03-434a-9dff-bd02b9fff504/network-device-overview?var-instance={{ $labels.instance }}'
           runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#Primary_outbound_port_utilization_over_90%'
@@ -74,7 +74,7 @@ groups:
           severity: critical  # TODO: move to paging once tested
           scope: network
         annotations:
-          summary: 'Transit or peering inbound traffic above 90% capacity - {{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}:{{ $labels.interface_name }} ({{ $labels.interface_description }})'
+          summary: 'Transit or peering inbound traffic above 90% capacity - {{ $labels.instance | stripPort }}:{{ $labels.interface_name }} ({{ $labels.interface_description }})'
           description: ''  # Not needed
           dashboard: 'https://grafana.wikimedia.org/d/fb403d62-5f03-434a-9dff-bd02b9fff504/network-device-overview?var-instance={{ $labels.instance }}'
           runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#Primary_inbound_port_utilization_over_90%'

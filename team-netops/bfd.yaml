@@ -11,7 +11,7 @@ groups:
           severity: critical
           scope: network
         annotations:
-          summary: 'BFD session down between {{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }} and {{ $labels.remote_address }}'
+          summary: 'BFD session down between {{ $labels.instance | stripPort }} and {{ $labels.remote_address }}'
           description: ''  # Not needed
           dashboard: 'https://grafana.wikimedia.org/d/fb403d62-5f03-434a-9dff-bd02b9fff504/network-device-overview?var-instance={{ $labels.instance }}'
           runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#BFD_status'
