@@ -38,4 +38,19 @@ groups:
           summary: 'Idle peering BGP session to {{ $labels.peer_descr }} ({{ $labels.address }} - AS{{ $labels.peer_as }})'
           description: 'This usually means hitting the prefix limit.'
           dashboard: 'https://grafana.wikimedia.org/d/ed8da087-4bcb-407d-9596-d158b8145d45/bgp-neighbors-detail?orgId=1&var-site={{ $externalLabels.site }}&var-device={{ $labels.instance }}&var-bgp_group={{ $labels.peer_group }}&var-bgp_neighbor={{ $labels.peer_descr | urlquery }}'
-          runbook: 'https://wikitech.wikimedia.org/wiki/Peering_management#PeeringBGPIdle'
+          runbook: 'https://wikitech.wikimedia.org/wiki/Peering_management#Managing_down_sessions'
+      - alert: PeeringBGPDown
+        expr: |
+          clamp_max((gnmi_bgp_neighbor_session_state{peer_group=~"IX[46]"} > 1) AND (gnmi_bgp_neighbor_session_state{peer_group=~"IX[46]"} < 6), 1)
+            * on (instance, address, peer_descr, peer_as, peer_group, site)
+          (time() - (gnmi_bgp_neighbor_last_established{peer_group=~"IX[46]"})/1000000000) > 1209600
+        for: 10m
+        labels:
+          team: sre
+          severity: warning
+          scope: network
+        annotations:
+          summary: 'Peering BGP session down for {{ $value | humanizeDuration }} - {{ $labels.peer_descr }} ({{ $labels.address }} - AS{{ $labels.peer_as }})'
+          description: ''
+          dashboard: 'https://grafana.wikimedia.org/d/ed8da087-4bcb-407d-9596-d158b8145d45/bgp-neighbors-detail?orgId=1&var-site={{ $externalLabels.site }}&var-device={{ $labels.instance }}&var-bgp_group={{ $labels.peer_group }}&var-bgp_neighbor={{ $labels.peer_descr | urlquery }}'
+          runbook: 'https://wikitech.wikimedia.org/wiki/Peering_management#Managing_down_sessions'

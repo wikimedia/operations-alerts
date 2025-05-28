@@ -12,6 +12,10 @@ tests:
         values: '1 1'
       - series: 'gnmi_bgp_neighbor_session_state{peer_group="IX6", instance="cr1-eqiad:9804", peer_descr="Test peer", address="3fff::1234:1", peer_as="1234"}'
         values: '1x10'
+      - series: 'gnmi_bgp_neighbor_session_state{peer_group="IX6", instance="cr1-eqiad:9804", peer_descr="Test peer 2", address="3fff::1234:2", peer_as="1111", site="eqiad"}'
+        values: '3x10086'
+      - series: 'gnmi_bgp_neighbor_last_established{peer_group="IX6", instance="cr1-eqiad:9804", peer_descr="Test peer 2", address="3fff::1234:2", peer_as="1111", site="eqiad"}'
+        values: '0x10086'
     alert_rule_test:
       - alertname: TransitBGPDown
         eval_time: 2m
@@ -61,4 +65,22 @@ tests:
               summary: 'Idle peering BGP session to Test peer (3fff::1234:1 - AS1234)'
               description: 'This usually means hitting the prefix limit.'
               dashboard: 'https://grafana.wikimedia.org/d/ed8da087-4bcb-407d-9596-d158b8145d45/bgp-neighbors-detail?orgId=1&var-site=eqiad&var-device=cr1-eqiad:9804&var-bgp_group=IX6&var-bgp_neighbor=Test+peer'
-              runbook: 'https://wikitech.wikimedia.org/wiki/Peering_management#PeeringBGPIdle'
+              runbook: 'https://wikitech.wikimedia.org/wiki/Peering_management#Managing_down_sessions'
+      - alertname: PeeringBGPDown
+        eval_time: 20172m
+        exp_alerts:
+          - exp_labels:
+              peer_group: IX6
+              instance: cr1-eqiad:9804
+              peer_descr: Test peer 2
+              peer_as: 1111
+              address: 3fff::1234:2
+              team: sre
+              site: eqiad
+              severity: warning
+              scope: network
+            exp_annotations:
+              summary: 'Peering BGP session down for 14d 0h 12m 0s - Test peer 2 (3fff::1234:2 - AS1111)'
+              description: ''
+              dashboard: 'https://grafana.wikimedia.org/d/ed8da087-4bcb-407d-9596-d158b8145d45/bgp-neighbors-detail?orgId=1&var-site=eqiad&var-device=cr1-eqiad:9804&var-bgp_group=IX6&var-bgp_neighbor=Test+peer+2'
+              runbook: 'https://wikitech.wikimedia.org/wiki/Peering_management#Managing_down_sessions'
