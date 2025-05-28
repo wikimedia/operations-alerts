@@ -12,7 +12,7 @@ groups:
           severity: critical
           scope: network
         annotations:
-          summary: 'Fundraising Firewall core BGP session down between {{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }} and {{ $labels.peer_descr }} ({{ $labels.address }}) - group {{ $labels.peer_group }}'
+          summary: 'Fundraising Firewall core BGP session down between {{ $labels.instance | stripPort }} and {{ $labels.peer_descr }} ({{ $labels.address }}) - group {{ $labels.peer_group }}'
           description: ''  # Not needed
           dashboard: 'https://grafana.wikimedia.org/d/ed8da087-4bcb-407d-9596-d158b8145d45/bgp-neighbors-detail?orgId=1&var-site={{ $externalLabels.site }}&var-device={{ $labels.instance }}&var-bgp_group={{ $labels.peer_group }}&var-bgp_neighbor={{ $labels.peer_descr }}'
           runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#BGP_status'
