@@ -8,6 +8,8 @@ tests:
     input_series:
       - series: 'instance:gnmic_target_up{instance="cr2-eqdfw:0"}'
         values: '0 0 0 0 0 0'
+      - series: 'go_goroutines{instance="netflow2003:7890", job="gnmic"}'
+        values: '15000x6'
     alert_rule_test:
       - alertname: GnmiTargetDown
         eval_time: 6m
@@ -22,3 +24,17 @@ tests:
               description: ""
               dashboard: 'https://grafana.wikimedia.org/d/eab73c60-a402-4f9b-a4a7-ea489b374458/gnmic'
               runbook: 'https://wikitech.wikimedia.org/wiki/Network_telemetry#Troubleshooting'
+      - alertname: GoRoutinesTooHigh
+        eval_time: 6m
+        exp_alerts:
+          - exp_labels:
+              instance: netflow2003:7890
+              team: sre
+              severity: critical
+              scope: network
+              job: gnmic
+            exp_annotations:
+              summary: "gNMIc running on netflow2003 have more than 10000 Go routines."
+              description: ""
+              dashboard: 'https://grafana.wikimedia.org/d/eab73c60-a402-4f9b-a4a7-ea489b374458/gnmic'
+              runbook: 'https://wikitech.wikimedia.org/wiki/Network_telemetry#GoRoutinesTooHigh'
