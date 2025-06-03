@@ -33,6 +33,8 @@ groups:
           dashboard: 'https://grafana.wikimedia.org/d/fb403d62-5f03-434a-9dff-bd02b9fff504/network-device-overview?var-instance={{ $labels.instance }}'
           runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#Inbound/outbound_interface_errors'
       - alert: OutboundInterfaceErrors
+        # When the counter is at 0, the devices don't expose the out errors
+        # pint disable promql/series
         expr: increase(gnmi_interfaces_interface_state_counters_out_errors[5m]) > 2
         for: 15m
         labels:
