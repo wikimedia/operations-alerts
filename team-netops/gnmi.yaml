@@ -15,3 +15,16 @@ groups:
           description: ''  # Not needed
           dashboard: 'https://grafana.wikimedia.org/d/eab73c60-a402-4f9b-a4a7-ea489b374458/gnmic'
           runbook: 'https://wikitech.wikimedia.org/wiki/Network_telemetry#Troubleshooting'
+      - alert: GoRoutinesTooHigh
+        # Arbitrary threshold of 10000, if we reach this, something is wrong
+        expr: go_goroutines{job="gnmic"} > 10000
+        for: 5m
+        labels:
+          team: sre
+          severity: critical
+          scope: network
+        annotations:
+          summary: 'gNMIc running on {{ $labels.instance | stripPort }} have more than 10000 Go routines.'
+          description: ''  # Not needed
+          dashboard: 'https://grafana.wikimedia.org/d/eab73c60-a402-4f9b-a4a7-ea489b374458/gnmic'
+          runbook: 'https://wikitech.wikimedia.org/wiki/Network_telemetry#GoRoutinesTooHigh'
