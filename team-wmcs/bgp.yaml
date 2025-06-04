@@ -1,0 +1,17 @@
+# deploy-tag: ops
+# deploy-site: eqiad, codfw
+
+groups:
+  - name: bgp
+    rules:
+      - alert: HostBGPDown
+        expr: remote_instance:gnmi_bgp_neighbor_session_state{peer_group=~"cloud_host6?"} < 6
+        for: 2m
+        labels:
+          team: wmcs
+          severity: critical
+        annotations:
+          summary: 'BGP session for {{ $labels.instance | stripPort }} ({{ $labels.address }}) is down'
+          description: ''  # Not needed
+          dashboard: 'https://grafana.wikimedia.org/d/ed8da087-4bcb-407d-9596-d158b8145d45/bgp-neighbors-detail?orgId=1&var-site={{ $externalLabels.site }}&var-device={{ $labels.remote_instance }}&var-bgp_group={{ $labels.peer_group }}'
+          runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#BGP_status'

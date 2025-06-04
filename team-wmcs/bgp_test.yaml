@@ -1,0 +1,30 @@
+rule_files:
+  - bgp.yaml
+evaluation_interval: 2m
+tests:
+  - interval: 2m
+    external_labels:
+      site: eqiad
+    input_series:
+      - series: 'remote_instance:gnmi_bgp_neighbor_session_state{address="172.20.1.2", instance="cloudlb1001:0", job="gnmi", network_instance_name="cloud", peer_as="64605", peer_group="cloud_host", peer_type="EXTERNAL", remote_instance="cloudsw1-c8-eqiad:9804"}'
+        values: '3 3'
+    alert_rule_test:
+      - alertname: HostBGPDown
+        eval_time: 2m
+        exp_alerts:
+          - exp_labels:
+              address: "172.20.1.2"
+              instance: cloudlb1001:0
+              job: gnmi
+              network_instance_name: cloud
+              peer_as: "64605"
+              peer_group: cloud_host
+              peer_type: EXTERNAL
+              remote_instance: cloudsw1-c8-eqiad:9804
+              severity: critical
+              team: wmcs
+            exp_annotations:
+              summary: "BGP session for cloudlb1001 (172.20.1.2) is down"
+              description: ""
+              dashboard: 'https://grafana.wikimedia.org/d/ed8da087-4bcb-407d-9596-d158b8145d45/bgp-neighbors-detail?orgId=1&var-site=eqiad&var-device=cloudsw1-c8-eqiad:9804&var-bgp_group=cloud_host'
+              runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#BGP_status'
