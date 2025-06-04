@@ -1,0 +1,17 @@
+# deploy-tag: ops
+
+groups:
+  - name: gnmi
+    rules:
+      - alert: GnmiTargetDown
+        expr: instance:gnmic_target_up{} != 1
+        for: 5m
+        labels:
+          team: sre
+          severity: critical
+          scope: network
+        annotations:
+          summary: '{{ $labels.instance | stripPort }} is unreachable through gNMI'
+          description: ''  # Not needed
+          dashboard: 'https://grafana.wikimedia.org/d/eab73c60-a402-4f9b-a4a7-ea489b374458/gnmic'
+          runbook: 'https://wikitech.wikimedia.org/wiki/Network_telemetry#Troubleshooting'

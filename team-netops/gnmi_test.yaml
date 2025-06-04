@@ -1,0 +1,24 @@
+rule_files:
+  - gnmi.yaml
+evaluation_interval: 2m
+tests:
+  - interval: 2m
+    external_labels:
+      site: codfw
+    input_series:
+      - series: 'instance:gnmic_target_up{instance="cr2-eqdfw:0"}'
+        values: '0 0 0 0 0 0'
+    alert_rule_test:
+      - alertname: GnmiTargetDown
+        eval_time: 6m
+        exp_alerts:
+          - exp_labels:
+              instance: cr2-eqdfw:0
+              team: sre
+              severity: critical
+              scope: network
+            exp_annotations:
+              summary: "cr2-eqdfw is unreachable through gNMI"
+              description: ""
+              dashboard: 'https://grafana.wikimedia.org/d/eab73c60-a402-4f9b-a4a7-ea489b374458/gnmic'
+              runbook: 'https://wikitech.wikimedia.org/wiki/Network_telemetry#Troubleshooting'
