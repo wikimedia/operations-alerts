@@ -27,7 +27,7 @@ groups:
         # _active metric so this will work fine.
         expr:
           (
-            haproxy_backend_active_servers{job="cloudlb-haproxy",proxy!~"(stats|wikireplica-db-(web|analytics)-s\\d)"}
+            haproxy_backend_active_servers{job="cloudlb-haproxy",proxy!~"(stats|wikireplica-db-(web|analytics)-[sx]\\d)"}
             + haproxy_backend_backup_servers
           ) == 0
         for: 2m
@@ -47,8 +47,8 @@ groups:
         expr:
           sum(
             label_replace(
-              haproxy_backend_active_servers{job="cloudlb-haproxy",proxy=~"wikireplica-db-(web|analytics)-s\\d"},
-              "section", "$2", "proxy", "wikireplica-db-(web|analytics)-(s\\d)"
+              haproxy_backend_active_servers{job="cloudlb-haproxy",proxy=~"wikireplica-db-(web|analytics)-[sx]\\d"},
+              "section", "$2", "proxy", "wikireplica-db-(web|analytics)-([sx]\\d)"
             )
           ) by (instance, section) == 0
         for: 2m
