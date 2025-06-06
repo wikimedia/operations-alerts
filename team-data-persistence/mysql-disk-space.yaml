@@ -1,0 +1,55 @@
+# deploy-tag: ops
+# deploy-site: eqiad, codfw
+
+groups:
+  - name: mysql
+    rules:
+      
+    - alert: MysqlPredictiveFreeDiskSpace
+      annotations:
+        description: Host {{$labels.instance}} might be at risk of running out of space on the root partition.
+        runbook: https://wikitech.wikimedia.org/wiki/MariaDB/troubleshooting
+        dashboard: 'https://grafana.wikimedia.org/goto/Jdz2PnLNg?orgId=1'
+        summary: "Host {{$labels.instance }} predictive low disk space on root "
+      expr: predict_linear(node_filesystem_avail_bytes{instance=~"db1.*|db2.*|es1.*|es2.*|pc1.*|pc2.*", mountpoint="/"}[1h], 3600*8) < 10 * 1024 * 1024 * 1024
+      for: 30m
+      labels:
+        severity: warning
+        team: data-persistence
+    
+    - alert: MysqlPredictiveFreeDiskSpace
+      annotations:
+        description: Host {{$labels.instance}} might be at risk of running out of space on the root partition.
+        runbook: https://wikitech.wikimedia.org/wiki/MariaDB/troubleshooting
+        dashboard: 'https://grafana.wikimedia.org/goto/Jdz2PnLNg?orgId=1'
+        summary: "Host {{$labels.instance }} predictive low disk space on root "
+      expr: predict_linear(node_filesystem_avail_bytes{instance=~"db1.*|db2.*|es1.*|es2.*|pc1.*|pc2.*", mountpoint="/"}[1h], 3600*8) < 1 * 1024 * 1024 * 1024
+      for: 30m
+      labels:
+        severity: critical
+        team: data-persistence
+    
+    - alert: MysqlPredictiveFreeDiskSpace
+      annotations:
+        description: Host {{$labels.instance}} might be at risk of running out of space on the /srv partition.
+        runbook: https://wikitech.wikimedia.org/wiki/MariaDB/troubleshooting
+        dashboard: 'https://grafana.wikimedia.org/goto/Jdz2PnLNg?orgId=1'
+        summary: "Host {{$labels.instance }} predictive low disk space on /srv"
+      expr: predict_linear(node_filesystem_avail_bytes{instance=~"db1.*|db2.*|es1.*|es2.*|pc1.*|pc2.*", mountpoint="/srv"}[1h], 3600*8) < 10 * 1024 * 1024 * 1024
+      for: 30m
+      labels:
+        severity: warning
+        team: data-persistence
+    
+    - alert: MysqlPredictiveFreeDiskSpace
+      annotations:
+        description: Host {{$labels.instance}} might be at risk of running out of space on the /srv partition.
+        runbook: https://wikitech.wikimedia.org/wiki/MariaDB/troubleshooting
+        dashboard: 'https://grafana.wikimedia.org/goto/Jdz2PnLNg?orgId=1'
+        summary: "Host {{$labels.instance }} predictive low disk space on /srv"
+      expr: predict_linear(node_filesystem_avail_bytes{instance=~"db1.*|db2.*|es1.*|es2.*|pc1.*|pc2.*", mountpoint="/srv"}[1h], 3600*8) < 1 * 1024 * 1024 * 1024
+      for: 30m
+      labels:
+        severity: critical
+        team: data-persistence
+    
