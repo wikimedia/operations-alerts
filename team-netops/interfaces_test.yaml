@@ -80,10 +80,10 @@ tests:
               interface_name: xe-0/1/0
               interface_description: "Peering: Test peering"
               team: sre
-              severity: critical
+              severity: page
               scope: network
             exp_annotations:
-              summary: "Transit or peering outbound traffic above 90% capacity - cr2-esams:xe-0/1/0 (Peering: Test peering)"
+              summary: "Transit or peering outbound traffic above 90% capacity - cr2-esams:xe-0/1/0 (Peering: Test peering) #page"
               description: ""
               dashboard: 'https://grafana.wikimedia.org/d/fb403d62-5f03-434a-9dff-bd02b9fff504/network-device-overview?var-instance=cr2-esams:9804'
               runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#Primary_outbound_port_utilization_over_90%'
@@ -95,10 +95,10 @@ tests:
               interface_name: xe-0/1/0
               interface_description: "Peering: Test peering"
               team: sre
-              severity: critical
+              severity: page
               scope: network
             exp_annotations:
-              summary: "Transit or peering inbound traffic above 90% capacity - cr2-esams:xe-0/1/0 (Peering: Test peering)"
+              summary: "Transit or peering inbound traffic above 90% capacity - cr2-esams:xe-0/1/0 (Peering: Test peering) #page"
               description: ""
               dashboard: 'https://grafana.wikimedia.org/d/fb403d62-5f03-434a-9dff-bd02b9fff504/network-device-overview?var-instance=cr2-esams:9804'
               runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#Primary_inbound_port_utilization_over_90%'
