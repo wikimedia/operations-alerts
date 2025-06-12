@@ -44,7 +44,7 @@ groups:
   rules:
   - &KubeletOperationalLatency
     alert: KubeletOperationalLatency
-    expr: histogram_quantile(0.99, rate(kubelet_runtime_operations_duration_seconds_bucket{job="k8s-node",operation_type!="list_images"}[5m])) > 1.0
+    expr: histogram_quantile(0.99, rate(kubelet_runtime_operations_duration_seconds_bucket{job="k8s-node",operation_type=~"(run|stop)_podsandbox",instance=~"dse-k8s-.*"}[5m])) > 3.1
     for: 15m
     labels:
       team: sre
@@ -55,8 +55,13 @@ groups:
       runbook: "https://wikitech.wikimedia.org/wiki/Kubernetes"
       dashboard: "https://grafana.wikimedia.org/d/000000472?var-cluster={{ $externalLabels.site }}%20prometheus/{{ $externalLabels.prometheus }}"
 
+  # Rule for list_images operations
   - <<: *KubeletOperationalLatency
     expr: histogram_quantile(0.99, rate(kubelet_runtime_operations_duration_seconds_bucket{job="k8s-node", operation_type="list_images"}[5m])) > 1.5
+
+  # Rule for all other operations
+  - <<: *KubeletOperationalLatency
+    expr: histogram_quantile(0.99, rate(kubelet_runtime_operations_duration_seconds_bucket{job="k8s-node",operation_type!="list_images",instance!~"dse-k8s.*"}[5m])) > 1.0
 
   # A continuous rate of non 4xx requests may be a pointer to some client/operation constantly failing or doing the wrong thing.
   # So everything non 2xx|0 is defined as "error" here. The special code 0 is currently (k8s 1.16) used for WATCH requests
