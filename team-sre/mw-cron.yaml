@@ -10,14 +10,29 @@ groups:
           runbook: 'https://wikitech.wikimedia.org/wiki/Periodic_jobs#Troubleshooting'
           dashboard: 'https://w.wiki/DocP'
         expr: sum by (label_cronjob, label_team) (
-          kube_job_status_failed{namespace='mw-cron'} * on (namespace, job_name)
-          group_left(label_cronjob,label_team) kube_job_labels{namespace="mw-cron"}
+          kube_job_status_failed{namespace='mw-cron', job_name != "wikidata-updatequeryservicelag"} * on (namespace, job_name)
+          group_left(label_cronjob,label_team) kube_job_labels{namespace="mw-cron", label_cronjob != "wikidata-updatequeryservicelag"}
           ) > 0
         for: 5m
         labels:
           severity: task
           team: '{{ $labels.label_team }}'
       - <<: *MediaWikiCronJobFailed
+        labels:
+          severity: warning
+          team: serviceops
+      - <<: *MediaWikiCronJobFailed
+        # Flaky job, alert when 5 runs failed in the last 10 minutes.
+        expr: sum by (label_cronjob, label_team) (
+          kube_job_status_failed{namespace='mw-cron', job_name="wikidata-updatequeryservicelag"} * on (namespace, job_name)
+          group_left(label_cronjob,label_team) kube_job_labels{namespace="mw-cron", label_cronjob="wikidata-updatequeryservicelag"}
+          ) > 5
+      - <<: *MediaWikiCronJobFailed
+        # Flaky job, alert when 5 runs failed in the last 10 minutes.
+        expr: sum by (label_cronjob, label_team) (
+          kube_job_status_failed{namespace='mw-cron', job_name="wikidata-updatequeryservicelag"} * on (namespace, job_name)
+          group_left(label_cronjob,label_team) kube_job_labels{namespace="mw-cron", label_cronjob="wikidata-updatequeryservicelag"}
+          ) > 5
         labels:
           severity: warning
           team: serviceops
