@@ -45,7 +45,7 @@ tests:
         exp_alerts:
           - exp_labels:
               team: data-persistence
-              severity: warning
+              severity: task
               cluster: sessionstore
               instance: sessionstore1004:9100
               mountpoint: /srv

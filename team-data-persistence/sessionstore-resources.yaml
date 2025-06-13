@@ -25,7 +25,7 @@ groups:
         expr: predict_linear(sessionstore_instance:node_filesystem_avail_bytes:max_over_time90m{mountpoint="/srv"}[6h], 259200) <= 0
         for: 1h
         labels:
-          severity: warning
+          severity: task
           team: data-persistence
         annotations:
           description: "Session storage {{ $labels.mountpoint }} disk space on {{ $labels.instance | stripPort }} will be exhausted in less than 3 days at its current growth rate."
