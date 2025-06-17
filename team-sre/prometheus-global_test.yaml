@@ -21,9 +21,9 @@ tests:
            prometheus: ops
            site: eqiad
            team: sre
-           severity: critical
+           severity: page
          exp_annotations:
            description: All hosts running Prometheus instance ops in eqiad are down.
-           summary: Prometheus ops in eqiad is down
+           summary: 'Prometheus ops in eqiad is down #page'
            dashboard: 'https://grafana.wikimedia.org/d/000000607/cluster-overview?var-site=eqiad&var-cluster=prometheus'
            runbook: 'https://wikitech.wikimedia.org/wiki/Prometheus#PrometheusDown'

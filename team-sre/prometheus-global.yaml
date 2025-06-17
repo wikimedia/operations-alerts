@@ -9,7 +9,7 @@ groups:
     - alert: PrometheusDown
       annotations:
         description: All hosts running Prometheus instance {{ $labels.prometheus }} in {{ $labels.site }} are down.
-        summary: Prometheus {{ $labels.prometheus }} in {{ $labels.site }} is down
+        summary: 'Prometheus {{ $labels.prometheus }} in {{ $labels.site }} is down #page'
         dashboard: 'https://grafana.wikimedia.org/d/000000607/cluster-overview?var-site={{ $labels.site }}&var-cluster=prometheus'
         runbook: 'https://wikitech.wikimedia.org/wiki/Prometheus#PrometheusDown'
       # Sum over the reported 'up' metrics, or 0 otherwise.
@@ -25,5 +25,5 @@ groups:
         < 1
       for: 5m
       labels:
-        severity: critical
+        severity: page
         team: sre
