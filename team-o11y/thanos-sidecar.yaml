@@ -41,3 +41,15 @@ groups:
       labels:
         severity: critical
         team: o11y
+
+    - alert: ThanosSidecarDropQueries
+      annotations:
+        description: Thanos Sidecar {{$labels.instance}} is dropping queries with many samples
+        summary: Thanos Sidecar is dropping large queries.
+        dashboard: https://grafana.wikimedia.org/d/b19644bfbf0ec1e108027cce268d99f7/thanos-sidecar
+        runbook: https://wikitech.wikimedia.org/wiki/Thanos#Alerts
+      expr: rate(thanos_store_selects_dropped_total{job="thanos-sidecar"}[5m]) > 1
+      for: 5m
+      labels:
+        severity: critical
+        team: o11y
