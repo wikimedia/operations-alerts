@@ -27,3 +27,25 @@ groups:
       labels:
         severity: page
         team: sre
+
+    - alert: PrometheusDown
+      annotations:
+        description: Prometheus instance {{ $labels.prometheus }} in {{ $labels.site }} is down.
+        summary: 'Prometheus {{ $labels.prometheus }} in {{ $labels.site }} is down'
+        dashboard: 'https://grafana.wikimedia.org/d/000000607/cluster-overview?var-site={{ $labels.site }}&var-cluster=prometheus'
+        runbook: 'https://wikitech.wikimedia.org/wiki/Prometheus#PrometheusDown'
+      # Sum over the reported 'up' metrics, or 0 otherwise.
+      # last_over_time() is used to look up labels when 'up' was present
+      expr: |
+        sum by (prometheus, site) (
+          up{job="prometheus",site!~"(eqiad|codfw)"}
+            or
+          (last_over_time(
+            up{job="prometheus",site!~"(eqiad|codfw)"}[12h]
+          ) * 0)
+        )
+        < 1
+      for: 5m
+      labels:
+        severity: critical
+        team: sre
