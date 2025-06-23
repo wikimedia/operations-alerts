@@ -5,7 +5,7 @@ groups:
     rules:
       - alert: SessionStoreDiskSpaceUtilizationTooHigh
         expr: |
-          1.0 - node_filesystem_avail_bytes{cluster="sessionstore", mountpoint="/srv"} / node_filesystem_size_bytes{cluster="sessionstore", mountpoint="/srv"} > 0.7
+          1.0 - node_filesystem_avail_bytes{cluster="sessionstore", mountpoint=~"/srv/storage-.*"} / node_filesystem_size_bytes{cluster="sessionstore", mountpoint=~"/srv/storage-.*"} > 0.7
         for: 10m
         labels:
           severity: page
@@ -22,7 +22,7 @@ groups:
       - alert: SessionStoreDiskSpaceRunwayTooLow
         # Uses linear regression (predict_linear) to project available bytes
         # 259200 seconds (3 days) into the future using the last 6h of data.
-        expr: predict_linear(sessionstore_instance:node_filesystem_avail_bytes:max_over_time90m{mountpoint="/srv"}[6h], 259200) <= 0
+        expr: predict_linear(sessionstore_instance:node_filesystem_avail_bytes:max_over_time90m{mountpoint=~"/srv/storage-.*"}[6h], 259200) <= 0
         for: 1h
         labels:
           severity: task

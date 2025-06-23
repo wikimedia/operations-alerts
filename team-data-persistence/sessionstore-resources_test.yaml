@@ -4,9 +4,9 @@ evaluation_interval: 1m
 tests:
   - interval: 1m
     input_series:
-      - series: 'node_filesystem_avail_bytes{cluster="sessionstore", instance="sessionstore1004:9100", mountpoint="/srv"}'
+      - series: 'node_filesystem_avail_bytes{cluster="sessionstore", instance="sessionstore1004:9100", mountpoint="/srv/storage-0"}'
         values: '50x5 20x15'
-      - series: 'node_filesystem_size_bytes{cluster="sessionstore", instance="sessionstore1004:9100", mountpoint="/srv"}'
+      - series: 'node_filesystem_size_bytes{cluster="sessionstore", instance="sessionstore1004:9100", mountpoint="/srv/storage-0"}'
         values: '100x20'
     external_labels:
       site: eqiad
@@ -22,15 +22,15 @@ tests:
               severity: page
               cluster: sessionstore
               instance: sessionstore1004:9100
-              mountpoint: /srv
+              mountpoint: /srv/storage-0
             exp_annotations:
               summary: "Session storage disk space utilization on sessionstore1004 is too high #page"
-              description: "Session storage disk space utilization on sessionstore1004 is too high: 80% on /srv"
+              description: "Session storage disk space utilization on sessionstore1004 is too high: 80% on /srv/storage-0"
               dashboard: "https://grafana.wikimedia.org/d/000000377/host-overview?orgId=1&viewPanel=12&var-server=sessionstore1004"
               runbook: "https://wikitech.wikimedia.org/wiki/SessionStorage/Runbook#High_Storage_Utilization"
   - interval: 1m
     input_series:
-      - series: 'node_filesystem_avail_bytes{cluster="sessionstore", instance="sessionstore1004:9100", mountpoint="/srv"}'
+      - series: 'node_filesystem_avail_bytes{cluster="sessionstore", instance="sessionstore1004:9100", mountpoint="/srv/storage-0"}'
         # There are 1440 minutes in a day. We are losing 1 byte of capacity per
         # minute and we start with 4 days of runway.
         values: '5760-1x5760'
@@ -48,15 +48,15 @@ tests:
               severity: task
               cluster: sessionstore
               instance: sessionstore1004:9100
-              mountpoint: /srv
+              mountpoint: /srv/storage-0
             exp_annotations:
-              description: "Session storage /srv disk space on sessionstore1004 will be exhausted in less than 3 days at its current growth rate."
+              description: "Session storage /srv/storage-0 disk space on sessionstore1004 will be exhausted in less than 3 days at its current growth rate."
               summary: "Session storage disk space runway on sessionstore1004 is too low"
               dashboard: 'https://grafana.wikimedia.org/d/000000377/host-overview?orgId=1&viewPanel=12&var-server=sessionstore1004'
               runbook: "https://wikitech.wikimedia.org/wiki/SessionStorage/Runbook#High_Storage_Utilization"
   - interval: 1m
     input_series:
-      - series: 'node_filesystem_avail_bytes{cluster="sessionstore", instance="sessionstore1004:9100", mountpoint="/srv"}'
+      - series: 'node_filesystem_avail_bytes{cluster="sessionstore", instance="sessionstore1004:9100", mountpoint="/srv/storage-0"}'
         # Similar setup to before, with one exception: the 11h hour of the
         # series constains a transient 10x excursion in growth rate, which
         # simulates the effect of a compaction.
