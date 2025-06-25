@@ -15,3 +15,14 @@ groups:
         labels:
           severity: task
           team: collaboration-services
+      - alert: MailmanOutQueueHigh
+        annotations:
+          summary: 'Mailman out queue on {{ $labels.instance }} has more than 50 messages'
+          description: 'The Mailman out queue at {{ $labels.path }} on {{ $labels.instance }} contains {{ $value }} files.'
+          dashboard: 'https://grafana.wikimedia.org/d/GvuAmuuGk/mailman3?forceLogin&from=now-3h&orgId=1&to=now&viewPanel=2'
+          runbook: 'https://wikitech.wikimedia.org/wiki/Mailman/Runbooks#MailmanOutQueueHigh'
+        expr: 'node_files_total{instance=~"lists.*", path=~"(.*)mailman3/queue/out"} > 250'
+        for: 2h
+        labels:
+          severity: task
+          team: collaboration-services
