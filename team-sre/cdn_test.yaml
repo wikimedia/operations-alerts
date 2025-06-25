@@ -18,7 +18,7 @@ tests:
               backend: 'pinkunicorn.service'
               cluster: 'cache_upload'
             exp_annotations:
-              summary: 'ATS: elevated 5xx errors from pinkunicorn.service #page'
+              summary: 'ATS: elevated 5xx errors from pinkunicorn.service in codfw #page'
               description: 'High number of 5xx responses from pinkunicorn.service to ATS in codfw'
               runbook: https://wikitech.wikimedia.org/wiki/Apache_Traffic_Server#Debugging
               dashboard: https://grafana.wikimedia.org/d/1T_4O08Wk/ats-backends-origin-servers-overview?orgId=1&viewPanel=12&var-site=codfw&var-cluster=upload&var-origin=pinkunicorn.service

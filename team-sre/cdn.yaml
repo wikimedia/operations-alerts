@@ -5,7 +5,7 @@ groups:
       - alert: ATSBackendErrorsHigh
         annotations:
           description: 'High number of 5xx responses from {{ $labels.backend }} to ATS in {{ $externalLabels.site }}'
-          summary: 'ATS: elevated 5xx errors from {{ $labels.backend }} #page'
+          summary: 'ATS: elevated 5xx errors from {{ $labels.backend }} in {{ $externalLabels.site }} #page'
           dashboard: 'https://grafana.wikimedia.org/d/1T_4O08Wk/ats-backends-origin-servers-overview?orgId=1&viewPanel=12&var-site={{ $externalLabels.site }}&var-cluster={{ $labels.cluster | reReplaceAll "cache_" ""}}&var-origin={{ $labels.backend }}'
           runbook: 'https://wikitech.wikimedia.org/wiki/Apache_Traffic_Server#Debugging'
         # Historically only real outages would've triggered this alert by keeping errors over 3 per second per backend for over 15 minutes.
