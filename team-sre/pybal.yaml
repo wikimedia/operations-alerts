@@ -31,6 +31,7 @@ groups:
           severity: warning
           team: sre
       - alert: PyBalBGPUnstable
+        # pint disable promql/series
         expr: pybal_bgp_session_established != 1 and ignoring (local_asn, peer) pybal_bgp_enabled == 1
         for: 2m
         labels:
