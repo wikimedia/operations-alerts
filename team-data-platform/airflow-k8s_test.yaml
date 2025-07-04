@@ -38,3 +38,19 @@ tests:
           namespace: airflow-test-k8s
           severity: critical
           team: data-platform
+  - input_series:
+    - series: airflow_scheduler_heartbeat{kubernetes_namespace="airflow-test-k8s"}
+      values: '1000 1000 1000 1000 1000'
+    alert_rule_test:
+    - alertname: AirflowNonHeartbeatingSchedulerEmpty
+      eval_time: 5m
+      exp_alerts:
+      - exp_annotations:
+          description: Airflow scheduler not heartbeating in airflow-test-k8s.dse-k8s-eqiad
+          summary: Airflow scheduler not heartbeating in airflow-test-k8s.dse-k8s-eqiad
+          dashboard: "https://grafana.wikimedia.org/d/lFXqBGxWk/airflow-instance?&var-airflow_instance=airflow-test-k8s"
+          runbook: "https://wikitech.wikimedia.org/wiki/Data_Platform/Systems/Airflow/Kubernetes#The_scheduler_is_not_heartbeating"
+        exp_labels:
+          kubernetes_namespace: airflow-test-k8s
+          severity: critical
+          team: data-platform

@@ -26,3 +26,14 @@ groups:
       labels:
         severity: critical
         team: data-platform
+    - alert: AirflowNonHeartbeatingSchedulerEmpty
+      annotations:
+        description: 'Airflow scheduler not heartbeating in {{ $labels.kubernetes_namespace }}.dse-k8s-eqiad'
+        summary: 'Airflow scheduler not heartbeating in {{ $labels.kubernetes_namespace }}.dse-k8s-eqiad'
+        dashboard: "https://grafana.wikimedia.org/d/lFXqBGxWk/airflow-instance?&var-airflow_instance={{ $labels.kubernetes_namespace }}"
+        runbook: "https://wikitech.wikimedia.org/wiki/Data_Platform/Systems/Airflow/Kubernetes#The_scheduler_is_not_heartbeating"
+      expr: avg(changes(airflow_scheduler_heartbeat[5m])) by (kubernetes_namespace) == 0
+      for: 5m
+      labels:
+        severity: critical
+        team: data-platform
