@@ -26,7 +26,7 @@ tests:
             exp_annotations:
               description: Last successful gobblin run of job gobblin_alert_test was more than 2 hours ago.
               summary: Last successful gobblin run of job gobblin_alert_test was more than 2 hours ago.
-              dashboard: https://grafana.wikimedia.org/d/pAQaJwEnk/gobblin?orgId=1&var-gobblin_job_name=gobblin_alert_test
+              dashboard: https://grafana.wikimedia.org/d/pAQaJwEnk/gobblin?orgId=1&var-gobblin_job_name=gobblin_alert_test&viewPanel=21
               runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Gobblin
 
   - interval: 1m
@@ -53,5 +53,130 @@ tests:
                 0 but did not ingest expected number of records.
                 NOTE: This alert only fires for the first Kafka topic partition for which this is true.
               summary: Gobblin job gobblin_alert_test ingested an unexpected number of records for a Kafka topic partition.
-              dashboard: https://grafana.wikimedia.org/d/pAQaJwEnk/gobblin?orgId=1&var-gobblin_job_name=gobblin_alert_test&var-kafka_topic=gobblin_alert_test_topic&viewPanel=4
+              dashboard: https://grafana.wikimedia.org/d/pAQaJwEnk/gobblin?orgId=1&var-gobblin_job_name=gobblin_alert_test&var-kafka_topic=gobblin_alert_test_topic&viewPanel=24
               runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Gobblin
+
+
+# Tests for gobblin publisher alert
+  - interval: 1m
+    input_series:
+      # We report one file in future      
+      - series: gobblin_publisher_files_in_future_count{job="gobblin_alert_test", publisher_topic="gobblin_ater_test_topic"}
+        values: "1"
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: GobblinProblematicPublishedFiles
+        eval_time: 1m
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              team: data-engineering
+              job: gobblin_alert_test
+              publisher_topic: gobblin_ater_test_topic
+            exp_annotations:
+              description: >
+                Gobblin job gobblin_alert_test published problematic files for topic gobblin_ater_test_topic.
+                Problematic files can be either published after flag, in future, or too far in the past.
+              summary: Gobblin job gobblin_alert_test published problematic files for topic gobblin_ater_test_topic.
+              dashboard: https://grafana.wikimedia.org/d/pAQaJwEnk/gobblin?orgId=1&var-gobblin_job_name=gobblin_alert_test&var-kafka_topic=gobblin_ater_test_topic&viewPanel=27
+              runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Gobblin
+
+  - interval: 1m
+    input_series:
+      # We report one file too far in the past
+      - series: gobblin_publisher_files_before_time_boundary_count{job="gobblin_alert_test", publisher_topic="gobblin_ater_test_topic"}
+        values: "1"
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: GobblinProblematicPublishedFiles
+        eval_time: 1m
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              team: data-engineering
+              job: gobblin_alert_test
+              publisher_topic: gobblin_ater_test_topic
+            exp_annotations:
+              description: >
+                Gobblin job gobblin_alert_test published problematic files for topic gobblin_ater_test_topic.
+                Problematic files can be either published after flag, in future, or too far in the past.
+              summary: Gobblin job gobblin_alert_test published problematic files for topic gobblin_ater_test_topic.
+              dashboard: https://grafana.wikimedia.org/d/pAQaJwEnk/gobblin?orgId=1&var-gobblin_job_name=gobblin_alert_test&var-kafka_topic=gobblin_ater_test_topic&viewPanel=27
+              runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Gobblin
+
+  - interval: 1m
+    input_series:
+      # We report one file published after flag, and the total size of regular-files is bigger than 1Mb
+      # It's important we define the metric for files-after-flag size other wise the test fails
+      - series: gobblin_publisher_files_after_flag_count{job="gobblin_alert_test", publisher_topic="gobblin_ater_test_topic"}
+        values: "1"
+      - series: gobblin_publisher_regular_files_size_total{job="gobblin_alert_test", publisher_topic="gobblin_ater_test_topic"}
+        values: "10000"
+      - series: gobblin_publisher_files_after_flag_size_total{job="gobblin_alert_test", publisher_topic="gobblin_ater_test_topic"}
+        values: "1000"
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: GobblinProblematicPublishedFiles
+        eval_time: 1m
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              team: data-engineering
+              job: gobblin_alert_test
+              publisher_topic: gobblin_ater_test_topic
+            exp_annotations:
+              description: >
+                Gobblin job gobblin_alert_test published problematic files for topic gobblin_ater_test_topic.
+                Problematic files can be either published after flag, in future, or too far in the past.
+              summary: Gobblin job gobblin_alert_test published problematic files for topic gobblin_ater_test_topic.
+              dashboard: https://grafana.wikimedia.org/d/pAQaJwEnk/gobblin?orgId=1&var-gobblin_job_name=gobblin_alert_test&var-kafka_topic=gobblin_ater_test_topic&viewPanel=27
+              runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Gobblin
+
+  - interval: 1m
+    input_series:
+      # We report one file published after flag, and the total size of regular-files is bigger than 1Mb
+      # The files-after-flag size is big enough for the metric to trigger
+      - series: gobblin_publisher_files_after_flag_count{job="gobblin_alert_test", publisher_topic="gobblin_ater_test_topic"}
+        values: "1"
+      - series: gobblin_publisher_regular_files_size_total{job="gobblin_alert_test", publisher_topic="gobblin_ater_test_topic"}
+        values: "2000000"
+      - series: gobblin_publisher_files_after_flag_size_total{job="gobblin_alert_test", publisher_topic="gobblin_ater_test_topic"}
+        values: "200000"
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: GobblinProblematicPublishedFiles
+        eval_time: 1m
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              team: data-engineering
+              job: gobblin_alert_test
+              publisher_topic: gobblin_ater_test_topic
+            exp_annotations:
+              description: >
+                Gobblin job gobblin_alert_test published problematic files for topic gobblin_ater_test_topic.
+                Problematic files can be either published after flag, in future, or too far in the past.
+              summary: Gobblin job gobblin_alert_test published problematic files for topic gobblin_ater_test_topic.
+              dashboard: https://grafana.wikimedia.org/d/pAQaJwEnk/gobblin?orgId=1&var-gobblin_job_name=gobblin_alert_test&var-kafka_topic=gobblin_ater_test_topic&viewPanel=27
+              runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Gobblin
+
+  - interval: 1m
+    input_series:
+      # We report one file published after flag, and the total size of regular-files is bigger than 1Mb
+      # the files-after-flag size is small enough for the metric NOT to trigger
+      - series: gobblin_publisher_files_after_flag_count{job="gobblin_alert_test", publisher_topic="gobblin_ater_test_topic"}
+        values: "1"
+      - series: gobblin_publisher_regular_files_size_total{job="gobblin_alert_test", publisher_topic="gobblin_ater_test_topic"}
+        values: "2000000"
+      - series: gobblin_publisher_files_after_flag_size_total{job="gobblin_alert_test", publisher_topic="gobblin_ater_test_topic"}
+        values: "200"
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: GobblinProblematicPublishedFiles
+        eval_time: 1m
+        exp_alerts: []

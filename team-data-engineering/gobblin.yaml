@@ -15,7 +15,7 @@ groups:
     annotations:
       description: Last successful gobblin run of job {{ $labels.job }} was more than 2 hours ago.
       summary: Last successful gobblin run of job {{ $labels.job }} was more than 2 hours ago.
-      dashboard: https://grafana.wikimedia.org/d/pAQaJwEnk/gobblin?orgId=1&var-gobblin_job_name={{ $labels.job }}
+      dashboard: https://grafana.wikimedia.org/d/pAQaJwEnk/gobblin?orgId=1&var-gobblin_job_name={{ $labels.job }}&viewPanel=21
       runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Gobblin
 
   - alert: GobblinKafkaRecordsExtractedNotEqualRecordsExpected
@@ -32,5 +32,38 @@ groups:
         {{ $labels.kafka_partition }} but did not ingest expected number of records.
         NOTE: This alert only fires for the first Kafka topic partition for which this is true.
       summary: Gobblin job {{ $labels.job }} ingested an unexpected number of records for a Kafka topic partition.
-      dashboard: https://grafana.wikimedia.org/d/pAQaJwEnk/gobblin?orgId=1&var-gobblin_job_name={{ $labels.job }}&var-kafka_topic={{ $labels.kafka_topic }}&viewPanel=4
+      dashboard: https://grafana.wikimedia.org/d/pAQaJwEnk/gobblin?orgId=1&var-gobblin_job_name={{ $labels.job }}&var-kafka_topic={{ $labels.kafka_topic }}&viewPanel=24
+      runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Gobblin
+
+  - alert: GobblinProblematicPublishedFiles
+    # Report if we find topics with
+    #  * files in future
+    #  * files too far in past
+    #  * files after flag if
+    #     * regular published files total size is less than 1Mb (report if we only write small files)
+    #     * regular published files total size is more than 1Mb and (after-flag-size / regular-size) > 0.0001
+    expr: |
+      gobblin_publisher_files_in_future_count > 0
+      or gobblin_publisher_files_before_time_boundary_count > 0
+      or (
+        gobblin_publisher_files_after_flag_count 
+        * (
+          (gobblin_publisher_regular_files_size_total < bool 1000000)
+          + (
+            ((gobblin_publisher_regular_files_size_total >= bool 1000000)
+            * (gobblin_publisher_files_after_flag_size_total / gobblin_publisher_regular_files_size_total)
+            ) > bool 0.0001
+          )
+        )
+      ) > 0
+    for: 1m
+    labels:
+      severity: critical
+      team: data-engineering
+    annotations:
+      description: >
+        Gobblin job {{ $labels.job }} published problematic files for topic {{ $labels.publisher_topic }}.
+        Problematic files can be either published after flag, in future, or too far in the past.
+      summary: Gobblin job {{ $labels.job }} published problematic files for topic {{ $labels.publisher_topic }}.
+      dashboard: https://grafana.wikimedia.org/d/pAQaJwEnk/gobblin?orgId=1&var-gobblin_job_name={{ $labels.job }}&var-kafka_topic={{ $labels.publisher_topic }}&viewPanel=27
       runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Gobblin
