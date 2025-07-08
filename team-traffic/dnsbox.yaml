@@ -1,0 +1,30 @@
+# deploy-tag: ops
+
+groups:
+  - name: traffic_dnsbox
+    rules:
+      - alert: DnsboxServiceMismatch
+        expr: |
+          dnsbox_service_state == 1
+          and on (service_name, instance)
+          (
+            label_replace(
+              anycast_healthchecker_service_check_ip_assignment,
+              "service_name", "$1", "service_name",
+              "hc-vip-(recdns|ntp-[abc])\\.anycast\\.wmnet"
+            )
+          or
+            label_replace(
+              anycast_healthchecker_service_check_ip_assignment,
+              "service_name", "authdns-$1", "service_name",
+              "hc-vip-(ns[0-2])\\.wikimedia\\.org"
+            )
+          ) == 0
+        labels:
+          team: traffic
+          severity: critical
+        annotations:
+          summary: 'Service {{ $labels.service_name }} state mismatch on {{ $labels.instance }}'
+          description: 'Service {{ $labels.service_name }} on {{ $labels.instance }} is marked pooled but the service VIP is not being advertised'
+          dashboard: 'https://grafana.wikimedia.org/d/96fb573c-0f3c-456a-886c-e50c29f3ed48/dns-box-service-state?var-site={{ $labels.site }}&var-instance={{ $labels.instance }}'
+          runbook: 'https://wikitech.wikimedia.org/wiki/DNS#DnsboxServiceMismatch'
