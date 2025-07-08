@@ -117,3 +117,111 @@ groups:
     - <<: *EventgateHTTPErrors
       # pint disable promql/series
       expr: rate(express_router_request_duration_seconds_count{service="eventgate-logging-external",status=~"5.."}[5m]) > 1
+
+## Eventgate Produce Rate Anomaly
+    - &EventgateProduceRateAnomaly
+      alert: EventgateProduceRateAnomaly
+      annotations:
+        description: Significant produce rate deviation (+-5%) detected on {{ $labels.service }} in {{ $externalLabels.site }}.
+        summary: Significant produce rate deviation (+-5%) on {{ $labels.service }} in {{ $externalLabels.site }}.
+        dashboard: https://grafana.wikimedia.org/d/ZB39Izmnz/eventgate?orgId=1&refresh=1m&var-dc={{ $externalLabels.site }}%2Bprometheus/k8s&var-service={{ $labels.service }}
+        runbook: https://wikitech.wikimedia.org/wiki/Event_Platform/EventGate
+      # Calculate the 1h average rate as baseline, then compare current 5m rate to it
+      # Alert if current rate deviates by more than 5% from the 1h average
+      # Absolute value of (current rate - 1h average) / 1h average > 0.05
+      expr: |
+        (
+          (
+            abs(
+              (sum(rate(eventgate_events_produced_total{service="eventgate-main"}[5m])) by (service)
+              - avg_over_time(sum(rate(eventgate_events_produced_total{service="eventgate-main"}[5m])) by (service)[1h:5m])
+              )
+              /
+              avg_over_time(sum(rate(eventgate_events_produced_total{service="eventgate-main"}[5m])) by (service)[1h:5m])
+            )
+            > 0.05
+          )
+          and
+          # Only alert if we have enough historical data (at least 1h)
+          avg_over_time(sum(rate(eventgate_events_produced_total{service="eventgate-main"}[5m])) by (service)[1h:5m]) > 0
+        )
+      for: 5m
+      labels:
+        severity: warning
+        team: data-engineering
+    - <<: *EventgateProduceRateAnomaly
+      # eventgate-analytics
+      expr: |
+        (
+          (
+            abs(
+              (sum(rate(eventgate_events_produced_total{service="eventgate-analytics"}[5m])) by (service)
+              - avg_over_time(sum(rate(eventgate_events_produced_total{service="eventgate-analytics"}[5m])) by (service)[1h:5m])
+              )
+              /
+              avg_over_time(sum(rate(eventgate_events_produced_total{service="eventgate-analytics"}[5m])) by (service)[1h:5m])
+            )
+            > 0.05
+          )
+          and
+          # Only alert if we have enough historical data (at least 1h)
+          avg_over_time(sum(rate(eventgate_events_produced_total{service="eventgate-analytics"}[5m])) by (service)[1h:5m]) > 0
+        )
+    - <<: *EventgateProduceRateAnomaly
+      # eventgate-analytics-external
+      expr: |
+        (
+          (
+            abs(
+              (sum(rate(eventgate_events_produced_total{service="eventgate-analytics-external"}[5m])) by (service)
+              - avg_over_time(sum(rate(eventgate_events_produced_total{service="eventgate-analytics-external"}[5m])) by (service)[1h:5m])
+              )
+              /
+              avg_over_time(sum(rate(eventgate_events_produced_total{service="eventgate-analytics-external"}[5m])) by (service)[1h:5m])
+            )
+            > 0.05
+          )
+          and
+          # Only alert if we have enough historical data (at least 1h)
+          avg_over_time(sum(rate(eventgate_events_produced_total{service="eventgate-analytics-external"}[5m])) by (service)[1h:5m]) > 0
+        )
+    - <<: *EventgateProduceRateAnomaly
+      # eventgate-logging-external
+      expr: |
+        (
+          (
+            abs(
+              (sum(rate(eventgate_events_produced_total{service="eventgate-logging-external"}[5m])) by (service)
+              - avg_over_time(sum(rate(eventgate_events_produced_total{service="eventgate-logging-external"}[5m])) by (service)[1h:5m])
+              )
+              /
+              avg_over_time(sum(rate(eventgate_events_produced_total{service="eventgate-logging-external"}[5m])) by (service)[1h:5m])
+            )
+            > 0.05
+          )
+          and
+          # Only alert if we have enough historical data (at least 1h)
+          avg_over_time(sum(rate(eventgate_events_produced_total{service="eventgate-logging-external"}[5m])) by (service)[1h:5m]) > 0
+        )
+## Eventgate produce rate stops
+    - &EventgateProduceRateStop
+      alert: EventgateProduceRateStop
+      annotations:
+        description: No produce rate detected on {{ $labels.service }} in {{ $externalLabels.site }}.
+        summary: No produce rate detected on {{ $labels.service }} in {{ $externalLabels.site }}.
+        dashboard: https://grafana.wikimedia.org/d/ZB39Izmnz/eventgate?orgId=1&refresh=1m&var-dc={{ $externalLabels.site }}%2Bprometheus/k8s&var-service={{ $labels.service }}
+        runbook: https://wikitech.wikimedia.org/wiki/Event_Platform/EventGate
+      expr: sum(rate(eventgate_events_produced_total{service="eventgate-main"}[5m])) by (service) == 0
+      for: 5m
+      labels:
+        severity: critical
+        team: data-engineering
+    - <<: *EventgateProduceRateStop
+      # eventgate-analytics
+      expr: sum(rate(eventgate_events_produced_total{service="eventgate-analytics"}[5m])) by (service) == 0
+    - <<: *EventgateProduceRateStop
+      # eventgate-analytics-external
+      expr: sum(rate(eventgate_events_produced_total{service="eventgate-analytics-external"}[5m])) by (service) == 0
+    - <<: *EventgateProduceRateStop
+      # eventgate-logging-external
+      expr: sum(rate(eventgate_events_produced_total{service="eventgate-eventlogging-external"}[5m])) by (service) == 0
