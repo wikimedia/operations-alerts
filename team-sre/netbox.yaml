@@ -10,7 +10,7 @@ groups:
           summary: 'Netbox - Accounting job failed'
           dashboard: 'https://netbox.wikimedia.org/core/jobs/'
           runbook: 'https://wikitech.wikimedia.org/wiki/Netbox#Report_Alert'
-        expr: sum(rate(netbox_reports_total{name="Accounting", status=~"(failed|errored)"}[1h]))
+        expr: sum(rate(netbox_reports_total{name="Accounting", status=~"(failed|errored)"}[1h])) > 0
         labels:
           severity: warning
           team: infrastructure-foundations
@@ -22,4 +22,4 @@ groups:
           summary: 'Netbox - Report parity errors between PuppetDB and Netbox for physical devices.'
           dashboard: 'https://netbox.wikimedia.org/core/jobs/'
           runbook: 'https://wikitech.wikimedia.org/wiki/Netbox#Report_Alert'
-        expr: sum(rate(netbox_reports_total{name="PhysicalHosts", status=~"(failed|errored)"}[1h]))
+        expr: sum(rate(netbox_reports_total{name="PhysicalHosts", status=~"(failed|errored)"}[1h])) > 0

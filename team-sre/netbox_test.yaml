@@ -5,13 +5,9 @@ tests:
   - interval: 1m
     input_series:
       - series: 'netbox_reports_total{instance="netbox1003:443", name="Accounting", status="failed"}'
-        values: '100x300 101+1x300'
-      - series: 'netbox_reports_total{instance="netbox1003:443", name="Accounting", status="completed"}'
-        values: '0+1x600'
+        values: '100x60 101+1x300'
       - series: 'netbox_reports_total{instance="netbox1003:443", name="PhysicalHosts", status="errored"}'
-        values: '100x200 101x200 102x200'
-      - series: 'netbox_reports_total{instance="netbox1003:443", name="PhysicalHosts", status="completed"}'
-        values: '100x200 101x200 102x200'
+        values: '100x60 101+1x300'
     external_labels:
       site: eqiad
     alert_rule_test:
