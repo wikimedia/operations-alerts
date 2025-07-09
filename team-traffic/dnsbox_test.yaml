@@ -9,8 +9,8 @@ tests:
       # Trigger an alert.
       - series: 'dnsbox_service_state{instance="dns1004:9100", service_name="ntp-a", site="eqiad"}'
         values: '1x5'
-      - series: 'anycast_healthchecker_service_check_ip_assignment{instance="dns1004:9100", ip_prefix="10.3.0.5/32", site="eqiad", service_name="hc-vip-ntp-a.anycast.wmnet"}'
-        values: '1 0 1 1 1 1'
+      - series: 'anycast_healthchecker_service_state{instance="dns1004:9100", ip_prefix="10.3.0.5/32", site="eqiad", service_name="hc-vip-ntp-a.anycast.wmnet"}'
+        values: '0 1 0 0 0 0'
     alert_rule_test:
       - alertname: DnsboxServiceMismatch
         eval_time: 1m
@@ -32,8 +32,8 @@ tests:
     input_series:
       - series: 'dnsbox_service_state{instance="dns2004:9100", service_name="authdns-ns1", site="codfw"}'
         values: '1x5'
-      - series: 'anycast_healthchecker_service_check_ip_assignment{instance="dns2004:9100", ip_prefix="208.80.153.231/32", site="codfw", service_name="hc-vip-ns1.wikimedia.org"}'
-        values: '1 1 1 0 1 1'
+      - series: 'anycast_healthchecker_service_state{instance="dns2004:9100", ip_prefix="208.80.153.231/32", site="codfw", service_name="hc-vip-ns1.wikimedia.org"}'
+        values: '0 0 0 1 0 0'
     alert_rule_test:
       - alertname: DnsboxServiceMismatch
         eval_time: 3m

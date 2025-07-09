@@ -9,17 +9,17 @@ groups:
           and on (service_name, instance)
           (
             label_replace(
-              anycast_healthchecker_service_check_ip_assignment,
+              anycast_healthchecker_service_state,
               "service_name", "$1", "service_name",
               "hc-vip-(recdns|ntp-[abc])\\.anycast\\.wmnet"
             )
           or
             label_replace(
-              anycast_healthchecker_service_check_ip_assignment,
+              anycast_healthchecker_service_state,
               "service_name", "authdns-$1", "service_name",
               "hc-vip-(ns[0-2])\\.wikimedia\\.org"
             )
-          ) == 0
+          ) != 0
         labels:
           team: traffic
           severity: critical
