@@ -1,0 +1,312 @@
+rule_files:
+  - eventbus.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    input_series:
+      # First 10 minutes: Normal operation
+      - series: 'mediawiki_EventBus_events_accepted_total{event_service_name="eventage-main", event_type="TYPE_EVENT"}'
+        values: '100+100x10'
+      - series: 'mediawiki_EventBus_events_outgoing_total{event_service_name="eventage-main", event_type="TYPE_EVENT"}'
+        values: '100+100x10'
+      # Next 10 minutes: Issue starts (ratio drops below 95%)
+      - series: 'mediawiki_EventBus_events_accepted_total{event_service_name="eventage-main", event_type="TYPE_EVENT"}'
+        values: '0+0x10 100+100x10'
+      - series: 'mediawiki_EventBus_events_outgoing_total{event_service_name="eventage-main", event_type="TYPE_EVENT"}'
+        values: '0+0x10 90+10x10'
+    external_labels:
+      site: test
+    alert_rule_test:
+      # Test that alert triggers when ratio drops below 95%
+      - alertname: EventBusOutgoingAcceptedRateStop
+        eval_time: 20m  # After 10 minutes of low ratio
+        exp_alerts:
+          - exp_labels:
+              event_type: TYPE_EVENT
+              severity: warning
+              team: data-engineering
+              event_service_name: eventage-main
+            exp_annotations:
+              description: 'outgoing / accepted messages rate droppend on eventage-main in test.'
+              summary: 'outgoing / accepted messages rate droppend on eventage-main in test.'
+              dashboard: https://grafana.wikimedia.org/d/f1731e1b-c463-4869-9c38-19b8070c5b03/eventbus?orgId=1&from=now-6h&to=now&timezone=utc&var-dc=000000017&var-service=eventage-main&var-event_type=TYPE_EVENT
+              runbook: https://www.mediawiki.org/wiki/Extension:EventBus
+      # Test that alert doesn't trigger during normal operation
+      - alertname: EventBusOutgoingAcceptedRateStop
+        eval_time: 5m
+        exp_alerts: []
+
+  # Test for eventage-analytics service
+  - interval: 1m
+    input_series:
+      # First 10 minutes: Normal operation (above 95% threshold)
+      - series: 'mediawiki_EventBus_events_accepted_total{event_service_name="eventage-analytics", event_type="TYPE_EVENT"}'
+        values: '100+100x10'
+      - series: 'mediawiki_EventBus_events_outgoing_total{event_service_name="eventage-analytics", event_type="TYPE_EVENT"}'
+        values: '100+100x10'
+      # Next 10 minutes: Issue starts (drops below 95% threshold)
+      - series: 'mediawiki_EventBus_events_accepted_total{event_service_name="eventage-analytics", event_type="TYPE_EVENT"}'
+        values: '0+0x10 100+100x10'
+      - series: 'mediawiki_EventBus_events_outgoing_total{event_service_name="eventage-analytics", event_type="TYPE_EVENT"}'
+        values: '0+0x10 90+10x10'
+    external_labels:
+      site: test
+    alert_rule_test:
+      - alertname: EventBusOutgoingAcceptedRateStop
+        eval_time: 20m
+        exp_alerts:
+          - exp_labels:
+              event_type: TYPE_EVENT
+              severity: warning
+              team: data-engineering
+              event_service_name: eventage-analytics
+            exp_annotations:
+              description: 'outgoing / accepted messages rate droppend on eventage-analytics in test.'
+              summary: 'outgoing / accepted messages rate droppend on eventage-analytics in test.'
+              dashboard: https://grafana.wikimedia.org/d/f1731e1b-c463-4869-9c38-19b8070c5b03/eventbus?orgId=1&from=now-6h&to=now&timezone=utc&var-dc=000000017&var-service=eventage-analytics&var-event_type=TYPE_EVENT
+              runbook: https://www.mediawiki.org/wiki/Extension:EventBus
+
+## Test for EventBusOutgoingRateDrop - eventage-main
+  - interval: 1m
+    input_series:
+      - series: 'mediawiki_EventBus_events_outgoing_total{event_service_name="eventage-main", event_type="TYPE_EVENT"}'
+        values: '1000+1000x60 60000+0x20'  # Normal growth for 60min, then flat for 20min
+    external_labels:
+      site: test
+    alert_rule_test:
+      # Test that alert triggers when rate drops to 0
+      - alertname: EventBusOutgoingRateDrop
+        eval_time: 75m
+        exp_alerts:
+          - exp_labels:
+              event_type: TYPE_EVENT
+              severity: critical
+              team: data-engineering
+              event_service_name: eventage-main
+            exp_annotations:
+              description: 'Outgoing messages rate dropped significantly (below 50% of 1h average) on eventage-main in test.'
+              summary: 'Significant drop in outgoing message rate detected on eventage-main'
+              dashboard: https://grafana.wikimedia.org/d/f1731e1b-c463-4869-9c38-19b8070c5b03/eventbus?orgId=1&from=now-6h&to=now&timezone=utc&var-dc=000000017&var-service=eventage-main&var-event_type=TYPE_EVENT
+              runbook: https://www.mediawiki.org/wiki/Extension:EventBus
+      # Test that alert doesn't trigger during normal operation
+      - alertname: EventBusOutgoingRateDrop
+        eval_time: 30m
+        exp_alerts: []
+## Test for EventBusStreamRateDrop - mediawiki.page_change.v1
+  - interval: 1m
+    input_series:
+      - series: 'mediawiki_EventBus_events_outgoing_total{event_service_name="eventage-main", event_type="TYPE_EVENT", stream_name="mediawiki.page_change.v1"}'
+        values: '1000+1000x60 61000+100x20'
+    external_labels:
+      site: test
+    alert_rule_test:
+      # Test that alert triggers when rate drops
+      - alertname: EventBusStreamRateDrop
+        eval_time: 1h5m
+        exp_alerts:
+          - exp_labels:
+              event_type: TYPE_EVENT
+              severity: critical
+              team: data-engineering
+              event_service_name: eventage-main
+              stream_name: mediawiki.page_change.v1
+            exp_annotations:
+              description: 'Stream mediawiki.page_change.v1 rate dropped significantly (below 50% of 1h average) on eventage-main in test.'
+              summary: 'Significant drop in stream rate detected for mediawiki.page_change.v1 on eventage-main'
+              dashboard: https://grafana.wikimedia.org/d/f1731e1b-c463-4869-9c38-19b8070c5b03/eventbus?orgId=1&from=now-6h&to=now&timezone=utc&var-dc=000000017&var-service=eventage-main&var-event_type=TYPE_EVENT&var-stream=mediawiki.page_change.v1
+              runbook: https://www.mediawiki.org/wiki/Extension:EventBus
+      
+      # Test that alert doesn't trigger during normal operation
+      - alertname: EventBusStreamRateDrop
+        eval_time: 30m
+        exp_alerts: []
+
+## Test for EventBusStreamRateDrop - mediawiki.page_change.v1 (traffic stops completely)
+  - interval: 1m
+    input_series:
+      - series: 'mediawiki_EventBus_events_outgoing_total{event_service_name="eventage-main", event_type="TYPE_EVENT", stream_name="mediawiki.page_change.v1"}'
+        values: '1000+1000x60 61000+0x20'  # Normal growth for 60min, then complete stop for 20min
+    external_labels:
+      site: test
+    alert_rule_test:
+      # Test that alert triggers when stream traffic stops completely
+      - alertname: EventBusStreamRateDrop
+        eval_time: 1h10m
+        exp_alerts:
+          - exp_labels:
+              event_type: TYPE_EVENT
+              severity: critical
+              team: data-engineering
+              event_service_name: eventage-main
+              stream_name: mediawiki.page_change.v1
+            exp_annotations:
+              description: 'Stream mediawiki.page_change.v1 rate dropped significantly (below 50% of 1h average) on eventage-main in test.'
+              summary: 'Significant drop in stream rate detected for mediawiki.page_change.v1 on eventage-main'
+              dashboard: https://grafana.wikimedia.org/d/f1731e1b-c463-4869-9c38-19b8070c5b03/eventbus?orgId=1&from=now-6h&to=now&timezone=utc&var-dc=000000017&var-service=eventage-main&var-event_type=TYPE_EVENT&var-stream=mediawiki.page_change.v1
+              runbook: https://www.mediawiki.org/wiki/Extension:EventBus
+## Test for EventBusStreamRateDrop - mediawiki.page-undelete
+  - interval: 1m
+    input_series:
+      - series: 'mediawiki_EventBus_events_outgoing_total{event_service_name="eventage-main", event_type="TYPE_EVENT", stream_name="mediawiki.page-undelete"}'
+        values: '100+100x60 6100+10x20'
+    external_labels:
+      site: test
+    alert_rule_test:
+      # Test that alert triggers when rate drops
+      - alertname: EventBusStreamRateDrop
+        eval_time: 1h5m
+        exp_alerts:
+          - exp_labels:
+              event_type: TYPE_EVENT
+              severity: critical
+              team: data-engineering
+              event_service_name: eventage-main
+              stream_name: mediawiki.page-undelete
+            exp_annotations:
+              description: 'Stream mediawiki.page-undelete rate dropped significantly (below 50% of 1h average) on eventage-main in test.'
+              summary: 'Significant drop in stream rate detected for mediawiki.page-undelete on eventage-main'
+              dashboard: https://grafana.wikimedia.org/d/f1731e1b-c463-4869-9c38-19b8070c5b03/eventbus?orgId=1&from=now-6h&to=now&timezone=utc&var-dc=000000017&var-service=eventage-main&var-event_type=TYPE_EVENT&var-stream=mediawiki.page-undelete
+              runbook: https://www.mediawiki.org/wiki/Extension:EventBus
+      
+      # Test that alert doesn't trigger during normal operation
+      - alertname: EventBusStreamRateDrop
+        eval_time: 30m
+        exp_alerts: []
+      - alertname: EventBusStreamRateDrop
+        eval_time: 1h5m
+        exp_alerts:
+          - exp_labels:
+              event_type: TYPE_EVENT
+              severity: critical
+              team: data-engineering
+              event_service_name: eventage-main
+              stream_name: mediawiki.page-undelete
+            exp_annotations:
+              description: 'Stream mediawiki.page-undelete rate dropped significantly (below 50% of 1h average) on eventage-main in test.'
+              summary: 'Significant drop in stream rate detected for mediawiki.page-undelete on eventage-main'
+              dashboard: https://grafana.wikimedia.org/d/f1731e1b-c463-4869-9c38-19b8070c5b03/eventbus?orgId=1&from=now-6h&to=now&timezone=utc&var-dc=000000017&var-service=eventage-main&var-event_type=TYPE_EVENT&var-stream=mediawiki.page-undelete
+              runbook: https://www.mediawiki.org/wiki/Extension:EventBus
+## Test for EventBusStreamRateDrop - mediawiki.page-undelete (traffic stops completely)
+  - interval: 1m
+    input_series:
+      - series: 'mediawiki_EventBus_events_outgoing_total{event_service_name="eventage-main", event_type="TYPE_EVENT", stream_name="mediawiki.page-undelete"}'
+        values: '100+100x60 6100+0x20'
+    external_labels:
+      site: test
+    alert_rule_test:
+      # Test that alert triggers when stream traffic stops completely
+      - alertname: EventBusStreamRateDrop
+        eval_time: 1h5m
+        exp_alerts:
+          - exp_labels:
+              event_type: TYPE_EVENT
+              severity: critical
+              team: data-engineering
+              event_service_name: eventage-main
+              stream_name: mediawiki.page-undelete
+            exp_annotations:
+              description: 'Stream mediawiki.page-undelete rate dropped significantly (below 50% of 1h average) on eventage-main in test.'
+              summary: 'Significant drop in stream rate detected for mediawiki.page-undelete on eventage-main'
+              dashboard: https://grafana.wikimedia.org/d/f1731e1b-c463-4869-9c38-19b8070c5b03/eventbus?orgId=1&from=now-6h&to=now&timezone=utc&var-dc=000000017&var-service=eventage-main&var-event_type=TYPE_EVENT&var-stream=mediawiki.page-undelete
+              runbook: https://www.mediawiki.org/wiki/Extension:EventBus
+      # Test that alert doesn't trigger during normal operation
+      - alertname: EventBusStreamRateDrop
+        eval_time: 30m
+        exp_alerts: []
+## EventBus HTTP errors tests
+  - interval: 1m
+    input_series:
+      - series: mediawiki_EventBus_http_requests_total{event_service_name="eventage-main", status_code="503", event_type="TYPE_EVENT"}
+        values: '0+120x60'
+      - series: mediawiki_EventBus_http_requests_total{event_service_name="eventage-analytics", status_code="503", event_type="TYPE_EVENT"}
+        values: '0+120x60'
+      - series: mediawiki_EventBus_http_requests_total{event_service_name="eventage-analytics-external", status_code="503", event_type="TYPE_EVENT"}
+        values: '0+120x60'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: EventBusHTTPServerErrors
+        eval_time: 15m
+        exp_alerts:
+          - exp_labels:
+              event_type: TYPE_EVENT
+              severity: warning
+              team: data-engineering
+              event_service_name: eventage-main
+              status_code: "503"
+            exp_annotations:
+              description: 'High rate of HTTP 503 errors on eventage-main in eqiad'
+              summary: 'High rate of HTTP 503 errors detected on eventage-main'
+              dashboard: https://grafana.wikimedia.org/d/f1731e1b-c463-4869-9c38-19b8070c5b03/eventbus?orgId=1&from=now-6h&to=now&timezone=utc&var-dc=000000017&var-service=eventage-main&var-event_type=TYPE_EVENT
+              runbook:  https://www.mediawiki.org/wiki/Extension:EventBus
+          - exp_labels:
+              event_type: TYPE_EVENT
+              severity: warning
+              team: data-engineering
+              event_service_name: eventage-analytics
+              status_code: "503"
+            exp_annotations:
+              description: 'High rate of HTTP 503 errors on eventage-analytics in eqiad'
+              summary: 'High rate of HTTP 503 errors detected on eventage-analytics'
+              dashboard: https://grafana.wikimedia.org/d/f1731e1b-c463-4869-9c38-19b8070c5b03/eventbus?orgId=1&from=now-6h&to=now&timezone=utc&var-dc=000000017&var-service=eventage-analytics&var-event_type=TYPE_EVENT
+              runbook: https://www.mediawiki.org/wiki/Extension:EventBus
+          - exp_labels:
+              event_type: TYPE_EVENT
+              severity: warning
+              team: data-engineering
+              event_service_name: eventage-analytics-external
+              status_code: "503"
+            exp_annotations:
+              description: 'High rate of HTTP 503 errors on eventage-analytics-external in eqiad'
+              summary: 'High rate of HTTP 503 errors detected on eventage-analytics-external'
+              dashboard: https://grafana.wikimedia.org/d/f1731e1b-c463-4869-9c38-19b8070c5b03/eventbus?orgId=1&from=now-6h&to=now&timezone=utc&var-dc=000000017&var-service=eventage-analytics-external&var-event_type=TYPE_EVENT
+              runbook: https://www.mediawiki.org/wiki/Extension:EventBus
+## Test for EventBus 4xx client errors
+  - interval: 1m
+    input_series:
+      # We need >50 4xx errors per 5min to trigger alert
+      - series: mediawiki_EventBus_http_requests_total{event_service_name="eventage-main", status_code="400", event_type="TYPE_EVENT"}
+        values: '0+18000x60'
+      - series: mediawiki_EventBus_http_requests_total{event_service_name="eventage-analytics", status_code="400", event_type="TYPE_EVENT"}
+        values: '0+18000x60'
+      - series: mediawiki_EventBus_http_requests_total{event_service_name="eventage-analytics-external", status_code="400", event_type="TYPE_EVENT"}
+        values: '0+18000x60'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: EventBusHTTPClientErrors
+        eval_time: 15m
+        exp_alerts:
+          - exp_labels:
+              event_type: TYPE_EVENT
+              severity: warning
+              team: data-engineering
+              event_service_name: eventage-main
+              status_code: "400"
+            exp_annotations:
+              description: 'High rate of HTTP 400 client errors on eventage-main in eqiad'
+              summary: 'High rate of HTTP 400 client errors detected on eventage-main'
+              dashboard: https://grafana.wikimedia.org/d/f1731e1b-c463-4869-9c38-19b8070c5b03/eventbus?orgId=1&from=now-6h&to=now&timezone=utc&var-dc=000000017&var-service=eventage-main&var-event_type=TYPE_EVENT
+              runbook: https://www.mediawiki.org/wiki/Extension:EventBus
+          - exp_labels:
+              event_type: TYPE_EVENT
+              severity: warning
+              team: data-engineering
+              event_service_name: eventage-analytics
+              status_code: "400"
+            exp_annotations:
+              description: 'High rate of HTTP 400 client errors on eventage-analytics in eqiad'
+              summary: 'High rate of HTTP 400 client errors detected on eventage-analytics'
+              dashboard: https://grafana.wikimedia.org/d/f1731e1b-c463-4869-9c38-19b8070c5b03/eventbus?orgId=1&from=now-6h&to=now&timezone=utc&var-dc=000000017&var-service=eventage-analytics&var-event_type=TYPE_EVENT
+              runbook: https://www.mediawiki.org/wiki/Extension:EventBus
+          - exp_labels:
+              event_type: TYPE_EVENT
+              severity: warning
+              team: data-engineering
+              event_service_name: eventage-analytics-external
+              status_code: "400"
+            exp_annotations:
+              description: 'High rate of HTTP 400 client errors on eventage-analytics-external in eqiad'
+              summary: 'High rate of HTTP 400 client errors detected on eventage-analytics-external'
+              dashboard: https://grafana.wikimedia.org/d/f1731e1b-c463-4869-9c38-19b8070c5b03/eventbus?orgId=1&from=now-6h&to=now&timezone=utc&var-dc=000000017&var-service=eventage-analytics-external&var-event_type=TYPE_EVENT
+              runbook: https://www.mediawiki.org/wiki/Extension:EventBus

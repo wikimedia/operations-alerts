@@ -1,0 +1,202 @@
+# We do not want to alert on this in staging at the moment
+# deploy-tag: k8s
+groups:
+  - name: eventbus
+    rules:
+
+## EventBus outgoing rate drops
+    - &EventBusOutgoingRateDrop
+      alert: EventBusOutgoingRateDrop
+      annotations:
+        description: Outgoing messages rate dropped significantly (below 50% of 1h average) on {{ $labels.event_service_name }} in {{ $externalLabels.site }}.
+        summary: Significant drop in outgoing message rate detected on {{ $labels.event_service_name }}
+        dashboard: https://grafana.wikimedia.org/d/f1731e1b-c463-4869-9c38-19b8070c5b03/eventbus?orgId=1&from=now-6h&to=now&timezone=utc&var-dc=000000017&var-service={{ $labels.event_service_name }}&var-event_type=TYPE_EVENT
+        runbook: https://www.mediawiki.org/wiki/Extension:EventBus
+      expr: |
+        (
+          # Current 5m rate is less than 50% of 1h average
+          rate(mediawiki_EventBus_events_outgoing_total{event_service_name="eventage-main", event_type="TYPE_EVENT"}[5m])
+          <
+          (0.5 * avg_over_time(rate(mediawiki_EventBus_events_outgoing_total{event_service_name="eventage-main", event_type="TYPE_EVENT"}[5m])[1h:]))
+          and
+          (avg_over_time(rate(mediawiki_EventBus_events_outgoing_total{event_service_name="eventage-main", event_type="TYPE_EVENT"}[5m])[1h:]) > 0)
+        )
+      for: 5m
+      labels:
+        severity: critical
+        team: data-engineering
+        event_type: TYPE_EVENT
+
+    # eventage-analytics
+    - <<: *EventBusOutgoingRateDrop
+      expr: |
+        (
+          rate(mediawiki_EventBus_events_outgoing_total{event_service_name="eventage-analytics"}[5m])
+          <
+          (0.5 * avg_over_time(rate(mediawiki_EventBus_events_outgoing_total{event_service_name="eventage-analytics"}[5m])[1h:]))
+        )
+        and
+        (avg_over_time(rate(mediawiki_EventBus_events_outgoing_total{event_service_name="eventage-analytics"}[5m])[1h:]) > 0)
+
+    # eventage-analytics-external
+    - <<: *EventBusOutgoingRateDrop
+      expr: |
+        (
+          rate(mediawiki_EventBus_events_outgoing_total{event_service_name="eventage-analytics-external", event_type="TYPE_EVENT"}[5m])
+          <
+          (0.5 * avg_over_time(rate(mediawiki_EventBus_events_outgoing_total{event_service_name="eventage-analytics-external", event_type="TYPE_EVENT"}[5m])[1h:]))
+        )
+        and
+        (avg_over_time(rate(mediawiki_EventBus_events_outgoing_total{event_service_name="eventage-analytics-external", event_type="TYPE_EVENT"}[5m])[1h:]) > 0)
+
+## EventBus Stream-Specific Rate Drop Alerts (eventage-main only)
+    - &EventBusStreamRateDrop
+      alert: EventBusStreamRateDrop
+      annotations:
+        description: 'Stream {{ $labels.stream_name }} rate dropped significantly (below 50% of 1h average) on {{ $labels.event_service_name }} in {{ $externalLabels.site }}.'
+        summary: 'Significant drop in stream rate detected for {{ $labels.stream_name }} on {{ $labels.event_service_name }}'
+        dashboard: https://grafana.wikimedia.org/d/f1731e1b-c463-4869-9c38-19b8070c5b03/eventbus?orgId=1&from=now-6h&to=now&timezone=utc&var-dc=000000017&var-service={{ $labels.event_service_name }}&var-event_type=TYPE_EVENT&var-stream={{ $labels.stream_name }}
+        runbook: https://www.mediawiki.org/wiki/Extension:EventBus
+      expr: |
+        (
+          # Current 5m rate is less than 50% of 1h average for mediawiki.page_change.v1
+          sum by (event_service_name, stream_name) (rate(mediawiki_EventBus_events_outgoing_total{event_service_name="eventage-main", event_type="TYPE_EVENT", stream_name="mediawiki.page_change.v1"}[5m]))
+          <
+          (0.5 * sum by (event_service_name, stream_name) (avg_over_time(rate(mediawiki_EventBus_events_outgoing_total{event_service_name="eventage-main", event_type="TYPE_EVENT", stream_name="mediawiki.page_change.v1"}[5m])[1h:])))
+          and
+          (sum by (event_service_name, stream_name) (avg_over_time(rate(mediawiki_EventBus_events_outgoing_total{event_service_name="eventage-main", event_type="TYPE_EVENT", stream_name="mediawiki.page_change.v1"}[5m])[1h:])) > 0)
+        )
+      for: 1m
+      labels:
+        severity: critical
+        team: data-engineering
+        event_type: TYPE_EVENT
+        stream_name: mediawiki.page_change.v1
+
+    # mediawiki.page-undelete on eventage-main
+    - <<: *EventBusStreamRateDrop
+      expr: |
+        (
+          sum by (event_service_name, stream_name) (rate(mediawiki_EventBus_events_outgoing_total{event_service_name="eventage-main", event_type="TYPE_EVENT", stream_name="mediawiki.page-undelete"}[5m]))
+          <
+          (0.5 * sum by (event_service_name, stream_name) (avg_over_time(rate(mediawiki_EventBus_events_outgoing_total{event_service_name="eventage-main", event_type="TYPE_EVENT", stream_name="mediawiki.page-undelete"}[5m])[1h:])))
+          and
+          (sum by (event_service_name, stream_name) (avg_over_time(rate(mediawiki_EventBus_events_outgoing_total{event_service_name="eventage-main", event_type="TYPE_EVENT", stream_name="mediawiki.page-undelete"}[5m])[1h:])) > 0)
+        )
+      labels:
+        severity: critical
+        team: data-engineering
+        event_type: TYPE_EVENT
+        stream_name: mediawiki.page-undelete
+
+## EventBus outgoing / accepted messages rate stops
+    - &EventBusOutgoingAcceptedRateStop
+      alert: EventBusOutgoingAcceptedRateStop
+      annotations:
+        description: outgoing / accepted messages rate droppend on {{ $labels.event_service_name }} in {{ $externalLabels.site }}.
+        summary:  outgoing / accepted messages rate droppend on {{ $labels.event_service_name }} in {{ $externalLabels.site }}.
+        dashboard: https://grafana.wikimedia.org/d/f1731e1b-c463-4869-9c38-19b8070c5b03/eventbus?orgId=1&from=now-6h&to=now&timezone=utc&var-dc=000000017&var-service={{ $labels.event_service_name }}&var-event_type=TYPE_EVENT
+        runbook: https://www.mediawiki.org/wiki/Extension:EventBus
+      expr: |
+        (
+          sum (rate(mediawiki_EventBus_events_outgoing_total{event_service_name="eventage-main", event_type="TYPE_EVENT"}[5m])) by (event_service_name) / 
+          sum (rate(mediawiki_EventBus_events_accepted_total{event_service_name="eventage-main", event_type="TYPE_EVENT"}[5m])) by (event_service_name)
+        ) < 0.95
+      for: 5m
+      labels:
+        severity: warning
+        team: data-engineering
+        event_type: TYPE_EVENT
+    # eventage-analytics
+    - <<: *EventBusOutgoingAcceptedRateStop
+      expr: |
+        (
+          sum (rate(mediawiki_EventBus_events_outgoing_total{event_service_name="eventage-analytics", event_type="TYPE_EVENT"}[5m])) by (event_service_name) / 
+          sum (rate(mediawiki_EventBus_events_accepted_total{event_service_name="eventage-analytics", event_type="TYPE_EVENT"}[5m])) by (event_service_name)
+        ) < 0.95
+    # eventage-analytics-external
+    - <<: *EventBusOutgoingAcceptedRateStop
+      expr: |
+        (
+          sum (rate(mediawiki_EventBus_events_outgoing_total{event_service_name="eventage-analytics-external", event_type="TYPE_EVENT"}[5m])) by (event_service_name) / 
+          sum (rate(mediawiki_EventBus_events_accepted_total{event_service_name="eventage-analytics-external", event_type="TYPE_EVENT"}[5m])) by (event_service_name)
+        ) < 0.95
+
+## EventBus HTTP Server Errors
+    - &EventBusHTTPServerErrors
+      alert: EventBusHTTPServerErrors
+      annotations:
+        description: 'High rate of HTTP {{ $labels.status_code }} errors on {{ $labels.event_service_name }} in {{ $externalLabels.site }}'
+        summary: 'High rate of HTTP {{ $labels.status_code }} errors detected on {{ $labels.event_service_name }}'
+        dashboard: https://grafana.wikimedia.org/d/f1731e1b-c463-4869-9c38-19b8070c5b03/eventbus?orgId=1&from=now-6h&to=now&timezone=utc&var-dc=000000017&var-service={{ $labels.event_service_name }}&var-event_type=TYPE_EVENT
+        runbook: https://www.mediawiki.org/wiki/Extension:EventBus
+      expr: |
+        sum by (event_service_name, status_code) (
+          rate(mediawiki_EventBus_http_requests_total{event_service_name="eventage-main", status_code=~"5..", event_type="TYPE_EVENT"}[5m])
+        ) > 0
+      for: 5m
+      labels:
+        severity: warning
+        team: data-engineering
+        event_type: TYPE_EVENT
+
+    - <<: *EventBusHTTPServerErrors
+      expr: |
+        sum by (event_service_name, status_code) (
+          rate(mediawiki_EventBus_http_requests_total{event_service_name="eventage-analytics", status_code=~"5..", event_type="TYPE_EVENT"}[5m])
+        ) > 0
+      for: 5m
+      labels:
+        severity: warning
+        team: data-engineering
+        event_type: TYPE_EVENT
+
+    - <<: *EventBusHTTPServerErrors
+      expr: |
+        sum by (event_service_name, status_code) (
+          rate(mediawiki_EventBus_http_requests_total{event_service_name="eventage-analytics-external", status_code=~"5..", event_type="TYPE_EVENT"}[5m])
+        ) > 0
+      for: 5m
+      labels:
+        severity: warning
+        team: data-engineering
+        event_type: TYPE_EVENT
+## EventBus HTTP Client Errors
+    - &EventBusHTTPClientErrors
+      alert: EventBusHTTPClientErrors
+      annotations:
+        description: 'High rate of HTTP {{ $labels.status_code }} client errors on {{ $labels.event_service_name }} in {{ $externalLabels.site }}'
+        summary: 'High rate of HTTP {{ $labels.status_code }} client errors detected on {{ $labels.event_service_name }}'
+        dashboard: https://grafana.wikimedia.org/d/f1731e1b-c463-4869-9c38-19b8070c5b03/eventbus?orgId=1&from=now-6h&to=now&timezone=utc&var-dc=000000017&var-service={{ $labels.event_service_name }}&var-event_type=TYPE_EVENT
+        runbook: https://www.mediawiki.org/wiki/Extension:EventBus
+      expr: |
+        sum by (event_service_name, status_code) (
+          rate(mediawiki_EventBus_http_requests_total{event_service_name="eventage-main", status_code=~"4..", event_type="TYPE_EVENT"}[5m])
+        ) > 50
+      for: 5m
+      labels:
+        severity: warning
+        team: data-engineering
+        event_type: TYPE_EVENT
+
+    - <<: *EventBusHTTPClientErrors
+      expr: |
+        sum by (event_service_name, status_code) (
+          rate(mediawiki_EventBus_http_requests_total{event_service_name="eventage-analytics", status_code=~"4..", event_type="TYPE_EVENT"}[5m])
+        ) > 50
+      for: 5m
+      labels:
+        severity: warning
+        team: data-engineering
+        event_type: TYPE_EVENT
+
+    - <<: *EventBusHTTPClientErrors
+      expr: |
+        sum by (event_service_name, status_code) (
+          rate(mediawiki_EventBus_http_requests_total{event_service_name="eventage-analytics-external", status_code=~"4..", event_type="TYPE_EVENT"}[5m])
+        ) > 50
+      for: 5m
+      labels:
+        severity: warning
+        team: data-engineering
+        event_type: TYPE_EVENT
