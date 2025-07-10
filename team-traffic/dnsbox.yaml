@@ -20,6 +20,7 @@ groups:
               "hc-vip-(ns[0-2])\\.wikimedia\\.org"
             )
           ) != 0
+        for: 1m
         labels:
           team: traffic
           severity: critical

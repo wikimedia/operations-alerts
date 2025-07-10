@@ -1,19 +1,19 @@
 rule_files:
   - dnsbox.yaml
-evaluation_interval: 1m
+evaluation_interval: 2m
 tests:
-  - interval: 1m
+  - interval: 2m
     external_labels:
       site: eqiad
     input_series:
       # Trigger an alert.
       - series: 'dnsbox_service_state{instance="dns1004:9100", service_name="ntp-a", site="eqiad"}'
-        values: '1x5'
+        values: '1 1'
       - series: 'anycast_healthchecker_service_state{instance="dns1004:9100", ip_prefix="10.3.0.5/32", site="eqiad", service_name="hc-vip-ntp-a.anycast.wmnet"}'
-        values: '0 1 0 0 0 0'
+        values: '1 1'
     alert_rule_test:
       - alertname: DnsboxServiceMismatch
-        eval_time: 1m
+        eval_time: 2m
         exp_alerts:
           - exp_labels:
               severity: critical
@@ -26,17 +26,17 @@ tests:
               description: 'Service ntp-a on dns1004:9100 is marked pooled but the service VIP is not being advertised'
               dashboard: 'https://grafana.wikimedia.org/d/96fb573c-0f3c-456a-886c-e50c29f3ed48/dns-box-service-state?var-site=eqiad&var-instance=dns1004:9100'
               runbook: 'https://wikitech.wikimedia.org/wiki/DNS#DnsboxServiceMismatch'
-  - interval: 1m
+  - interval: 2m
     external_labels:
       site: codfw
     input_series:
       - series: 'dnsbox_service_state{instance="dns2004:9100", service_name="authdns-ns1", site="codfw"}'
-        values: '1x5'
+        values: '1 1'
       - series: 'anycast_healthchecker_service_state{instance="dns2004:9100", ip_prefix="208.80.153.231/32", site="codfw", service_name="hc-vip-ns1.wikimedia.org"}'
-        values: '0 0 0 1 0 0'
+        values: '1 1'
     alert_rule_test:
       - alertname: DnsboxServiceMismatch
-        eval_time: 3m
+        eval_time: 2m
         exp_alerts:
           - exp_labels:
               severity: critical
