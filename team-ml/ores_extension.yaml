@@ -1,5 +1,4 @@
-# deploy-tag: ops
-# deploy-site: eqiad, codfw
+# deploy-tag: global
 
 groups:
   - name: ores_extension
