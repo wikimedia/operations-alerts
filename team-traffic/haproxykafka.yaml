@@ -1,0 +1,50 @@
+# deploy-tag: ops
+
+groups:
+  - name: traffic_haproxykafka
+    rules:
+      - alert: HaproxyKafkaExporterDown
+        annotations:
+          summary: 'HaproxyKafka on {{  $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }} is down'
+          description: 'HaproxyKafka on {{  $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }} has been down for more than 5 minutes'
+          dashboard: 'https://grafana.wikimedia.org/d/d3e4e37c-c1d9-47af-9aad-a08dae2b3fd5/haproxykafka?orgId=1&var-instance={{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}'
+          runbook: 'https://wikitech.wikimedia.org/wiki/HAProxyKafka#HaproxyKafkaExporterDown'
+        expr: up{instance=~"cp[0-9]{4}:9341"} == 0
+        for: 5m
+        labels:
+          team: traffic
+          severity: warning
+      - alert: HaproxyKafkaExporterDown
+        annotations:
+          summary: 'HaproxyKafka on {{  $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }} is down'
+          description: 'HaproxyKafka on {{  $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }} has been down for more than 1 hour'
+          dashboard: 'https://grafana.wikimedia.org/d/d3e4e37c-c1d9-47af-9aad-a08dae2b3fd5/haproxykafka?orgId=1&var-instance={{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}'
+          runbook: "https://wikitech.wikimedia.org/wiki/HAProxyKafka#HaproxyKafkaExporterDown"
+        expr: up{instance=~"cp[0-9]{4}:9341"} == 0
+        for: 1h
+        labels:
+          team: traffic
+          severity: critical
+
+      - alert: HaproxyKafkaNoMessages
+        expr: 'sum by (hostname, cluster) (label_replace (rate(haproxykafka_valid_messages_total[5m]), "hostname", "$1", "instance", "(.*):.*")) / sum by (hostname, cluster) (label_replace (rate(haproxy_frontend_http_requests_total[5m]), "hostname", "$1", "instance", "(.*):.*")) < 0.2'
+        for: 5m
+        labels:
+          team: traffic
+          severity: warning
+        annotations:
+          summary: 'Unexpected rate of produced HaproxyKafka messages by {{ $labels.hostname }}'
+          description: 'Haproxy on {{ $labels.hostname }} is receiving requests, but HaproxyKafka is not sending enough messages ({{ $labels.cluster }})'
+          dashboard: 'https://grafana.wikimedia.org/d/d3e4e37c-c1d9-47af-9aad-a08dae2b3fd5/haproxykafka?orgId=1&var-instance={{ $labels.hostname }}'
+          runbook: 'https://wikitech.wikimedia.org/wiki/HAProxyKafka#HaproxyKafkaNoMessages'
+      - alert: HaproxyKafkaNoMessages
+        expr: 'sum by (hostname, cluster) (label_replace (rate(haproxykafka_valid_messages_total[5m]), "hostname", "$1", "instance", "(.*):.*")) / sum by (hostname, cluster) (label_replace (rate(haproxy_frontend_http_requests_total[5m]), "hostname", "$1", "instance", "(.*):.*")) < 0.1'
+        for: 5m
+        labels:
+          team: traffic
+          severity: critical
+        annotations:
+          summary: 'Unexpected rate of produced HaproxyKafka messages by {{ $labels.hostname }}'
+          description: 'Haproxy on {{ $labels.hostname }} is receiving requests, but HaproxyKafka is not sending enough messages ({{ $labels.cluster }})'
+          dashboard: 'https://grafana.wikimedia.org/d/d3e4e37c-c1d9-47af-9aad-a08dae2b3fd5/haproxykafka?orgId=1&var-instance={{ $labels.hostname }}'
+          runbook: 'https://wikitech.wikimedia.org/wiki/HAProxyKafka#HaproxyKafkaNoMessages'
