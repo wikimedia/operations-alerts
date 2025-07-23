@@ -5,7 +5,7 @@ groups:
   - name: neutron
     rules:
       - alert: NeutronAgentDown
-        expr: min_over_time(openstack_neutron_agent_state{adminState="up"}[20m]) == 0
+        expr: openstack_neutron_agent_state{adminState="up"} == 0
         for: 1m
         labels:
           team: wmcs
@@ -16,7 +16,7 @@ groups:
           runbook: https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Troubleshooting#Networking_failures
           dashboard: https://grafana.wikimedia.org/d/wKnDJf97z/wmcs-neutron-eqiad1
       - alert: NeutronAgentDownForLong
-        expr: min_over_time(openstack_neutron_agent_state{adminState="up"}[20m]) == 0
+        expr: openstack_neutron_agent_state{adminState="up"} == 0
         for: 2h
         labels:
           team: wmcs
