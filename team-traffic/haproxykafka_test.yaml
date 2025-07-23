@@ -3,6 +3,8 @@ rule_files:
 evaluation_interval: 1m
 tests:
   - interval: 1m
+    external_labels:
+      site: eqsin
     input_series:
       - series: 'up{instance="cp5017:9341"}'
         values: '1 1 1 1 0 0 0 0 0 0 0'  # Goes down at 4m, stays down
@@ -20,10 +22,12 @@ tests:
            exp_annotations:
              summary: 'HaproxyKafka on cp5017 is down'
              description: 'HaproxyKafka on cp5017 has been down for more than 5 minutes'
-             dashboard: 'https://grafana.wikimedia.org/d/d3e4e37c-c1d9-47af-9aad-a08dae2b3fd5/haproxykafka?orgId=1&var-instance=cp5017'
+             dashboard: 'https://grafana.wikimedia.org/d/d3e4e37c-c1d9-47af-9aad-a08dae2b3fd5/haproxykafka?orgId=1&var-site=eqsin&var-instance=cp5017'
              runbook: "https://wikitech.wikimedia.org/wiki/HAProxyKafka#HaproxyKafkaExporterDown"
 
   - interval: 1m
+    external_labels:
+      site: eqsin
     input_series:
       - series: 'up{instance="cp5017:9341"}'
         values: '1 1 1 0+0x70' # 70m
@@ -38,7 +42,7 @@ tests:
            exp_annotations:
              summary: 'HaproxyKafka on cp5017 is down'
              description: 'HaproxyKafka on cp5017 has been down for more than 1 hour'
-             dashboard: 'https://grafana.wikimedia.org/d/d3e4e37c-c1d9-47af-9aad-a08dae2b3fd5/haproxykafka?orgId=1&var-instance=cp5017'
+             dashboard: 'https://grafana.wikimedia.org/d/d3e4e37c-c1d9-47af-9aad-a08dae2b3fd5/haproxykafka?orgId=1&var-site=eqsin&var-instance=cp5017'
              runbook: "https://wikitech.wikimedia.org/wiki/HAProxyKafka#HaproxyKafkaExporterDown"
          - exp_labels:
              severity: warning
@@ -47,40 +51,43 @@ tests:
            exp_annotations:
              summary: 'HaproxyKafka on cp5017 is down'
              description: 'HaproxyKafka on cp5017 has been down for more than 5 minutes'
-             dashboard: 'https://grafana.wikimedia.org/d/d3e4e37c-c1d9-47af-9aad-a08dae2b3fd5/haproxykafka?orgId=1&var-instance=cp5017'
+             dashboard: 'https://grafana.wikimedia.org/d/d3e4e37c-c1d9-47af-9aad-a08dae2b3fd5/haproxykafka?orgId=1&var-site=eqsin&var-instance=cp5017'
              runbook: "https://wikitech.wikimedia.org/wiki/HAProxyKafka#HaproxyKafkaExporterDown"
 
   - interval: 1m
+    external_labels:
+      site: eqsin
     # test case 1, WARNING when ratio < 0.2 and >= 0.1
     input_series:
       # sum by (hostname, cluster) (label_replace (rate(haproxykafka_valid_messages_total[5m]), "hostname", "$1", "instance", "(.*):.*"))
       # /
       # sum by (hostname, cluster) (label_replace (rate(haproxy_frontend_http_requests_total[5m]), "hostname", "$1", "instance", "(.*):.*")) < 0.2
-      - series: 'haproxykafka_valid_messages_total{instance="cp5017:9341", cluster="eqsin"}'
+      - series: 'haproxykafka_valid_messages_total{instance="cp5017:9341", site="eqsin"}'
         values: '0+2x5'  # Rate of 10/5m = 2 per minute
-      - series: 'haproxy_frontend_http_requests_total{instance="cp5017:9341", cluster="eqsin"}'
+      - series: 'haproxy_frontend_http_requests_total{instance="cp5017:9341", site="eqsin"}'
         values: '0+20x5' # Rate of 100/5m = 20 per minute
     alert_rule_test:
       - alertname: HaproxyKafkaNoMessages
         eval_time: 6m
         exp_alerts:
          - exp_labels:
-             cluster: eqsin
              hostname: "cp5017"
              severity: warning
              team: traffic
            exp_annotations:
               summary: 'Unexpected rate of produced HaproxyKafka messages by cp5017'
-              description: 'Haproxy on cp5017 is receiving requests, but HaproxyKafka is not sending enough messages (eqsin)'
-              dashboard: 'https://grafana.wikimedia.org/d/d3e4e37c-c1d9-47af-9aad-a08dae2b3fd5/haproxykafka?orgId=1&var-instance=cp5017'
+              description: 'Haproxy on cp5017 is receiving requests, but HaproxyKafka is not sending enough messages'
+              dashboard: 'https://grafana.wikimedia.org/d/d3e4e37c-c1d9-47af-9aad-a08dae2b3fd5/haproxykafka?orgId=1&var-site=eqsin&var-instance=cp5017'
               runbook: 'https://wikitech.wikimedia.org/wiki/HAProxyKafka#HaproxyKafkaNoMessages'
 
   - interval: 1m
+    external_labels:
+      site: eqsin
     # Test case 2: CRITICAL when ratio < 0.1
     input_series:
-      - series: 'haproxykafka_valid_messages_total{instance="cp5017:9341", cluster="eqsin"}'
+      - series: 'haproxykafka_valid_messages_total{instance="cp5017:9341", site="eqsin"}'
         values: '0+1x10'   # Rate of 1/5m = 0.2 per minute
-      - series: 'haproxy_frontend_http_requests_total{instance="cp5017:9341", cluster="eqsin"}'
+      - series: 'haproxy_frontend_http_requests_total{instance="cp5017:9341", site="eqsin"}'
         values: '0+100x10' # Rate of 100/5m = 20 per minute
     alert_rule_test:
       # Test case 2: CRITICAL alert should fire when ratio is < 0.1
@@ -88,22 +95,20 @@ tests:
         alertname: HaproxyKafkaNoMessages
         exp_alerts:
           - exp_labels:
-              cluster: eqsin
               hostname: "cp5017"
               severity: warning
               team: traffic
             exp_annotations:
               summary: 'Unexpected rate of produced HaproxyKafka messages by cp5017'
-              description: 'Haproxy on cp5017 is receiving requests, but HaproxyKafka is not sending enough messages (eqsin)'
-              dashboard: 'https://grafana.wikimedia.org/d/d3e4e37c-c1d9-47af-9aad-a08dae2b3fd5/haproxykafka?orgId=1&var-instance=cp5017'
+              description: 'Haproxy on cp5017 is receiving requests, but HaproxyKafka is not sending enough messages'
+              dashboard: 'https://grafana.wikimedia.org/d/d3e4e37c-c1d9-47af-9aad-a08dae2b3fd5/haproxykafka?orgId=1&var-site=eqsin&var-instance=cp5017'
               runbook: 'https://wikitech.wikimedia.org/wiki/HAProxyKafka#HaproxyKafkaNoMessages'
           - exp_labels:
               severity: critical
               team: traffic
-              cluster: eqsin
               hostname: "cp5017"
             exp_annotations:
               summary: 'Unexpected rate of produced HaproxyKafka messages by cp5017'
-              description: 'Haproxy on cp5017 is receiving requests, but HaproxyKafka is not sending enough messages (eqsin)'
-              dashboard: 'https://grafana.wikimedia.org/d/d3e4e37c-c1d9-47af-9aad-a08dae2b3fd5/haproxykafka?orgId=1&var-instance=cp5017'
+              description: 'Haproxy on cp5017 is receiving requests, but HaproxyKafka is not sending enough messages'
+              dashboard: 'https://grafana.wikimedia.org/d/d3e4e37c-c1d9-47af-9aad-a08dae2b3fd5/haproxykafka?orgId=1&var-site=eqsin&var-instance=cp5017'
               runbook: 'https://wikitech.wikimedia.org/wiki/HAProxyKafka#HaproxyKafkaNoMessages'
