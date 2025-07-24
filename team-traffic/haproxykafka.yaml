@@ -56,3 +56,15 @@ groups:
           description: 'Haproxy on {{ $labels.hostname }} is receiving requests, but HaproxyKafka is not sending enough messages'
           dashboard: 'https://grafana.wikimedia.org/d/d3e4e37c-c1d9-47af-9aad-a08dae2b3fd5/haproxykafka?orgId=1&var-site={{ $externalLabels.site }}&var-instance={{ $labels.hostname }}'
           runbook: 'https://wikitech.wikimedia.org/wiki/HAProxyKafka#HaproxyKafkaNoMessages'
+
+      - alert: HaproxyKafkaRestarted
+        # In normal conditions, restart count is 0. Alert if it is >= 1.
+        expr: 'increase(node_systemd_service_restart_total{name="haproxykafka.service", cluster=~"cache_(text|upload)"}[5m]) > 0'
+        labels:
+          team: traffic
+          severity: critical
+        annotations:
+          summary: 'HaproxyKafka restarted on {{ $labels.instance }}'
+          description: "HaproxyKafka on {{ $labels.instance }} ({{ $externalLabels.site }}) has restarted unexpectedly."
+          dashboard: 'https://grafana.wikimedia.org/d/d3e4e37c-c1d9-47af-9aad-a08dae2b3fd5/haproxykafka?orgId=1&var-site={{ $externalLabels.site }}&var-instance={{ $labels.instance | stripPort }}'
+          runbook: 'https://wikitech.wikimedia.org/wiki/HAProxyKafka#HaproxyKafkaRestarted'

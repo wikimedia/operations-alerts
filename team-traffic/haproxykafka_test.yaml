@@ -149,3 +149,27 @@ tests:
               description: 'Haproxy on cp5017 is receiving requests, but HaproxyKafka is not sending enough messages'
               dashboard: 'https://grafana.wikimedia.org/d/d3e4e37c-c1d9-47af-9aad-a08dae2b3fd5/haproxykafka?orgId=1&var-site=eqsin&var-instance=cp5017'
               runbook: 'https://wikitech.wikimedia.org/wiki/HAProxyKafka#HaproxyKafkaNoMessages'
+
+  - interval: 1m
+    external_labels:
+      site: eqsin
+    input_series:
+      - series: 'node_systemd_service_restart_total{instance="cp5017:9100", cluster="cache_text", name="haproxykafka.service"}'
+        values: '0 1 2 3 4 5 6 7'
+      - series: 'node_systemd_service_restart_total{instance="cp5018:9100", cluster="cache_text", name="haproxykafka.service"}'
+        values: '0 1 0 0 0 0 0 0'
+    alert_rule_test:
+      - alertname: HaproxyKafkaRestarted
+        eval_time: 7m
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              team: traffic
+              instance: cp5017:9100
+              cluster: cache_text
+              name: haproxykafka.service
+            exp_annotations:
+              summary: 'HaproxyKafka restarted on cp5017:9100'
+              description: "HaproxyKafka on cp5017:9100 (eqsin) has restarted unexpectedly."
+              dashboard: 'https://grafana.wikimedia.org/d/d3e4e37c-c1d9-47af-9aad-a08dae2b3fd5/haproxykafka?orgId=1&var-site=eqsin&var-instance=cp5017'
+              runbook: 'https://wikitech.wikimedia.org/wiki/HAProxyKafka#HaproxyKafkaRestarted'
