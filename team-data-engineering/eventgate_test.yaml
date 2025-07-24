@@ -220,9 +220,9 @@ tests:
         # Baseline: 100 events per minute for 30 minutes
         - series: 'eventgate_events_produced_total{service="eventgate-analytics"}'
           values: '100+0x30'
-        # Then increase by 6% (above 5% threshold)
+        # Then increase by 26% (above 25% threshold)
         - series: 'eventgate_events_produced_total{service="eventgate-analytics"}'
-          values: '0+0x30 106+0x30'
+          values: '0+0x30 126+0x30'
       external_labels:
         site: test
       alert_rule_test:
@@ -234,12 +234,12 @@ tests:
                 service: eventgate-analytics
                 team: data-engineering
               exp_annotations:
-                description: Significant produce rate deviation (+-5%) detected on eventgate-analytics in test.
-                summary: Significant produce rate deviation (+-5%) on eventgate-analytics in test.
+                description: Significant produce rate deviation (+-25%) detected on eventgate-analytics in test.
+                summary: Significant produce rate deviation (+-25%) on eventgate-analytics in test.
                 dashboard: https://grafana.wikimedia.org/d/ZB39Izmnz/eventgate?orgId=1&refresh=1m&var-dc=test%2Bprometheus/k8s&var-service=eventgate-analytics
                 runbook: https://wikitech.wikimedia.org/wiki/Event_Platform/EventGate
 
-        # Should not alert on normal rate (5% change)
+        # Should not alert on normal rate (<25% change)
         - alertname: EventgateProduceRateAnomaly
           eval_time: 15m
           exp_alerts: []

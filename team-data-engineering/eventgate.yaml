@@ -122,13 +122,13 @@ groups:
     - &EventgateProduceRateAnomaly
       alert: EventgateProduceRateAnomaly
       annotations:
-        description: Significant produce rate deviation (+-5%) detected on {{ $labels.service }} in {{ $externalLabels.site }}.
-        summary: Significant produce rate deviation (+-5%) on {{ $labels.service }} in {{ $externalLabels.site }}.
+        description: Significant produce rate deviation (+-25%) detected on {{ $labels.service }} in {{ $externalLabels.site }}.
+        summary: Significant produce rate deviation (+-25%) on {{ $labels.service }} in {{ $externalLabels.site }}.
         dashboard: https://grafana.wikimedia.org/d/ZB39Izmnz/eventgate?orgId=1&refresh=1m&var-dc={{ $externalLabels.site }}%2Bprometheus/k8s&var-service={{ $labels.service }}
         runbook: https://wikitech.wikimedia.org/wiki/Event_Platform/EventGate
       # Calculate the 1h average rate as baseline, then compare current 5m rate to it
-      # Alert if current rate deviates by more than 5% from the 1h average
-      # Absolute value of (current rate - 1h average) / 1h average > 0.05
+      # Alert if current rate deviates by more than 25% from the 1h average
+      # Absolute value of (current rate - 1h average) / 1h average > 0.25
       expr: |
         (
           (
@@ -139,7 +139,7 @@ groups:
               /
               avg_over_time(sum(rate(eventgate_events_produced_total{service="eventgate-main"}[5m])) by (service)[1h:5m])
             )
-            > 0.05
+            > 0.25
           )
           and
           # Only alert if we have enough historical data (at least 1h)
@@ -161,7 +161,7 @@ groups:
               /
               avg_over_time(sum(rate(eventgate_events_produced_total{service="eventgate-analytics"}[5m])) by (service)[1h:5m])
             )
-            > 0.05
+            > 0.25
           )
           and
           # Only alert if we have enough historical data (at least 1h)
@@ -179,7 +179,7 @@ groups:
               /
               avg_over_time(sum(rate(eventgate_events_produced_total{service="eventgate-analytics-external"}[5m])) by (service)[1h:5m])
             )
-            > 0.05
+            > 0.25
           )
           and
           # Only alert if we have enough historical data (at least 1h)
@@ -197,7 +197,7 @@ groups:
               /
               avg_over_time(sum(rate(eventgate_events_produced_total{service="eventgate-logging-external"}[5m])) by (service)[1h:5m])
             )
-            > 0.05
+            > 0.25
           )
           and
           # Only alert if we have enough historical data (at least 1h)
