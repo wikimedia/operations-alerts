@@ -22,7 +22,7 @@ tests:
               severity: critical
               kubernetes_pod_name: test1
             exp_annotations:
-              summary: "Thumbor haproxy error rate - staging"
+              summary: "Thumbor haproxy error rate for pod test1 - staging"
               description: "HAProxy on thumbor pod test1 reporting a sustained high error rate. This pod should be investigated or deleted."
               dashboard: https://grafana.wikimedia.org/d/Pukjw6cWk/thumbor
               runbook: https://wikitech.wikimedia.org/wiki/Thumbor
