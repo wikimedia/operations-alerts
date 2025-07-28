@@ -4,6 +4,7 @@ groups:
   - name: statsv
     rules:
       - alert: StatsvThroughput
+        # pint disable promql/series
         expr: sum(rate(statsv_messages_handled_total[10m])) < 1
         for: 10m
         labels:
