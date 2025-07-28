@@ -93,6 +93,7 @@ groups:
         summary: Thanos Query is having high number of DNS failures.
         dashboard: https://grafana.wikimedia.org/d/af36c91291a603f1d9fbdabdd127ac4a/thanos-query
         runbook: https://wikitech.wikimedia.org/wiki/Thanos#Alerts
+      # pint disable promql/series
       expr: |
         (
           sum by (job) (rate(thanos_query_store_apis_dns_failures_total{job=~".*thanos-query.*"}[5m]))
