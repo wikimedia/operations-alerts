@@ -27,7 +27,11 @@ groups:
           severity: critical
 
       - alert: HaproxyKafkaNoMessages
-        expr: 'sum by (hostname, cluster) (label_replace (rate(haproxykafka_valid_messages_total[5m]), "hostname", "$1", "instance", "(.*):.*")) / sum by (hostname, cluster) (label_replace (rate(haproxy_frontend_http_requests_total[5m]), "hostname", "$1", "instance", "(.*):.*")) < 0.2'
+        expr: '(
+          sum by (hostname, cluster) (label_replace (rate(haproxykafka_valid_messages_total{cluster=~"cache_(text|upload)"}[5m]), "hostname", "$1", "instance", "(.*):.*"))
+          or
+          (sum by (hostname, cluster) (label_replace(up{cluster=~"cache_(text|upload)"} * 0, "hostname", "$1", "instance", "(.*):.*")))
+          ) / sum by (hostname, cluster) (label_replace (rate(haproxy_frontend_http_requests_total{cluster=~"cache_(text|upload)"}[5m]), "hostname", "$1", "instance", "(.*):.*")) < 0.2'
         for: 5m
         labels:
           team: traffic
@@ -38,7 +42,11 @@ groups:
           dashboard: 'https://grafana.wikimedia.org/d/d3e4e37c-c1d9-47af-9aad-a08dae2b3fd5/haproxykafka?orgId=1&var-site={{ $externalLabels.site }}&var-instance={{ $labels.hostname }}'
           runbook: 'https://wikitech.wikimedia.org/wiki/HAProxyKafka#HaproxyKafkaNoMessages'
       - alert: HaproxyKafkaNoMessages
-        expr: 'sum by (hostname, cluster) (label_replace (rate(haproxykafka_valid_messages_total[5m]), "hostname", "$1", "instance", "(.*):.*")) / sum by (hostname, cluster) (label_replace (rate(haproxy_frontend_http_requests_total[5m]), "hostname", "$1", "instance", "(.*):.*")) < 0.1'
+        expr: '(
+          sum by (hostname, cluster) (label_replace (rate(haproxykafka_valid_messages_total{cluster=~"cache_(text|upload)"}[5m]), "hostname", "$1", "instance", "(.*):.*"))
+          or
+          (sum by (hostname, cluster) (label_replace(up{cluster=~"cache_(text|upload)"} * 0, "hostname", "$1", "instance", "(.*):.*")))
+          ) / sum by (hostname, cluster) (label_replace (rate(haproxy_frontend_http_requests_total{cluster=~"cache_(text|upload)"}[5m]), "hostname", "$1", "instance", "(.*):.*")) < 0.1'
         for: 5m
         labels:
           team: traffic

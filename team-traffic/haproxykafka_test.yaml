@@ -62,9 +62,9 @@ tests:
       # sum by (hostname, cluster) (label_replace (rate(haproxykafka_valid_messages_total[5m]), "hostname", "$1", "instance", "(.*):.*"))
       # /
       # sum by (hostname, cluster) (label_replace (rate(haproxy_frontend_http_requests_total[5m]), "hostname", "$1", "instance", "(.*):.*")) < 0.2
-      - series: 'haproxykafka_valid_messages_total{instance="cp5017:9341", site="eqsin"}'
+      - series: 'haproxykafka_valid_messages_total{instance="cp5017:9341", cluster="cache_text", site="eqsin"}'
         values: '0+2x5'  # Rate of 10/5m = 2 per minute
-      - series: 'haproxy_frontend_http_requests_total{instance="cp5017:9341", site="eqsin"}'
+      - series: 'haproxy_frontend_http_requests_total{instance="cp5017:9422", cluster="cache_text", site="eqsin"}'
         values: '0+20x5' # Rate of 100/5m = 20 per minute
     alert_rule_test:
       - alertname: HaproxyKafkaNoMessages
@@ -74,6 +74,7 @@ tests:
              hostname: "cp5017"
              severity: warning
              team: traffic
+             cluster: cache_text
            exp_annotations:
               summary: 'Unexpected rate of produced HaproxyKafka messages by cp5017'
               description: 'Haproxy on cp5017 is receiving requests, but HaproxyKafka is not sending enough messages'
@@ -85,9 +86,9 @@ tests:
       site: eqsin
     # Test case 2: CRITICAL when ratio < 0.1
     input_series:
-      - series: 'haproxykafka_valid_messages_total{instance="cp5017:9341", site="eqsin"}'
+      - series: 'haproxykafka_valid_messages_total{instance="cp5017:9341", cluster="cache_text", site="eqsin"}'
         values: '0+1x10'   # Rate of 1/5m = 0.2 per minute
-      - series: 'haproxy_frontend_http_requests_total{instance="cp5017:9341", site="eqsin"}'
+      - series: 'haproxy_frontend_http_requests_total{instance="cp5017:9422", cluster="cache_text", site="eqsin"}'
         values: '0+100x10' # Rate of 100/5m = 20 per minute
     alert_rule_test:
       # Test case 2: CRITICAL alert should fire when ratio is < 0.1
@@ -98,6 +99,7 @@ tests:
               hostname: "cp5017"
               severity: warning
               team: traffic
+              cluster: cache_text
             exp_annotations:
               summary: 'Unexpected rate of produced HaproxyKafka messages by cp5017'
               description: 'Haproxy on cp5017 is receiving requests, but HaproxyKafka is not sending enough messages'
@@ -107,6 +109,41 @@ tests:
               severity: critical
               team: traffic
               hostname: "cp5017"
+              cluster: cache_text
+            exp_annotations:
+              summary: 'Unexpected rate of produced HaproxyKafka messages by cp5017'
+              description: 'Haproxy on cp5017 is receiving requests, but HaproxyKafka is not sending enough messages'
+              dashboard: 'https://grafana.wikimedia.org/d/d3e4e37c-c1d9-47af-9aad-a08dae2b3fd5/haproxykafka?orgId=1&var-site=eqsin&var-instance=cp5017'
+              runbook: 'https://wikitech.wikimedia.org/wiki/HAProxyKafka#HaproxyKafkaNoMessages'
+  - interval: 1m
+    external_labels:
+      site: eqsin
+    # Test case 3: haproxykafka_valid_messages_total metric is missing
+    input_series:
+      - series: 'up{instance="cp5017:9341", cluster="cache_text", site="eqsin"}'
+        values: '0x10'
+      - series: 'haproxy_frontend_http_requests_total{instance="cp5017:9422", cluster="cache_text", site="eqsin"}'
+        values: '0+100x10' # Rate of 100/5m = 20 per minute
+    alert_rule_test:
+      # Test case 3: CRITICAL alert should fire when ratio is < 0.1
+      - eval_time: 6m
+        alertname: HaproxyKafkaNoMessages
+        exp_alerts:
+          - exp_labels:
+              hostname: "cp5017"
+              severity: warning
+              team: traffic
+              cluster: cache_text
+            exp_annotations:
+              summary: 'Unexpected rate of produced HaproxyKafka messages by cp5017'
+              description: 'Haproxy on cp5017 is receiving requests, but HaproxyKafka is not sending enough messages'
+              dashboard: 'https://grafana.wikimedia.org/d/d3e4e37c-c1d9-47af-9aad-a08dae2b3fd5/haproxykafka?orgId=1&var-site=eqsin&var-instance=cp5017'
+              runbook: 'https://wikitech.wikimedia.org/wiki/HAProxyKafka#HaproxyKafkaNoMessages'
+          - exp_labels:
+              severity: critical
+              team: traffic
+              hostname: "cp5017"
+              cluster: cache_text
             exp_annotations:
               summary: 'Unexpected rate of produced HaproxyKafka messages by cp5017'
               description: 'Haproxy on cp5017 is receiving requests, but HaproxyKafka is not sending enough messages'
