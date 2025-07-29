@@ -143,7 +143,7 @@ groups:
           )
           and
           # Only alert if we have enough historical data (at least 1h)
-          avg_over_time(sum(rate(eventgate_events_produced_total{service="eventgate-main"}[5m])) by (service)[1h:5m]) > 0
+          avg_over_time(sum(rate(eventgate_events_produced_total{service="eventgate-main"}[5m])) by (service)[1h:5m]) > 5
         )
       for: 5m
       labels:
@@ -165,7 +165,7 @@ groups:
           )
           and
           # Only alert if we have enough historical data (at least 1h)
-          avg_over_time(sum(rate(eventgate_events_produced_total{service="eventgate-analytics"}[5m])) by (service)[1h:5m]) > 0
+          avg_over_time(sum(rate(eventgate_events_produced_total{service="eventgate-analytics"}[5m])) by (service)[1h:5m]) > 5
         )
     - <<: *EventgateProduceRateAnomaly
       # eventgate-analytics-external
@@ -183,7 +183,7 @@ groups:
           )
           and
           # Only alert if we have enough historical data (at least 1h)
-          avg_over_time(sum(rate(eventgate_events_produced_total{service="eventgate-analytics-external"}[5m])) by (service)[1h:5m]) > 0
+          avg_over_time(sum(rate(eventgate_events_produced_total{service="eventgate-analytics-external"}[5m])) by (service)[1h:5m]) > 5
         )
     - <<: *EventgateProduceRateAnomaly
       # eventgate-logging-external
@@ -201,7 +201,7 @@ groups:
           )
           and
           # Only alert if we have enough historical data (at least 1h)
-          avg_over_time(sum(rate(eventgate_events_produced_total{service="eventgate-logging-external"}[5m])) by (service)[1h:5m]) > 0
+          avg_over_time(sum(rate(eventgate_events_produced_total{service="eventgate-logging-external"}[5m])) by (service)[1h:5m]) > 5
         )
 ## Eventgate produce rate stops
     - &EventgateProduceRateStop

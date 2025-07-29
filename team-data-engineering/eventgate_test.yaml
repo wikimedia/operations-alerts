@@ -214,20 +214,20 @@ tests:
                 summary: Elevated errors on eventgate-analytics-external in eqiad.
                 dashboard: https://grafana.wikimedia.org/d/ZB39Izmnz/eventgate?orgId=1&refresh=1m&var-dc=eqiad%2Bprometheus/k8s&var-service=eventgate-analytics-external
                 runbook: https://wikitech.wikimedia.org/wiki/Event_Platform/EventGate
-## Eventgate Produce Rate Anomaly tests
+
+## Test for EventgateProduceRateAnomaly - eventgate-analytics
     - interval: 1m
       input_series:
-        # Baseline: 100 events per minute for 30 minutes
+        # First 2 hours: 360 events per minute (6 events/sec, above 5 threshold)
+        # Then 540 events per minute (50% increase) for 30 minutes
         - series: 'eventgate_events_produced_total{service="eventgate-analytics"}'
-          values: '100+0x30'
-        # Then increase by 26% (above 25% threshold)
-        - series: 'eventgate_events_produced_total{service="eventgate-analytics"}'
-          values: '0+0x30 126+0x30'
+          values: '360+360x120 43560+540x30'
       external_labels:
         site: test
       alert_rule_test:
+        # Test that alert triggers when rate increases significantly
         - alertname: EventgateProduceRateAnomaly
-          eval_time: 45m  # After 15 minutes of increased rate (6% increase)
+          eval_time: 2h20m  # 2h baseline + 20m into anomaly
           exp_alerts:
             - exp_labels:
                 severity: warning
@@ -239,12 +239,29 @@ tests:
                 dashboard: https://grafana.wikimedia.org/d/ZB39Izmnz/eventgate?orgId=1&refresh=1m&var-dc=test%2Bprometheus/k8s&var-service=eventgate-analytics
                 runbook: https://wikitech.wikimedia.org/wiki/Event_Platform/EventGate
 
-        # Should not alert on normal rate (<25% change)
+        # Test that alert does not trigger during baseline period
         - alertname: EventgateProduceRateAnomaly
-          eval_time: 15m
+          eval_time: 1h
           exp_alerts: []
 
-# Eventgate Produce Rate Stop tests
+## Test for EventgateProduceRateAnomaly - no alert on small changes
+    - interval: 1m
+      input_series:
+        # First 2 hours: 360 events per minute (6 events/sec, above 5 threshold)
+        # Then 432 events per minute (20% increase, below 25% threshold) for 30 minutes
+        - series: 'eventgate_events_produced_total{service="eventgate-analytics"}'
+          values: '360+360x120 43560+432x30'
+      external_labels:
+        site: test
+      alert_rule_test:
+        - alertname: EventgateProduceRateAnomaly
+          eval_time: 2h20m
+          exp_alerts: []
+        - alertname: EventgateProduceRateAnomaly
+          eval_time: 1h6m
+          exp_alerts: []
+
+## Test for EventgateProduceRateStop
     - interval: 1m
       input_series:
         # Normal traffic for 5 minutes
