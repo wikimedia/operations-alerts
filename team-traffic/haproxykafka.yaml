@@ -5,9 +5,9 @@ groups:
     rules:
       - alert: HaproxyKafkaExporterDown
         annotations:
-          summary: 'HaproxyKafka on {{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }} is down'
-          description: 'HaproxyKafka on {{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }} has been down for more than 5 minutes'
-          dashboard: 'https://grafana.wikimedia.org/d/d3e4e37c-c1d9-47af-9aad-a08dae2b3fd5/haproxykafka?orgId=1&var-site={{ $externalLabels.site }}&var-instance={{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}'
+          summary: 'HaproxyKafka on {{ $labels.instance | stripPort }} is down'
+          description: 'HaproxyKafka on {{ $labels.instance | stripPort }} has been down for more than 5 minutes'
+          dashboard: 'https://grafana.wikimedia.org/d/d3e4e37c-c1d9-47af-9aad-a08dae2b3fd5/haproxykafka?orgId=1&var-site={{ $externalLabels.site }}&var-instance={{ $labels.instance | stripPort }}'
           runbook: 'https://wikitech.wikimedia.org/wiki/HAProxyKafka#HaproxyKafkaExporterDown'
         expr: up{instance=~"cp[0-9]{4}:9341"} == 0
         for: 5m
@@ -16,9 +16,9 @@ groups:
           severity: warning
       - alert: HaproxyKafkaExporterDown
         annotations:
-          summary: 'HaproxyKafka on {{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }} is down'
-          description: 'HaproxyKafka on {{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }} has been down for more than 1 hour'
-          dashboard: 'https://grafana.wikimedia.org/d/d3e4e37c-c1d9-47af-9aad-a08dae2b3fd5/haproxykafka?orgId=1&var-site={{ $externalLabels.site }}&var-instance={{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}'
+          summary: 'HaproxyKafka on {{ $labels.instance | stripPort }} is down'
+          description: 'HaproxyKafka on {{ $labels.instance | stripPort }} has been down for more than 1 hour'
+          dashboard: 'https://grafana.wikimedia.org/d/d3e4e37c-c1d9-47af-9aad-a08dae2b3fd5/haproxykafka?orgId=1&var-site={{ $externalLabels.site }}&var-instance={{ $labels.instance | stripPort }}'
           runbook: "https://wikitech.wikimedia.org/wiki/HAProxyKafka#HaproxyKafkaExporterDown"
         expr: up{instance=~"cp[0-9]{4}:9341"} == 0
         for: 1h
