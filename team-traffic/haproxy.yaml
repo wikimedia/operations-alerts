@@ -5,12 +5,12 @@ groups:
     rules:
       - alert: HAProxyRestarted
         # In normal conditions, restart count is 0. Alert if it is >= 1.
-        expr: 'sum by (instance) (increase(node_systemd_service_restart_total{name="haproxy.service", instance=~"(cp|dns).*"}[5m]) > 0)'
+        expr: 'increase(node_systemd_service_restart_total{name="haproxy.service", cluster=~"cache_upload|cache_text|dnsbox"}[5m]) > 0'
         labels:
           team: traffic
           severity: critical
         annotations:
           summary: 'HAProxy server restarted on {{ $labels.instance }}'
           description: "HAProxy on {{ $labels.instance }} ({{ $externalLabels.site }}) has restarted unexpectedly."
-          dashboard: 'https://grafana.wikimedia.org/d/gQblbjtnk/haproxy-drilldown?orgId=1&var-site={{ $externalLabels.site }}%20prometheus/ops&var-instance={{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}&viewPanel=10'
+          dashboard: 'https://grafana.wikimedia.org/d/gQblbjtnk/haproxy-drilldown?orgId=1&var-site={{ $externalLabels.site }}%20prometheus/ops&var-instance={{ $labels.instance | stripPort }}&viewPanel=10'
           runbook: 'https://wikitech.wikimedia.org/wiki/HAProxy#HAProxy_for_edge_caching'
