@@ -8,8 +8,17 @@ groups:
       # These values have been chosen in order to avoid false alerts from stop/start events.
       # The label_replace function is used to generate hostnames from instance, so that we can match the two series from different exporters.
       # This has been copied from previous VarnishKafka alert
+      #
+      # This query *could* fail if haproxykafka_valid_messages_total metric is not available,
+      # so the 'or' along with the 'up' metric ensure that there's always some data to process
+      # even if the haproxykafka exporter goes down.
+      # See I114bd0eb958bb7ed58be61532a7100ab8802e2f7 for the original commit and more details
       - alert: HaproxykafkaNoMessages
-        expr: sum by (hostname, cluster) (label_replace (rate(haproxykafka_valid_messages_total[5m]), "hostname", "$1", "instance", "(.*):.*")) / sum by (cluster, hostname) (label_replace(rate(haproxy_frontend_http_requests_total[5m]), "hostname","$1", "instance", "(.*):.*")) < 0.2
+        expr: '(
+          sum by (hostname, cluster) (label_replace (rate(haproxykafka_valid_messages_total{cluster=~"cache_(text|upload)"}[5m]), "hostname", "$1", "instance", "(.*):.*"))
+          or
+          (sum by (hostname, cluster) (label_replace(up{cluster=~"cache_(text|upload)"} * 0, "hostname", "$1", "instance", "(.*):.*")))
+          ) / sum by (hostname, cluster) (label_replace (rate(haproxy_frontend_http_requests_total{cluster=~"cache_(text|upload)"}[5m]), "hostname", "$1", "instance", "(.*):.*")) < 0.2'
         for: 5m
         labels:
           team: data-engineering
@@ -18,11 +27,15 @@ groups:
           summary: '[WARNING] - Haproxykafka on {{ $labels.hostname }} is not sending enough {{ $labels.cluster }} requests'
           description: '[WARNING] - Haproxy on {{ $labels.hostname }} is receiving requests, but Haproxykafka is not sending enough {{ $labels.cluster }} requests'
           dashboard: 'https://grafana.wikimedia.org/d/d3e4e37c-c1d9-47af-9aad-a08dae2b3fd5/haproxykafka?orgId=1&var-datasource={{ $externalLabels.site }}%20prometheus/ops&var-cp_cluster={{ $labels.cluster }}&var-instance={{ $labels.hostname }}'
-          runbook: 'https://wikitech.wikimedia.org/wiki/HAProxyKafka'
+          runbook: 'https://wikitech.wikimedia.org/wiki/HAProxyKafka#HaproxyKafkaNoMessages'
 
       # Fire a critical alert if fewer than 10% of the requests are logged to kafka over the same 5 minutes window.
       - alert: HaproxykafkaNoMessages
-        expr: sum by (hostname, cluster) (label_replace (rate(haproxykafka_valid_messages_total[5m]), "hostname", "$1", "instance", "(.*):.*")) / sum by (cluster, hostname) (label_replace(rate(haproxy_frontend_http_requests_total[5m]), "hostname","$1", "instance", "(.*):.*")) < 0.1
+        expr: '(
+          sum by (hostname, cluster) (label_replace (rate(haproxykafka_valid_messages_total{cluster=~"cache_(text|upload)"}[5m]), "hostname", "$1", "instance", "(.*):.*"))
+          or
+          (sum by (hostname, cluster) (label_replace(up{cluster=~"cache_(text|upload)"} * 0, "hostname", "$1", "instance", "(.*):.*")))
+          ) / sum by (hostname, cluster) (label_replace (rate(haproxy_frontend_http_requests_total{cluster=~"cache_(text|upload)"}[5m]), "hostname", "$1", "instance", "(.*):.*")) < 0.1'
         for: 5m
         labels:
           team: data-engineering
