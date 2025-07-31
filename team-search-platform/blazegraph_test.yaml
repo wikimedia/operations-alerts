@@ -82,3 +82,57 @@ tests:
               description: "Categories Query service lag on wdqs3050:9194 is above 2 days"
               runbook: https://wikitech.wikimedia.org/wiki/Wikidata_Query_Service/Runbook
               dashboard: https://grafana.wikimedia.org/d/000000489/wikidata-query-service
+
+  - interval: 1m
+    external_labels:
+      site: eqiad
+    input_series:
+      - series: 'blazegraph_triples{cluster="wdqs-main", instance="wdqs1010:9193"}'
+        values: '5000000+0x61'
+      - series: 'blazegraph_triples{cluster="wdqs-main", instance="wdqs1011:9193"}'
+        values: '5000000+0x61'
+      - series: 'blazegraph_triples{cluster="wdqs-main", instance="wdqs1012:9193"}'
+        values: '4000000+0x61'
+    alert_rule_test:
+      - alertname: BlazegraphMainTriplesDeltaIncreasing
+        eval_time: 61m
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              team: search-platform
+              cluster: wdqs-main
+            exp_annotations:
+              summary: "Large percentage difference in triples count across Blazegraph instances"
+              description: |
+                The difference between max and min triples count across wdqs-main instances in eqiad
+                is 20% of the maximum and is not decreasing, indicating potential replication or sync issues.
+                This alert excludes cases where the delta is shrinking (backfill in progress).
+              runbook: https://wikitech.wikimedia.org/wiki/Wikidata_Query_Service/Runbook
+              dashboard: https://grafana.wikimedia.org/d/000000489/wikidata-query-service
+
+  - interval: 1m
+    external_labels:
+      site: eqiad
+    input_series:
+      - series: 'blazegraph_triples{cluster="wdqs-main", instance="wdqs1010:9194"}'
+        values: '500000+0x61'
+      - series: 'blazegraph_triples{cluster="wdqs-main", instance="wdqs1011:9194"}'
+        values: '500000+0x61'
+      - series: 'blazegraph_triples{cluster="wdqs-main", instance="wdqs1012:9194"}'
+        values: '400000+0x61'
+    alert_rule_test:
+      - alertname: BlazegraphCategoriesTriplesDeltaIncreasing
+        eval_time: 61m
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              team: search-platform
+              cluster: wdqs-main
+            exp_annotations:
+              summary: "Large percentage difference in categories triples count across Blazegraph instances"
+              description: |
+                The difference between max and min categories triples count across wdqs-main instances in eqiad
+                is 20% of the maximum and is not decreasing, indicating potential replication or sync issues.
+                This alert excludes cases where the delta is shrinking (backfill in progress).
+              runbook: https://wikitech.wikimedia.org/wiki/Wikidata_Query_Service/Runbook
+              dashboard: https://grafana.wikimedia.org/d/000000489/wikidata-query-service

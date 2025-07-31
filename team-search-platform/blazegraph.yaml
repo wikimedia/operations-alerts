@@ -54,3 +54,87 @@ groups:
           description: "Categories Query service lag on {{$labels.instance}} is above 2 days"
           runbook: https://wikitech.wikimedia.org/wiki/Wikidata_Query_Service/Runbook
           dashboard: https://grafana.wikimedia.org/d/000000489/wikidata-query-service
+
+      - alert: BlazegraphMainTriplesDeltaIncreasing
+        expr: |
+          (
+            (
+              max by (cluster) (
+                blazegraph_triples{cluster=~"wdqs-.*", instance=~".*:9193"}
+              )
+              -
+              min by (cluster) (
+                blazegraph_triples{cluster=~"wdqs-.*", instance=~".*:9193"}
+              )
+            )
+            /
+            max by (cluster) (
+              blazegraph_triples{cluster=~"wdqs-.*", instance=~".*:9193"}
+            )
+          ) > 0.02
+          and
+          increase(
+            (
+              max by (cluster) (
+                blazegraph_triples{cluster=~"wdqs-.*", instance=~".*:9193"}
+              )
+              -
+              min by (cluster) (
+                blazegraph_triples{cluster=~"wdqs-.*", instance=~".*:9193"}
+              )
+            )[30m:1m]
+          ) >= 0
+        for: 60m
+        labels:
+          team: search-platform
+          severity: warning
+        annotations:
+          summary: "Large percentage difference in triples count across Blazegraph instances"
+          description: |
+            The difference between max and min triples count across {{ $labels.cluster }} instances in {{ $externalLabels.site }}
+            is {{ $value | humanizePercentage }} of the maximum and is not decreasing, indicating potential replication or sync issues.
+            This alert excludes cases where the delta is shrinking (backfill in progress).
+          runbook: https://wikitech.wikimedia.org/wiki/Wikidata_Query_Service/Runbook
+          dashboard: https://grafana.wikimedia.org/d/000000489/wikidata-query-service
+
+      - alert: BlazegraphCategoriesTriplesDeltaIncreasing
+        expr: |
+          (
+            (
+              max by (cluster) (
+                blazegraph_triples{cluster=~"wdqs-.*", instance=~".*:9194"}
+              )
+              -
+              min by (cluster) (
+                blazegraph_triples{cluster=~"wdqs-.*", instance=~".*:9194"}
+              )
+            )
+            /
+            max by (cluster) (
+              blazegraph_triples{cluster=~"wdqs-.*", instance=~".*:9194"}
+            )
+          ) > 0.01
+          and
+          increase(
+            (
+              max by (cluster) (
+                blazegraph_triples{cluster=~"wdqs-.*", instance=~".*:9194"}
+              )
+              -
+              min by (cluster) (
+                blazegraph_triples{cluster=~"wdqs-.*", instance=~".*:9194"}
+              )
+            )[30m:1m]
+          ) >= 0
+        for: 60m
+        labels:
+          team: search-platform
+          severity: warning
+        annotations:
+          summary: "Large percentage difference in categories triples count across Blazegraph instances"
+          description: |
+            The difference between max and min categories triples count across {{ $labels.cluster }} instances in {{ $externalLabels.site }}
+            is {{ $value | humanizePercentage }} of the maximum and is not decreasing, indicating potential replication or sync issues.
+            This alert excludes cases where the delta is shrinking (backfill in progress).
+          runbook: https://wikitech.wikimedia.org/wiki/Wikidata_Query_Service/Runbook
+          dashboard: https://grafana.wikimedia.org/d/000000489/wikidata-query-service
