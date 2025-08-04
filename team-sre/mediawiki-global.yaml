@@ -43,7 +43,7 @@ groups:
           runbook: TODO
         labels:
           severity: critical
-          team: trust-and-safety-product # TODO: add paging to security team in the future?
+          team: sre # Also copied to t&s and sec teams via alertmanager routing config.
         for: 30m
         # mw-web
         expr: |
