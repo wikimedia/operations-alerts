@@ -129,28 +129,7 @@ groups:
       # Calculate the 1h average rate as baseline, then compare current 5m rate to it
       # Alert if current rate deviates by more than 25% from the 1h average
       # Absolute value of (current rate - 1h average) / 1h average > 0.25
-      expr: |
-        (
-          (
-            abs(
-              (sum(rate(eventgate_events_produced_total{service="eventgate-main"}[5m])) by (service)
-              - avg_over_time(sum(rate(eventgate_events_produced_total{service="eventgate-main"}[5m])) by (service)[1h:5m])
-              )
-              /
-              avg_over_time(sum(rate(eventgate_events_produced_total{service="eventgate-main"}[5m])) by (service)[1h:5m])
-            )
-            > 0.25
-          )
-          and
-          # Only alert if we have enough historical data (at least 1h)
-          avg_over_time(sum(rate(eventgate_events_produced_total{service="eventgate-main"}[5m])) by (service)[1h:5m]) > 5
-        )
-      for: 5m
-      labels:
-        severity: warning
-        team: data-engineering
-    - <<: *EventgateProduceRateAnomaly
-      # eventgate-analytics
+      # == eventgate-analytics
       expr: |
         (
           (
@@ -167,8 +146,12 @@ groups:
           # Only alert if we have enough historical data (at least 1h)
           avg_over_time(sum(rate(eventgate_events_produced_total{service="eventgate-analytics"}[5m])) by (service)[1h:5m]) > 5
         )
+      for: 5m
+      labels:
+        severity: warning
+        team: data-engineering
     - <<: *EventgateProduceRateAnomaly
-      # eventgate-analytics-external
+      # == eventgate-analytics-external
       expr: |
         (
           (
@@ -186,7 +169,7 @@ groups:
           avg_over_time(sum(rate(eventgate_events_produced_total{service="eventgate-analytics-external"}[5m])) by (service)[1h:5m]) > 5
         )
     - <<: *EventgateProduceRateAnomaly
-      # eventgate-logging-external
+      # == eventgate-logging-external
       expr: |
         (
           (
