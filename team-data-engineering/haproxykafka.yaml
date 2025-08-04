@@ -35,6 +35,9 @@ groups:
       # Let's get concerned when we average more than 1 saturation error per second per
       # caching method, instance, and datacenter.
       - alert: HaproxyKafkaDeliveryErrors
+        # Disable linting:
+        # https://wikitech.wikimedia.org/wiki/Alertmanager#Prometheus_didn't_have_any_series_(promql/series)
+        # pint disable promql/series
         expr: sum by (cluster, instance, site) (irate(haproxykafka_saturation_errors{channel='kafka-msg'}[5m])) >= 1
         labels:
           team: data-engineering
@@ -47,6 +50,9 @@ groups:
 
       # Yell a little louder when enough errors become a concern.
       - alert: HaproxyKafkaDeliveryErrors
+        # Disable linting:
+        # https://wikitech.wikimedia.org/wiki/Alertmanager#Prometheus_didn't_have_any_series_(promql/series)
+        # pint disable promql/series
         expr: sum by (cluster, instance, site) (irate(haproxykafka_saturation_errors{channel='kafka-msg'}[5m])) >= 5
         labels:
           team: data-engineering
