@@ -40,7 +40,7 @@ tests:
             exp_annotations:
               summary: 'PVC mediawiki-dumps-legacy-fs.mediawiki-dumps-legacy is 85% full'
               description: 'PVC mediawiki-dumps-legacy-fs.mediawiki-dumps-legacy is 85% full'
-              dashboard: "https://thanos.wikimedia.org/graph?g0.expr%3Dkubelet_volume_stats_available_bytes%257Bnamespace%253D%2527mediawiki-dumps-legacy%2527%252C%2520persistentvolumeclaim%253D%2522mediawiki-dumps-legacy-fs%2522%257D%2520%252F%2520kubelet_volume_stats_capacity_bytes%257Bnamespace%253D%2527mediawiki-dumps-legacy%2527%252C%2520persistentvolumeclaim%253D%2522mediawiki-dumps-legacy-fs%2522%257D%2520%2A%2520100%26g0.tab%3D0%26g0.stacked%3D0%26g0.range_input%3D1w%26g0.max_source_resolution%3D0s%26g0.deduplicate%3D1%26g0.partial_response%3D0%26g0.store_matches%3D%255B%255D"
+              dashboard: "https://grafana.wikimedia.org/goto/Ge3TKCwNR?orgId=1"
               runbook: "https://wikitech.wikimedia.org/wiki/Dumps/Airflow/Operations#The_dumps_CephFS_volume_is_filling_up"
 
   # Test 3: Space usage crossing critical threshold (91% full)
@@ -65,5 +65,5 @@ tests:
             exp_annotations:
               summary: 'PVC mediawiki-dumps-legacy-fs.mediawiki-dumps-legacy is 90% full'
               description: 'PVC mediawiki-dumps-legacy-fs.mediawiki-dumps-legacy is 90% full'
-              dashboard: "https://thanos.wikimedia.org/graph?g0.expr%3Dkubelet_volume_stats_available_bytes%257Bnamespace%253D%2527mediawiki-dumps-legacy%2527%252C%2520persistentvolumeclaim%253D%2522mediawiki-dumps-legacy-fs%2522%257D%2520%252F%2520kubelet_volume_stats_capacity_bytes%257Bnamespace%253D%2527mediawiki-dumps-legacy%2527%252C%2520persistentvolumeclaim%253D%2522mediawiki-dumps-legacy-fs%2522%257D%2520%2A%2520100%26g0.tab%3D0%26g0.stacked%3D0%26g0.range_input%3D1w%26g0.max_source_resolution%3D0s%26g0.deduplicate%3D1%26g0.partial_response%3D0%26g0.store_matches%3D%255B%255D"
+              dashboard: "https://grafana.wikimedia.org/goto/Ge3TKCwNR?orgId=1"
               runbook: "https://wikitech.wikimedia.org/wiki/Dumps/Airflow/Operations#The_dumps_CephFS_volume_is_filling_up"
