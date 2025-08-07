@@ -3,7 +3,7 @@ rule_files:
 tests:
   - interval: 1m
     input_series:
-      - series: kafka_server_BrokerTopicMetrics_MessagesIn_total{cluster="kafka_jumbo",instance="kafka-jumbo1007:7800",topic="eventlogging_NavigationTiming"}
+      - series: kafka_server_BrokerTopicMetrics_MessagesIn_total{cluster="kafka_jumbo",instance="kafka-jumbo1018:7800",topic="eventlogging_NavigationTiming"}
         values: "0+0x30"
     alert_rule_test:
       - alertname: EventloggingNavigationTimingEventsLow
