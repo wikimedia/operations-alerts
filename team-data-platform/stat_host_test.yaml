@@ -24,3 +24,25 @@ tests:
               summary: 'Very high load average on stat1010:9100 load: 201'
               dashboard: https://grafana.wikimedia.org/d/000000342/node-exporter-server-metrics?var-node=stat1010%3A9100&var-disk_device=All&var-net_dev=All
               runbook: 'TODO'
+  - interval: 1m
+    input_series:
+      - series: 'node_pressure_memory_stalled_seconds_total{cluster="analytics", instance="stat1010:9100", job="node", site="eqiad"}'
+        values: '0+31x30'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: statNodeMemoryStall
+        eval_time: 15m
+        exp_alerts:
+          - exp_labels:
+              cluster: analytics
+              instance: 'stat1010:9100'
+              job: node
+              severity: critical
+              site: eqiad
+              team: 'data-platform'
+            exp_annotations:
+              description: 'Memory stalled on stat1010:9100'
+              summary: 'stat1010:9100 is stalled on memory, current value 51.67%'
+              dashboard: https://grafana.wikimedia.org/d/000000342/node-exporter-server-metrics?var-node=stat1010%3A9100&var-disk_device=All&var-net_dev=All
+              runbook: 'TODO'
