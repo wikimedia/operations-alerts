@@ -62,3 +62,42 @@ tests:
           summary: Too many messages in logging-eqiad for group logstash7-eqiad
           dashboard: https://grafana.wikimedia.org/d/000000484/kafka-consumer-lag?var-cluster=logging-eqiad&var-datasource=eqiad%20prometheus/ops
           runbook: https://wikitech.wikimedia.org/wiki/Logstash#Kafka_consumer_lag
+
+ - interval: 1m
+   input_series:
+   - series: 'elasticsearch_cluster_health_unassigned_shards{cluster="logstash"}'
+     values: '1x1440'
+   external_labels:
+     site: eqiad
+   alert_rule_test:
+     - alertname: LogstashUnassignedShards
+       eval_time: 24h
+       exp_alerts:
+         - exp_labels:
+             severity: critical
+             team: o11y
+           exp_annotations:
+             description: OpenSearch reports unassigned shards outstanding for more than 24h.
+             summary: OpenSearch reports unassigned shards outstanding for more than 24h.
+             dashboard: https://grafana.wikimedia.org/d/000000561/logstash?viewPanel=panel-48
+             runbook: https://wikitech.wikimedia.org/wiki/Logstash#Unassigned_Shards_and_Cluster_Status
+
+ - interval: 1m
+   input_series:
+     - series: 'elasticsearch_cluster_health_status{cluster="logstash", color="red"}'
+       values: '1x60'
+   external_labels:
+     site: eqiad
+   alert_rule_test:
+     - alertname: LogstashClusterStatus
+       eval_time: 30m
+       exp_alerts:
+         - exp_labels:
+             severity: critical
+             team: o11y
+             color: red
+           exp_annotations:
+             description: OpenSearch reports cluster status is red.
+             summary: OpenSearch reports cluster status is red.
+             dashboard: https://grafana.wikimedia.org/d/000000561/logstash?viewPanel=panel-49
+             runbook: https://wikitech.wikimedia.org/wiki/Logstash#Unassigned_Shards_and_Cluster_Status
