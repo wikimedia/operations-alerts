@@ -51,28 +51,3 @@ groups:
     - <<: *logstash_kafka_lag
       expr: sum by (exported_cluster, group) (kafka_burrow_partition_lag{exported_cluster=~"logging-.*",group=~"logstash7-.+"}) > 500000
       for: 2m
-
-    - alert: LogstashUdpLoss
-      annotations:
-        description: Logstash node is dropping more than 10% of its received UDP packets.
-          Usually, this means Logstash needs a restart.
-        summary: Packet loss ratio for UDP > 10% on {{ $labels.instance }}
-        dashboard: https://grafana.wikimedia.org/d/000000561/logstash?viewPanel=1&var-datasource={{ $externalLabels.site }}%20prometheus/ops
-        runbook: https://wikitech.wikimedia.org/wiki/Logstash#UDP_packet_loss
-      # >10%
-      expr: |
-        (
-          sum by (instance) (
-            rate(node_netstat_Udp_InErrors{instance=~"logstash.*"}[5m])
-          ) / (
-            sum by (instance) (
-              rate(node_netstat_Udp_InErrors{instance=~"logstash.*"}[5m])
-            ) + sum by (instance) (
-              rate(node_netstat_Udp_InDatagrams{instance=~"logstash.*"}[5m])
-            )
-          )
-        ) > 0.1
-      for: 1m
-      labels:
-        severity: critical
-        team: o11y
