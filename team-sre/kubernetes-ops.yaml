@@ -15,3 +15,40 @@ groups:
       description: "Rsyslog mmkubernetes plugin on {{ $labels.instance }} did not see any records in the last 5 minutes. This might mean that the plugin was terminated."
       runbook: https://wikitech.wikimedia.org/wiki/Kubernetes/Logging#Common_issues
       dashboard: https://grafana.wikimedia.org/d/OagQjQmnk?var-server={{ reReplaceAll "([^.:]+)([.:].*)?" "$1" $labels.instance }}
+
+    # k8s hosts change critical and warning thresholds from the usual thresholds (team-sre/resources.yaml)
+  - alert: DiskSpace
+    expr: |
+      (node_filesystem_avail_bytes{
+        fstype!="tmpfs",
+        cluster=~"(dse_k8s|kubernetes|kubernetes-staging|ml_serve)"
+      }
+      / node_filesystem_size_bytes)
+      * on (instance) group_left(team) role_owner < 0.05
+    for: 5m
+    labels:
+      severity: critical
+      team: "{{$labels.team}}"
+    annotations:
+      summary: "Disk space {{$labels.instance}}:{{$labels.mountpoint}} {{ $value | humanizePercentage }} free"
+      description: "Disk space {{$labels.instance}}:{{$labels.mountpoint}} ({{$labels.fstype}})"
+      dashboard: 'https://grafana.wikimedia.org/d/000000377/host-overview?orgId=1&viewPanel=12&var-server={{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}'
+      runbook: https://wikitech.wikimedia.org/wiki/Monitoring/Disk_space
+
+  - alert: DiskSpace
+    expr: |
+      (node_filesystem_avail_bytes{
+        fstype!="tmpfs",
+        cluster=~"(dse_k8s|kubernetes|kubernetes-staging|ml_serve)"
+      }
+      / node_filesystem_size_bytes)
+      * on (instance) group_left(team) role_owner < 0.1
+    for: 5m
+    labels:
+      severity: warning
+      team: "{{$labels.team}}"
+    annotations:
+      summary: "Disk space {{$labels.instance}}:{{$labels.mountpoint}} {{ $value | humanizePercentage }} free"
+      description: "Disk space {{$labels.instance}}:{{$labels.mountpoint}} ({{$labels.fstype}})"
+      dashboard: 'https://grafana.wikimedia.org/d/000000377/host-overview?orgId=1&viewPanel=12&var-server={{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}'
+      runbook: https://wikitech.wikimedia.org/wiki/Monitoring/Disk_space
