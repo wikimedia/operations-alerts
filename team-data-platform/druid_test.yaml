@@ -6,9 +6,9 @@ tests:
 ## Druid Realtime Ingestion tests
     - interval: 1m
       input_series:
-        - series: druid_realtime_ingest_events_processed_count{cluster="druid_analytics", datasource="wmf_netflow", instance="an-druid1001:8000", job="druid", prometheus="analytics", site="eqiad"}
+        - series: druid_realtime_ingest_events_processed_count{cluster="druid_analytics", datasource="wmf_netflow", instance="an-druid1006:8000", job="druid", prometheus="analytics", site="eqiad"}
           values: '0'
-        - series: druid_realtime_ingest_events_processed_count{cluster="druid_analytics", datasource="wmf_netflow", instance="an-druid1002:8000", job="druid", prometheus="analytics", site="eqiad"}
+        - series: druid_realtime_ingest_events_processed_count{cluster="druid_analytics", datasource="wmf_netflow", instance="an-druid1007:8000", job="druid", prometheus="analytics", site="eqiad"}
           values: '0'
         - series: druid_realtime_ingest_events_processed_count{cluster="druid_analytics", datasource="wmf_netflow", instance="an-druid1003:8000", job="druid", prometheus="analytics", site="eqiad"}
           values: '0'
@@ -40,7 +40,7 @@ tests:
 ## Druid Segments Unavailable tests
     - interval: 1m
       input_series:
-        - series: druid_coordinator_segment_unavailable_count{cluster="druid_analytics", datasource="event_navigationtiming", instance="an-druid1001:8000", job="druid", prometheus="analytics", site="eqiad"}
+        - series: druid_coordinator_segment_unavailable_count{cluster="druid_analytics", datasource="event_navigationtiming", instance="an-druid1006:8000", job="druid", prometheus="analytics", site="eqiad"}
           values: '11 11 11 11 11 11 11 11 11 11 11 11 11 11 11'
       alert_rule_test:
       - alertname: DruidSegmentsUnavailable
