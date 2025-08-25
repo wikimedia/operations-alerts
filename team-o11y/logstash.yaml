@@ -70,7 +70,7 @@ groups:
         summary: OpenSearch reports cluster status is red.
         dashboard: https://grafana.wikimedia.org/d/000000561/logstash?viewPanel=panel-49
         runbook: https://wikitech.wikimedia.org/wiki/Logstash#Unassigned_Shards_and_Cluster_Status
-      expr: max by (color) (elasticsearch_cluster_health_status{cluster="logstash", color="red"})
+      expr: max by (color) (elasticsearch_cluster_health_status{cluster="logstash", color="red"}) > 0
       for: 30m
       labels:
         severity: critical
