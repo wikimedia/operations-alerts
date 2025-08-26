@@ -1,0 +1,25 @@
+rule_files:
+  - nova.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    input_series:
+      - series: 'openstack_nova_agent_state{cluster="wmcs", instance="cloudvirt1044", job="openstack", service="nova-compute"}'
+        values: "1x120"
+      - series: 'openstack_nova_agent_state{cluster="wmcs", instance="cloudvirt1045", job="openstack", service="nova-compute"}'
+        values: "1x120"
+      - series: 'openstack_nova_agent_state{cluster="wmcs", instance="cloudvirt1046", job="openstack", service="nova-compute"}'
+        values: "0x120"
+    alert_rule_test:
+      - alertname: NovaComputeUnavailable
+        eval_time: 1h
+        exp_alerts:
+          - exp_labels:
+              severity: page
+              team: wmcs
+              service: cloudvps
+            exp_annotations:
+              summary: "#page nova-compute agent is unavailable"
+              description: "The Nova agent nova-compute is reported unavailable by Openstack: 66.67%"
+              runbook: https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/NovaComputeUnavailable
+              dashboard: https://grafana.wikimedia.org/d/000000579/wmcs-openstack-eqiad-summary

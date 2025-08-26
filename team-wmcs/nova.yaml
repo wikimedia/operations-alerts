@@ -1,0 +1,22 @@
+# deploy-tag: cloud
+# deploy-site: eqiad
+
+groups:
+  - name: Nova
+    rules:
+      - alert: NovaComputeUnavailable
+        expr: |
+          sum (openstack_nova_agent_state{service="nova-compute"})
+            /
+          count (openstack_nova_agent_state{service="nova-compute"})
+            < 0.9
+        for: 1h
+        labels:
+          team: wmcs
+          severity: page
+          service: cloudvps
+        annotations:
+          summary: "#page nova-compute agent is unavailable"
+          description: "The Nova agent nova-compute is reported unavailable by Openstack: {{ $value | humanizePercentage }}"
+          runbook: https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/NovaComputeUnavailable
+          dashboard: https://grafana.wikimedia.org/d/000000579/wmcs-openstack-eqiad-summary
