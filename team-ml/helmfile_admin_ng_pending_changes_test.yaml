@@ -1,0 +1,58 @@
+rule_files:
+  - helmfile_admin_ng_pending_changes.yaml
+evaluation_interval: 1h
+tests:
+  - interval: 1h
+    input_series:
+    - series: helmfile_admin_ng_pending_changes{exported_cluster="ml-serve-eqiad"}
+      values: '1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1'
+    alert_rule_test:
+    - alertname: HelmfileAdminNGPendingChangesLiftWing
+      eval_time: 1d
+      exp_alerts:
+      - exp_annotations:
+          description: 'Pending admin_ng changes on ml-serve-eqiad'
+          summary: 'Pending admin_ng changes on ml-serve-eqiad'
+          dashboard: "https://grafana.wikimedia.org/d/d15d3135-ff1c-4c6f-bebe-ee57b136df70/helmfile-admin-ng-pending-changes?orgId=1&var-kubernetes_cluster=ml-serve-eqiad"
+          runbook: "https://wikitech.wikimedia.org/wiki/Kubernetes/Add_a_new_service#Deploy_changes_to_helmfile.d%2Fadmin_ng"
+        exp_labels:
+          alertname: HelmfileAdminNGPendingChanges
+          exported_cluster: ml-serve-eqiad
+          severity: warning
+          team: ml
+  - interval: 1h
+    input_series:
+    - series: helmfile_admin_ng_pending_changes{exported_cluster="ml-serve-codfw"}
+      values: '1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1'
+    alert_rule_test:
+    - alertname: HelmfileAdminNGPendingChangesLiftWing
+      eval_time: 1d
+      exp_alerts:
+      - exp_annotations:
+          description: 'Pending admin_ng changes on ml-serve-codfw'
+          summary: 'Pending admin_ng changes on ml-serve-codfw'
+          dashboard: "https://grafana.wikimedia.org/d/d15d3135-ff1c-4c6f-bebe-ee57b136df70/helmfile-admin-ng-pending-changes?orgId=1&var-kubernetes_cluster=ml-serve-codfw"
+          runbook: "https://wikitech.wikimedia.org/wiki/Kubernetes/Add_a_new_service#Deploy_changes_to_helmfile.d%2Fadmin_ng"
+        exp_labels:
+          alertname: HelmfileAdminNGPendingChanges
+          exported_cluster: ml-serve-codfw
+          severity: warning
+          team: ml
+  - interval: 1h
+    input_series:
+    - series: helmfile_admin_ng_pending_changes{exported_cluster="ml-staging-codfw"}
+      values: '1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1'
+    alert_rule_test:
+    - alertname: HelmfileAdminNGPendingChangesLiftWing
+      eval_time: 1d
+      exp_alerts:
+      - exp_annotations:
+          description: 'Pending admin_ng changes on ml-staging-codfw'
+          summary: 'Pending admin_ng changes on ml-staging-codfw'
+          dashboard: "https://grafana.wikimedia.org/d/d15d3135-ff1c-4c6f-bebe-ee57b136df70/helmfile-admin-ng-pending-changes?orgId=1&var-kubernetes_cluster=ml-staging-codfw"
+          runbook: "https://wikitech.wikimedia.org/wiki/Kubernetes/Add_a_new_service#Deploy_changes_to_helmfile.d%2Fadmin_ng"
+        exp_labels:
+          alertname: HelmfileAdminNGPendingChanges
+          exported_cluster: ml-staging-codfw
+          severity: warning
+          team: ml
