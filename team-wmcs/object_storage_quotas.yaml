@@ -1,0 +1,61 @@
+# deploy-tag: ops
+# deploy-site: eqiad
+
+groups:
+  - name: object_storage_quota
+    rules:
+      # warn on all as users don't really have any way to know if we don't tell them
+      - alert: ObjectStorageSizeQuotaFull
+        expr: (sum by(user) (ceph_rgw_quota_size_kb_used) / sum by(user) (ceph_rgw_quota_size_kb_total{cluster="wmcs"})) > 0.8
+        for: 5h
+        labels:
+          team: wmcs
+          severity: warning
+          service: openstack,cloudvps,radosgw
+        annotations:
+          summary: "Object storage quota by 'size' is {{ $value | humanizePercentage }} full for project {{ $labels.user }}"
+          description: "The project {{ $labels.user }} has used almost it's 'size' quota."
+          runbook: https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/ObjectStorageSizeQuotaFull
+          dashboard: https://grafana.wikimedia.org/d/7120b794-4638-49f5-bccd-9716efc60f24/wmcs-object-storage-quotas
+
+      # crit only on the ones we manage
+      - alert: ObjectStorageSizeQuotaFull
+        expr: (sum by(user) (ceph_rgw_quota_size_kb_used) / sum by(user) (ceph_rgw_quota_size_kb_total{cluster="wmcs", user=~"(tools.*|admin|quarry|metricsinfra|paws|tofu|cloudinfra)"})) > 0.95
+        for: 5h
+        labels:
+          team: wmcs
+          severity: critical
+          service: openstack,cloudvps,radosgw
+        annotations:
+          summary: "Object storage quota by 'size' is {{ $value | humanizePercentage }} full for project {{ $labels.user }}"
+          description: "The project {{ $labels.user }} is about to get out of 'size' quota, expand it asap."
+          runbook: https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/ObjectStorageSizeQuotaFull
+          dashboard: https://grafana.wikimedia.org/d/7120b794-4638-49f5-bccd-9716efc60f24/wmcs-object-storage-quotas
+
+      # warn on all as users don't really have any way to know if we don't tell them
+      - alert: ObjectStorageObjectQuotaFull
+        expr: (sum by(user) (ceph_rgw_quota_objects_used) / sum by(user) (ceph_rgw_quota_objects_total{cluster="wmcs"})) > 0.8
+        for: 5h
+        labels:
+          team: wmcs
+          severity: warning
+          service: openstack,cloudvps,radosgw
+        annotations:
+          summary: "Object storage quota by 'objects' is {{ $value | humanizePercentage }} full for project {{ $labels.user }}"
+          description: "The project {{ $labels.user }} has used almost it's 'objects' quota."
+          runbook: https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/ObjectStorageObjectQuotaFull
+          dashboard: https://grafana.wikimedia.org/d/7120b794-4638-49f5-bccd-9716efc60f24/wmcs-object-storage-quotas
+
+      # crit only on the ones we manage
+      - alert: ObjectStorageObjectQuotaFull
+        expr: (sum by(user) (ceph_rgw_quota_objects_used) / sum by(user) (ceph_rgw_quota_objects_total{cluster="wmcs", user=~"(tools.*|admin|quarry|metricsinfra|paws|tofu|cloudinfra)"})) > 0.95
+        for: 5h
+        labels:
+          team: wmcs
+          severity: critical
+          service: openstack,cloudvps,radosgw
+        annotations:
+          summary: "Object storage quota by 'objects' is {{ $value | humanizePercentage }} full for project {{ $labels.user }}"
+          description: "The project {{ $labels.user }} is about to get out of 'objects' quota, expand it asap."
+          runbook: https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/ObjectStorageObjectQuotaFull
+          dashboard: https://grafana.wikimedia.org/d/7120b794-4638-49f5-bccd-9716efc60f24/wmcs-object-storage-quotas
