@@ -70,22 +70,13 @@ groups:
           runbook: 'https://wikitech.wikimedia.org/wiki/HAProxyKafka#HaproxyKafkaRestarted'
 
       - alert: HaproxyKafkaSocketDroppedMessages
-        expr: 'rate(haproxykafka_socket_dropped_messages_total{instance=~"cp.*"}[5m]) > 100'
+        expr: 'avg_over_time(rate(haproxykafka_socket_dropped_messages_total[5m])[15m:1m]) > 500'
+        for: 5m
         labels:
           team: traffic
           severity: warning
         annotations:
-          summary: 'Unexpected rate of dropped messages from HaproxyKafka'
-          description: "HaproxyKafka on {{ $labels.instance }} has dropped more than 100 messages over 5m from socket buffer"
-          dashboard: 'https://grafana.wikimedia.org/d/d3e4e37c-c1d9-47af-9aad-a08dae2b3fd5/haproxykafka?orgId=1&var-site={{ $externalLabels.site }}&var-instance={{ $labels.instance | stripPort }}&viewPanel=panel-19'
-          runbook: 'https://wikitech.wikimedia.org/wiki/HAProxyKafka#HaproxyKafkaSocketDroppedMessages'
-      - alert: HaproxyKafkaSocketDroppedMessages
-        expr: 'rate(haproxykafka_socket_dropped_messages_total{instance=~"cp.*"}[5m]) > 500'
-        labels:
-          team: traffic
-          severity: critical
-        annotations:
-          summary: 'Unexpected rate of dropped messages from HaproxyKafka'
-          description: "HaproxyKafka on {{ $labels.instance }} has dropped more than 500 messages over 5m from socket buffer"
+          summary: 'Sustained high rate of dropped messages from HaproxyKafka'
+          description: "HaproxyKafka ({{ $labels.instance }}) average dropped messages (socket buffer) rate over 15m is > 500"
           dashboard: 'https://grafana.wikimedia.org/d/d3e4e37c-c1d9-47af-9aad-a08dae2b3fd5/haproxykafka?orgId=1&var-site={{ $externalLabels.site }}&var-instance={{ $labels.instance | stripPort }}&viewPanel=panel-19'
           runbook: 'https://wikitech.wikimedia.org/wiki/HAProxyKafka#HaproxyKafkaSocketDroppedMessages'

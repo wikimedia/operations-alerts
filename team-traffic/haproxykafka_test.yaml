@@ -179,10 +179,11 @@ tests:
       site: eqsin
     input_series:
       - series: 'haproxykafka_socket_dropped_messages_total{instance="cp5026:9341", cluster="cache_upload"}'
-        values: '0+33000x10' # Increases by 33000 every minute (rate ~550/sec) triggers warning and critical
+        values: '0+10x5 1000+100000x25'  # Normal for 5min, then sustained 600/min (10/sec) for 25min
+      
     alert_rule_test:
       - alertname: HaproxyKafkaSocketDroppedMessages
-        eval_time: 6m
+        eval_time: 25m
         exp_alerts:
           - exp_labels:
               severity: warning
@@ -190,17 +191,7 @@ tests:
               instance: cp5026:9341
               cluster: cache_upload
             exp_annotations:
-              summary: 'Unexpected rate of dropped messages from HaproxyKafka'
-              description: 'HaproxyKafka on cp5026:9341 has dropped more than 100 messages over 5m from socket buffer'
-              dashboard: 'https://grafana.wikimedia.org/d/d3e4e37c-c1d9-47af-9aad-a08dae2b3fd5/haproxykafka?orgId=1&var-site=eqsin&var-instance=cp5026&viewPanel=panel-19'
-              runbook: 'https://wikitech.wikimedia.org/wiki/HAProxyKafka#HaproxyKafkaSocketDroppedMessages'
-          - exp_labels:
-              severity: critical
-              team: traffic
-              instance: cp5026:9341
-              cluster: cache_upload
-            exp_annotations:
-              summary: 'Unexpected rate of dropped messages from HaproxyKafka'
-              description: 'HaproxyKafka on cp5026:9341 has dropped more than 500 messages over 5m from socket buffer'
+              summary: 'Sustained high rate of dropped messages from HaproxyKafka'
+              description: 'HaproxyKafka (cp5026:9341) average dropped messages (socket buffer) rate over 15m is > 500'
               dashboard: 'https://grafana.wikimedia.org/d/d3e4e37c-c1d9-47af-9aad-a08dae2b3fd5/haproxykafka?orgId=1&var-site=eqsin&var-instance=cp5026&viewPanel=panel-19'
               runbook: 'https://wikitech.wikimedia.org/wiki/HAProxyKafka#HaproxyKafkaSocketDroppedMessages'
