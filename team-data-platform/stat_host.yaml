@@ -16,7 +16,7 @@ groups:
           dashboard: 'https://grafana.wikimedia.org/d/000000342/node-exporter-server-metrics?var-node={{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}%3A9100&var-disk_device=All&var-net_dev=All'
           runbook: 'TODO'
 # use Kernel PSI metrics ( https://docs.kernel.org/accounting/psi.html ) to alert when a
-# host has been stalled on memory for more than 50% of the time over a period of 5 minutes.
+# host has been stalled for more than 50% of the time over a period of 5 minutes.
       - alert: statNodeMemoryStall
         expr: rate(node_pressure_memory_stalled_seconds_total{cluster="analytics",instance=~"stat1[0-9]{3}:9100"}[5m]) > .5
         for: 5m
@@ -26,5 +26,16 @@ groups:
         annotations:
           description: 'Memory stalled on {{ $labels.instance }}'
           summary: '{{ $labels.instance }} is stalled on memory, current value {{ humanizePercentage $value }}'
+          dashboard: 'https://grafana.wikimedia.org/d/000000342/node-exporter-server-metrics?var-node={{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}%3A9100&var-disk_device=All&var-net_dev=All'
+          runbook: 'TODO'
+      - alert: statNodeIOStall
+        expr: rate(node_pressure_io_stalled_seconds_total{cluster="analytics",instance=~"stat1[0-9]{3}:9100"}[5m]) > .5
+        for: 5m
+        labels:
+          severity: critical
+          team: 'data-platform'
+        annotations:
+          description: 'IO stalled on {{ $labels.instance }}'
+          summary: '{{ $labels.instance }} is stalled on IO, current value {{ humanizePercentage $value }}'
           dashboard: 'https://grafana.wikimedia.org/d/000000342/node-exporter-server-metrics?var-node={{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}%3A9100&var-disk_device=All&var-net_dev=All'
           runbook: 'TODO'
