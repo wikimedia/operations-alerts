@@ -2,7 +2,7 @@ rule_files:
   - object_storage_quotas.yaml
 evaluation_interval: 1h
 tests:
-  # size quota, non-managed user, warning
+  # size quota, non-managed user does nothing
   - interval: 1h
     input_series:
       - series: ceph_rgw_quota_size_kb_used{cluster="wmcs", user="testuser1"}
@@ -14,41 +14,7 @@ tests:
     alert_rule_test:
       - alertname: ObjectStorageSizeQuotaFull
         eval_time: 7h
-        exp_alerts:
-          - exp_labels:
-              team: wmcs
-              severity: warning
-              service: openstack,cloudvps,radosgw
-              user: testuser1
-            exp_annotations:
-              summary: "Object storage quota by 'size' is 86% full for project testuser1"
-              description: "The project testuser1 has used almost it's 'size' quota."
-              runbook: https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/ObjectStorageSizeQuotaFull
-              dashboard: https://grafana.wikimedia.org/d/7120b794-4638-49f5-bccd-9716efc60f24/wmcs-object-storage-quotas
-
-  # size quota, non-managed projects only warn
-  - interval: 1h
-    input_series:
-      - series: ceph_rgw_quota_size_kb_used{cluster="wmcs", user="testuser1"}
-        values: "96+0x9"
-      - series: ceph_rgw_quota_size_kb_total{cluster="wmcs", user="testuser1"}
-        values: "100+0x9"
-    external_labels:
-      site: eqiad
-    alert_rule_test:
-      - alertname: ObjectStorageSizeQuotaFull
-        eval_time: 7h
-        exp_alerts:
-          - exp_labels:
-              team: wmcs
-              severity: warning
-              service: openstack,cloudvps,radosgw
-              user: testuser1
-            exp_annotations:
-              summary: "Object storage quota by 'size' is 96% full for project testuser1"
-              description: "The project testuser1 has used almost it's 'size' quota."
-              runbook: https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/ObjectStorageSizeQuotaFull
-              dashboard: https://grafana.wikimedia.org/d/7120b794-4638-49f5-bccd-9716efc60f24/wmcs-object-storage-quotas
+        exp_alerts: []
 
   # size quota, managed projects both warn and crit
   - interval: 1h
@@ -68,6 +34,7 @@ tests:
               severity: warning
               service: openstack,cloudvps,radosgw
               user: tools
+              project: tools
             exp_annotations:
               summary: "Object storage quota by 'size' is 96% full for project tools"
               description: "The project tools has used almost it's 'size' quota."
@@ -78,13 +45,14 @@ tests:
               severity: critical
               service: openstack,cloudvps,radosgw
               user: tools
+              project: tools
             exp_annotations:
               summary: "Object storage quota by 'size' is 96% full for project tools"
               description: "The project tools is about to get out of 'size' quota, expand it asap."
               runbook: https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/ObjectStorageSizeQuotaFull
               dashboard: https://grafana.wikimedia.org/d/7120b794-4638-49f5-bccd-9716efc60f24/wmcs-object-storage-quotas
 
-  # objects quota, non-managed users, warning
+  # objects quota, non-managed users, do nothing
   - interval: 1h
     input_series:
       - series: ceph_rgw_quota_objects_used{cluster="wmcs", user="testuser1"}
@@ -96,41 +64,7 @@ tests:
     alert_rule_test:
       - alertname: ObjectStorageObjectQuotaFull
         eval_time: 7h
-        exp_alerts:
-          - exp_labels:
-              team: wmcs
-              severity: warning
-              service: openstack,cloudvps,radosgw
-              user: testuser1
-            exp_annotations:
-              summary: "Object storage quota by 'objects' is 86% full for project testuser1"
-              description: "The project testuser1 has used almost it's 'objects' quota."
-              runbook: https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/ObjectStorageObjectQuotaFull
-              dashboard: https://grafana.wikimedia.org/d/7120b794-4638-49f5-bccd-9716efc60f24/wmcs-object-storage-quotas
-
-  # objects quota, non-managed projects only warn
-  - interval: 1h
-    input_series:
-      - series: ceph_rgw_quota_objects_used{cluster="wmcs", user="testuser1"}
-        values: "96+0x9"
-      - series: ceph_rgw_quota_objects_total{cluster="wmcs", user="testuser1"}
-        values: "100+0x9"
-    external_labels:
-      site: eqiad
-    alert_rule_test:
-      - alertname: ObjectStorageObjectQuotaFull
-        eval_time: 7h
-        exp_alerts:
-          - exp_labels:
-              team: wmcs
-              severity: warning
-              service: openstack,cloudvps,radosgw
-              user: testuser1
-            exp_annotations:
-              summary: "Object storage quota by 'objects' is 96% full for project testuser1"
-              description: "The project testuser1 has used almost it's 'objects' quota."
-              runbook: https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/ObjectStorageObjectQuotaFull
-              dashboard: https://grafana.wikimedia.org/d/7120b794-4638-49f5-bccd-9716efc60f24/wmcs-object-storage-quotas
+        exp_alerts: []
 
   # objects quota, managed projects both warn and crit
   - interval: 1h
@@ -150,6 +84,7 @@ tests:
               severity: warning
               service: openstack,cloudvps,radosgw
               user: tools
+              project: tools
             exp_annotations:
               summary: "Object storage quota by 'objects' is 96% full for project tools"
               description: "The project tools has used almost it's 'objects' quota."
@@ -160,6 +95,7 @@ tests:
               severity: critical
               service: openstack,cloudvps,radosgw
               user: tools
+              project: tools
             exp_annotations:
               summary: "Object storage quota by 'objects' is 96% full for project tools"
               description: "The project tools is about to get out of 'objects' quota, expand it asap."
