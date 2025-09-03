@@ -15,6 +15,17 @@ groups:
       description: "GitLab CI job error rate {{ $value }} is above threshold of 0.05"
       dashboard: https://grafana.wikimedia.org/d/Chb-gC07k/gitlab-ci-overview
       runbook: https://wikitech.wikimedia.org/wiki/GitLab/Runbook
+  - alert: GitLabSidekiqQueueOverloaded
+    expr: sum(avg_over_time(sidekiq_queue_size{}[10m])) by (instance) > 1000
+    for: 1h
+    labels:
+      severity: task
+      team: collaboration-services
+    annotations:
+      summary: "GitLab - Sidekiq queue is filling up"
+      description: "Sidekiq queue is at {{ $value }} and keeps growing."
+      dashboard: 'https://grafana.wikimedia.org/d/R_1IvBZnz/gitlab-omnibus-overview?orgId=1&from=now-2d&to=now&timezone=utc&var-node={{ $labels.instance | reReplaceAll ":[0-9]+" "" }}&refresh=1m&viewPanel=12'
+      runbook: https://wikitech.wikimedia.org/wiki/GitLab/Cheat_Sheet#Restarts
   - alert: GitLabCIPipelineErrors
     expr: sum (rate(gitlab_ci_pipeline_failure_reasons[5m])) > 0.05
     for: 10m
