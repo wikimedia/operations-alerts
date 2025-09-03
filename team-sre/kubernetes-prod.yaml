@@ -17,7 +17,7 @@ groups:
 
   - &KubernetesContainerReachingMemoryLimit
     alert: KubernetesContainerReachingMemoryLimit
-    expr: (container_memory_working_set_bytes{container!~"POD|", namespace!~"linkrecommendation|mw-mcrouter"} / (container_spec_memory_limit_bytes{container!~"POD|", namespace!~"linkrecommendation|mw-mcrouter"} > 0)) > 0.95
+    expr: (container_memory_working_set_bytes{container!~"POD|", namespace!~"linkrecommendation|mw-mcrouter|rdf-streaming-updater"} / (container_spec_memory_limit_bytes{container!~"POD|", namespace!~"linkrecommendation|mw-mcrouter|rdf-streaming-updater"} > 0)) > 0.95
     for: 10m
     labels:
       team: sre
