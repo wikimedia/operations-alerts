@@ -56,6 +56,11 @@ PROMETHEUS_INSTANCES = [
     "services",
 ]
 
+USER_AGENT = (
+    "AlertsTest/0.1 (https://gerrit.wikimedia.org/r/plugins/gitiles/operations/alerts; "
+    "sre-observability@wikimedia.org)"
+)
+
 
 def all_testfiles(paths):
     """Return all files with alerting rules tests."""
@@ -227,11 +232,14 @@ def test_runbook_exists(rulefile):
     """Ensure that if the alert has a runbook, it actually exists"""
     groups = yaml.load(rulefile.read_text(), Loader=yaml.FullLoader)
 
+    session = requests.Session()
+    session.headers.update({"User-Agent": USER_AGENT})
+
     for group in groups["groups"]:
         for rule in group["rules"]:
             runbook = rule.get("annotations", {}).get("runbook", None)
             if runbook is not None and runbook != "TODO":
-                response = requests.get(runbook)
+                response = session.get(runbook)
                 # Private runbooks are okay
                 if response.status_code == 401 and ".google.com" in response.url:
                     continue
