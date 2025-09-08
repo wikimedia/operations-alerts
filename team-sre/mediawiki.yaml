@@ -16,8 +16,7 @@ groups:
           severity: critical
           team: sre
         for: 2m
-        # TODO: T401425 - Ignore kube-dumps for now, while memcached connectivity is being fixed.
-        expr: sum(log_mediawiki_servergroup_level_channel_doc_count{channel="memcached", level="ERROR", servergroup!="kube-dumps"}) > 5000
+        expr: sum(log_mediawiki_servergroup_level_channel_doc_count{channel="memcached", level="ERROR"}) > 5000
 
       # Mediawiki fatals and exceptions per MediaWiki cluster.
       - alert: MediaWikiHighErrorRate
