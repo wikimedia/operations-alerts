@@ -1,0 +1,20 @@
+# deploy-tag: ops
+
+groups:
+  - name: proxoid
+    rules:
+      - alert: ProxoidHigh5xxErrorRate
+        annotations:
+          description: 'High 5xx error rate (>1%) on {{ $labels.instance }} for {{ $externalLabels.site }}'
+          summary: '{{ $labels.instance }}: >1% of requests are 5xx errors in {{ $externalLabels.site }}'
+          dashboard: 'https://grafana.wikimedia.org/d/441b2def-52e9-49d6-acad-91f5bb748989/hcaptcha-reverse-proxy?orgId=1&var-site={{ $externalLabels.site }}&var-instance={{ $labels.instance }}'
+          runbook: 'https://wikitech.wikimedia.org/wiki/HCaptcha#Runbook'
+        expr: |
+          sum(irate(nginx_http_requests_total{instance=~"urldownloader.*", status_code=~"5.."}[5m])) by (instance)
+          /
+          sum(irate(nginx_http_requests_total{instance=~"urldownloader.*"}[5m])) by (instance)
+          > 0.01
+        for: 5m
+        labels:
+          severity: critical
+          team: sre
