@@ -42,11 +42,13 @@ groups:
     #  * files after flag if
     #     * regular published files total size is less than 1Mb (report if we only write small files)
     #     * regular published files total size is more than 1Mb and (after-flag-size / regular-size) > 0.0001
+    # Don't report files-after-flag for webrequest_frontend_test topic - the test topic is too small to generate
+    # trustworthy data.
     expr: |
       gobblin_publisher_files_in_future_count > 0
       or gobblin_publisher_files_before_time_boundary_count > 0
       or (
-        gobblin_publisher_files_after_flag_count 
+        gobblin_publisher_files_after_flag_count{job != "webrequest_frontend_test"}
         * (
           (gobblin_publisher_regular_files_size_total < bool 1000000)
           + (

@@ -108,8 +108,8 @@ tests:
 
   - interval: 1m
     input_series:
-      # We report one file published after flag, and the total size of regular-files is bigger than 1Mb
-      # It's important we define the metric for files-after-flag size other wise the test fails
+      # We report one file published after flag, and the total size of regular-files is smaller than 1Mb
+      # NOTE: It's important we define the metric for files-after-flag size otherwise the test fails
       - series: gobblin_publisher_files_after_flag_count{job="gobblin_alert_test", publisher_topic="gobblin_ater_test_topic"}
         values: "1"
       - series: gobblin_publisher_regular_files_size_total{job="gobblin_alert_test", publisher_topic="gobblin_ater_test_topic"}
@@ -174,6 +174,23 @@ tests:
         values: "2000000"
       - series: gobblin_publisher_files_after_flag_size_total{job="gobblin_alert_test", publisher_topic="gobblin_ater_test_topic"}
         values: "200"
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: GobblinProblematicPublishedFiles
+        eval_time: 1m
+        exp_alerts: []
+
+  - interval: 1m
+    input_series:
+      # Assert metric doesn't fire for webrequest_frontend_test topic
+      # We report one file published after flag and the total size of regular-files is smaller than 1Mb
+      - series: gobblin_publisher_files_after_flag_count{job="webrequest_frontend_test", publisher_topic="gobblin_ater_test_topic"}
+        values: "1"
+      - series: gobblin_publisher_regular_files_size_total{job="webrequest_frontend_test", publisher_topic="gobblin_ater_test_topic"}
+        values: "10000"
+      - series: gobblin_publisher_files_after_flag_size_total{job="webrequest_frontend_test", publisher_topic="gobblin_ater_test_topic"}
+        values: "1000"
     external_labels:
       site: eqiad
     alert_rule_test:
