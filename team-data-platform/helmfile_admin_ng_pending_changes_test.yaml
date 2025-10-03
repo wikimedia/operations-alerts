@@ -7,7 +7,7 @@ tests:
     - series: helmfile_admin_ng_pending_changes{exported_cluster="dse-k8s-eqiad"}
       values: '1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1'
     alert_rule_test:
-    - alertname: HelmfileAdminNGPendingChangesDseEqiad
+    - alertname: HelmfileAdminNGPendingChangesDse
       eval_time: 1d
       exp_alerts:
       - exp_annotations:
@@ -20,3 +20,26 @@ tests:
           exported_cluster: dse-k8s-eqiad
           severity: warning
           team: data-platform
+  - interval: 1h
+    input_series:
+    - series: helmfile_admin_ng_pending_changes{exported_cluster="dse-k8s-codfw"}
+      values: '1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1'
+    alert_rule_test:
+    - alertname: HelmfileAdminNGPendingChangesDse
+      eval_time: 1d
+      exp_alerts:
+      - exp_annotations:
+          description: 'Pending admin_ng changes on dse-k8s-codfw'
+          summary: 'Pending admin_ng changes on dse-k8s-codfw'
+          dashboard: "https://grafana.wikimedia.org/d/d15d3135-ff1c-4c6f-bebe-ee57b136df70/helmfile-admin-ng-pending-changes?orgId=1&var-kubernetes_cluster=dse-k8s-codfw"
+          runbook: "https://wikitech.wikimedia.org/wiki/Kubernetes/Add_a_new_service#Deploy_changes_to_helmfile.d%2Fadmin_ng"
+        exp_labels:
+          alertname: HelmfileAdminNGPendingChanges
+          exported_cluster: dse-k8s-codfw
+          severity: warning
+          team: data-platform
+  - interval: 1h
+    input_series:
+    - series: helmfile_admin_ng_pending_changes{exported_cluster="eqiad"}
+      values: '1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1'
+    alert_rule_test: []
