@@ -10,13 +10,17 @@ tests:
         values: '1 1 0 0 0'
       - series: 'keyholder_armed{instance="deploy1002:9100",key="/etc/keyholder.d/deploy_zuul.pub"}'
         values: '1 1 1 1 1'
+      - series: 'role_owner{instance="acmechief1001:9100",team="traffic"}'
+        values: '1 1 1 1 1'
+      - series: 'role_owner{instance="deploy1002:9100",team="serviceops"}'
+        values: '1 1 1 1 1'
     alert_rule_test:
       - alertname: KeyholderUnarmed
         eval_time: 5m
         exp_alerts:
           - exp_labels:
               severity: critical
-              team: sre
+              team: serviceops
               instance: deploy1002:9100
             exp_annotations:
               summary: "1 unarmed Keyholder key(s) on deploy1002:9100"

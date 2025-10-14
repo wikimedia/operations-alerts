@@ -5,7 +5,10 @@ groups:
   - name: Keyholder
     rules:
       - alert: KeyholderUnarmed
-        expr: 'count(keyholder_armed == 0) by (instance) > 0'
+        expr: |
+          count(keyholder_armed == 0) by (instance)
+            * on (instance) group_left(team) role_owner
+          > 0
         for: 1m
         annotations:
           summary: '{{ $value }} unarmed Keyholder key(s) on {{ $labels.instance }}'
@@ -14,4 +17,3 @@ groups:
           dashboard: TODO
         labels:
           severity: critical
-          team: sre
