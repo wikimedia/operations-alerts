@@ -16,7 +16,7 @@ groups:
           dashboard: 'https://grafana.wikimedia.org/d/ed8da087-4bcb-407d-9596-d158b8145d45/bgp-neighbors-detail?orgId=1&var-site={{ $externalLabels.site }}&var-device={{ $labels.instance }}&var-bgp_group={{ $labels.peer_group }}&var-bgp_neighbor={{ $labels.peer_descr | urlquery }}'
           runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#BGP_status'
       - alert: CoreBGPDown
-        expr: gnmi_bgp_neighbor_session_state{peer_group=~"(EVPN_IBGP|Switch|core|Fundraising|Management|Cloud|Confed_).*"} < 6
+        expr: gnmi_bgp_neighbor_session_state{peer_group=~"(EVPN_IBGP|ibgp|evpn_external|Switch|core|Fundraising|Management|Cloud|Confed_).*"} < 6
         for: 2m
         labels:
           team: sre
