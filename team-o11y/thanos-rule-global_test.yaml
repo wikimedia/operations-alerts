@@ -4,9 +4,9 @@ evaluation_interval: 1m
 tests:
  - interval: 1m
    input_series:
-     - series: 'serie:1{recorder="thanos-rule"}'
+     - series: 'serie:1{recorder="thanos-rule@main"}'
        values: '_x15'
-     - series: 'serie:2{recorder="thanos-rule"}'
+     - series: 'serie:2{recorder="thanos-rule@main"}'
        values: '_x15'
    alert_rule_test:
      - alertname: ThanosRecordingRuleGaps
@@ -15,7 +15,7 @@ tests:
          - exp_labels:
              severity: critical
              team: o11y
-             recorder: thanos-rule
+             recorder: thanos-rule@main
            exp_annotations:
              description: Gap in metrics rendered from Thanos Rule
              summary: Thanos recording rule has stopped working correctly, check thanos-rule service.

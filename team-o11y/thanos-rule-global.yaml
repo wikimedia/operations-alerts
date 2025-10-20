@@ -14,9 +14,9 @@ groups:
       # The ':' is required in the regexp; otherwise, the tests will not pass. Could this be a bug?
       expr: |
         (
-          absent({__name__=~".*:.*", recorder="thanos-rule"})
+          absent({__name__=~".*:.*", recorder="thanos-rule@main"})
           or
-          label_replace(vector(0), "recorder", "thanos-rule", "__name__", ".*")
+          label_replace(vector(0), "recorder", "thanos-rule@main", "__name__", ".*")
         ) > 0
       for: 5m
       labels:
