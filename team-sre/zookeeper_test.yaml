@@ -74,11 +74,11 @@ tests:
         eval_time: 4m
         exp_alerts:
           - exp_labels:
-              severity: critical
+              severity: page
               team: sre
               zookeeper_cluster: main-eqiad
             exp_annotations:
-              summary: 'Zookeeper cluster main-eqiad has lost quorum'
+              summary: 'Zookeeper cluster main-eqiad has lost quorum #page'
               description: 'The Zookeeper cluster main-eqiad has less than 50% of quorum available: 33.33%'
               runbook: https://wikitech.wikimedia.org/wiki/Zookeeper
               dashboard: https://grafana.wikimedia.org/d/000000261/zookeeper?orgId=1&var-datasource=eqiad%20prometheus/ops&var-cluster=main-eqiad

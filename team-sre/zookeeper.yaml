@@ -36,10 +36,10 @@ groups:
             < 0.5
         for: 2m
         annotations:
-          summary: 'Zookeeper cluster {{ $labels.zookeeper_cluster }} has lost quorum'
+          summary: 'Zookeeper cluster {{ $labels.zookeeper_cluster }} has lost quorum #page'
           description: 'The Zookeeper cluster {{ $labels.zookeeper_cluster }} has less than 50% of quorum available: {{ $value | humanizePercentage }}'
           runbook: https://wikitech.wikimedia.org/wiki/Zookeeper
           dashboard: https://grafana.wikimedia.org/d/000000261/zookeeper?orgId=1&var-datasource={{ $externalLabels.site }}%20prometheus/{{ $externalLabels.prometheus }}&var-cluster={{ $labels.zookeeper_cluster }}
         labels:
-          severity: critical
+          severity: page
           team: sre
