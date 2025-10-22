@@ -1,0 +1,52 @@
+rule_files:
+  - ospf.yaml
+evaluation_interval: 2m
+tests:
+  - interval: 2m
+    external_labels:
+      site: eqiad
+    input_series:
+      # Interface is of type point-to-point (state 4) but has no neighbors (count 0)
+      - series: 'gnmi_nokia_ospf_oper_state{instance_name="ospfv2",interface_interface_name="ethernet-1/11.0",instance="lsw1-c2-eqiad:9804"}'
+        values: '4 4 4 4'
+      - series: 'gnmi_nokia_ospf_neighbor_count{instance_name="ospfv2",interface_interface_name="ethernet-1/11.0",instance="lsw1-c2-eqiad:9804"}'
+        values: '0 0 0 0'
+    alert_rule_test:
+      - alertname: OspfAdjDown
+        eval_time: 2m
+        exp_alerts:
+          - exp_labels:
+              instance_name: ospfv2
+              interface_interface_name: ethernet-1/11.0
+              instance: lsw1-c2-eqiad:9804
+              team: sre
+              severity: critical
+              scope: network
+            exp_annotations:
+              summary: "OSPF Adjacency down on lsw1-c2-eqiad interface ethernet-1/11.0"
+              description: "Protocol should be up and show 1 neighbor if port is up and connected to device at other side"
+              dashboard: 'https://grafana.wikimedia.org/d/b77db156-d852-4601-acc5-4065b888e5fe/ospf-status-nokia?orgId=1&var-site=eqiad'
+              runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#OSPF_status'
+
+  - interval: 2m
+    external_labels:
+      site: eqiad
+    input_series:
+      # Neighbor exists but adjacency state is not 8 (FULL)
+      - series: 'gnmi_nokia_ospf_neighbor_adjacency_state{interface_interface_name="ethernet-1/12.0",instance="lsw1-c2-eqiad:9804"}'
+        values: '2 2 2 2'
+    alert_rule_test:
+      - alertname: OspfAdjError
+        eval_time: 2m
+        exp_alerts:
+          - exp_labels:
+              interface_interface_name: ethernet-1/12.0
+              instance: lsw1-c2-eqiad:9804
+              team: sre
+              severity: critical
+              scope: network
+            exp_annotations:
+              summary: "OSPF Adjacency not formed on lsw1-c2-eqiad interface ethernet-1/12.0"
+              description: "OSPF interface is up but for some reason the two devices have not created a FULL adjacency"
+              dashboard: 'https://grafana.wikimedia.org/d/b77db156-d852-4601-acc5-4065b888e5fe/ospf-status-nokia?orgId=1&var-site=eqiad'
+              runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#OSPF_status'

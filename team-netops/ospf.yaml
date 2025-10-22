@@ -1,0 +1,32 @@
+# deploy-tag: ops
+
+groups:
+  - name: ospf-nokia
+    rules:
+      - alert: OspfAdjDown
+        expr: |
+          gnmi_nokia_ospf_oper_state == 4
+          and on(source, instance_name, interface_interface_name)
+          gnmi_nokia_ospf_neighbor_count == 0
+        for: 2m
+        labels:
+          team: sre
+          severity: critical
+          scope: network
+        annotations:
+          summary: 'OSPF Adjacency down on {{ $labels.instance | stripPort }} interface {{ $labels.interface_interface_name }}'
+          description: 'Protocol should be up and show 1 neighbor if port is up and connected to device at other side'
+          dashboard: 'https://grafana.wikimedia.org/d/b77db156-d852-4601-acc5-4065b888e5fe/ospf-status-nokia?orgId=1&var-site={{ $externalLabels.site }}'
+          runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#OSPF_status'
+      - alert: OspfAdjError
+        expr: gnmi_nokia_ospf_neighbor_adjacency_state != 8
+        for: 2m
+        labels:
+          team: sre
+          severity: critical
+          scope: network
+        annotations:
+          summary: 'OSPF Adjacency not formed on {{ $labels.instance | stripPort }} interface {{ $labels.interface_interface_name }}'
+          description: 'OSPF interface is up but for some reason the two devices have not created a FULL adjacency'
+          dashboard: 'https://grafana.wikimedia.org/d/b77db156-d852-4601-acc5-4065b888e5fe/ospf-status-nokia?orgId=1&var-site={{ $externalLabels.site }}'
+          runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#OSPF_status'
