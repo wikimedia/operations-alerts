@@ -126,3 +126,27 @@ groups:
           description: "The number of weighted_tags cleared is too low in the last 10 minutes"
           runbook: https://wikitech.wikimedia.org/wiki/Search#Streaming_Updater
           dashboard: https://grafana.wikimedia.org/d/fe251f4f-f6cf-4010-8d78-5f482255b16f/cirrussearch-update-pipeline-weighted-tags?orgId=1&var-tag_prefix=All&var-search_cluster_site={{$externalLabels.site}}&var-search_cluster={{$labels.release}}
+      - alert: CirrusStreamingUpdaterIndexNotFoundErrors
+        expr: |
+          sum(increase(flink_taskmanager_job_task_operator_bulk_index_not_found_action_failures{}[10m])) by (release) > 0
+        for: 1m
+        labels:
+          team: search-platform
+          severity: critical
+        annotations:
+          summary: "CirrusSearch {{$labels.release}}@{{$externalLabels.site}} is failing write requests because of missing indices"
+          description: "Some index requests are failing because some indices are missing"
+          runbook: https://wikitech.wikimedia.org/wiki/Search#Streaming_Updater
+          dashboard: https://grafana.wikimedia.org/d/jKqki4MSk/cirrus-streaming-updater
+      - alert: CirrusStreamingUpdaterUnknownErrors
+        expr: |
+          sum(increase(flink_taskmanager_job_task_operator_bulk_unknown_action_failures{}[10m])) by (release) > 0
+        for: 1m
+        labels:
+          team: search-platform
+          severity: critical
+        annotations:
+          summary: "CirrusSearch {{$labels.release}}@{{$externalLabels.site}} is failing write requests because of unknown errors"
+          description: "Some index requests are failing because of unknown errors"
+          runbook: https://wikitech.wikimedia.org/wiki/Search#Streaming_Updater
+          dashboard: https://grafana.wikimedia.org/d/jKqki4MSk/cirrus-streaming-updater
