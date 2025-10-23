@@ -5,10 +5,10 @@ tests:
   - interval: 1h
     input_series:
     - series: helmfile_admin_ng_pending_changes{exported_cluster="ml-serve-eqiad"}
-      values: '1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1'
+      values: '1x168' # 24h*7d
     alert_rule_test:
     - alertname: HelmfileAdminNGPendingChangesLiftWing
-      eval_time: 1d
+      eval_time: 1w
       exp_alerts:
       - exp_annotations:
           description: 'Pending admin_ng changes on ml-serve-eqiad'
@@ -23,10 +23,10 @@ tests:
   - interval: 1h
     input_series:
     - series: helmfile_admin_ng_pending_changes{exported_cluster="ml-serve-codfw"}
-      values: '1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1'
+      values: '1x168' # 24h*7d
     alert_rule_test:
     - alertname: HelmfileAdminNGPendingChangesLiftWing
-      eval_time: 1d
+      eval_time: 1w
       exp_alerts:
       - exp_annotations:
           description: 'Pending admin_ng changes on ml-serve-codfw'
@@ -41,10 +41,10 @@ tests:
   - interval: 1h
     input_series:
     - series: helmfile_admin_ng_pending_changes{exported_cluster="ml-staging-codfw"}
-      values: '1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1'
+      values: '1x168' # 24h*7d
     alert_rule_test:
     - alertname: HelmfileAdminNGPendingChangesLiftWing
-      eval_time: 1d
+      eval_time: 1w
       exp_alerts:
       - exp_annotations:
           description: 'Pending admin_ng changes on ml-staging-codfw'
