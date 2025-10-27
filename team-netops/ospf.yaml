@@ -6,7 +6,7 @@ groups:
       - alert: OspfAdjDown
         expr: |
           gnmi_nokia_ospf_oper_state == 4
-          and on(source, instance_name, interface_interface_name)
+          and on(instance, instance_name, interface_interface_name)
           gnmi_nokia_ospf_neighbor_count == 0
         for: 2m
         labels:
