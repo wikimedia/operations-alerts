@@ -4,6 +4,8 @@ groups:
   - name: ospf-nokia
     rules:
       - alert: OspfAdjDown
+        # we don't have nokias at all sites and so this metric is missing on some prometheus hosts
+        # pint disable promql/series
         expr: |
           gnmi_nokia_ospf_oper_state == 4
           and on(instance, instance_name, interface_interface_name)
@@ -19,6 +21,7 @@ groups:
           dashboard: 'https://grafana.wikimedia.org/d/b77db156-d852-4601-acc5-4065b888e5fe/ospf-status-nokia?orgId=1&var-site={{ $externalLabels.site }}'
           runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#OSPF_status'
       - alert: OspfAdjError
+        # pint disable promql/series
         expr: gnmi_nokia_ospf_neighbor_adjacency_state != 8
         for: 2m
         labels:
