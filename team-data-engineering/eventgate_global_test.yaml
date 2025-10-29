@@ -1,0 +1,74 @@
+rule_files:
+  - eventgate_global.yaml
+evaluation_interval: 1m
+tests:
+
+## Test for EventgateProduceRateAnomaly - eventgate-analytics
+    - interval: 1m
+      input_series:
+        # First 2 hours: 360 events per minute (6 events/sec, above 5 threshold)
+        # Then 540 events per minute (50% increase) for 30 minutes
+        - series: 'eventgate_events_produced_total{service="eventgate-analytics"}'
+          values: '360+360x120 43560+540x30'
+      alert_rule_test:
+        # Test that alert triggers when rate increases significantly
+        - alertname: EventgateProduceRateAnomaly
+          eval_time: 2h20m  # 2h baseline + 20m into anomaly
+          exp_alerts:
+            - exp_labels:
+                severity: warning
+                service: eventgate-analytics
+                team: data-engineering
+              exp_annotations:
+                description: Significant produce rate deviation (+-25%) detected on eventgate-analytics.
+                summary: Significant produce rate deviation (+-25%) on eventgate-analytics.
+                dashboard: https://grafana.wikimedia.org/d/ZB39Izmnz/eventgate?orgId=1&refresh=1m&var-dc=000000026&var-service=eventgate-analytics
+                runbook: https://wikitech.wikimedia.org/wiki/Event_Platform/EventGate
+
+        # Test that alert does not trigger during baseline period
+        - alertname: EventgateProduceRateAnomaly
+          eval_time: 1h
+          exp_alerts: []
+
+## Test for EventgateProduceRateAnomaly - no alert on small changes
+    - interval: 1m
+      input_series:
+        # First 2 hours: 360 events per minute (6 events/sec, above 5 threshold)
+        # Then 432 events per minute (20% increase, below 25% threshold) for 30 minutes
+        - series: 'eventgate_events_produced_total{service="eventgate-analytics"}'
+          values: '360+360x120 43560+432x30'
+      alert_rule_test:
+        - alertname: EventgateProduceRateAnomaly
+          eval_time: 2h20m
+          exp_alerts: []
+        - alertname: EventgateProduceRateAnomaly
+          eval_time: 1h6m
+          exp_alerts: []
+
+## Test for EventgateProduceRateStop
+    - interval: 1m
+      input_series:
+        # Normal traffic for 5 minutes
+        - series: 'eventgate_events_produced_total{service="eventgate-analytics"}'
+          values: '100+0x5'
+        # Then no traffic for 5 minutes
+        - series: 'eventgate_events_produced_total{service="eventgate-analytics"}'
+          values: '0+0x5 0+0x5'
+      alert_rule_test:
+        - alertname: EventgateProduceRateStop
+          eval_time: 10m  # After 5 minutes of no traffic
+          exp_alerts:
+            - exp_labels:
+                severity: critical
+                team: data-engineering
+                service: "eventgate-analytics"
+              exp_annotations:
+                description: No produce rate detected on eventgate-analytics.
+                summary: No produce rate detected on eventgate-analytics.
+                dashboard: https://grafana.wikimedia.org/d/ZB39Izmnz/eventgate?orgId=1&refresh=1m&var-dc=000000026&var-service=eventgate-analytics
+                runbook: https://wikitech.wikimedia.org/wiki/Event_Platform/EventGate
+
+        # Should not alert when there is traffic
+        - alertname: EventgateProduceRateStop
+          eval_time: 5m
+          exp_alerts: []
