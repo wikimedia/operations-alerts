@@ -20,6 +20,7 @@ groups:
         labels:
           severity: critical
           team: 'infrastructure-foundations'
+
       - alert: GanetiBGPDown
         # To be removed once we have Routed Ganeti running in all the sites
         # pint disable promql/series
@@ -34,3 +35,21 @@ groups:
           description: ''  # Not needed
           dashboard: 'https://grafana.wikimedia.org/d/ed8da087-4bcb-407d-9596-d158b8145d45/bgp-neighbors-detail?orgId=1&var-site={{ $labels.site }}&var-device={{ $labels.remote_instance }}&var-bgp_group={{ $labels.peer_group }}&var-bgp_neighbor={{ $labels.instance | stripPort }}'
           runbook: 'https://wikitech.wikimedia.org/wiki/Ganeti#GanetiBGPDown'
+
+      - &ganeti_ca_cert_about_to_expire
+        alert: GanetiCACertificateAboutToExpire
+        expr: '(86400 * 7) < ganeti_ca_cert_expiry - time() < (86400 * 500)'
+        for: 1m
+        annotations:
+          summary: 'Ganeti CA certificate {{ $labels.subject }} is about to expire'
+          description: 'Ganeti CA certificate {{ $labels.subject }} will expire in {{ $value | humanizeDuration }}'
+          runbook: https://wikitech.wikimedia.org/wiki/Ganeti#Renew_cluster_certificates
+          dashboard: TODO
+        labels:
+          severity: warning
+          team: 'infrastructure-foundations'
+      - <<: *ganeti_ca_cert_about_to_expire
+        expr: 'ganeti_ca_cert_expiry - time() < (86400 * 7)'
+        labels:
+          severity: critical
+          team: 'infrastructure-foundations'

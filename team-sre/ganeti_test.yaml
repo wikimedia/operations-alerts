@@ -14,6 +14,10 @@ tests:
         values: '34359738368x100'
       - series: 'remote_instance:gnmi_bgp_neighbor_session_state{instance="ganeti2033:0", peer_group="Ganeti4", remote_instance="lsw1-b7-codfw:9804", site="codfw"}'
         values: '1 1'
+      - series: 'ganeti_ca_cert_expiry{cluster="ganeti", instance="ganeti1003:9100", job="node", prometheus="ops", site="eqiad", subject="ganeti.example.com"}'
+        values: '17280000x100' # 200 days remaining on certificate.
+      - series: 'ganeti_ca_cert_expiry{cluster="ganeti", instance="ganeti1004:9100", job="node", prometheus="ops", site="eqiad", subject="ganeti.example.com"}'
+        values: '518400x100' # 6 days remaining on certificate.
     external_labels:
       site: eqiad
     alert_rule_test:
@@ -60,3 +64,34 @@ tests:
               description: ""
               dashboard: 'https://grafana.wikimedia.org/d/ed8da087-4bcb-407d-9596-d158b8145d45/bgp-neighbors-detail?orgId=1&var-site=codfw&var-device=lsw1-b7-codfw:9804&var-bgp_group=Ganeti4&var-bgp_neighbor=ganeti2033'
               runbook: 'https://wikitech.wikimedia.org/wiki/Ganeti#GanetiBGPDown'
+      - alertname: GanetiCACertificateAboutToExpire
+        eval_time: 15m
+        exp_alerts:
+          - exp_labels:
+              cluster: ganeti
+              instance: ganeti1003:9100
+              job: node
+              prometheus: ops
+              severity: warning
+              site: eqiad
+              subject: ganeti.example.com
+              team: infrastructure-foundations
+            exp_annotations:
+              summary: "Ganeti CA certificate ganeti.example.com is about to expire"
+              description: 'Ganeti CA certificate ganeti.example.com will expire in 199d 23h 45m 0s'
+              runbook: https://wikitech.wikimedia.org/wiki/Ganeti#Renew_cluster_certificates
+              dashboard: TODO
+          - exp_labels:
+              cluster: ganeti
+              instance: ganeti1004:9100
+              job: node
+              prometheus: ops
+              severity: critical
+              site: eqiad
+              subject: ganeti.example.com
+              team: infrastructure-foundations
+            exp_annotations:
+              summary: "Ganeti CA certificate ganeti.example.com is about to expire"
+              description: 'Ganeti CA certificate ganeti.example.com will expire in 5d 23h 45m 0s'
+              runbook: https://wikitech.wikimedia.org/wiki/Ganeti#Renew_cluster_certificates
+              dashboard: TODO
