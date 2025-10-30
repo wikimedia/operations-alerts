@@ -4,22 +4,14 @@
 groups:
 - name: mirrors
   rules:
-  - &mirrors_warn
-    alert: MirrorHighLag
-    expr: time() - node_file_age_timestamp_seconds_total{path=~"/srv/mirrors/(debian|ubuntu)"} > 8 * 3600
+  - alert: MirrorHighLag
+    expr: time() - node_file_age_timestamp_seconds_total{path=~"/srv/mirrors/(debian|ubuntu)"} > 14 * 3600
     for: 10m
     labels:
-      severity: warning
+      severity: critical
       team: infrastructure-foundations
     annotations:
       summary: "Mirrors - {{ $labels.path }} synchronization lag"
       description: "Mirrors - {{ $labels.path }} synchronization lag is behind {{ $value | humanizeDuration }}"
       dashboard: https://grafana.wikimedia.org/d/dbd8a904-eab2-48d1-a3b9-fa1851ef3ed2/mirrors?orgId=1
       runbook: https://wikitech.wikimedia.org/wiki/Mirrors
-
-  - <<: *mirrors_warn
-    alert: MirrorHighLag
-    expr: time() - node_file_age_timestamp_seconds_total{path=~"/srv/mirrors/(debian|ubuntu)"} > 14 * 3600
-    labels:
-      severity: critical
-      team: infrastructure-foundations
