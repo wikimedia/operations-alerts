@@ -1,0 +1,18 @@
+# deploy-tag: ops
+# deploy-site: eqiad, codfw
+
+groups:
+- name: vrts
+  rules:
+  - alert: JunkQueueSize
+    expr: sql_vrts_ticket_count{name="junk_queues"} > 20000
+    for: 5m
+    labels:
+      severity: warning
+      team: collaboration-services
+    annotations:
+      summary: "VRTS junk queue size is large"
+      description: "The VRTS junk queue is above its usual threshold"
+      runbook: https://wikitech.wikimedia.org/wiki/VRT_System/Troubleshooting
+      dashboard: TODO
+
