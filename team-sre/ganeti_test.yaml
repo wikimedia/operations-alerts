@@ -14,9 +14,9 @@ tests:
         values: '34359738368x100'
       - series: 'remote_instance:gnmi_bgp_neighbor_session_state{instance="ganeti2033:0", peer_group="Ganeti4", remote_instance="lsw1-b7-codfw:9804", site="codfw"}'
         values: '1 1'
-      - series: 'ganeti_ca_cert_expiry{cluster="ganeti", instance="ganeti1003:9100", job="node", prometheus="ops", site="eqiad", subject="ganeti.example.com"}'
+      - series: 'ganeti_ca_cert_expiry{cluster="ganeti", instance="ganeti1003:9100", job="node", prometheus="ops", site="eqiad", clustername="ganeti01.codfw.wmnet"}'
         values: '17280000x100' # 200 days remaining on certificate.
-      - series: 'ganeti_ca_cert_expiry{cluster="ganeti", instance="ganeti1004:9100", job="node", prometheus="ops", site="eqiad", subject="ganeti.example.com"}'
+      - series: 'ganeti_ca_cert_expiry{cluster="ganeti", instance="ganeti1004:9100", job="node", prometheus="ops", site="eqiad", clustername="ganeti01.codfw.wmnet"}'
         values: '518400x100' # 6 days remaining on certificate.
     external_labels:
       site: eqiad
@@ -74,11 +74,11 @@ tests:
               prometheus: ops
               severity: warning
               site: eqiad
-              subject: ganeti.example.com
+              clustername: ganeti01.codfw.wmnet
               team: infrastructure-foundations
             exp_annotations:
-              summary: "Ganeti CA certificate ganeti.example.com is about to expire"
-              description: 'Ganeti CA certificate ganeti.example.com will expire in 199d 23h 45m 0s'
+              summary: "Ganeti CA certificate ganeti01.codfw.wmnet is about to expire"
+              description: 'Ganeti CA certificate ganeti01.codfw.wmnet will expire in 199d 23h 45m 0s'
               runbook: https://wikitech.wikimedia.org/wiki/Ganeti#Renew_cluster_certificates
               dashboard: TODO
           - exp_labels:
@@ -88,10 +88,10 @@ tests:
               prometheus: ops
               severity: critical
               site: eqiad
-              subject: ganeti.example.com
+              clustername: ganeti01.codfw.wmnet
               team: infrastructure-foundations
             exp_annotations:
-              summary: "Ganeti CA certificate ganeti.example.com is about to expire"
-              description: 'Ganeti CA certificate ganeti.example.com will expire in 5d 23h 45m 0s'
+              summary: "Ganeti CA certificate ganeti01.codfw.wmnet is about to expire"
+              description: 'Ganeti CA certificate ganeti01.codfw.wmnet will expire in 5d 23h 45m 0s'
               runbook: https://wikitech.wikimedia.org/wiki/Ganeti#Renew_cluster_certificates
               dashboard: TODO

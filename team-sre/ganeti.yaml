@@ -41,8 +41,8 @@ groups:
         expr: '(86400 * 7) < ganeti_ca_cert_expiry - time() < (86400 * 500)'
         for: 1m
         annotations:
-          summary: 'Ganeti CA certificate {{ $labels.subject }} is about to expire'
-          description: 'Ganeti CA certificate {{ $labels.subject }} will expire in {{ $value | humanizeDuration }}'
+          summary: 'Ganeti CA certificate {{ $labels.clustername }} is about to expire'
+          description: 'Ganeti CA certificate {{ $labels.clustername }} will expire in {{ $value | humanizeDuration }}'
           runbook: https://wikitech.wikimedia.org/wiki/Ganeti#Renew_cluster_certificates
           dashboard: TODO
         labels:
