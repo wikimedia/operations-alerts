@@ -4,10 +4,14 @@ groups:
   - name: node_exporter
     rules:
       - alert: NodeTextfileStale
+        # NodeTextfileStale was designed for checking the run success of cron jobs or timer units
+        # that write to their output textfile on every run.  But for jobs that don't perform a write
+        # except if changes are needed, such as textfiles produced by Puppet templates or confd templates,
+        # this will lead to false positives.  So here we exclude those kinds of files by name.
         expr: |
           (time() -
             node_textfile_mtime_seconds{
-              file!~"(.+/)?(confd-reload-vcl|atlas_metadata|trafficserver_config_.+|varnish_params|systemd_unit_.+_owner|role_owner|mediawiki-conftool-state)\\.prom"
+              file!~"(.+/)?(confd-reload-vcl|atlas_metadata|trafficserver_config_.+|varnish_params|systemd_unit_.+_owner|role_owner|(mediawiki|discovery)-conftool-state)\\.prom"
             }
           ) * on (instance) group_left(team) role_owner
           >= 4 * (60*60*24)
