@@ -15,7 +15,7 @@ tests:
       - series: 'remote_instance:gnmi_bgp_neighbor_session_state{instance="ganeti2033:0", peer_group="Ganeti4", remote_instance="lsw1-b7-codfw:9804", site="codfw"}'
         values: '1 1'
       - series: 'ganeti_ca_cert_expiry{cluster="ganeti", instance="ganeti1003:9100", job="node", prometheus="ops", site="eqiad", clustername="ganeti01.codfw.wmnet"}'
-        values: '17280000x100' # 200 days remaining on certificate.
+        values: '7689600x100' # 89 days remaining on certificate.
       - series: 'ganeti_ca_cert_expiry{cluster="ganeti", instance="ganeti1004:9100", job="node", prometheus="ops", site="eqiad", clustername="ganeti01.codfw.wmnet"}'
         values: '518400x100' # 6 days remaining on certificate.
     external_labels:
@@ -78,7 +78,7 @@ tests:
               team: infrastructure-foundations
             exp_annotations:
               summary: "Ganeti CA certificate ganeti01.codfw.wmnet is about to expire"
-              description: 'Ganeti CA certificate ganeti01.codfw.wmnet will expire in 199d 23h 45m 0s'
+              description: 'Ganeti CA certificate ganeti01.codfw.wmnet will expire in 88d 23h 45m 0s'
               runbook: https://wikitech.wikimedia.org/wiki/Ganeti#Renew_cluster_certificates
               dashboard: TODO
           - exp_labels:
