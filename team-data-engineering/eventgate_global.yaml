@@ -109,4 +109,4 @@ groups:
       expr: sum(rate(eventgate_events_produced_total{service="eventgate-analytics-external"}[5m])) by (service) == 0
     - <<: *EventgateProduceRateStop
       # eventgate-logging-external
-      expr: sum(rate(eventgate_events_produced_total{service="eventgate-eventlogging-external"}[5m])) by (service) == 0
+      expr: sum(rate(eventgate_events_produced_total{service="eventgate-logging-external"}[5m])) by (service) == 0
