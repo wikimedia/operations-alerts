@@ -1,0 +1,61 @@
+rule_files:
+  - maintain_dbusers.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    input_series:
+      - series: up{job="maintain_dbusers_eqiad"}
+        values: "1 1 0x100"
+    alert_rule_test:
+      - alertname: MaintainDBUsersDown
+        eval_time: 20m
+        exp_alerts:
+          - exp_labels:
+              job: "maintain_dbusers_eqiad"
+              service: "openstack,cloudvps,maintaindbusers,toolforge,paws"
+              severity: "warning"
+              team: "wmcs"
+            exp_annotations:
+              dashboard: "https://grafana.wikimedia.org/d/ae240a06-c13e-49f3-b12c-58432c551e85/wmcs-maintain-dbusers"
+              description: "Maintain-dbusers can't be reached by prometheus"
+              runbook: "https://wikitech.wikimedia.org/wiki/Portal:Toolforge/Admin/Runbooks/MaintainDBUsersDown"
+              summary: "Maintain-dbusers is down"
+
+  - interval: 1m
+    input_series:
+      - series: maintain_dbusers_populate_total{status="errored"}
+        values: "1+1x120"
+    alert_rule_test:
+      - alertname: MaintainDBUsersManyErrors
+        eval_time: 1h10m
+        exp_alerts:
+          - exp_labels:
+              service: "openstack,cloudvps,maintaindbusers,toolforge,paws"
+              severity: "warning"
+              status: "errored"
+              team: "wmcs"
+            exp_annotations:
+              dashboard: "https://grafana.wikimedia.org/d/ae240a06-c13e-49f3-b12c-58432c551e85/wmcs-maintain-dbusers"
+              description: "Maintain-dbusers is failing to create or extract accounts to create credentials for"
+              runbook: "https://wikitech.wikimedia.org/wiki/Portal:Toolforge/Admin/Runbooks/MaintainDBUsersManyErrors"
+              summary: "Maintain-dbusers is having sustained errors"
+
+  - interval: 1m
+    input_series:
+      - series: maintain_dbusers_last_run
+        # time() behavior in unit tests is from zero, using eval_time, not the current time.  See:
+        # https://github.com/prometheus/prometheus/issues/4817#issuecomment-514765285
+        values: "0+0x120"
+    alert_rule_test:
+      - alertname: MaintainDBUsersStuck
+        eval_time: 46m
+        exp_alerts:
+          - exp_labels:
+              service: "openstack,cloudvps,maintaindbusers,toolforge,paws"
+              severity: "warning"
+              team: "wmcs"
+            exp_annotations:
+              dashboard: "https://grafana.wikimedia.org/d/ae240a06-c13e-49f3-b12c-58432c551e85/wmcs-maintain-dbusers"
+              description: "Maintain-dbusers did not do any run for the last 46m 0s"
+              runbook: "https://wikitech.wikimedia.org/wiki/Portal:Toolforge/Admin/Runbooks/MaintainDBUsersStuck"
+              summary: "Maintain-dbusers is stuck"

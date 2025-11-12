@@ -1,0 +1,44 @@
+# deploy-tag: cloud
+# deploy-site: eqiad
+
+groups:
+  - name: maintain_dbusers
+    rules:
+      - alert: MaintainDBUsersDown
+        expr: up{job="maintain_dbusers_eqiad"} or on() vector(-1) > 0
+        for: 15m
+        labels:
+          team: wmcs
+          severity: warning
+          service: openstack,cloudvps,maintaindbusers,toolforge,paws
+        annotations:
+          summary: "Maintain-dbusers is down"
+          description: "Maintain-dbusers can't be reached by prometheus"
+          runbook: https://wikitech.wikimedia.org/wiki/Portal:Toolforge/Admin/Runbooks/MaintainDBUsersDown
+          dashboard: https://grafana.wikimedia.org/d/ae240a06-c13e-49f3-b12c-58432c551e85/wmcs-maintain-dbusers
+
+      - alert: MaintainDBUsersStuck
+        expr: time() - maintain_dbusers_last_run > 30*60
+        for: 15m
+        labels:
+          team: wmcs
+          severity: warning
+          service: openstack,cloudvps,maintaindbusers,toolforge,paws
+        annotations:
+          summary: "Maintain-dbusers is stuck"
+          description: "Maintain-dbusers did not do any run for the last {{ $value | humanizeDuration }}"
+          runbook: https://wikitech.wikimedia.org/wiki/Portal:Toolforge/Admin/Runbooks/MaintainDBUsersStuck
+          dashboard: https://grafana.wikimedia.org/d/ae240a06-c13e-49f3-b12c-58432c551e85/wmcs-maintain-dbusers
+
+      - alert: MaintainDBUsersManyErrors
+        expr: increase(maintain_dbusers_populate_total{status="errored"}[1h]) or on() vector(1) > 0
+        for: 1h
+        labels:
+          team: wmcs
+          severity: warning
+          service: openstack,cloudvps,maintaindbusers,toolforge,paws
+        annotations:
+          summary: "Maintain-dbusers is having sustained errors"
+          description: "Maintain-dbusers is failing to create or extract accounts to create credentials for"
+          runbook: https://wikitech.wikimedia.org/wiki/Portal:Toolforge/Admin/Runbooks/MaintainDBUsersManyErrors
+          dashboard: https://grafana.wikimedia.org/d/ae240a06-c13e-49f3-b12c-58432c551e85/wmcs-maintain-dbusers
