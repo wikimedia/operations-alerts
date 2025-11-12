@@ -4,21 +4,20 @@ evaluation_interval: 1m
 tests:
   - interval: 1m
     input_series:
-      - series: nginx_http_requests_total{site="eqiad", instance="urldownloader1001", status_code="500"}
+      - series: nginx_http_requests_total{site="eqiad", instance="urldownloader1001", status_code="500", cluster="hcaptcha"}
         values: '0+10x600'
-      - series: nginx_http_requests_total{site="eqiad", instance="urldownloader1001", status_code="200"}
+      - series: nginx_http_requests_total{site="eqiad", instance="urldownloader1001", status_code="200", cluster="hcaptcha"}
         values: '0+900x600'
     external_labels:
       site: eqiad
     alert_rule_test:
       - eval_time: 4m
         alertname: ProxoidHigh5xxErrorRate
-        exp_alerts: []   # no alert yet
-      - eval_time: 15m
+        exp_alerts: []   # no alert yet (still pending)
+      - eval_time: 6m
         alertname: ProxoidHigh5xxErrorRate
         exp_alerts:
           - exp_labels:
-              alertname: ProxoidHigh5xxErrorRate
               instance: urldownloader1001
               severity: critical
               team: sre
