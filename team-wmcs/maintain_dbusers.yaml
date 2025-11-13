@@ -5,7 +5,7 @@ groups:
   - name: maintain_dbusers
     rules:
       - alert: MaintainDBUsersDown
-        expr: up{job="maintain_dbusers_eqiad"} or on() vector(-1) > 0
+        expr: (up{job="maintain_dbusers_eqiad"} or on() vector(-1)) < 1
         for: 15m
         labels:
           team: wmcs

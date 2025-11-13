@@ -5,7 +5,7 @@ tests:
   - interval: 1m
     input_series:
       - series: up{job="maintain_dbusers_eqiad"}
-        values: "1 1 0x100"
+        values: "0x100"
     alert_rule_test:
       - alertname: MaintainDBUsersDown
         eval_time: 20m
@@ -20,6 +20,15 @@ tests:
               description: "Maintain-dbusers can't be reached by prometheus"
               runbook: "https://wikitech.wikimedia.org/wiki/Portal:Toolforge/Admin/Runbooks/MaintainDBUsersDown"
               summary: "Maintain-dbusers is down"
+
+  - interval: 1m
+    input_series:
+      - series: up{job="maintain_dbusers_eqiad"}
+        values: "1x100"
+    alert_rule_test:
+      - alertname: MaintainDBUsersDown
+        eval_time: 20m
+        exp_alerts: []
 
   - interval: 1m
     input_series:
