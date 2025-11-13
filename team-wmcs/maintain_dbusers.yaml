@@ -31,7 +31,7 @@ groups:
           dashboard: https://grafana.wikimedia.org/d/ae240a06-c13e-49f3-b12c-58432c551e85/wmcs-maintain-dbusers
 
       - alert: MaintainDBUsersManyErrors
-        expr: increase(maintain_dbusers_populate_total{status="errored"}[1h]) or on() vector(1) > 0
+        expr: (increase(maintain_dbusers_populate_total{status="errored"}[1h]) or on() vector(1)) > 0
         for: 1h
         labels:
           team: wmcs
