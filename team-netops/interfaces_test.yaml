@@ -18,9 +18,13 @@ tests:
         values: '0+4x15'
       - series: 'gnmi_interfaces_interface_state_counters_out_octets{instance="cr2-esams:9804", interface_description="Peering: Test peering", interface_name="xe-0/1/0"}'
         values: '0+144000000000x5' # 1200000000 * 2 * 60
+      - series: 'gnmi_interfaces_interface_state_counters_out_octets{instance="cr2-esams:9804", interface_description="Core: Test core", interface_name="xe-0/1/1"}'
+        values: '0+144000000000x5' # 1200000000 * 2 * 60
       - series: 'gnmi_interfaces_interface_state_counters_in_octets{instance="cr2-esams:9804", interface_description="Peering: Test peering", interface_name="xe-0/1/0"}'
         values: '0+144000000000x5' # 1200000000 * 2 * 60
       - series: 'gnmi_interfaces_interface_state_high_speed{instance="cr2-esams:9804", interface_description="Peering: Test peering", interface_name="xe-0/1/0"}'
+        values: '10000x5'
+      - series: 'gnmi_interfaces_interface_state_high_speed{instance="cr2-esams:9804", interface_description="Core: Test core", interface_name="xe-0/1/1"}'
         values: '10000x5'
       - series: 'gnmi_interfaces_interface_state_oper_status{instance="asw1-b12-drmrs:9804", interface_name="et-0/0/48", interface_description="Core: cr1-drmrs:et-0/0/1 {#D0100}"}'
         values: '2 2'
@@ -84,6 +88,21 @@ tests:
               scope: network
             exp_annotations:
               summary: "Transit, peering or transport outbound traffic above 90% capacity - cr2-esams:xe-0/1/0 (Peering: Test peering) #page"
+              description: ""
+              dashboard: 'https://grafana.wikimedia.org/d/fb403d62-5f03-434a-9dff-bd02b9fff504/network-device-overview?var-instance=cr2-esams:9804'
+              runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#Primary_outbound_port_utilization_over_90%'
+      - alertname: CoreOutboundSaturation
+        eval_time: 10m
+        exp_alerts:
+          - exp_labels:
+              instance: cr2-esams:9804
+              interface_name: xe-0/1/1
+              interface_description: "Core: Test core"
+              team: sre
+              severity: page
+              scope: network
+            exp_annotations:
+              summary: "Core link outbound traffic above 90% capacity - cr2-esams:xe-0/1/1 (Core: Test core) #page"
               description: ""
               dashboard: 'https://grafana.wikimedia.org/d/fb403d62-5f03-434a-9dff-bd02b9fff504/network-device-overview?var-instance=cr2-esams:9804'
               runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#Primary_outbound_port_utilization_over_90%'
