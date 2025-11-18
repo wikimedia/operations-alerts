@@ -72,7 +72,7 @@ tests:
               description: ""
               dashboard: 'https://grafana.wikimedia.org/d/fb403d62-5f03-434a-9dff-bd02b9fff504/network-device-overview?var-instance=cr3-ulsfo:9804'
               runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#Inbound/outbound_interface_errors'
-      - alertname: TransitPeeringOutboundSaturation
+      - alertname: TransitPeeringTransportOutboundSaturation
         eval_time: 10m
         exp_alerts:
           - exp_labels:
@@ -83,7 +83,7 @@ tests:
               severity: page
               scope: network
             exp_annotations:
-              summary: "Transit or peering outbound traffic above 90% capacity - cr2-esams:xe-0/1/0 (Peering: Test peering) #page"
+              summary: "Transit, peering or transport outbound traffic above 90% capacity - cr2-esams:xe-0/1/0 (Peering: Test peering) #page"
               description: ""
               dashboard: 'https://grafana.wikimedia.org/d/fb403d62-5f03-434a-9dff-bd02b9fff504/network-device-overview?var-instance=cr2-esams:9804'
               runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#Primary_outbound_port_utilization_over_90%'
