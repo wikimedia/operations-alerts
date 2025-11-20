@@ -1,0 +1,19 @@
+# deploy-tag: analytics
+# deploy-site: eqiad
+
+groups:
+  - name: analytics-mariadb
+    rules:
+
+      ## Hive high query rate
+      - alert: MariaDBQueryRate
+        annotations:
+          description: More than 5000 requests / second on the {{ $labels.instance }} MariaDB.
+          summary: High query rate on {{ $labels.instance }}.
+          dashboard: https://grafana.wikimedia.org/d/d251bef4-d946-4bea-a8a5-b02a3546762e/mariadb?var-server={{ $labels.instance }}
+          runbook: https://wikitech.wikimedia.org/wiki/Data_Platform/Systems/Hive/Alerts#High_DB_query_rate
+        expr: irate(mysql_global_status_queries{instance=~"an-mariadb.*"}[5m]) > 5000
+        for: 15m
+        labels:
+          severity: critical
+          team: data-platform

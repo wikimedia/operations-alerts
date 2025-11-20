@@ -1,0 +1,24 @@
+rule_files:
+  - analytics-mariadb.yaml
+evaluation_interval: 1m
+tests:
+
+  ## Hive high query rate tests
+  - interval: 1m
+    input_series:
+      - series: mysql_global_status_queries{cluster="misc", instance="an-mariadb1001:9104"}
+        values: '0+600000x20' # start from zero, then increase the next 7 samples by 600'000 each time or 10k request / second
+    alert_rule_test:
+      - alertname: MariaDBQueryRate
+        eval_time: 16m
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              team: data-platform
+              instance: an-mariadb1001:9104
+              cluster: misc
+            exp_annotations:
+              description: More than 5000 requests / second on the an-mariadb1001:9104 MariaDB.
+              summary: High query rate on an-mariadb1001:9104.
+              dashboard: https://grafana.wikimedia.org/d/d251bef4-d946-4bea-a8a5-b02a3546762e/mariadb?var-server=an-mariadb1001:9104
+              runbook: https://wikitech.wikimedia.org/wiki/Data_Platform/Systems/Hive/Alerts#High_DB_query_rate
