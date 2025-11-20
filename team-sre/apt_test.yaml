@@ -1,0 +1,49 @@
+rule_files:
+  - apt.yaml
+
+evaluation_interval: 1m
+
+tests:
+  #
+  # GitlabPackagePullerFailedOnReprepro
+  #
+  - interval: 1m
+    input_series:
+      - series: 'gitlab_package_puller_reprepro_notify_failed{instance="apt1001:9100",job="gitlab-package-puller"}'
+        values: '0 1x120'
+    alert_rule_test:
+      - alertname: GitlabPackagePullerFailedOnReprepro
+        eval_time: 61m
+        exp_alerts:
+          - exp_labels:
+              severity: task
+              team: collaboration-services
+              job: gitlab-package-puller
+              instance: apt1001:9100
+            exp_annotations:
+              summary: "Package puller has some reprepro errors that needs investigation."
+              description: "Errors seen in package puller on apt1001 for the last hour, this needs an investigation."
+              dashboard: "TODO"
+              runbook: "TODO"
+
+  #
+  # GitlabPackagePullerFailedOnRun
+  #
+  - interval: 1m
+    input_series:
+      - series: 'gitlab_package_puller_run_success{instance="apt1001:9100",job="gitlab-package-puller"}'
+        values: '0 1x120'
+    alert_rule_test:
+      - alertname: GitlabPackagePullerFailedOnRun
+        eval_time: 61m
+        exp_alerts:
+          - exp_labels:
+              severity: task
+              team: collaboration-services
+              job: gitlab-package-puller
+              instance: apt1001:9100
+            exp_annotations:
+              summary: "Package puller has some run errors that needs investigation."
+              description: "Errors seen in package puller on apt1001 for the last hour, this needs an investigation."
+              dashboard: "TODO"
+              runbook: "TODO"

@@ -1,0 +1,29 @@
+# deploy-tag: ops
+# deploy-site: eqiad, codfw
+
+groups:
+- name: apt
+  rules:
+  - alert: GitlabPackagePullerFailedOnReprepro
+    expr: gitlab_package_puller_reprepro_notify_failed > 0
+    for: 1h
+    labels:
+      severity: task
+      team: collaboration-services
+    annotations:
+      summary: "Package puller has some reprepro errors that needs investigation."
+      description: 'Errors seen in package puller on {{ $labels.instance | reReplaceAll ":[0-9]+" "" }} for the last hour, this needs an investigation.'
+      dashboard: TODO
+      runbook: TODO
+
+  - alert: GitlabPackagePullerFailedOnRun
+    expr: gitlab_package_puller_run_success > 0
+    for: 1h
+    labels:
+      severity: task
+      team: collaboration-services
+    annotations:
+      summary: "Package puller has some run errors that needs investigation."
+      description: 'Errors seen in package puller on {{ $labels.instance | reReplaceAll ":[0-9]+" "" }} for the last hour, this needs an investigation.'
+      dashboard: TODO
+      runbook: TODO
