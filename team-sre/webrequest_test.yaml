@@ -1,0 +1,25 @@
+rule_files:
+  - webrequest.yaml
+evaluation_interval: 1m
+tests:
+
+  - interval: 1m
+    input_series:
+      - series: kafka_server_BrokerTopicMetrics_BytesOut_total{cluster="kafka_jumbo", instance="kafka-jumbo1012:7800", job="jmx_kafka", kafka_cluster="jumbo-eqiad", prometheus="ops", site="eqiad", topic="webrequest_sampled"}
+        values: '0+0x20'
+      - series: kafka_server_BrokerTopicMetrics_BytesOut_total{cluster="kafka_jumbo", instance="kafka-jumbo1015:7800", job="jmx_kafka", kafka_cluster="jumbo-eqiad", prometheus="ops", site="eqiad", topic="webrequest_sampled"}
+        values: '0+0x20'
+      - series: kafka_server_BrokerTopicMetrics_BytesOut_total{cluster="kafka_jumbo", instance="kafka-jumbo1016:7800", job="jmx_kafka", kafka_cluster="jumbo-eqiad", prometheus="ops", site="eqiad", topic="webrequest_sampled"}
+        values: '0+0x20'
+    alert_rule_test:
+      - alertname: WebrequestNotIngested
+        eval_time: 16m
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              team: sre
+            exp_annotations:
+              description: Webrequests are not ingested into Druid.
+              summary: Webrequests are not ingested into Druid. Kafka read rate for topic webrequest_sampled is zero.
+              dashboard: https://grafana.wikimedia.org/d/000000234/kafka-by-topic?var-topic=webrequest_sampled
+              runbook: https://wikitech.wikimedia.org/wiki/Data_Platform/Systems/Druid/Alerts#Druid_webrequest_sampled_live_Supervisor

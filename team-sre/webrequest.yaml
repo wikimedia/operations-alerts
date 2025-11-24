@@ -1,0 +1,19 @@
+# deploy-tag: ops
+# deploy-site: eqiad
+
+groups:
+  - name: webrequest
+    rules:
+
+      ## Hive high query rate
+      - alert: WebrequestNotIngested
+        annotations:
+          description: Webrequests are not ingested into Druid.
+          summary: Webrequests are not ingested into Druid. Kafka read rate for topic webrequest_sampled is zero.
+          dashboard: https://grafana.wikimedia.org/d/000000234/kafka-by-topic?var-topic=webrequest_sampled
+          runbook: https://wikitech.wikimedia.org/wiki/Data_Platform/Systems/Druid/Alerts#Druid_webrequest_sampled_live_Supervisor
+        expr: sum(irate(kafka_server_BrokerTopicMetrics_BytesOut_total{topic='webrequest_sampled'}[5m])) == 0
+        for: 15m
+        labels:
+          severity: critical
+          team: sre
