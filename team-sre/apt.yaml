@@ -17,7 +17,7 @@ groups:
       runbook: TODO
 
   - alert: GitlabPackagePullerFailedOnRun
-    expr: gitlab_package_puller_run_success > 0
+    expr: gitlab_package_puller_run_success < 1
     for: 1h
     labels:
       severity: task

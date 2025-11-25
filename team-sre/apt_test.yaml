@@ -32,7 +32,7 @@ tests:
   - interval: 1m
     input_series:
       - series: 'gitlab_package_puller_run_success{instance="apt1001:9100",job="gitlab-package-puller"}'
-        values: '0 1x120'
+        values: '1 0x120'
     alert_rule_test:
       - alertname: GitlabPackagePullerFailedOnRun
         eval_time: 61m
