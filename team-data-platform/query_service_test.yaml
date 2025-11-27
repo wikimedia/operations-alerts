@@ -1,0 +1,22 @@
+rule_files:
+  - query_service.yaml
+tests:
+  - interval: 1m
+    input_series:
+      - series: jvm_threads_current{cluster="wdqs-main", instance="wdqs1011:9102", job="jmx_wdqs_blazegraph"}
+        values: '1000+0x40'
+    alert_rule_test:
+      - alertname: QueryServiceHighThreadCound
+        eval_time: 31m
+        exp_alerts:
+          - exp_annotations:
+              description: 'High thread count on wdqs1011:9102 / wdqs-main'
+              summary: 'Blazegraph running on wdqs1011:9102 as part of the wdqs-main cluster has a high thread count.'
+              dashboard: 'https://grafana.wikimedia.org/d/000000489/wikidata-query-service?var-cluster_name=wdqs-main&from=now-6h&to=now&viewPanel=panel-22'
+              runbook: 'https://wikitech.wikimedia.org/wiki/Wikidata_Query_Service/Runbook#Resolving_blazegraph_deadlock'
+            exp_labels:
+              cluster: wdqs-main
+              instance: wdqs1011:9102
+              job: jmx_wdqs_blazegraph
+              severity: critical
+              team: data-platform
