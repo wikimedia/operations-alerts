@@ -39,3 +39,15 @@ groups:
         labels:
           severity: critical
           team: sre
+
+      - alert: KafkaRollingRestartRequired
+        expr: label_replace(node_file_age_timestamp_seconds_total{instance=~"kafka-main.*", path=~".*broker.keystore.p12"}, "instance", "$1", "instance", "(.*):.*") - on(instance) label_replace(process_start_time_seconds{instance=~"kafka-main.*",job="jmx_kafka"}, "instance", "$1", "instance", "(.*):.*") > 0
+        for: 30m
+        annotations:
+          summary: 'Instance {{ $labels.instance }} in {{ $externalLabels.site }} has not picked up new TLS certs.'
+          description: 'The Kafka broker processes are currently older than the TLS keystore file. This means that a rolling restart is required to pick up the new certs.'
+          runbook: https://wikitech.wikimedia.org/wiki/Kafka/Administration#Renew_TLS_certificate
+          dashboard: TODO
+        labels:
+          severity: warning
+          team: serviceops

@@ -63,3 +63,25 @@ tests:
               description: 'Reported lag in Kafka is increasing for jumbo-eqiad in eqiad'
               runbook: https://wikitech.wikimedia.org/wiki/Kafka/Administration
               dashboard: https://grafana.wikimedia.org/d/000000027/kafka?orgId=1&var-datasource=eqiad%20prometheus/ops&var-kafka_cluster=jumbo-eqiad
+
+  - interval: 1m
+    input_series:
+      - series: node_file_age_timestamp_seconds_total{cluster="kafka_main", instance="kafka-main1006:9100", job="node", path="/etc/kafka/ssl/kafka_main-eqiad_broker.keystore.p12"}
+        values: '1760000000+60x32'
+      - series: process_start_time_seconds{cluster="kafka_main", instance="kafka-main1006:7800", job="jmx_kafka", kafka_cluster="main-eqiad"}
+        values: '1750000000+60x32'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: KafkaRollingRestartRequired
+        eval_time: 31m
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              team: serviceops
+              instance: kafka-main1006
+            exp_annotations:
+              summary: 'Instance kafka-main1006 in eqiad has not picked up new TLS certs.'
+              description: 'The Kafka broker processes are currently older than the TLS keystore file. This means that a rolling restart is required to pick up the new certs.'
+              runbook: https://wikitech.wikimedia.org/wiki/Kafka/Administration#Renew_TLS_certificate
+              dashboard: TODO
