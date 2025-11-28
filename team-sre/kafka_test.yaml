@@ -77,7 +77,7 @@ tests:
         eval_time: 31m
         exp_alerts:
           - exp_labels:
-              severity: warning
+              severity: task
               team: serviceops
               instance: kafka-main1006
             exp_annotations:

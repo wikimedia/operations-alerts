@@ -49,5 +49,5 @@ groups:
           runbook: https://wikitech.wikimedia.org/wiki/Kafka/Administration#Renew_TLS_certificate
           dashboard: TODO
         labels:
-          severity: warning
+          severity: task
           team: serviceops
