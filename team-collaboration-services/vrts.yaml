@@ -1,0 +1,18 @@
+# deploy-tag: ops
+# deploy-site: eqiad, codfw
+
+groups:
+- name: vrts
+  rules:
+  - alert: VRTSHighInodeUsage
+    expr: |
+      (100 * (node_filesystem_files_free{instance=~"vrts.*", fstype="ext4"} / node_filesystem_files{instance=~"vrts.*", fstype="ext4"})) < 20
+    for: 5m
+    labels:
+      severity: warning
+      team: collaboration-services
+    annotations:
+      summary: "High inode usage on {{ $labels.instance }}"
+      description: "{{ $labels.instance }} inodes are almost exhausted"
+      runbook: https://wikitech.wikimedia.org/wiki/VRT_System/Troubleshooting#VRTSHighInodeUsage
+      dashboard: https://grafana.wikimedia.org/goto/jbpjcxZvg?orgId=1

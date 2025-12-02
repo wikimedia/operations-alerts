@@ -1,0 +1,26 @@
+rule_files:
+  - vrts.yaml
+evaluation_interval: 5m
+
+tests:
+  # HighInodeUsage
+  - interval: 1m
+    input_series:
+      - series: 'node_filesystem_files_free{instance="vrts1003:9100", fstype="ext4"}'
+        values: '500000'
+      - series: 'node_filesystem_files{instance="vrts1003:9100", fstype="ext4"}'
+        values: '4890624'
+    alert_rule_test:
+      - alertname: VRTSHighInodeUsage
+        eval_time: 5m
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              team: collaboration-services
+              instance: vrts1003:9100
+              fstype: ext4
+            exp_annotations:
+              summary: High inode usage on vrts1003:9100
+              description: vrts1003:9100 inodes are almost exhausted
+              runbook: https://wikitech.wikimedia.org/wiki/VRT_System/Troubleshooting#VRTSHighInodeUsage
+              dashboard: https://grafana.wikimedia.org/goto/jbpjcxZvg?orgId=1
