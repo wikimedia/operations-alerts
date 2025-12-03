@@ -9,6 +9,10 @@ tests:
         values: '1+0x5 0+0x20'
       - series: 'probe_success{job="probes/test", module="http_test", instance="ok:443"}'
         values: '1+0x30'
+      - series: 'service_catalog_info{instance="fail:443", team="sre"}'
+        values: '1+0x30'
+      - series: 'service_catalog_info{instance="ok:443", team="sre"}'
+        values: '1+0x30'
     external_labels:
       site: eqiad
     alert_rule_test:
@@ -40,6 +44,10 @@ tests:
         values: '1+0x30'
       - series: 'service_catalog_page{instance="ok:443"}'
         values: '0+0x30'
+      - series: 'service_catalog_info{instance="fail-page:443", team="sre"}'
+        values: '1+0x30'
+      - series: 'service_catalog_info{instance="ok:443", team="sre"}'
+        values: '1+0x30'
     external_labels:
       site: eqiad
     alert_rule_test:
