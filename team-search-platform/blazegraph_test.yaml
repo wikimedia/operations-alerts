@@ -47,12 +47,12 @@ tests:
       site: eqiad
     input_series:
       - series: 'blazegraph_lastupdated{site="eqiad", cluster="wdqs-main", instance="wdqs3050:9193"}'
-        values: "0x10"
+        values: "-610+60x32"
       - series: org_wikidata_query_rdf_blazegraph_filters_QueryEventSenderFilter_event_sender_filter_StartedQueries{instance="wdqs3050:9102", cluster="wdqs-main", site="eqiad"}
-        values: "10000+10000x10"
+        values: "0+100x32"
     alert_rule_test:
       - alertname: ElevatedMaxLagWDQS
-        eval_time: 12m
+        eval_time: 31m
         exp_alerts:
           - exp_labels:
               team: search-platform

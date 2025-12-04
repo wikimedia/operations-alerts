@@ -4,10 +4,10 @@ groups:
   - name: rdf-streaming-updater
     rules:
 
-## RDF Streaming Updater Consumer alerts
+      ## RDF Streaming Updater Consumer alerts
       - alert: RdfStreamingUpdaterHighConsumerUpdateLag
         expr: wdqs_streaming_updater_kafka_stream_consumer_lag_Value / 1000 > 600
-        for: 5m
+        for: 30m
         labels:
           team: search-platform
           severity: warning

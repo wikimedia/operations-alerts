@@ -5,10 +5,10 @@ tests:
   - interval: 1m
     input_series:
       - series: 'wdqs_streaming_updater_kafka_stream_consumer_lag_Value{instance="wcqs2001:9101"}'
-        values: 1260000
+        values: "1260000+0x32"
     alert_rule_test:
       - alertname: RdfStreamingUpdaterHighConsumerUpdateLag
-        eval_time: 5m
+        eval_time: 31m
         exp_alerts:
           - exp_labels:
               severity: warning

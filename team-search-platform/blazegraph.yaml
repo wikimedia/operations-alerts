@@ -30,10 +30,26 @@ groups:
 
       - alert: ElevatedMaxLagWDQS
         expr: >-
-          max(time() - label_replace(blazegraph_lastupdated{cluster=~"wdqs-(main|scholarly)", instance=~".*:9193"}, "host", "$1", "instance", "^([^:]+):.*")
-          and on(host) label_replace(rate(org_wikidata_query_rdf_blazegraph_filters_QueryEventSenderFilter_event_sender_filter_StartedQueries{cluster=~"wdqs-(main|scholarly)", instance  =~ ".*:9102"}[5m])
-          > 0.2, "host", "$1", "instance", "^([^:]+):.*"))/60 > 10
-        for: 1m
+          max(
+            # time since last update in (in seconds since epoch), we want this to be < 10 minutes
+            time() -
+            label_replace(
+              # time of the latest update (in seconds since epoch)
+              blazegraph_lastupdated{cluster=~"wdqs-.*", instance=~".*:9193"},
+              "host", "$1", "instance", "^([^:]+):.*"
+            )
+            # filter the above vectors to remove nodes which see less than 0.2 queries per second (12 queries per minute), those are probably depooled
+            and on(host) label_replace(
+              rate(
+                org_wikidata_query_rdf_blazegraph_filters_QueryEventSenderFilter_event_sender_filter_StartedQueries{
+                  cluster=~"wdqs-(main|scholarly)",
+                  instance  =~ ".*:9102"
+                }[5m]
+              ) > 0.2,
+              "host", "$1", "instance", "^([^:]+):.*"
+            )
+          )/60 > 10
+        for: 30m
         labels:
           team: search-platform
           severity: critical
