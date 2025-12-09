@@ -1,5 +1,5 @@
-# deploy-tag: k8s-dse
-# deploy-site: eqiad
+# deploy-tag: ops
+# deploy-site: eqiad, codfw
 
 groups:
   - name: query_service
