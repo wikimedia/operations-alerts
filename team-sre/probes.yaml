@@ -75,14 +75,14 @@ groups:
        summary: 'Certificate for service {{ $labels.instance }} is about to expire'
        runbook: 'https://wikitech.wikimedia.org/wiki/TLS/Runbook#{{ $labels.instance }}'
        dashboard: TODO
-     expr: probe_ssl_earliest_cert_expiry{job=~"probes/.*", job!="probes/custom"} - time() < (86400 * 9)
+     expr: probe_ssl_earliest_cert_expiry{job=~"probes/.*", job!="probes/custom", module!~".*-staging.*"} - time() < (86400 * 9)
      for: 5m
      labels:
        severity: warning
        team: sre
 
    - <<: *cert_expired
-     expr: probe_ssl_earliest_cert_expiry{job=~"probes/.*", job!="probes/custom"} - time() < (86400 * 7)
+     expr: probe_ssl_earliest_cert_expiry{job=~"probes/.*", job!="probes/custom", module!~".*-staging.*"} - time() < (86400 * 7)
      labels:
        severity: critical
        team: sre
