@@ -6,7 +6,7 @@ tests:
       - series: jvm_threads_current{cluster="wdqs-main", instance="wdqs1011:9102", job="jmx_wdqs_blazegraph"}
         values: '1000+0x40'
     alert_rule_test:
-      - alertname: QueryServiceHighThreadCound
+      - alertname: QueryServiceHighThreadCount
         eval_time: 31m
         exp_alerts:
           - exp_annotations:

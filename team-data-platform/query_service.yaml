@@ -4,7 +4,7 @@
 groups:
   - name: query_service
     rules:
-    - alert: QueryServiceHighThreadCound
+    - alert: QueryServiceHighThreadCount
       annotations:
         description: 'High thread count on {{ $labels.instance }} / {{ $labels.cluster }}'
         summary: 'Blazegraph running on {{ $labels.instance }} as part of the {{ $labels.cluster }} cluster has a high thread count.'
