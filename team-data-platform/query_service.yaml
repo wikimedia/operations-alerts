@@ -8,9 +8,9 @@ groups:
       annotations:
         description: 'High thread count on {{ $labels.instance }} / {{ $labels.cluster }}'
         summary: 'Blazegraph running on {{ $labels.instance }} as part of the {{ $labels.cluster }} cluster has a high thread count.'
-        dashboard: 'https://grafana.wikimedia.org/d/000000489/wikidata-query-service?var-cluster_name={{ $labels.cluster }}&from=now-6h&to=now&viewPanel=panel-22'
+        dashboard: 'https://w.wiki/Gaze'
         runbook: 'https://wikitech.wikimedia.org/wiki/Wikidata_Query_Service/Runbook#Resolving_blazegraph_deadlock'
-      expr: jvm_threads_current{job=~'jmx_w[cd]qs_blazegraph'} > 800
+      expr: jvm_threads_current{job=~'jmx_w[cd]qs_blazegraph'} > 1000
       for: 30m
       labels:
         severity: critical
