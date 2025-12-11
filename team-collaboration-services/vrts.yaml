@@ -1,5 +1,5 @@
 # deploy-tag: ops
-# deploy-site: eqiad, codfw
+# deploy-site: eqiad
 
 groups:
 - name: vrts
@@ -15,4 +15,15 @@ groups:
       summary: "High inode usage on {{ $labels.instance }}"
       description: "{{ $labels.instance }} inodes are almost exhausted"
       runbook: https://wikitech.wikimedia.org/wiki/VRT_System/Troubleshooting#VRTSHighInodeUsage
+      dashboard: https://grafana.wikimedia.org/goto/jbpjcxZvg?orgId=1
+  - alert: VRTSJunkQueueSize
+    expr: sql_vrts_ticket_count{name="junk_queues"} > 20000
+    for: 5m
+    labels:
+      severity: warning
+      team: collaboration-services
+    annotations:
+      summary: "VRTS junk queue size is large"
+      description: "The VRTS junk queue is above its usual threshold"
+      runbook: https://wikitech.wikimedia.org/wiki/VRT_System/Troubleshooting#VRTSJunkQueueSize
       dashboard: https://grafana.wikimedia.org/goto/jbpjcxZvg?orgId=1

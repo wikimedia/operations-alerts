@@ -24,3 +24,20 @@ tests:
               description: vrts1003:9100 inodes are almost exhausted
               runbook: https://wikitech.wikimedia.org/wiki/VRT_System/Troubleshooting#VRTSHighInodeUsage
               dashboard: https://grafana.wikimedia.org/goto/jbpjcxZvg?orgId=1
+  - interval: 1m
+    input_series:
+      - series: 'sql_vrts_ticket_count{name="junk_queues"}'
+        values: '30000'
+    alert_rule_test:
+      - alertname: VRTSJunkQueueSize
+        eval_time: 5m
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              team: collaboration-services
+              name: junk_queues
+            exp_annotations:
+              summary: VRTS junk queue size is large
+              description: The VRTS junk queue is above its usual threshold
+              runbook: https://wikitech.wikimedia.org/wiki/VRT_System/Troubleshooting#VRTSJunkQueueSize
+              dashboard: https://grafana.wikimedia.org/goto/jbpjcxZvg?orgId=1
