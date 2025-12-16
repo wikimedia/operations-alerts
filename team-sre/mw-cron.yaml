@@ -5,10 +5,10 @@ groups:
       - &MediaWikiCronJobFailed
         alert: MediaWikiCronJobFailed
         annotations:
-          description: 'Use `kube-env mw-cron {{ $externalLabels.site }}; kubectl get jobs -l team={{ $labels.label_team }},cronjob={{ $labels.label_cronjob }} --field-selector status.successful=0` to see failures'
+          description: 'Use `kube-env mw-cron {{ $externalLabels.site }}; kubectl get jobs -l team={{ $labels.label_team }},cronjob={{ $labels.label_cronjob }} --field-selector status.successful=0; kubectl logs -l cronjob={{ $labels.label_cronjob }} --timestamps=true --prefix=true -c mediawiki-main-app` to see failures and logs'
           summary: 'MediaWiki periodic job {{ $labels.label_cronjob }} failed'
           runbook: 'https://wikitech.wikimedia.org/wiki/Periodic_jobs#Troubleshooting'
-          dashboard: 'https://w.wiki/DocP'
+          dashboard: 'https://logstash.wikimedia.org/app/dashboards#/view/d51552d0-e309-11ef-87d0-9371e01d3c68?_a=(filters:!((query:(match_phrase:(kubernetes.labels.cronjob.keyword:{{ $labels.label_cronjob }})))))&_g=(time:(from:now-24h,to:now))'
         expr: sum by (label_cronjob, label_team) (
           kube_job_status_failed{namespace='mw-cron', job_name != "wikidata-updatequeryservicelag"} * on (namespace, job_name)
           group_left(label_cronjob,label_team) kube_job_labels{namespace="mw-cron", label_cronjob != "wikidata-updatequeryservicelag"}

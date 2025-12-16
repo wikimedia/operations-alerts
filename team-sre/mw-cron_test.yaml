@@ -20,8 +20,8 @@ tests:
               label_cronjob: mw-cron-test
               label_team: sre-serviceops
             exp_annotations:
-              dashboard: 'https://w.wiki/DocP'
-              description: "Use `kube-env mw-cron eqiad; kubectl get jobs -l team=sre-serviceops,cronjob=mw-cron-test --field-selector status.successful=0` to see failures"
+              dashboard: 'https://logstash.wikimedia.org/app/dashboards#/view/d51552d0-e309-11ef-87d0-9371e01d3c68?_a=(filters:!((query:(match_phrase:(kubernetes.labels.cronjob.keyword:mw-cron-test)))))&_g=(time:(from:now-24h,to:now))'
+              description: "Use `kube-env mw-cron eqiad; kubectl get jobs -l team=sre-serviceops,cronjob=mw-cron-test --field-selector status.successful=0; kubectl logs -l cronjob=mw-cron-test --timestamps=true --prefix=true -c mediawiki-main-app` to see failures and logs"
               runbook: 'https://wikitech.wikimedia.org/wiki/Periodic_jobs#Troubleshooting'
               summary: 'MediaWiki periodic job mw-cron-test failed'
           - exp_labels:
@@ -30,7 +30,7 @@ tests:
               label_cronjob: mw-cron-test
               label_team: sre-serviceops
             exp_annotations:
-              dashboard: 'https://w.wiki/DocP'
-              description: "Use `kube-env mw-cron eqiad; kubectl get jobs -l team=sre-serviceops,cronjob=mw-cron-test --field-selector status.successful=0` to see failures"
+              dashboard: 'https://logstash.wikimedia.org/app/dashboards#/view/d51552d0-e309-11ef-87d0-9371e01d3c68?_a=(filters:!((query:(match_phrase:(kubernetes.labels.cronjob.keyword:mw-cron-test)))))&_g=(time:(from:now-24h,to:now))'
+              description: "Use `kube-env mw-cron eqiad; kubectl get jobs -l team=sre-serviceops,cronjob=mw-cron-test --field-selector status.successful=0; kubectl logs -l cronjob=mw-cron-test --timestamps=true --prefix=true -c mediawiki-main-app` to see failures and logs"
               runbook: 'https://wikitech.wikimedia.org/wiki/Periodic_jobs#Troubleshooting'
               summary: 'MediaWiki periodic job mw-cron-test failed'
