@@ -8,7 +8,7 @@ groups:
         expr: deriv(blazegraph_free_allocators{instance=~".*:919[35]"}[10m]) < -0.03
         for: 5m
         labels:
-          team: search-platform
+          team: wikidata-platform
           severity: critical
         annotations:
           summary: "Blazegraph instance {{$labels.instance}} is burning free allocators at a very high rate"
@@ -20,7 +20,7 @@ groups:
         expr: blazegraph_free_allocators < 100000
         for: 1m
         labels:
-          team: search-platform
+          team: wikidata-platform
           severity: critical
         annotations:
           summary: "Blazegraph instance {{$labels.instance}} is running out of free allocators"
@@ -51,7 +51,7 @@ groups:
           )/60 > 10
         for: 30m
         labels:
-          team: search-platform
+          team: wikidata-platform
           severity: critical
         annotations:
           summary: "WDQS lag is above 10 minutes"
@@ -63,7 +63,7 @@ groups:
         expr: (time() - blazegraph_lastupdated{instance=~".*:9194"})/60 > 2880
         for: 1m
         labels:
-          team: search-platform
+          team: wikidata-platform
           severity: critical
         annotations:
           summary: "Categories Query service lag is above 2 days"
@@ -102,7 +102,7 @@ groups:
           ) >= 0
         for: 60m
         labels:
-          team: search-platform
+          team: wikidata-platform
           severity: warning
         annotations:
           summary: "Large percentage difference in triples count across Blazegraph instances"
@@ -144,7 +144,7 @@ groups:
           ) >= 0
         for: 60m
         labels:
-          team: search-platform
+          team: wikidata-platform
           severity: warning
         annotations:
           summary: "Large percentage difference in categories triples count across Blazegraph instances"

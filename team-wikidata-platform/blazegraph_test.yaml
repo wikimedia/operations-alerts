@@ -16,7 +16,7 @@ tests:
         exp_alerts:
           - exp_labels:
               severity: critical
-              team: search-platform
+              team: wikidata-platform
               instance: "wdqs1010:9193"
             exp_annotations:
               summary: "Blazegraph instance wdqs1010:9193 is burning free allocators at a very high rate"
@@ -34,7 +34,7 @@ tests:
         exp_alerts:
           - exp_labels:
               severity: critical
-              team: search-platform
+              team: wikidata-platform
               instance: "wdqs1001:9195"
             exp_annotations:
               summary: "Blazegraph instance wdqs1001:9195 is running out of free allocators"
@@ -55,7 +55,7 @@ tests:
         eval_time: 31m
         exp_alerts:
           - exp_labels:
-              team: search-platform
+              team: wikidata-platform
               severity: critical
             exp_annotations:
               summary: "WDQS lag is above 10 minutes"
@@ -74,7 +74,7 @@ tests:
         eval_time: 12m
         exp_alerts:
           - exp_labels:
-              team: search-platform
+              team: wikidata-platform
               severity: critical
               instance: wdqs3050:9194
             exp_annotations:
@@ -99,7 +99,7 @@ tests:
         exp_alerts:
           - exp_labels:
               severity: warning
-              team: search-platform
+              team: wikidata-platform
               cluster: wdqs-main
             exp_annotations:
               summary: "Large percentage difference in triples count across Blazegraph instances"
@@ -126,7 +126,7 @@ tests:
         exp_alerts:
           - exp_labels:
               severity: warning
-              team: search-platform
+              team: wikidata-platform
               cluster: wdqs-main
             exp_annotations:
               summary: "Large percentage difference in categories triples count across Blazegraph instances"
