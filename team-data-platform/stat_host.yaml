@@ -4,17 +4,6 @@
 groups:
   - name: stat
     rules:
-      - alert: statNodeHighLoad
-        expr: node_load15{cluster="analytics",instance=~"stat1[0-9]{3}:9100"} > 32
-        for: 1m
-        labels:
-          severity: critical
-          team: 'data-platform'
-        annotations:
-          description: 'Very high load average on {{ $labels.instance }}'
-          summary: 'Very high load average on {{ $labels.instance }} load: {{ $value }}'
-          dashboard: 'https://grafana.wikimedia.org/d/000000342/node-exporter-server-metrics?var-node={{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}%3A9100&var-disk_device=All&var-net_dev=All'
-          runbook: 'TODO'
 # use Kernel PSI metrics ( https://docs.kernel.org/accounting/psi.html ) to alert when a
 # host has been stalled for more than 50% of the time over a period of 5 minutes.
       - alert: statNodeMemoryStall
