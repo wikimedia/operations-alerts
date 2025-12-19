@@ -53,7 +53,7 @@ groups:
           /
           (gnmi_interfaces_interface_state_high_speed{instance=~"cr.*", interface_description=~"(Transit|Peering|Transport).*"}/8*1000000)
           ) > 0.9
-        for: 5m
+        for: 10m
         labels:
           team: sre
           severity: page
@@ -70,7 +70,7 @@ groups:
           /
           (gnmi_interfaces_interface_state_high_speed{instance=~"cr.*", interface_description=~"(Transit|Peering).*"}/8*1000000)
           ) > 0.9
-        for: 5m
+        for: 10m
         labels:
           team: sre
           severity: page
@@ -87,7 +87,7 @@ groups:
           /
           (gnmi_interfaces_interface_state_high_speed{instance=~"(cr|pfw|(f?[lsa]sw)).*", interface_description=~"Core.*"}/8*1000000)
           ) > 0.9
-        for: 5m
+        for: 10m
         labels:
           team: sre
           severity: page
