@@ -115,3 +115,22 @@ groups:
           description: ''  # Not needed
           dashboard: 'https://grafana.wikimedia.org/d/fb403d62-5f03-434a-9dff-bd02b9fff504/network-device-overview?var-instance={{ $labels.instance }}'
           runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#Switch_interface_down'
+      - alert: CoreRouterInterfaceDropPercent
+        # the drop stat series are not exported if there is no drops, so we use "or on() vector(0)" to make the expression
+        # evaluate to 0 if series not present, so the overall expression can still be evaluated
+        expr: |
+            (
+            ((sum by (instance, interface_name, interface_description, site) (increase(gnmi_interfaces_interface_state_counters_out_queue_red_drop_pkts{instance=~"cr.*", out_queue_queue_number!="1"}[5m])) or on() vector(0)) +
+            (sum by (instance, interface_name, interface_description, site) (increase(gnmi_interfaces_interface_state_counters_out_queue_tail_drop_pkts{instance=~"cr.*", out_queue_queue_number!="1"}[5m])) or on() vector(0))) /
+            sum by (instance, interface_name, interface_description, site) (increase(gnmi_interfaces_interface_state_counters_out_queue_pkts{instance=~"cr.*", out_queue_queue_number!="1"}[5m]))
+            ) > 0.02
+        for: 5m
+        labels:
+          team: sre
+          severity: critical
+          scope: network
+        annotations:
+          summary: 'Core router normal + high priority queue drops are high on {{ $labels.instance | stripPort }}:{{ $labels.interface_name }} ({{ $labels.interface_description }})'
+          description: ''  # Not needed
+          dashboard: 'https://grafana.wikimedia.org/d/5p97dAASz/network-device-interface-queues-and-error-stats?var-site={{ $labels.site }},var-instance={{ $labels.instance }}&var-interface={{ $labels.interface_name }}'
+          runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#CoreRouterInterfaceDropPercent'

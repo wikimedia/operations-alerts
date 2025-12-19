@@ -30,6 +30,16 @@ tests:
         values: '2 2'
       - series: 'gnmi_interfaces_interface_state_enabled{instance="asw1-b12-drmrs:9804", interface_name="et-0/0/48", interface_description="Core: cr1-drmrs:et-0/0/1 {#D0100}"}'
         values: '1 1'
+      - series: 'gnmi_interfaces_interface_state_counters_out_queue_pkts{instance="cr2-esams:9804", interface_name="xe-0/1/2", interface_description="CCTID", out_queue_queue_number="0", site="esams"}'
+        values: '0+100000x15'  # 100k packets per minute queue 0
+      - series: 'gnmi_interfaces_interface_state_counters_out_queue_pkts{instance="cr2-esams:9804", interface_name="xe-0/1/2", interface_description="CCTID", out_queue_queue_number="2", site="esams"}'
+        values: '0+50000x15'   # 50k packets per minute queue 2
+      - series: 'gnmi_interfaces_interface_state_counters_out_queue_tail_drop_pkts{instance="cr2-esams:9804", interface_name="xe-0/1/2", interface_description="CCTID", out_queue_queue_number="0", site="esams"}'
+        values: '0+5000x15'     # 5000 tail drops per minute queue 0
+      - series: 'gnmi_interfaces_interface_state_counters_out_queue_red_drop_pkts{instance="cr2-esams:9804", interface_name="xe-0/1/2", interface_description="CCTID", out_queue_queue_number="0", site="esams"}'
+        values: '0+5000x15'     # 5000 RED drops per minute queue 0
+      - series: 'gnmi_interfaces_interface_state_counters_out_queue_tail_drop_pkts{instance="cr2-esams:9804", interface_name="xe-0/1/2", interface_description="CCTID", out_queue_queue_number="2", site="esams"}'
+        values: '0+5000x15'     # 5000 tail drops per minute on queue 2
     alert_rule_test:
       - alertname: CoreRouterInterfaceDown
         eval_time: 2m
@@ -136,3 +146,19 @@ tests:
               description: ""
               dashboard: 'https://grafana.wikimedia.org/d/fb403d62-5f03-434a-9dff-bd02b9fff504/network-device-overview?var-instance=asw1-b12-drmrs:9804'
               runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#Switch_interface_down'
+      - alertname: CoreRouterInterfaceDropPercent
+        eval_time: 10m
+        exp_alerts:
+          - exp_labels:
+              instance: cr2-esams:9804
+              interface_name: xe-0/1/2
+              interface_description: "CCTID"
+              site: esams
+              team: sre
+              severity: critical
+              scope: network
+            exp_annotations:
+              summary: "Core router normal + high priority queue drops are high on cr2-esams:xe-0/1/2 (CCTID)"
+              description: ""
+              dashboard: 'https://grafana.wikimedia.org/d/5p97dAASz/network-device-interface-queues-and-error-stats?var-site=esams,var-instance=cr2-esams:9804&var-interface=xe-0/1/2'
+              runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#CoreRouterInterfaceDropPercent'
