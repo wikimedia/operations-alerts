@@ -1,0 +1,17 @@
+# deploy-tag: ops
+# deploy-site: eqiad, codfw
+
+groups:
+- name: mysql-not-using-gtid
+  rules:
+  - alert: MySQLReplicaNotUsingGTID
+    expr: mysql_slave_status_using_gtid{role!="master", instance=~"(db|an-redacteddb|clouddb)[12].*"} == 0
+    for: 5m
+    labels:
+      severity: warning
+      team: data-persistence
+    annotations:
+      summary: "MySQL replica {{ $labels.instance }} not using GTID"
+      runbook: https://wikitech.wikimedia.org/wiki/MariaDB/troubleshooting
+      description: "Replica {{ $labels.instance }} (channel: {{ $labels.channel }}) has mysql_slave_status_using_gtid=0, expected GTID mode."
+      dashboard: https://grafana.wikimedia.org/d/0fec1d02-1b0b-44c0-84b0-64894f3ba682/mariadb-gtid

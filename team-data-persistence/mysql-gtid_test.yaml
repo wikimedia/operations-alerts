@@ -1,0 +1,38 @@
+rule_files:
+  - mysql-gtid.yaml
+
+evaluation_interval: 1m
+
+tests:
+  - interval: 1m
+    input_series:
+      - series: 'mysql_slave_status_using_gtid{instance="db1234.eqiad.wmnet:1234",job="mysql",channel="default",role="slave"}'
+        values: '1 1 1 1 1'  # GTID active, no alert
+    alert_rule_test:
+      - eval_time: 5m
+        alertname: MySQLReplicaNotUsingGTID
+        exp_alerts: []  # No firing alerts
+
+  - interval: 1m
+    input_series:
+      - series: 'mysql_slave_status_using_gtid{instance="db1234.eqiad.wmnet:1234",job="mysql",channel="default",role="slave"}'
+        values: '0 0 0 0 0 0 0'  # GTID disabled
+    alert_rule_test:
+      - eval_time: 4m
+        alertname: MySQLReplicaNotUsingGTID
+        exp_alerts: []  # Pending (for: 5m not reached)
+      - eval_time: 6m
+        alertname: MySQLReplicaNotUsingGTID
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              team: data-persistence
+              instance: db1234.eqiad.wmnet:1234
+              job: mysql
+              channel: default
+              role: slave
+            exp_annotations:
+              summary: 'MySQL replica db1234.eqiad.wmnet:1234 not using GTID'
+              description: 'Replica db1234.eqiad.wmnet:1234 (channel: default) has mysql_slave_status_using_gtid=0, expected GTID mode.'
+              dashboard: 'https://grafana.wikimedia.org/d/0fec1d02-1b0b-44c0-84b0-64894f3ba682/mariadb-gtid'
+              runbook: https://wikitech.wikimedia.org/wiki/MariaDB/troubleshooting
