@@ -1,0 +1,66 @@
+rule_files:
+  - opensearch-k8s.yaml
+
+evaluation_interval: 1m
+
+tests:
+  #
+  # ===============================
+  # Low watermark ( > 85% )
+  # ===============================
+  #
+  - interval: 1m
+    input_series:
+      - series: 'opensearch_fs_path_total_bytes{cluster="eqiad",instance="10.0.0.1:9200",node="os-node-1"}'
+        values: '1000 1000 1000 1000 1000 1000'
+      - series: 'opensearch_cluster_routing_allocation_disk_watermark_low_pct{cluster="eqiad",instance="10.0.0.1:9200",node="os-node-1"}'
+        values: '85 85 85 85 85 85'
+      - series: 'opensearch_fs_path_available_bytes{cluster="eqiad",instance="10.0.0.1:9200",node="os-node-1"}'
+        # 14% free → 86% used (above low watermark, below high)
+        values: '140 140 140 140 140 140'
+
+    alert_rule_test:
+      - eval_time: 6m
+        alertname: OpenSearchNodeLowDiskWatermarkReached
+        exp_alerts:
+          - exp_labels:
+              cluster: eqiad
+              instance: 10.0.0.1:9200
+              node: os-node-1
+              severity: warning
+              team: data-platform
+            exp_annotations:
+              summary: 'Disk Low Watermark Reached - disk saturation is 86%'
+              description: 'Disk Low Watermark Reached at os-node-1 node in eqiad cluster. Shards can not be allocated to this node anymore. You should consider adding more disk to the node.'
+              dashboard: "https://w.wiki/HKe3"
+              runbook: "https://w.wiki/HKer"
+  #
+  # ===============================
+  # High watermark ( > 90% )
+  # ===============================
+  #
+  - interval: 1m
+    input_series:
+      - series: 'opensearch_fs_path_total_bytes{cluster="codfw",instance="10.0.0.2:9200",node="os-node-2"}'
+        values: '1000 1000 1000 1000 1000 1000'
+      - series: 'opensearch_cluster_routing_allocation_disk_watermark_high_pct{cluster="codfw",instance="10.0.0.2:9200",node="os-node-2"}'
+        values: '90 90 90 90 90 90'
+      - series: 'opensearch_fs_path_available_bytes{cluster="codfw",instance="10.0.0.2:9200",node="os-node-2"}'
+        # 8% free → 92% used
+        values: '80 80 80 80 80 80'
+
+    alert_rule_test:
+      - eval_time: 6m
+        alertname: OpenSearchNodeHighDiskWatermarkReached
+        exp_alerts:
+          - exp_labels:
+              cluster: codfw
+              instance: 10.0.0.2:9200
+              node: os-node-2
+              severity: critical
+              team: data-platform
+            exp_annotations:
+              summary: 'Disk High Watermark Reached - disk saturation is 92%'
+              description: 'Disk High Watermark Reached at os-node-2 node in codfw cluster. Some shards will be re-allocated to different nodes if possible. Make sure more disk space is added to the node or drop old indices allocated to this node.'
+              dashboard: "https://w.wiki/HKe3"
+              runbook: "https://w.wiki/HKer"
