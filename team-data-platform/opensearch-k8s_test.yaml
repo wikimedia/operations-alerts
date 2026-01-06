@@ -12,12 +12,12 @@ tests:
   - interval: 1m
     input_series:
       - series: 'opensearch_fs_path_total_bytes{cluster="eqiad",instance="10.0.0.1:9200",node="os-node-1"}'
-        values: '1000 1000 1000 1000 1000 1000'
+        values: '1000+0x6'
       - series: 'opensearch_cluster_routing_allocation_disk_watermark_low_pct{cluster="eqiad",instance="10.0.0.1:9200",node="os-node-1"}'
-        values: '85 85 85 85 85 85'
+        values: '85+0x6'
       - series: 'opensearch_fs_path_available_bytes{cluster="eqiad",instance="10.0.0.1:9200",node="os-node-1"}'
         # 14% free → 86% used (above low watermark, below high)
-        values: '140 140 140 140 140 140'
+        values: '140+0x6'
 
     alert_rule_test:
       - eval_time: 6m
@@ -42,12 +42,12 @@ tests:
   - interval: 1m
     input_series:
       - series: 'opensearch_fs_path_total_bytes{cluster="codfw",instance="10.0.0.2:9200",node="os-node-2"}'
-        values: '1000 1000 1000 1000 1000 1000'
+        values: '1000+0x6'
       - series: 'opensearch_cluster_routing_allocation_disk_watermark_high_pct{cluster="codfw",instance="10.0.0.2:9200",node="os-node-2"}'
-        values: '90 90 90 90 90 90'
+        values: '90+0x6'
       - series: 'opensearch_fs_path_available_bytes{cluster="codfw",instance="10.0.0.2:9200",node="os-node-2"}'
         # 8% free → 92% used
-        values: '80 80 80 80 80 80'
+        values: '80+0x6'
 
     alert_rule_test:
       - eval_time: 6m
@@ -64,3 +64,62 @@ tests:
               description: 'Disk High Watermark Reached at os-node-2 node in codfw cluster. Some shards will be re-allocated to different nodes if possible. Make sure more disk space is added to the node or drop old indices allocated to this node.'
               dashboard: "https://w.wiki/HKe3"
               runbook: "https://w.wiki/HKer"
+
+  - interval: 1m
+    input_series:
+      - series: 'opensearch_cluster_status{cluster="eqiad"}'
+        values: '5+0x6'
+
+    alert_rule_test:
+      - eval_time: 6m
+        alertname: OpenSearchClusterAtLeastOneRedIndex
+        exp_alerts:
+          - exp_labels:
+              cluster: eqiad
+              severity: critical
+              team: data-platform
+            exp_annotations:
+              dashboard: "https://w.wiki/HLXP"
+              runbook: "https://w.wiki/HKer"
+              "description": "Cluster eqiad health status has been RED for at least 5m, writes will not be accepted on red indices. Check _cat/shards or _cat/indices to find the red indices."
+              "summary": "Cluster health status is RED"
+  - interval: 1m
+    input_series:
+      - series: 'bulk:reject_ratio:rate2m{cluster="eqiad",node="os-node-7"}'
+        values: '0.06123+0x11'
+
+    alert_rule_test:
+      - eval_time: 11m
+        alertname: OpenSearchBulkRequestsRejectionJumps
+        exp_alerts:
+          - exp_labels:
+              cluster: eqiad
+              severity: critical
+              team: data-platform
+              node: os-node-7
+            exp_annotations:
+              dashboard: "https://w.wiki/HLXP"
+              runbook: "https://w.wiki/HKer"
+              description: "High Bulk Rejection Ratio at os-node-7 node in eqiad cluster. This node may not be keeping up with the indexing speed."
+              summary: "High Bulk Rejection Ratio - 6.123%"
+
+  - interval: 1m
+    input_series:
+      - series: 'opensearch_jvm_mem_heap_used_percent{cluster="eqiad",node="os-node-9"}'
+        # Sustained heap usage at 95% (>94)
+        values: '95+0x11'
+
+    alert_rule_test:
+      - eval_time: 11m
+        alertname: OpenSearchJVMHeapUseHigh
+        exp_alerts:
+          - exp_labels:
+              cluster: eqiad
+              node: os-node-9
+              severity: critical
+              team: data-platform
+            exp_annotations:
+              dashboard: "https://w.wiki/HLXP"
+              runbook: "https://w.wiki/HKer"
+              description: "JVM Heap usage on the node os-node-9 in eqiad cluster is 95%."
+              summary: "JVM Heap usage on the node is high"

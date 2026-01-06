@@ -44,3 +44,39 @@ groups:
       "labels":
         "severity": "critical"
         "team": "data-platform"
+    - "alert": "OpenSearchClusterAtLeastOneRedIndex"
+      "annotations":
+        dashboard: "https://w.wiki/HLXP"
+        runbook: "https://w.wiki/HKer"
+        "description": "Cluster {{ $labels.cluster }} health status has been RED for at least 5m, writes will not be accepted on red indices. Check _cat/shards or _cat/indices to find the red indices."
+        "summary": "Cluster health status is RED"
+      "expr": |
+        sum by (cluster) (opensearch_cluster_status == 5)
+      "for": "5m"
+      "labels":
+        "severity": "critical"
+        "team": "data-platform"
+    - "alert": "OpenSearchBulkRequestsRejectionJumps"
+      "annotations":
+        dashboard: "https://w.wiki/HLXP"
+        runbook: "https://w.wiki/HKer"
+        description: "High Bulk Rejection Ratio at {{ $labels.node }} node in {{ $labels.cluster }} cluster. This node may not be keeping up with the indexing speed."
+        summary: "High Bulk Rejection Ratio - {{ $value }}%"
+      "expr": |
+        round( bulk:reject_ratio:rate2m * 100, 0.001 ) > 5
+      "for": "10m"
+      "labels":
+        "severity": "critical"
+        "team": "data-platform"
+    - "alert": "OpenSearchJVMHeapUseHigh"
+      "annotations":
+        dashboard: "https://w.wiki/HLXP"
+        runbook: "https://w.wiki/HKer"
+        "description": "JVM Heap usage on the node {{ $labels.node }} in {{ $labels.cluster }} cluster is {{ $value }}%."
+        "summary": "JVM Heap usage on the node is high"
+      "expr": |
+        sum by (cluster, instance, node) (opensearch_jvm_mem_heap_used_percent) > 94
+      "for": "10m"
+      "labels":
+        "severity": "critical"
+        "team": "data-platform"
