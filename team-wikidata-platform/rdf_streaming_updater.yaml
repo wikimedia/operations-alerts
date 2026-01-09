@@ -13,7 +13,7 @@ groups:
           absent(flink_jobmanager_job_uptime{kubernetes_namespace="rdf-streaming-updater", job_name="WDQS_Streaming_Updater"})
         for: 5m
         labels:
-          team: search-platform
+          team: wikidata-platform
           severity: critical
         annotations:
           summary: "{{$labels.job_name}} in {{$externalLabels.site}} ({{$externalLabels.prometheus}}) is not running"
@@ -26,7 +26,7 @@ groups:
           absent(flink_jobmanager_job_uptime{kubernetes_namespace="rdf-streaming-updater", job_name="WCQS_Streaming_Updater"})
         for: 5m
         labels:
-          team: search-platform
+          team: wikidata-platform
           severity: critical
         annotations:
           summary: "{{$labels.job_name}} in {{$externalLabels.site}} ({{$externalLabels.prometheus}}) is not running"
@@ -46,7 +46,7 @@ groups:
           max by (job_name, release, kubernetes_namespace) (max_over_time(flink_jobmanager_job_uptime{kubernetes_namespace="rdf-streaming-updater"}[10m])) < 300000
         for: 10m
         labels:
-          team: search-platform
+          team: wikidata-platform
           severity: critical
         annotations:
           summary: "{{$labels.job_name}} in {{$externalLabels.site}} ({{$externalLabels.prometheus}}) is unstable"
@@ -59,7 +59,7 @@ groups:
           avg by (job_name, release, kubernetes_namespace) (avg_over_time(flink_taskmanager_job_task_operator_processing_latency_ms{kubernetes_namespace="rdf-streaming-updater"}[5m]) > 600000)
         for: 10m
         labels:
-          team: search-platform
+          team: wikidata-platform
           severity: warning
         annotations:
           summary: "Processing latency of {{$labels.job_name}} in {{$externalLabels.site}} ({{$externalLabels.prometheus}}) is above 10 minutes"

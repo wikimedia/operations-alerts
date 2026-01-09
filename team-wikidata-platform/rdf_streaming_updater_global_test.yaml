@@ -12,7 +12,7 @@ tests:
         exp_alerts:
           - exp_labels:
               severity: warning
-              team: search-platform
+              team: wikidata-platform
               instance: wcqs2001:9101
             exp_annotations:
               summary: "wcqs2001:9101 has fallen behind applying updates from the RDF Streaming Updater"

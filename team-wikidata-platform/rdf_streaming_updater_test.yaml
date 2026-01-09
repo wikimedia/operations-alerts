@@ -19,7 +19,7 @@ tests:
         exp_alerts:
           - exp_labels:
               severity: critical
-              team: search-platform
+              team: wikidata-platform
               kubernetes_namespace: rdf-streaming-updater
               job_name: "WDQS_Streaming_Updater"
               release: wikidata
@@ -33,7 +33,7 @@ tests:
         exp_alerts:
           - exp_labels:
               severity: warning
-              team: search-platform
+              team: wikidata-platform
               kubernetes_namespace: rdf-streaming-updater
               job_name: "WCQS_Streaming_Updater"
               release: commons
@@ -55,7 +55,7 @@ tests:
         exp_alerts:
           - exp_labels:
               severity: critical
-              team: search-platform
+              team: wikidata-platform
               kubernetes_namespace: rdf-streaming-updater
               job_name: WDQS_Streaming_Updater
             exp_annotations:
@@ -68,7 +68,7 @@ tests:
         exp_alerts:
           - exp_labels:
               severity: critical
-              team: search-platform
+              team: wikidata-platform
               kubernetes_namespace: rdf-streaming-updater
               job_name: WCQS_Streaming_Updater
             exp_annotations:

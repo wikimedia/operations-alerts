@@ -9,7 +9,7 @@ groups:
         expr: wdqs_streaming_updater_kafka_stream_consumer_lag_Value / 1000 > 600
         for: 30m
         labels:
-          team: search-platform
+          team: wikidata-platform
           severity: warning
         annotations:
           summary: "{{$labels.instance}} has fallen behind applying updates from the RDF Streaming Updater"
