@@ -16,16 +16,17 @@ CI will run `tox` on this repository at code review time. You can also run
 tests locally by calling `tox` (python 3). You'll also need to have the
 following tools in your `$PATH`:
 
-* `promtool` Available in Linux distributions, or
-  https://github.com/prometheus/prometheus/releases (>= 2.10 required)
+* `promtool` Available as a Debian package (starting with Trixie, for older
+  releases see below). Or https://github.com/prometheus/prometheus/releases (>=
+  2.10 required)
 
 * `pint` Available as a Debian package from
   https://wikitech.wikimedia.org/wiki/APT_repository or a single binary from
   https://github.com/cloudflare/pint/releases
 
-On Debian systems the `promtool` binary is part of `prometheus` package, which
-will also start the Prometheus server. To stop the server and stop it from
-starting at boot issue the following:
+On Debian systems earlier than Trixie the `promtool` binary was shipped as part
+of `prometheus` package, which will also start the Prometheus server. To stop
+the server and prevent it from starting at boot issue the following:
 
     systemctl stop prometheus
     systemctl mask prometheus
