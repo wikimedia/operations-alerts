@@ -25,7 +25,7 @@ tests:
         alertname: MySQLReplicaNotUsingGTID
         exp_alerts:
           - exp_labels:
-              severity: warning
+              severity: critical
               team: data-persistence
               instance: db1234.eqiad.wmnet:1234
               job: mysql
