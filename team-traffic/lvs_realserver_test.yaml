@@ -16,6 +16,11 @@ tests:
         values: '1400 1400 1400 1400 1400 1400 1400'
       - series: 'lvs_realserver_mss_value{cluster="ncredir", endpoint="[2620:0:863:ed1a::3]:443", instance="ncredir4001:9100", job="node", protocol="IPv6"}'
         values: '1400 1400 1400 1400 1400 1400 1400'
+      # Should pass: MSS value of 0 (server socket down) should not trigger alert
+      - series: 'tcp_mss_clamper_mss_cfg{cluster="ncredir", instance="ncredir4002:2200", interface="lo", job="lvs_realserver", protocol="IPv4"}'
+        values: '1440 1440 1440 1440 1440 1440 1440'
+      - series:  'lvs_realserver_mss_value{cluster="ncredir", endpoint="198.35.26.98:443", instance="ncredir4002:9100", job="node", protocol="IPv4"}'
+        values: '0 0 0 0 0 0 0'
     alert_rule_test:
       - alertname: LVSRealserverMSS
         eval_time: 6m
