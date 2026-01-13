@@ -1,0 +1,87 @@
+rule_files:
+  - probes.yaml
+evaluation_interval: 1m
+tests:
+  # base test for failing probe
+  - interval: 1m
+    input_series:
+      - series: 'probe_success{job="probes/service", module="http_test", instance="fail:443", address="10.2.1.91"}'
+        values: '1+0x5 0+0x20'
+      - series: 'probe_success{job="probes/service", module="http_test", instance="ok:443", address="10.2.1.91"}'
+        values: '1+0x30'
+      - series: 'service_catalog_info{instance="fail:443", team="data_platform", address="10.2.1.91"}'
+        values: '1+0x30'
+      - series: 'service_catalog_info{instance="ok:443", team="data_platform", address="10.2.1.91"}'
+        values: '1+0x30'
+    external_labels:
+      site: example_site
+    alert_rule_test:
+    - alertname: ProbeDown
+      eval_time: 10m
+      exp_alerts:
+       - exp_labels:
+           address: 10.2.1.91
+           job: probes/service
+           team: data-platform
+           severity: critical
+           instance: fail:443
+           module: http_test
+         exp_annotations:
+           description: fail:443 failed when probed by http_test from example_site.
+             Availability is 0%.
+           summary: Service fail:443 has failed probes (http_test)
+           dashboard: 'https://grafana.wikimedia.org/d/O0nHhdhnz/network-probes-overview?var-job=probes/service&var-module=All'
+           logs: 'https://logstash.wikimedia.org/app/dashboards#/view/f3e709c0-a5f8-11ec-bf8e-43f1807d5bc2?_g=(filters:!((query:(match_phrase:(service.name:http_test)))))'
+           runbook: 'https://wikitech.wikimedia.org/wiki/Runbook#fail:443'
+
+  - interval: 1m
+    input_series:
+      # Successful probe taking > 1s for 3 minutes
+      - series: 'probe_duration_seconds{job="probes/service", address="10.2.1.91", instance="slow:443", module="http_test"}'
+        values: '1.5+0x3'
+
+      - series: 'probe_success{job="probes/service", address="10.2.1.91", instance="slow:443", module="http_test"}'
+        values: '1+0x3'
+
+    alert_rule_test:
+      - alertname: ProbeSlow
+        eval_time: 3m
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              team: data-platform
+              job: probes/service
+              instance: slow:443
+              module: http_test
+              address: 10.2.1.91
+            exp_annotations:
+              description: 'slow:443 took 1.5s to reply successfully to probe http_test'
+              summary: 'Slow probes for service slow:443'
+              dashboard: 'https://grafana.wikimedia.org/d/O0nHhdhnz/network-probes-overview?var-job=probes/service&var-module=http_test'
+              logs: 'https://logstash.wikimedia.org/app/dashboards#/view/f3e709c0-a5f8-11ec-bf8e-43f1807d5bc2?_g=(filters:!((query:(match_phrase:(service.name:http_test)))))'
+              runbook: TODO
+
+  - interval: 1m
+    input_series:
+      - series: 'probe_ssl_earliest_cert_expiry{job="probes/service", address="10.2.1.91", instance="service:443", module="http_opensearch-ipoid_ip4"}'
+        values: '777600-60x6 604800-60x6'
+      - series: 'probe_ssl_earliest_cert_expiry{job="probes/service", address="10.2.1.91", instance="service:443", module="http_opensearch-ipoid_ip4"}'
+        values: '777600-60x6 604800-60x6'
+    external_labels:
+      site: example_site
+    alert_rule_test:
+    - alertname: CertAlmostExpired
+      eval_time: 10m
+      exp_alerts:
+       - exp_labels:
+           job: probes/service
+           team: data-platform
+           severity: warning
+           instance: service:443
+           address: 10.2.1.91
+           module: http_opensearch-ipoid_ip4
+         exp_annotations:
+           description: The certificate presented by service service:443 is going to expire in 6d 23h 47m 0s
+           summary: Certificate for service service:443 is about to expire
+           runbook: 'https://wikitech.wikimedia.org/wiki/TLS/Runbook#service:443'
+           dashboard: TODO

@@ -1,0 +1,61 @@
+# deploy-tag: ops
+
+# This is mostly a copy/paste of the `probes.yaml` found in team-sre, but with
+# a regex that targets the IP addresses of the dse-k8s-clusters' ingress (10.2.1.91 for codfw
+# and 10.2.2.91 for eqiad)
+
+# When making changes remember to update modules/prometheus/manifests/blackbox/check/http.pp as well to keep alert definition in sync.
+groups:
+ - name: probes
+   rules:
+   - alert: ProbeDown
+     annotations:
+       description: '{{ $labels.instance }} failed when probed by {{ $labels.module }} from {{ $externalLabels.site }}. Availability is {{ $value }}%.'
+       summary: 'Service {{ $labels.instance }} has failed probes ({{ $labels.module }})'
+       dashboard: 'https://grafana.wikimedia.org/d/O0nHhdhnz/network-probes-overview?var-job={{ $labels.job }}&var-module=All'
+       logs: 'https://logstash.wikimedia.org/app/dashboards#/view/f3e709c0-a5f8-11ec-bf8e-43f1807d5bc2?_g=(filters:!((query:(match_phrase:(service.name:{{ $labels.module }})))))'
+       runbook: 'https://wikitech.wikimedia.org/wiki/Runbook#{{ $labels.instance }}'
+     # Probes are sent out every 15s, allow at most two to fail in a minute
+     # (i.e. one minute availability is less than 75%)
+     expr: |
+       ( avg_over_time(probe_success{job="probes/service", address=~"10\\.2\\.[12]\\.91", module=~"(http|tcp).*"}[1m])
+         * on (instance) group_left(team) service_catalog_info
+       ) * 100
+       < 75
+     for: 4m
+     labels:
+       severity: critical
+       team: data-platform
+
+   - alert: ProbeSlow
+     annotations:
+       description: '{{ $labels.instance }} took {{ $value | humanizeDuration }} to reply successfully to probe {{ $labels.module }}'
+       summary: 'Slow probes for service {{ $labels.instance }}'
+       dashboard: 'https://grafana.wikimedia.org/d/O0nHhdhnz/network-probes-overview?var-job={{ $labels.job }}&var-module={{ $labels.module }}'
+       logs: 'https://logstash.wikimedia.org/app/dashboards#/view/f3e709c0-a5f8-11ec-bf8e-43f1807d5bc2?_g=(filters:!((query:(match_phrase:(service.name:{{ $labels.module }})))))'
+       runbook: TODO
+     expr: probe_duration_seconds{job="probes/service", address=~"10\\.2\\.[12]\\.91"} * probe_success > 1
+     for: 2m
+     labels:
+       severity: warning
+       team: data-platform
+
+
+   - &cert_expired
+     alert: CertAlmostExpired
+     annotations:
+       description: 'The certificate presented by service {{ $labels.instance }} is going to expire in {{ $value | humanizeDuration }}'
+       summary: 'Certificate for service {{ $labels.instance }} is about to expire'
+       runbook: 'https://wikitech.wikimedia.org/wiki/TLS/Runbook#{{ $labels.instance }}'
+       dashboard: TODO
+     expr: probe_ssl_earliest_cert_expiry{job="probes/service", address=~"10\\.2\\.[12]\\.91", module=~"http.*"} - time() < (86400 * 9)
+     for: 5m
+     labels:
+       severity: warning
+       team: data-platform
+
+   - <<: *cert_expired
+     expr: probe_ssl_earliest_cert_expiry{job="probes/service", address=~"10\\.2\\.[12]\\.91", module=~"http.*"} - time() < (86400 * 7)
+     labels:
+       severity: critical
+       team: data-platform
