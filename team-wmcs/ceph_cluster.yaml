@@ -47,8 +47,8 @@ groups:
 
       - alert: CephSlowOps
         annotations:
-          description: "Ceph cluster in {{ $externalLabels.site }} has slow ops, which might be blocking some writes"
-          summary: "Ceph cluster in {{ $externalLabels.site }} has {{ $value }} slow ops"
+          description: "Ceph cluster in {{ $externalLabels.site }} has {{ $value }} slow ops, which might be blocking some writes"
+          summary: "Ceph cluster in {{ $externalLabels.site }} has slow ops"
           dashboard: "https://grafana.wikimedia.org/d/P1tFnn3Mk/wmcs-ceph-eqiad-health?orgId=1&search=open&tag=ceph&tag=health&tag=WMCS"
           runbook: "https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/CephSlowOps"
         expr: ceph_healthcheck_slow_ops{job="ceph_eqiad"} > 0
