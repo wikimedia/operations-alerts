@@ -136,3 +136,99 @@ tests:
                 This alert excludes cases where the delta is shrinking (backfill in progress).
               runbook: https://wikitech.wikimedia.org/wiki/Wikidata_Query_Service/Runbook
               dashboard: https://grafana.wikimedia.org/d/000000489/wikidata-query-service
+
+  # Check that an increase in the rate of 4xx client erro codes for more than 30m raises an alert
+  - interval: 1m
+    input_series:
+      - series: 'trafficserver_backend_requests_seconds_count{backend="wdqs-main.discovery.wmnet", status="200"}'
+        values: "0+250x19 1500+200x39"
+      - series: 'trafficserver_backend_requests_seconds_count{backend="wdqs-main.discovery.wmnet", status="400"}'
+        values: "0x19 0+50x39"
+    alert_rule_test:
+      - alertname: BlazegraphFailedClientRatioIncrease
+        eval_time: 60m
+        exp_alerts:
+          - exp_labels:
+              team: wikidata-platform
+              severity: warning
+              backend: "wdqs-main.discovery.wmnet"
+            exp_annotations:
+              summary: "Increased ratio of failed client requests on Blazegraph instance wdqs-main.discovery.wmnet (client error)"
+              description: |
+                Blazegraph instance wdqs-main.discovery.wmnet is seeing a higher than normal number of failed queries due to client errors
+                compared to the number of succeeded ones. This might be a sign of a bad actor spamming the system with
+                malformed queries. This specifically excludes 403 (permission denied) and 419 (page expired).
+              runbook: https://wikitech.wikimedia.org/wiki/Wikidata_Query_Service/Runbook
+              dashboard: https://grafana.wikimedia.org/d/000000489/wikidata-query-service
+
+  # Make sure that changes in 403 are ignored
+  - interval: 1m
+    input_series:
+      - series: 'trafficserver_backend_requests_seconds_count{backend="wdqs-main.discovery.wmnet", status="200"}'
+        values: "0+250x19 1500+200x39"
+      - series: 'trafficserver_backend_requests_seconds_count{backend="wdqs-main.discovery.wmnet", status="403"}'
+        values: "0x19 0+50x39"
+    alert_rule_test:
+      - alertname: BlazegraphFailedClientRatioIncrease
+        eval_time: 60m
+        exp_alerts: []
+
+  # Make sure that changes in 419 are ignored
+  - interval: 1m
+    input_series:
+      - series: 'trafficserver_backend_requests_seconds_count{backend="wdqs-main.discovery.wmnet", status="200"}'
+        values: "0+250x19 1500+200x39"
+      - series: 'trafficserver_backend_requests_seconds_count{backend="wdqs-main.discovery.wmnet", status="419"}'
+        values: "0x19 0+50x39"
+    alert_rule_test:
+      - alertname: BlazegraphFailedClientRatioIncrease
+        eval_time: 60m
+        exp_alerts: []
+
+  # make sure that an increased rate for less than 30m is ignored
+  - interval: 1m
+    input_series:
+      - series: 'trafficserver_backend_requests_seconds_count{backend="wdqs-main.discovery.wmnet", status="200"}'
+        values: "0+250x19 1500+200x19 2750+250x19"
+      - series: 'trafficserver_backend_requests_seconds_count{backend="wdqs-main.discovery.wmnet", status="400"}'
+        values: "0x19 0+50x19 250x19"
+    alert_rule_test:
+      - alertname: BlazegraphFailedClientRatioIncrease
+        eval_time: 60m
+        exp_alerts: []
+
+  # Check that an increase in the rate of 5xx server error codes for more than 30m raises an alert
+  - interval: 1m
+    input_series:
+      - series: 'trafficserver_backend_requests_seconds_count{backend="wdqs-main.discovery.wmnet", status="200"}'
+        values: "0+250x19 1500+200x39"
+      - series: 'trafficserver_backend_requests_seconds_count{backend="wdqs-main.discovery.wmnet", status="500"}'
+        values: "0x19 0+50x39"
+    alert_rule_test:
+      - alertname: BlazegraphFailedServerRatioIncrease
+        eval_time: 60m
+        exp_alerts:
+          - exp_labels:
+              team: wikidata-platform
+              severity: warning
+              backend: "wdqs-main.discovery.wmnet"
+            exp_annotations:
+              summary: "Increased ratio of failed requests on Blazegraph instance wdqs-main.discovery.wmnet (server error)"
+              description: |
+                Blazegraph instance wdqs-main.discovery.wmnet is seeing a higher than normal number of failed queries due to server errors
+                compared to the number of succeeded ones. This might be a sign of a bad actor spamming the system with
+                malformed queries.
+              runbook: https://wikitech.wikimedia.org/wiki/Wikidata_Query_Service/Runbook
+              dashboard: https://grafana.wikimedia.org/d/000000489/wikidata-query-service
+
+  # make sure that an increased rate for less than 30m is ignored
+  - interval: 1m
+    input_series:
+      - series: 'trafficserver_backend_requests_seconds_count{backend="wdqs-main.discovery.wmnet", status="200"}'
+        values: "0+250x19 1500+200x19 2750+250x19"
+      - series: 'trafficserver_backend_requests_seconds_count{backend="wdqs-main.discovery.wmnet", status="500"}'
+        values: "0x19 0+50x19 250x19"
+    alert_rule_test:
+      - alertname: BlazegraphFailedServerRatioIncrease
+        eval_time: 60m
+        exp_alerts: []

@@ -154,3 +154,41 @@ groups:
             This alert excludes cases where the delta is shrinking (backfill in progress).
           runbook: https://wikitech.wikimedia.org/wiki/Wikidata_Query_Service/Runbook
           dashboard: https://grafana.wikimedia.org/d/000000489/wikidata-query-service
+
+      - alert: BlazegraphFailedClientRatioIncrease
+        expr: |
+          (
+            sum by (backend) (rate(trafficserver_backend_requests_seconds_count{backend=~"wdqs.*",status=~"4..", status!="403", status!="419"}[5m])) /
+            clamp_min(sum by (backend) (rate(trafficserver_backend_requests_seconds_count{backend=~"wdqs.*",status=~"[23].."}[5m])), 1)
+          ) > 0.02
+        for: 30m
+        labels:
+          team: wikidata-platform
+          severity: warning
+        annotations:
+          summary: "Increased ratio of failed client requests on Blazegraph instance {{$labels.backend}} (client error)"
+          description: |
+            Blazegraph instance {{$labels.backend}} is seeing a higher than normal number of failed queries due to client errors
+            compared to the number of succeeded ones. This might be a sign of a bad actor spamming the system with
+            malformed queries. This specifically excludes 403 (permission denied) and 419 (page expired).
+          runbook: https://wikitech.wikimedia.org/wiki/Wikidata_Query_Service/Runbook
+          dashboard: https://grafana.wikimedia.org/d/000000489/wikidata-query-service
+
+      - alert: BlazegraphFailedServerRatioIncrease
+        expr: |
+          (
+            sum by (backend) (rate(trafficserver_backend_requests_seconds_count{backend=~"wdqs.*",status=~"5.."}[5m])) /
+            clamp_min(sum by (backend) (rate(trafficserver_backend_requests_seconds_count{backend=~"wdqs.*",status=~"[23].."}[5m])), 1)
+          ) > 0.01
+        for: 30m
+        labels:
+          team: wikidata-platform
+          severity: warning
+        annotations:
+          summary: "Increased ratio of failed requests on Blazegraph instance {{$labels.backend}} (server error)"
+          description: |
+            Blazegraph instance {{$labels.backend}} is seeing a higher than normal number of failed queries due to server errors
+            compared to the number of succeeded ones. This might be a sign of a bad actor spamming the system with
+            malformed queries.
+          runbook: https://wikitech.wikimedia.org/wiki/Wikidata_Query_Service/Runbook
+          dashboard: https://grafana.wikimedia.org/d/000000489/wikidata-query-service
