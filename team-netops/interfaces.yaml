@@ -30,7 +30,7 @@ groups:
         annotations:
           summary: 'Inbound errors on interface {{ $labels.instance | stripPort }}:{{ $labels.interface_name }} ({{ $labels.interface_description }})'
           description: ''  # Not needed
-          dashboard: 'https://grafana.wikimedia.org/d/fb403d62-5f03-434a-9dff-bd02b9fff504/network-device-overview?var-instance={{ $labels.instance }}'
+          dashboard: 'https://grafana.wikimedia.org/d/5p97dAASz/queue-and-error-stats-by-network-device?var-site={{ printf "%s prometheus/ops" $labels.site | urlquery }}&var-device={{ $labels.instance | stripPort }}&var-interface={{ $labels.interface_name | urlquery }}'
           runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#Inbound/outbound_interface_errors'
       - alert: OutboundInterfaceErrors
         # When the counter is at 0, the devices don't expose the out errors
@@ -44,7 +44,7 @@ groups:
         annotations:
           summary: 'Outbound errors on interface {{ $labels.instance | stripPort }}:{{ $labels.interface_name }} ({{ $labels.interface_description }})'
           description: ''  # Not needed
-          dashboard: 'https://grafana.wikimedia.org/d/fb403d62-5f03-434a-9dff-bd02b9fff504/network-device-overview?var-instance={{ $labels.instance }}'
+          dashboard: 'https://grafana.wikimedia.org/d/5p97dAASz/queue-and-error-stats-by-network-device?var-site={{ printf "%s prometheus/ops" $labels.site | urlquery }}&var-device={{ $labels.instance | stripPort }}&var-interface={{ $labels.interface_name | urlquery }}'
           runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#Inbound/outbound_interface_errors'
       - alert: TransitPeeringTransportOutSaturation
         expr: |
@@ -61,7 +61,7 @@ groups:
         annotations:
           summary: 'Transit, peering or transport OUT traffic above 90% capacity - {{ $labels.instance | stripPort }}:{{ $labels.interface_name }} ({{ $labels.interface_description }}) #page'
           description: ''  # Not needed
-          dashboard: 'https://grafana.wikimedia.org/d/fb403d62-5f03-434a-9dff-bd02b9fff504/network-device-overview?var-instance={{ $labels.instance }}'
+          dashboard: 'https://grafana.wikimedia.org/d/d968a627-b6f6-47fc-9316-e058854a4945/throughput-network-device-interfaces?var-site={{ printf "%s prometheus/ops" $labels.site | urlquery }}&var-device={{ $labels.instance }}&var-interface={{ $labels.interface_name | urlquery }}'
           runbook: 'https://w.wiki/Gbyf'
       - alert: TransitPeeringInSaturation
         expr: |
@@ -78,7 +78,7 @@ groups:
         annotations:
           summary: 'Transit or peering IN traffic above 90% capacity - {{ $labels.instance | stripPort }}:{{ $labels.interface_name }} ({{ $labels.interface_description }}) #page'
           description: ''  # Not needed
-          dashboard: 'https://grafana.wikimedia.org/d/fb403d62-5f03-434a-9dff-bd02b9fff504/network-device-overview?var-instance={{ $labels.instance }}'
+          dashboard: 'https://grafana.wikimedia.org/d/d968a627-b6f6-47fc-9316-e058854a4945/throughput-network-device-interfaces?var-site={{ printf "%s prometheus/ops" $labels.site | urlquery }}&var-device={{ $labels.instance }}&var-interface={{ $labels.interface_name | urlquery }}'
           runbook: 'https://w.wiki/Gbyg'
       - alert: CoreOutboundSaturation
         expr: |
@@ -95,7 +95,7 @@ groups:
         annotations:
           summary: 'Core link outbound traffic above 90% capacity - {{ $labels.instance | stripPort }}:{{ $labels.interface_name }} ({{ $labels.interface_description }}) #page'
           description: ''  # Not needed
-          dashboard: 'https://grafana.wikimedia.org/d/fb403d62-5f03-434a-9dff-bd02b9fff504/network-device-overview?var-instance={{ $labels.instance }}'
+          dashboard: 'https://grafana.wikimedia.org/d/d968a627-b6f6-47fc-9316-e058854a4945/throughput-network-device-interfaces?var-site={{ printf "%s prometheus/ops" $labels.site | urlquery }}&var-device={{ $labels.instance }}&var-interface={{ $labels.interface_name | urlquery }}'
           runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#Primary_outbound_port_utilization_over_90%'
       - alert: SwitchCoreInterfaceDown
         # eqsin and ulsfo don't have the metrics matching the filters (old switches)
@@ -132,5 +132,5 @@ groups:
         annotations:
           summary: 'Core router normal + high priority queue drops are high on {{ $labels.instance | stripPort }}:{{ $labels.interface_name }} ({{ $labels.interface_description }})'
           description: ''  # Not needed
-          dashboard: 'https://grafana.wikimedia.org/d/5p97dAASz/network-device-interface-queues-and-error-stats?var-site={{ $labels.site }},var-instance={{ $labels.instance }}&var-interface={{ $labels.interface_name }}'
+          dashboard: 'https://grafana.wikimedia.org/d/5p97dAASz/queue-and-error-stats-by-network-device?var-site={{ printf "%s prometheus/ops" $labels.site | urlquery }}&var-device={{ $labels.instance | stripPort }}&var-interface={{ $labels.interface_name | urlquery }}'
           runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#CoreRouterInterfaceDropPercent'

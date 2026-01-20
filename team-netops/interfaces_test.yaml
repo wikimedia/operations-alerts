@@ -6,25 +6,25 @@ tests:
     external_labels:
       site: ulsfo
     input_series:
-      - series: 'gnmi_interfaces_interface_state_oper_status{instance="cr3-ulsfo:9804", interface_name="xe-0/1/7", interface_description="Core: cr4-ulsfo:xe-0/1/7 {#1074}"}'
+      - series: 'gnmi_interfaces_interface_state_oper_status{instance="cr3-ulsfo:9804", interface_name="xe-0/1/7", site="ulsfo", interface_description="Core: cr4-ulsfo:xe-0/1/7 {#1074}"}'
         values: '2 2'
-      - series: 'gnmi_interfaces_interface_state_enabled{instance="cr3-ulsfo:9804", interface_name="xe-0/1/7", interface_description="Core: cr4-ulsfo:xe-0/1/7 {#1074}"}'
+      - series: 'gnmi_interfaces_interface_state_enabled{instance="cr3-ulsfo:9804", interface_name="xe-0/1/7", site="ulsfo", interface_description="Core: cr4-ulsfo:xe-0/1/7 {#1074}"}'
         values: '1 1'
-      - series: 'gnmi_interfaces_interface_state_counters_in_errors{instance="cr3-ulsfo:9804", interface_name="xe-0/1/7", interface_description="Core: cr4-ulsfo:xe-0/1/7 {#1074}"}'
+      - series: 'gnmi_interfaces_interface_state_counters_in_errors{instance="cr3-ulsfo:9804", interface_name="xe-0/1/7", site="ulsfo", interface_description="Core: cr4-ulsfo:xe-0/1/7 {#1074}"}'
         values: '0+4x15'
-      - series: 'gnmi_interfaces_interface_state_counters_in_fcs_errors{instance="cr3-ulsfo:9804", interface_name="xe-0/1/7", interface_description="Core: cr4-ulsfo:xe-0/1/7 {#1074}"}'
+      - series: 'gnmi_interfaces_interface_state_counters_in_fcs_errors{instance="cr3-ulsfo:9804", interface_name="xe-0/1/7", site="ulsfo", interface_description="Core: cr4-ulsfo:xe-0/1/7 {#1074}"}'
         values: '0+4x15'
-      - series: 'gnmi_interfaces_interface_state_counters_out_errors{instance="cr3-ulsfo:9804", interface_name="xe-0/1/7", interface_description="Core: cr4-ulsfo:xe-0/1/7 {#1074}"}'
+      - series: 'gnmi_interfaces_interface_state_counters_out_errors{instance="cr3-ulsfo:9804", interface_name="xe-0/1/7", site="ulsfo", interface_description="Core: cr4-ulsfo:xe-0/1/7 {#1074}"}'
         values: '0+4x15'
-      - series: 'gnmi_interfaces_interface_state_counters_out_octets{instance="cr2-esams:9804", interface_description="Peering: Test peering", interface_name="xe-0/1/0"}'
+      - series: 'gnmi_interfaces_interface_state_counters_out_octets{instance="cr2-esams:9804", interface_description="Peering: Test peering", interface_name="xe-0/1/0", site="esams"}'
         values: '0+144000000000x10' # 1200000000 * 2 * 60
-      - series: 'gnmi_interfaces_interface_state_counters_out_octets{instance="cr2-esams:9804", interface_description="Core: Test core", interface_name="xe-0/1/1"}'
+      - series: 'gnmi_interfaces_interface_state_counters_out_octets{instance="cr2-esams:9804", interface_description="Core: Test core", interface_name="xe-0/1/1", site="esams"}'
         values: '0+144000000000x10' # 1200000000 * 2 * 60
-      - series: 'gnmi_interfaces_interface_state_counters_in_octets{instance="cr2-esams:9804", interface_description="Peering: Test peering", interface_name="xe-0/1/0"}'
+      - series: 'gnmi_interfaces_interface_state_counters_in_octets{instance="cr2-esams:9804", interface_description="Peering: Test peering", interface_name="xe-0/1/0", site="esams"}'
         values: '0+144000000000x10' # 1200000000 * 2 * 60
-      - series: 'gnmi_interfaces_interface_state_high_speed{instance="cr2-esams:9804", interface_description="Peering: Test peering", interface_name="xe-0/1/0"}'
+      - series: 'gnmi_interfaces_interface_state_high_speed{instance="cr2-esams:9804", interface_description="Peering: Test peering", interface_name="xe-0/1/0", site="esams"}'
         values: '10000x10'
-      - series: 'gnmi_interfaces_interface_state_high_speed{instance="cr2-esams:9804", interface_description="Core: Test core", interface_name="xe-0/1/1"}'
+      - series: 'gnmi_interfaces_interface_state_high_speed{instance="cr2-esams:9804", interface_description="Core: Test core", interface_name="xe-0/1/1", site="esams"}'
         values: '10000x10'
       - series: 'gnmi_interfaces_interface_state_oper_status{instance="asw1-b12-drmrs:9804", interface_name="et-0/0/48", interface_description="Core: cr1-drmrs:et-0/0/1 {#D0100}"}'
         values: '2 2'
@@ -63,13 +63,14 @@ tests:
               instance: cr3-ulsfo:9804
               interface_name: xe-0/1/7
               interface_description: "Core: cr4-ulsfo:xe-0/1/7 {#1074}"
+              site: ulsfo
               team: dcops
               severity: task
               scope: network
             exp_annotations:
               summary: "Inbound errors on interface cr3-ulsfo:xe-0/1/7 (Core: cr4-ulsfo:xe-0/1/7 {#1074})"
               description: ""
-              dashboard: 'https://grafana.wikimedia.org/d/fb403d62-5f03-434a-9dff-bd02b9fff504/network-device-overview?var-instance=cr3-ulsfo:9804'
+              dashboard: 'https://grafana.wikimedia.org/d/5p97dAASz/queue-and-error-stats-by-network-device?var-site=ulsfo+prometheus%2Fops&var-device=cr3-ulsfo&var-interface=xe-0%2F1%2F7'
               runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#Inbound/outbound_interface_errors'
       - alertname: OutboundInterfaceErrors
         eval_time: 20m
@@ -78,13 +79,14 @@ tests:
               instance: cr3-ulsfo:9804
               interface_name: xe-0/1/7
               interface_description: "Core: cr4-ulsfo:xe-0/1/7 {#1074}"
+              site: ulsfo
               team: dcops
               severity: task
               scope: network
             exp_annotations:
               summary: "Outbound errors on interface cr3-ulsfo:xe-0/1/7 (Core: cr4-ulsfo:xe-0/1/7 {#1074})"
               description: ""
-              dashboard: 'https://grafana.wikimedia.org/d/fb403d62-5f03-434a-9dff-bd02b9fff504/network-device-overview?var-instance=cr3-ulsfo:9804'
+              dashboard: 'https://grafana.wikimedia.org/d/5p97dAASz/queue-and-error-stats-by-network-device?var-site=ulsfo+prometheus%2Fops&var-device=cr3-ulsfo&var-interface=xe-0%2F1%2F7'
               runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#Inbound/outbound_interface_errors'
       - alertname: TransitPeeringTransportOutSaturation
         eval_time: 20m
@@ -93,13 +95,14 @@ tests:
               instance: cr2-esams:9804
               interface_name: xe-0/1/0
               interface_description: "Peering: Test peering"
+              site: esams
               team: sre
               severity: page
               scope: network
             exp_annotations:
               summary: "Transit, peering or transport OUT traffic above 90% capacity - cr2-esams:xe-0/1/0 (Peering: Test peering) #page"
               description: ""
-              dashboard: 'https://grafana.wikimedia.org/d/fb403d62-5f03-434a-9dff-bd02b9fff504/network-device-overview?var-instance=cr2-esams:9804'
+              dashboard: 'https://grafana.wikimedia.org/d/d968a627-b6f6-47fc-9316-e058854a4945/throughput-network-device-interfaces?var-site=esams+prometheus%2Fops&var-device=cr2-esams:9804&var-interface=xe-0%2F1%2F0'
               runbook: 'https://w.wiki/Gbyf'
       - alertname: CoreOutboundSaturation
         eval_time: 20m
@@ -108,13 +111,14 @@ tests:
               instance: cr2-esams:9804
               interface_name: xe-0/1/1
               interface_description: "Core: Test core"
+              site: esams
               team: sre
               severity: page
               scope: network
             exp_annotations:
               summary: "Core link outbound traffic above 90% capacity - cr2-esams:xe-0/1/1 (Core: Test core) #page"
               description: ""
-              dashboard: 'https://grafana.wikimedia.org/d/fb403d62-5f03-434a-9dff-bd02b9fff504/network-device-overview?var-instance=cr2-esams:9804'
+              dashboard: 'https://grafana.wikimedia.org/d/d968a627-b6f6-47fc-9316-e058854a4945/throughput-network-device-interfaces?var-site=esams+prometheus%2Fops&var-device=cr2-esams:9804&var-interface=xe-0%2F1%2F1'
               runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#Primary_outbound_port_utilization_over_90%'
       - alertname: TransitPeeringInSaturation
         eval_time: 20m
@@ -123,13 +127,14 @@ tests:
               instance: cr2-esams:9804
               interface_name: xe-0/1/0
               interface_description: "Peering: Test peering"
+              site: esams
               team: sre
               severity: page
               scope: network
             exp_annotations:
               summary: "Transit or peering IN traffic above 90% capacity - cr2-esams:xe-0/1/0 (Peering: Test peering) #page"
               description: ""
-              dashboard: 'https://grafana.wikimedia.org/d/fb403d62-5f03-434a-9dff-bd02b9fff504/network-device-overview?var-instance=cr2-esams:9804'
+              dashboard: 'https://grafana.wikimedia.org/d/d968a627-b6f6-47fc-9316-e058854a4945/throughput-network-device-interfaces?var-site=esams+prometheus%2Fops&var-device=cr2-esams:9804&var-interface=xe-0%2F1%2F0'
               runbook: 'https://w.wiki/Gbyg'
       - alertname: SwitchCoreInterfaceDown
         eval_time: 2m
@@ -160,5 +165,5 @@ tests:
             exp_annotations:
               summary: "Core router normal + high priority queue drops are high on cr2-esams:xe-0/1/2 (CCTID)"
               description: ""
-              dashboard: 'https://grafana.wikimedia.org/d/5p97dAASz/network-device-interface-queues-and-error-stats?var-site=esams,var-instance=cr2-esams:9804&var-interface=xe-0/1/2'
+              dashboard: 'https://grafana.wikimedia.org/d/5p97dAASz/queue-and-error-stats-by-network-device?var-site=esams+prometheus%2Fops&var-device=cr2-esams&var-interface=xe-0%2F1%2F2'
               runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#CoreRouterInterfaceDropPercent'
