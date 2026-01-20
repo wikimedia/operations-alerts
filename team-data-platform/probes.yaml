@@ -11,7 +11,7 @@ groups:
    - alert: ProbeDown
      annotations:
        description: '{{ $labels.instance }} failed when probed by {{ $labels.module }} from {{ $externalLabels.site }}. Availability is {{ $value }}%.'
-       summary: 'Service {{ $labels.instance }} has failed probes ({{ $labels.module }})'
+       summary: 'Service {{ $labels.instance }} has failed probes ({{ $labels.module }}) in {{ $externalLabels.site }}'
        dashboard: 'https://grafana.wikimedia.org/d/O0nHhdhnz/network-probes-overview?var-job={{ $labels.job }}&var-module=All'
        logs: 'https://logstash.wikimedia.org/app/dashboards#/view/f3e709c0-a5f8-11ec-bf8e-43f1807d5bc2?_g=(filters:!((query:(match_phrase:(service.name:{{ $labels.module }})))))'
        runbook: 'https://wikitech.wikimedia.org/wiki/Runbook#{{ $labels.instance }}'
@@ -29,8 +29,8 @@ groups:
 
    - alert: ProbeSlow
      annotations:
-       description: '{{ $labels.instance }} took {{ $value | humanizeDuration }} to reply successfully to probe {{ $labels.module }}'
-       summary: 'Slow probes for service {{ $labels.instance }}'
+       description: '{{ $labels.instance }} took {{ $value | humanizeDuration }} to reply successfully to probe {{ $labels.module }} in {{ $externalLabels.site }}'
+       summary: 'Slow probes for service {{ $labels.instance }} in {{ $externalLabels.site }}'
        dashboard: 'https://grafana.wikimedia.org/d/O0nHhdhnz/network-probes-overview?var-job={{ $labels.job }}&var-module={{ $labels.module }}'
        logs: 'https://logstash.wikimedia.org/app/dashboards#/view/f3e709c0-a5f8-11ec-bf8e-43f1807d5bc2?_g=(filters:!((query:(match_phrase:(service.name:{{ $labels.module }})))))'
        runbook: TODO
@@ -44,8 +44,8 @@ groups:
    - &cert_expired
      alert: CertAlmostExpired
      annotations:
-       description: 'The certificate presented by service {{ $labels.instance }} is going to expire in {{ $value | humanizeDuration }}'
-       summary: 'Certificate for service {{ $labels.instance }} is about to expire'
+       description: 'The certificate presented by service {{ $labels.instance }} in {{ $externalLabels.site }} is going to expire in {{ $value | humanizeDuration }}'
+       summary: 'Certificate for service {{ $labels.instance }} in {{ $externalLabels.site }} is about to expire'
        runbook: 'https://wikitech.wikimedia.org/wiki/TLS/Runbook#{{ $labels.instance }}'
        dashboard: TODO
      expr: probe_ssl_earliest_cert_expiry{job="probes/service", address=~"10\\.2\\.[12]\\.91", module=~"http.*"} - time() < (86400 * 9)

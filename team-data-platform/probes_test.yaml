@@ -29,7 +29,7 @@ tests:
          exp_annotations:
            description: fail:443 failed when probed by http_test from example_site.
              Availability is 0%.
-           summary: Service fail:443 has failed probes (http_test)
+           summary: Service fail:443 has failed probes (http_test) in example_site
            dashboard: 'https://grafana.wikimedia.org/d/O0nHhdhnz/network-probes-overview?var-job=probes/service&var-module=All'
            logs: 'https://logstash.wikimedia.org/app/dashboards#/view/f3e709c0-a5f8-11ec-bf8e-43f1807d5bc2?_g=(filters:!((query:(match_phrase:(service.name:http_test)))))'
            runbook: 'https://wikitech.wikimedia.org/wiki/Runbook#fail:443'
@@ -42,7 +42,8 @@ tests:
 
       - series: 'probe_success{job="probes/service", address="10.2.1.91", instance="slow:443", module="http_test"}'
         values: '1+0x3'
-
+    external_labels:
+      site: example_site
     alert_rule_test:
       - alertname: ProbeSlow
         eval_time: 3m
@@ -55,8 +56,8 @@ tests:
               module: http_test
               address: 10.2.1.91
             exp_annotations:
-              description: 'slow:443 took 1.5s to reply successfully to probe http_test'
-              summary: 'Slow probes for service slow:443'
+              description: 'slow:443 took 1.5s to reply successfully to probe http_test in example_site'
+              summary: 'Slow probes for service slow:443 in example_site'
               dashboard: 'https://grafana.wikimedia.org/d/O0nHhdhnz/network-probes-overview?var-job=probes/service&var-module=http_test'
               logs: 'https://logstash.wikimedia.org/app/dashboards#/view/f3e709c0-a5f8-11ec-bf8e-43f1807d5bc2?_g=(filters:!((query:(match_phrase:(service.name:http_test)))))'
               runbook: TODO
@@ -81,7 +82,7 @@ tests:
            address: 10.2.1.91
            module: http_opensearch-ipoid_ip4
          exp_annotations:
-           description: The certificate presented by service service:443 is going to expire in 6d 23h 47m 0s
-           summary: Certificate for service service:443 is about to expire
+           description: The certificate presented by service service:443 in example_site is going to expire in 6d 23h 47m 0s
+           summary: Certificate for service service:443 in example_site is about to expire
            runbook: 'https://wikitech.wikimedia.org/wiki/TLS/Runbook#service:443'
            dashboard: TODO
