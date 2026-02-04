@@ -197,16 +197,16 @@ tests:
         eval_time: 60m
         exp_alerts: []
 
-  # Check that an increase in the rate of 5xx server error codes for more than 30m raises an alert
+  # Check that an increase in the rate of 5xx server error codes for more than 45m raises an alert
   - interval: 1m
     input_series:
       - series: 'trafficserver_backend_requests_seconds_count{backend="wdqs-main.discovery.wmnet", status="200"}'
-        values: "0+250x19 1500+200x39"
+        values: "0+250x19 1500+200x54"
       - series: 'trafficserver_backend_requests_seconds_count{backend="wdqs-main.discovery.wmnet", status="500"}'
-        values: "0x19 0+50x39"
+        values: "0x19 0+50x54"
     alert_rule_test:
       - alertname: BlazegraphFailedServerRatioIncrease
-        eval_time: 60m
+        eval_time: 75m
         exp_alerts:
           - exp_labels:
               team: wikidata-platform
@@ -221,7 +221,7 @@ tests:
               runbook: https://wikitech.wikimedia.org/wiki/Wikidata_Query_Service/Runbook
               dashboard: https://grafana.wikimedia.org/d/000000489/wikidata-query-service
 
-  # make sure that an increased rate for less than 30m is ignored
+  # make sure that an increased rate for less than 45m is ignored
   - interval: 1m
     input_series:
       - series: 'trafficserver_backend_requests_seconds_count{backend="wdqs-main.discovery.wmnet", status="200"}'

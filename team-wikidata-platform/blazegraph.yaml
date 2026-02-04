@@ -180,7 +180,7 @@ groups:
             sum by (backend) (rate(trafficserver_backend_requests_seconds_count{backend=~"wdqs.*",status=~"5.."}[5m])) /
             clamp_min(sum by (backend) (rate(trafficserver_backend_requests_seconds_count{backend=~"wdqs.*",status=~"[23].."}[5m])), 1)
           ) > 0.01
-        for: 30m
+        for: 45m
         labels:
           team: wikidata-platform
           severity: warning
