@@ -1,0 +1,30 @@
+# deploy-tag: ops
+
+groups:
+  - name: gerrit
+    rules:
+      - alert: GerritHAProxyBackendUnavailable
+        # Alert if Gerrit backend server is down
+        expr: haproxy_backend_active_servers{proxy="gerrit_ssh", job="tcp_proxy"} == 0
+        for: 1m
+        labels:
+          severity: task
+          team: collaboration-services
+        annotations:
+          summary: "Gerrit backend is unavilable for tcp-proxy (HAProxy) {{ $labels.proxy }}"
+          description: "Gerrit backend is unavilable for tcp-proxy (HAProxy) {{ $labels.proxy }}, 0 active backend servers."
+          runbook: https://wikitech.wikimedia.org/wiki/Gerrit/Operations#GerritHAProxyBackendUnavailable
+          dashboard: grafana.wikimedia.org/d/459365f6-df37-48d6-8142-82b22c1875e7/gerrit-tcp-proxy?viewPanel=panel-15
+
+      - alert: GerritHAProxyServiceUnavailable
+        # Alert if both tcp-proxy hosts in a single DC are down
+        expr: count by (job, proxy, site, state) (haproxy_server_status{proxy="gerrit_ssh", state!="UP", job="tcp_proxy"} > 0) > 1
+        for: 1m
+        labels:
+          severity: task
+          team: collaboration-services
+        annotations:
+          summary: "Gerrit tcp-proxy (HAProxy) service {{ $labels.proxy }} is {{ $labels.state }} in {{ $labels.site }}"
+          description: "Gerrit tcp-proxy (HAProxy) service {{ $labels.proxy }} is {{ $labels.state }}, less than 2 available proxies in {{ $labels.site }}."
+          runbook: https://wikitech.wikimedia.org/wiki/Gerrit/Operations#GerritHAProxyServiceUnavailable
+          dashboard: grafana.wikimedia.org/d/459365f6-df37-48d6-8142-82b22c1875e7/gerrit-tcp-proxy?viewPanel=panel-15
