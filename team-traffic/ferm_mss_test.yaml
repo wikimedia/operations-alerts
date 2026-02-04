@@ -15,7 +15,11 @@ tests:
       - series: 'ferm_mss_cfg{cluster="ncredir", instance="ncredir4001:2200", interface="lo", job="ferm_mss", protocol="IPv6"}'
         values: '1400x7'
       - series: 'lvs_realserver_mss_value{cluster="ncredir", endpoint="[2620:0:863:ed1a::3]:443", instance="ncredir4001:9100", job="node", protocol="IPv6"}'
+      # Should pass: MSS value of 0 (server socket down) should not trigger alert
+      - series: 'ferm_mss_cfg{cluster="ncredir", instance="ncredir3001:2200", interface="lo", job="ferm_mss", protocol="IPv6"}'
         values: '1400x7'
+      - series: 'lvs_realserver_mss_value{cluster="ncredir", endpoint="[2620:0:863:ed1a::3]:443", instance="ncredir3001:9100", job="node", protocol="IPv6"}'
+        values: '0x7'
     alert_rule_test:
      - alertname: FermMSS
        eval_time: 2m

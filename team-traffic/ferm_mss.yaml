@@ -6,7 +6,7 @@ groups:
       - alert: FermMSS
         expr:
           sum by (hostname, protocol, endpoint, cluster) (
-            label_replace(lvs_realserver_mss_value, "hostname", "$1", "instance", "(.*):.*")
+            label_replace(lvs_realserver_mss_value > 0, "hostname", "$1", "instance", "(.*):.*")
             )
             /
           sum by (hostname, protocol, endpoint, cluster) (
