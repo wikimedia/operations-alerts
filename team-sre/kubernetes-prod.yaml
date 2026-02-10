@@ -7,7 +7,7 @@ groups:
     # Using last_terminated_exitcode == 137 here instead of last_terminated_reason{reason="OOMKilled"} as the latter does not seem to catch all OOM kills properly
     expr: (kube_pod_container_status_restarts_total - kube_pod_container_status_restarts_total offset 10m >= 2) and min_over_time(kube_pod_container_status_last_terminated_exitcode[10m]) == 137
     labels:
-      team: sre
+      team: serviceops
       severity: warning
     annotations:
       summary: "Container {{ $labels.container }} has been OOM killed at least twice in 10min"
@@ -20,7 +20,7 @@ groups:
     expr: (container_memory_working_set_bytes{container!~"POD|", namespace!~"linkrecommendation|mw-mcrouter|rdf-streaming-updater"} / (container_spec_memory_limit_bytes{container!~"POD|", namespace!~"linkrecommendation|mw-mcrouter|rdf-streaming-updater"} > 0)) > 0.95
     for: 10m
     labels:
-      team: sre
+      team: serviceops
       severity: warning
     annotations:
       summary: "Container {{ $labels.pod }}:{{ $labels.container }} is consistently using {{ $value | humanizePercentage }} of its memory limit"
