@@ -8,7 +8,7 @@ groups:
     expr: time() - node_file_age_timestamp_seconds_total{path=~"/srv/mirrors/(debian|ubuntu)"} > 14 * 3600
     for: 10m
     labels:
-      severity: critical
+      severity: warning
       team: infrastructure-foundations
     annotations:
       summary: "Mirrors - {{ $labels.path }} synchronization lag"

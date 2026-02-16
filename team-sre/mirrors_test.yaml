@@ -24,7 +24,7 @@ tests:
           - exp_labels:
               team: infrastructure-foundations
               path: /srv/mirrors/debian
-              severity: critical
+              severity: warning
             exp_annotations:
               summary: 'Mirrors - /srv/mirrors/debian synchronization lag'
               description: 'Mirrors - /srv/mirrors/debian synchronization lag is behind 14h 20m 0s'
