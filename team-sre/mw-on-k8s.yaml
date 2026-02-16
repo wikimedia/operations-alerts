@@ -13,7 +13,7 @@ groups:
           summary: 'Not enough idle PHP-FPM workers for Mediawiki {{ $labels.deployment }} releases routed via {{ $labels.routed_via }} at {{ $externalLabels.site }}: {{ $value | humanizePercentage }} idle'
           dashboard: 'https://grafana.wikimedia.org/d/U7JT--knk/mw-on-k8s?orgId=1&viewPanel=84&var-dc={{ $externalLabels.site }}%20prometheus/k8s&var-service=mediawiki&var-namespace={{$labels.deployment}}&var-container_name=All&var-release={{ $labels.routed_via }}'
           runbook: 'https://bit.ly/wmf-fpmsat'
-        expr: sum by (deployment, routed_via) (phpfpm_processes_total{app="mediawiki", state="idle", deployment!~"mw-jobrunner|mw-debug"}) / sum by (deployment, routed_via) (phpfpm_processes_total{app="mediawiki", deployment!~"mw-jobrunner|mw-debug"}) <= 0.25
+        expr: sum by (deployment, routed_via) (phpfpm_processes_total{app="mediawiki", state="idle", deployment!~"mw-jobrunner|mw-debug|mw-parsoid|mw-experimental"}) / sum by (deployment, routed_via) (phpfpm_processes_total{app="mediawiki", deployment!~"mw-jobrunner|mw-debug|mw-parsoid|mw-experimental"}) <= 0.25
         for: 2m
         labels:
           severity: critical
@@ -60,11 +60,11 @@ groups:
           histogram_quantile(
             0.75,
             sum(
-              rate(envoy_cluster_upstream_rq_time_bucket{ app="mediawiki", envoy_cluster_name=~"(local_service|LOCAL_.*)", deployment!="mw-jobrunner"}[2m])
+              rate(envoy_cluster_upstream_rq_time_bucket{ app="mediawiki", envoy_cluster_name=~"(local_service|LOCAL_.*)", deployment!~"mw-jobrunner|mw-parsoid|mw-experimental"}[2m])
             ) by (le, deployment, routed_via)
           ) / 1000 > 0.8
           and sum(
-            rate(envoy_cluster_upstream_rq_time_count{app="mediawiki",envoy_cluster_name=~"(local_service|LOCAL_.*)", deployment!="mw-jobrunner"}[2m])
+            rate(envoy_cluster_upstream_rq_time_count{app="mediawiki",envoy_cluster_name=~"(local_service|LOCAL_.*)", deployment!~"mw-jobrunner|mw-parsoid|mw-experimental"}[2m])
           ) by (deployment, routed_via) > 300
         for: 4m
         labels:
@@ -76,6 +76,6 @@ groups:
           histogram_quantile(
             0.75,
             sum(
-              rate(envoy_cluster_upstream_rq_time_bucket{ app="mediawiki", envoy_cluster_name=~"(local_service|LOCAL_.*)", deployment!="mw-jobrunner"}[2m])
+              rate(envoy_cluster_upstream_rq_time_bucket{ app="mediawiki", envoy_cluster_name=~"(local_service|LOCAL_.*)", deployment!~"mw-jobrunner|mw-parsoid|mw-experimental"}[2m])
             ) by (le, deployment, routed_via)
           ) / 1000 > 1
