@@ -87,7 +87,7 @@ tests:
               project: tools
             exp_annotations:
               summary: "Object storage quota by 'objects' is 96% full for project tools"
-              description: "The project tools has used almost it's 'objects' quota."
+              description: "The project tools has used almost it's 'objects' (NOT 'size') quota."
               runbook: https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/ObjectStorageObjectQuotaFull
               dashboard: https://grafana.wikimedia.org/d/7120b794-4638-49f5-bccd-9716efc60f24/wmcs-object-storage-quotas
           - exp_labels:
@@ -98,6 +98,6 @@ tests:
               project: tools
             exp_annotations:
               summary: "Object storage quota by 'objects' is 96% full for project tools"
-              description: "The project tools is about to get out of 'objects' quota, expand it asap."
+              description: "The project tools is about to get out of 'objects' (NOT 'size') quota, expand it asap."
               runbook: https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/ObjectStorageObjectQuotaFull
               dashboard: https://grafana.wikimedia.org/d/7120b794-4638-49f5-bccd-9716efc60f24/wmcs-object-storage-quotas
