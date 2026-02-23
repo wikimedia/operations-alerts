@@ -28,3 +28,16 @@ groups:
           description: "Gerrit tcp-proxy (HAProxy) service {{ $labels.proxy }} is {{ $labels.state }}, less than 2 available proxies in {{ $labels.site }}."
           runbook: https://wikitech.wikimedia.org/wiki/Gerrit/Operations#GerritHAProxyServiceUnavailable
           dashboard: grafana.wikimedia.org/d/459365f6-df37-48d6-8142-82b22c1875e7/gerrit-tcp-proxy?viewPanel=panel-15
+
+      - alert: GerritReplicationUnavailable
+        # Alert if Gerrit replication is unavailable for more than 15 minutes
+        expr: sum(events_ref_replication_scheduled_total{} - events_ref_replicated_total{}) by (instance) < 0
+        for: 15m
+        labels:
+          severity: task
+          team: collaboration-services
+        annotations:
+          summary: "Gerrit replication on {{ $labels.instance }} is lagging for more than 15 minutes."
+          description: "Gerrit replication on {{ $labels.instance }} is lagging for more than 15 minutes."
+          runbook: https://wikitech.wikimedia.org/wiki/Gerrit/Operations#GerritReplicationUnavailable
+          dashboard: https://grafana.wikimedia.org/goto/8VXsGHdDR?orgId=1
