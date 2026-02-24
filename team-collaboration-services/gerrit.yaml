@@ -30,8 +30,9 @@ groups:
           dashboard: grafana.wikimedia.org/d/459365f6-df37-48d6-8142-82b22c1875e7/gerrit-tcp-proxy?viewPanel=panel-15
 
       - alert: GerritReplicationUnavailable
+        # pint disable promql/series
         # Alert if Gerrit replication is unavailable for more than 15 minutes
-        expr: sum(events_ref_replication_scheduled_total{} - events_ref_replicated_total{}) by (instance) < 0
+        expr: sum(events_ref_replication_scheduled_total - events_ref_replicated_total) by (instance) < 0
         for: 15m
         labels:
           severity: task
