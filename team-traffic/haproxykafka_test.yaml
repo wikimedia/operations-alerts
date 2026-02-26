@@ -74,7 +74,6 @@ tests:
              hostname: "cp5017"
              severity: warning
              team: traffic
-             cluster: cache_text
            exp_annotations:
               summary: 'Unexpected rate of produced HaproxyKafka messages by cp5017'
               description: 'Haproxy on cp5017 is receiving requests, but HaproxyKafka is not sending enough messages'
@@ -99,7 +98,6 @@ tests:
               hostname: "cp5017"
               severity: warning
               team: traffic
-              cluster: cache_text
             exp_annotations:
               summary: 'Unexpected rate of produced HaproxyKafka messages by cp5017'
               description: 'Haproxy on cp5017 is receiving requests, but HaproxyKafka is not sending enough messages'
@@ -109,7 +107,6 @@ tests:
               severity: critical
               team: traffic
               hostname: "cp5017"
-              cluster: cache_text
             exp_annotations:
               summary: 'Unexpected rate of produced HaproxyKafka messages by cp5017'
               description: 'Haproxy on cp5017 is receiving requests, but HaproxyKafka is not sending enough messages'
@@ -133,7 +130,6 @@ tests:
               hostname: "cp5017"
               severity: warning
               team: traffic
-              cluster: cache_text
             exp_annotations:
               summary: 'Unexpected rate of produced HaproxyKafka messages by cp5017'
               description: 'Haproxy on cp5017 is receiving requests, but HaproxyKafka is not sending enough messages'
@@ -143,7 +139,6 @@ tests:
               severity: critical
               team: traffic
               hostname: "cp5017"
-              cluster: cache_text
             exp_annotations:
               summary: 'Unexpected rate of produced HaproxyKafka messages by cp5017'
               description: 'Haproxy on cp5017 is receiving requests, but HaproxyKafka is not sending enough messages'
@@ -180,7 +175,7 @@ tests:
     input_series:
       - series: 'haproxykafka_socket_dropped_messages_total{instance="cp5026:9341", cluster="cache_upload"}'
         values: '0+10x5 1000+100000x25'  # Normal for 5min, then sustained 600/min (10/sec) for 25min
-      
+
     alert_rule_test:
       - alertname: HaproxyKafkaSocketDroppedMessages
         eval_time: 25m
