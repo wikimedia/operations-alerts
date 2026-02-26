@@ -31,7 +31,9 @@ groups:
           sum by (hostname) (label_replace (rate(haproxykafka_valid_messages_total{cluster=~"cache_(text|upload)"}[5m]), "hostname", "$1", "instance", "(.*):.*"))
           or
           (sum by (hostname) (label_replace(up{cluster=~"cache_(text|upload)"} * 0, "hostname", "$1", "instance", "(.*):.*")))
-          ) / sum by (hostname) (label_replace (rate(haproxy_frontend_http_requests_total{cluster=~"cache_(text|upload)", proxy!="stats"}[5m]), "hostname", "$1", "instance", "(.*):.*")) < 0.2'
+          ) / sum by (hostname) (label_replace (rate(haproxy_frontend_http_requests_total{cluster=~"cache_(text|upload)", proxy!="stats"}[5m]), "hostname", "$1", "instance", "(.*):.*")) < 0.2
+          and
+          sum by (hostname) (label_replace (rate(haproxy_frontend_http_requests_total{cluster=~"cache_(text|upload)", proxy!="stats"}[5m]), "hostname", "$1", "instance", "(.*):.*")) > 0'
         for: 5m
         labels:
           team: traffic
@@ -46,7 +48,9 @@ groups:
           sum by (hostname) (label_replace (rate(haproxykafka_valid_messages_total{cluster=~"cache_(text|upload)"}[5m]), "hostname", "$1", "instance", "(.*):.*"))
           or
           (sum by (hostname) (label_replace(up{cluster=~"cache_(text|upload)"} * 0, "hostname", "$1", "instance", "(.*):.*")))
-          ) / sum by (hostname) (label_replace (rate(haproxy_frontend_http_requests_total{cluster=~"cache_(text|upload)", proxy!="stats"}[5m]), "hostname", "$1", "instance", "(.*):.*")) < 0.1'
+          ) / sum by (hostname) (label_replace (rate(haproxy_frontend_http_requests_total{cluster=~"cache_(text|upload)", proxy!="stats"}[5m]), "hostname", "$1", "instance", "(.*):.*")) < 0.1
+          and
+          sum by (hostname) (label_replace (rate(haproxy_frontend_http_requests_total{cluster=~"cache_(text|upload)", proxy!="stats"}[5m]), "hostname", "$1", "instance", "(.*):.*")) > 0'
         for: 5m
         labels:
           team: traffic
