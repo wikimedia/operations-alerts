@@ -51,11 +51,11 @@ tests:
             dashboard: https://grafana.wikimedia.org/d/000000585/hadoop?var-hadoop_cluster=analytics-hadoop&orgId=1&panelId=106&fullscreen
             runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#HDFS_Capacity_Remaining
 
-## HDFS Namenode RPC Call Queue Length tests
+## HDFS Namenode RPC Queue Length tests
     - interval: 1m
       input_series:
         - series: Hadoop_NameNode_CallQueueLength{name="RpcActivityForPort8020", hadoop_cluster="analytics-hadoop", instance="an-master1001:10080"}
-          values: '21'
+          values: '501'
       alert_rule_test:
       - alertname: HdfsRpcQueueLength
         eval_time: 5m
@@ -65,16 +65,45 @@ tests:
             team: data-engineering
             hadoop_cluster: analytics-hadoop
           exp_annotations:
-            description: The HDFS Namenode RPC 8020 call queue length on the analytics-hadoop cluster is too high.
-            summary: RPC call queue length on the analytics-hadoop cluster is too high.
+            description: The HDFS Namenode RPC 8020 queue length on the analytics-hadoop cluster is too high.
+            summary: RPC queue length on the analytics-hadoop cluster is too high.
             dashboard: https://grafana.wikimedia.org/d/000000585/hadoop?var-hadoop_cluster=analytics-hadoop&orgId=1&panelId=54&fullscreen
-            runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#HDFS_Namenode_RPC_length_queue
+            runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#HDFS_Namenode_RPC_length_queue/latency
         - exp_labels:
             severity: warning
             team: data-engineering
             hadoop_cluster: analytics-hadoop
           exp_annotations:
-            description: The HDFS Namenode RPC 8020 call queue length on the analytics-hadoop cluster is too high.
-            summary: RPC call queue length on the analytics-hadoop cluster is too high.
+            description: The HDFS Namenode RPC 8020 queue length on the analytics-hadoop cluster is too high.
+            summary: RPC queue length on the analytics-hadoop cluster is too high.
             dashboard: https://grafana.wikimedia.org/d/000000585/hadoop?var-hadoop_cluster=analytics-hadoop&orgId=1&panelId=54&fullscreen
-            runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#HDFS_Namenode_RPC_length_queue
+            runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#HDFS_Namenode_RPC_length_queue/latency
+
+## HDFS Namenode RPC Queue Latency tests
+    - interval: 1m
+      input_series:
+        - series: Hadoop_NameNode_RpcQueueTimeAvgTime{name="RpcActivityForPort8020", hadoop_cluster="analytics-hadoop", instance="an-master1001:10080"}
+          values: '101'
+      alert_rule_test:
+      - alertname: HdfsRpcQueueLatency
+        eval_time: 5m
+        exp_alerts:
+        - exp_labels:
+            severity: critical
+            team: data-engineering
+            hadoop_cluster: analytics-hadoop
+          exp_annotations:
+            description: The HDFS Namenode RPC 8020 queue latency on the analytics-hadoop cluster is too high.
+            summary: RPC queue latency on the analytics-hadoop cluster is too high.
+            dashboard: https://grafana.wikimedia.org/d/000000585/hadoop?var-hadoop_cluster=analytics-hadoop&orgId=1&panelId=56&fullscreen
+            runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#HDFS_Namenode_RPC_length_queue/latency
+        - exp_labels:
+            severity: warning
+            team: data-engineering
+            hadoop_cluster: analytics-hadoop
+          exp_annotations:
+            description: The HDFS Namenode RPC 8020 queue latency on the analytics-hadoop cluster is too high.
+            summary: RPC queue latency on the analytics-hadoop cluster is too high.
+            dashboard: https://grafana.wikimedia.org/d/000000585/hadoop?var-hadoop_cluster=analytics-hadoop&orgId=1&panelId=56&fullscreen
+            runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#HDFS_Namenode_RPC_length_queue/latency
+
