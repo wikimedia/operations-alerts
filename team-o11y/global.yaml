@@ -109,3 +109,59 @@ groups:
       labels:
         severity: warning
         team: o11y
+
+  - name: PrometheusCardinalityExplosion
+    rules:
+      - alert: PrometheusSeriesCountAnomalyHigh
+        expr: prometheus_site:prometheus_tsdb_head_series:zscore >= 5
+        for: 2h
+        labels:
+          severity: task
+          team: o11y
+        annotations:
+          summary: "Anomalous increase in number of active series on {{ $labels.prometheus }} ({{ $labels.site }})"
+          description: >
+            The total number of active series on {{ $labels.prometheus }} / {{ $labels.site }}
+            has been statistically anomalous for more than 2 hours (z-score: {{ $value | humanize }}, threshold: 5).
+            This is a sustained upward deviation from the 3-week baseline, suggesting a cardinality explosion
+            rather than a transient spike. Investigate recently added or modified scrape targets
+            and look for high-cardinality labels.
+          dashboard: https://grafana.wikimedia.org/d/taff979/prometheus-tsdb-cardinality-monitoring?orgId=1&from=now-14d&to=now&timezone=utc&var-prometheus={{ $labels.prometheus }}&var-site={{ $labels.site }}
+          runbook: https://wikitech.wikimedia.org/wiki/Prometheus#Runbooks
+
+      - alert: PrometheusSeriesCreationRateAnomalyHigh
+        expr: prometheus_site:prometheus_tsdb_head_series_created:zscore >= 5
+        for: 24h
+        labels:
+          severity: task
+          team: o11y
+        annotations:
+          summary: "Anomalous increase in series creation rate on {{ $labels.prometheus }} ({{ $labels.site }})"
+          description: >
+            The rate of new series being created on {{ $labels.prometheus }} / {{ $labels.site }}
+            has been statistically anomalous for more than 24 hours (z-score: {{ $value | humanize }}, threshold: 5).
+            This is a sustained upward deviation from the 3-week baseline and is a strong indicator of label churn,
+            typically caused by high-cardinality label values.
+          dashboard: https://grafana.wikimedia.org/d/taff979/prometheus-tsdb-cardinality-monitoring?orgId=1&from=now-14d&to=now&timezone=utc&var-prometheus={{ $labels.prometheus }}&var-site={{ $labels.site }}
+          runbook: https://wikitech.wikimedia.org/wiki/Prometheus#Runbooks
+
+      - alert: PrometheusZombieSeriesDetected
+        expr: |
+          avg_over_time(prometheus_site:prometheus_tsdb_head_samples_appended_per_series:ratio_rate1d[1d])
+            <
+          ((1 / avg by (prometheus, site) (prometheus_target_interval_length_seconds{quantile="0.5"})) * 0.85)
+        for: 72h
+        labels:
+          severity: task
+          team: o11y
+        annotations:
+          summary: "Zombie series detected on {{ $labels.prometheus }} ({{ $labels.site }})"
+          description: >
+            The average samples-per-series ratio on {{ $labels.prometheus }} / {{ $labels.site }}
+            has been below 85% of the expected scrape rate for more than 72 hours.
+            A large number of active series are receiving few or no samples, indicating
+            accumulated zombie series — likely the residual effect of a cardinality explosion
+            where new series were continuously created via label churn and old ones
+            were never cleaned up. Current ratio: {{ $value | humanize }} samples/s per series.
+          dashboard: https://grafana.wikimedia.org/d/taff979/prometheus-tsdb-cardinality-monitoring?orgId=1&from=now-14d&to=now&timezone=utc&var-prometheus={{ $labels.prometheus }}&var-site={{ $labels.site }}
+          runbook: https://wikitech.wikimedia.org/wiki/Prometheus#Runbooks

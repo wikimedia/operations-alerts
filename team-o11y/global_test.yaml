@@ -2,21 +2,95 @@ rule_files:
   - global.yaml
 evaluation_interval: 1m
 tests:
- - interval: 1m
-   input_series:
-    - series: 'alertmanager_config_hash{site="eqiad"}'
-      values: '1000+3x50'
-    - series: 'alertmanager_config_hash{site="codfw"}'
-      values: '2000+3x50'
-   alert_rule_test:
-    - alertname: AlertManagerConfigDesync
-      eval_time: 35m
-      exp_alerts:
-       - exp_labels:
-           severity: warning
-           team: o11y
-         exp_annotations:
-           description: AlertManager cluster configuration is out of sync, check logs
-           summary: AlertManager cluster configuration out of sync
-           dashboard: https://grafana.wikimedia.org/d/eea-9_sik/alertmanager
-           runbook: https://wikitech.wikimedia.org/wiki/Alertmanager#Alerts
+  - interval: 1m
+    input_series:
+     - series: 'alertmanager_config_hash{site="eqiad"}'
+       values: '1000+3x50'
+     - series: 'alertmanager_config_hash{site="codfw"}'
+       values: '2000+3x50'
+    alert_rule_test:
+     - alertname: AlertManagerConfigDesync
+       eval_time: 35m
+       exp_alerts:
+        - exp_labels:
+            severity: warning
+            team: o11y
+          exp_annotations:
+            description: AlertManager cluster configuration is out of sync, check logs
+            summary: AlertManager cluster configuration out of sync
+            dashboard: https://grafana.wikimedia.org/d/eea-9_sik/alertmanager
+            runbook: https://wikitech.wikimedia.org/wiki/Alertmanager#Alerts
+
+  - interval: 5m
+    input_series:
+      - series: 'prometheus_site:prometheus_tsdb_head_series:zscore{prometheus="ops",site="eqiad"}'
+        values: "6+0x23"
+    alert_rule_test:
+      - alertname: PrometheusSeriesCountAnomalyHigh
+        eval_time: 2h
+        exp_alerts:
+          - exp_labels:
+              severity: task
+              team: o11y
+              prometheus: ops
+              site: eqiad
+            exp_annotations:
+              summary: "Anomalous increase in number of active series on ops (eqiad)"
+              description: >
+                The total number of active series on ops / eqiad
+                has been statistically anomalous for more than 2 hours (z-score: 6, threshold: 5).
+                This is a sustained upward deviation from the 3-week baseline, suggesting a cardinality explosion
+                rather than a transient spike. Investigate recently added or modified scrape targets
+                and look for high-cardinality labels.
+              dashboard: https://grafana.wikimedia.org/d/taff979/prometheus-tsdb-cardinality-monitoring?orgId=1&from=now-14d&to=now&timezone=utc&var-prometheus=ops&var-site=eqiad
+              runbook: https://wikitech.wikimedia.org/wiki/Prometheus#Runbooks
+
+  - interval: 5m
+    input_series:
+      - series: 'prometheus_site:prometheus_tsdb_head_series_created:zscore{prometheus="ops",site="eqiad"}'
+        values: "6+0x287"
+    alert_rule_test:
+      - alertname: PrometheusSeriesCreationRateAnomalyHigh
+        eval_time: 24h
+        exp_alerts:
+          - exp_labels:
+              severity: task
+              team: o11y
+              prometheus: ops
+              site: eqiad
+            exp_annotations:
+              summary: "Anomalous increase in series creation rate on ops (eqiad)"
+              description: >
+                The rate of new series being created on ops / eqiad
+                has been statistically anomalous for more than 24 hours (z-score: 6, threshold: 5).
+                This is a sustained upward deviation from the 3-week baseline and is a strong indicator of label churn,
+                typically caused by high-cardinality label values.
+              dashboard: https://grafana.wikimedia.org/d/taff979/prometheus-tsdb-cardinality-monitoring?orgId=1&from=now-14d&to=now&timezone=utc&var-prometheus=ops&var-site=eqiad
+              runbook: https://wikitech.wikimedia.org/wiki/Prometheus#Runbooks
+
+  - interval: 5m
+    input_series:
+      - series: 'prometheus_site:prometheus_tsdb_head_samples_appended_per_series:ratio_rate1d{prometheus="ops",site="eqiad"}'
+        values: "0+0x1727"
+      - series: 'prometheus_target_interval_length_seconds{quantile="0.5",prometheus="ops",site="eqiad"}'
+        values: "60+0x1727"
+    alert_rule_test:
+      - alertname: PrometheusZombieSeriesDetected
+        eval_time: 144h
+        exp_alerts:
+          - exp_labels:
+              severity: task
+              team: o11y
+              prometheus: ops
+              site: eqiad
+            exp_annotations:
+              summary: "Zombie series detected on ops (eqiad)"
+              description: >
+                The average samples-per-series ratio on ops / eqiad
+                has been below 85% of the expected scrape rate for more than 72 hours.
+                A large number of active series are receiving few or no samples, indicating
+                accumulated zombie series — likely the residual effect of a cardinality explosion
+                where new series were continuously created via label churn and old ones
+                were never cleaned up. Current ratio: 0 samples/s per series.
+              dashboard: https://grafana.wikimedia.org/d/taff979/prometheus-tsdb-cardinality-monitoring?orgId=1&from=now-14d&to=now&timezone=utc&var-prometheus=ops&var-site=eqiad
+              runbook: https://wikitech.wikimedia.org/wiki/Prometheus#Runbooks
