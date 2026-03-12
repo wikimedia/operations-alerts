@@ -27,7 +27,7 @@ groups:
           runbook: https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Troubleshooting#Networking_failures
           dashboard: https://grafana.wikimedia.org/d/wKnDJf97z/wmcs-neutron-eqiad1
       - alert: NeutronAgentAdminDown
-        expr: openstack_neutron_agent_state{adminState="down"}
+        expr: (openstack_neutron_agent_state{adminState="down"} or on() vector(0)) == 1
         for: 1h
         labels:
           team: wmcs
