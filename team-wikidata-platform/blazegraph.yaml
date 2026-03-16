@@ -64,7 +64,7 @@ groups:
         for: 1m
         labels:
           team: wikidata-platform
-          severity: critical
+          severity: warning
         annotations:
           summary: "Categories Query service lag is above 2 days"
           description: "Categories Query service lag on {{$labels.instance}} is above 2 days"

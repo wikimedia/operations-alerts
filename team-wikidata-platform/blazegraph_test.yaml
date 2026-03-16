@@ -75,7 +75,7 @@ tests:
         exp_alerts:
           - exp_labels:
               team: wikidata-platform
-              severity: critical
+              severity: warning
               instance: wdqs3050:9194
             exp_annotations:
               summary: "Categories Query service lag is above 2 days"
