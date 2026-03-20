@@ -70,7 +70,7 @@ tests:
 
   - interval: 5m
     input_series:
-      - series: 'prometheus_site:prometheus_tsdb_head_samples_appended_per_series:ratio_rate1d{prometheus="ops",site="eqiad"}'
+      - series: 'prometheus_site:prometheus_tsdb_head_samples_appended_per_series:ratio_rate1d{prometheus="ops",recorder="thanos-rule@main",site="eqiad"}'
         values: "0+0x1727"
       - series: 'prometheus_target_interval_length_seconds{quantile="0.5",prometheus="ops",site="eqiad"}'
         values: "60+0x1727"
@@ -83,6 +83,7 @@ tests:
               team: o11y
               prometheus: ops
               site: eqiad
+              recorder: thanos-rule@main
             exp_annotations:
               summary: "Zombie series detected on ops (eqiad)"
               description: >

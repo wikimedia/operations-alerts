@@ -148,7 +148,7 @@ groups:
       - alert: PrometheusZombieSeriesDetected
         expr: |
           avg_over_time(prometheus_site:prometheus_tsdb_head_samples_appended_per_series:ratio_rate1d[1d])
-            <
+            < on(prometheus, site) group_left()
           ((1 / avg by (prometheus, site) (prometheus_target_interval_length_seconds{quantile="0.5"})) * 0.85)
         for: 72h
         labels:
