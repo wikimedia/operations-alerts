@@ -6,6 +6,7 @@ groups:
       # reflect common pools of capacity, which may span releases.
       # In these cases, we aggregate by routed_via, and use the "primary"
       # associated release as the release hint in the dashboard link.
+      # IRC alert at 75% saturation...
       - &PHPFPMTooBusy
         alert: PHPFPMTooBusy
         annotations:
@@ -17,6 +18,20 @@ groups:
         for: 2m
         labels:
           severity: critical
+          team: sre
+      # ... and page at 95%. We expect to also see 5xxs in this situation, so it's possible this
+      # means we'll get two pages. But: PHPFPMTooBusy at 95% will alert faster, will pretty much
+      # never be a false positive (it will always need our attention), and will fire more reliably:
+      # we've at least once reached 100% saturation without getting an alert for 5xxs at all.
+      - <<: *PHPFPMTooBusy
+        annotations:
+          description: 'The MediaWiki k8s deployment {{ $labels.deployment }} in {{ $externalLabels.site }} is experiencing saturation of PHP-FPM workers in releases routed via {{ $labels.routed_via }}: {{ $value | humanizePercentage }} idle'
+          summary: 'Not enough idle PHP-FPM workers for Mediawiki {{ $labels.deployment }} releases routed via {{ $labels.routed_via }} at {{ $externalLabels.site }}: {{ $value | humanizePercentage }} idle #page'
+          dashboard: 'https://grafana.wikimedia.org/d/U7JT--knk/mw-on-k8s?orgId=1&viewPanel=84&var-dc={{ $externalLabels.site }}%20prometheus/k8s&var-service=mediawiki&var-namespace={{$labels.deployment}}&var-container_name=All&var-release={{ $labels.routed_via }}'
+          runbook: 'https://bit.ly/wmf-fpmsat'
+        expr: sum by (deployment, routed_via) (phpfpm_processes_total{app="mediawiki", state="idle", deployment!~"mw-jobrunner|mw-debug|mw-parsoid|mw-experimental"}) / sum by (deployment, routed_via) (phpfpm_processes_total{app="mediawiki", deployment!~"mw-jobrunner|mw-debug|mw-parsoid|mw-experimental"}) <= 0.05
+        labels:
+          severity: page
           team: sre
       - <<: *PHPFPMTooBusy
         expr: sum by (deployment, routed_via) (phpfpm_processes_total{app="mediawiki", state="idle", deployment="mw-jobrunner"}) / sum by (deployment, routed_via) (phpfpm_processes_total{app="mediawiki", deployment="mw-jobrunner"}) <= 0.1
