@@ -1,0 +1,29 @@
+# deploy-tag: k8s-dse
+# deploy-site: eqiad
+
+groups:
+  - name: turnilo
+    rules:
+    - alert: TurniloNextServiceUnavailable
+      annotations:
+        description: 'turnilo-staging is unavailable on k8s-dse'
+        summary: 'turnilo-staging is unavailable on k8s-dse'
+        dashboard: "https://grafana.wikimedia.org/d/hyl18XgMk/kubernetes-container-details?orgId=1&var-datasource=thanos&var-site=eqiad&var-cluster=k8s-dse&var-namespace=turnilo-next&var-container=All"
+        runbook: "https://wikitech.wikimedia.org/wiki/Data_Platform/Systems/Turnilo"
+      expr: kube_deployment_status_replicas_available{deployment="turnilo-staging", namespace="turnilo-next"} < 1
+      for: 5m
+      labels:
+        severity: warning
+        team: data-platform
+
+    - alert: TurniloServiceUnavailable
+      annotations:
+        description: 'turnilo-production is unavailable on k8s-dse'
+        summary: 'turnilo-production is unavailable on k8s-dse'
+        dashboard: "https://grafana.wikimedia.org/d/hyl18XgMk/kubernetes-container-details?orgId=1&var-datasource=thanos&var-site=eqiad&var-cluster=k8s-dse&var-namespace=turnilo&var-container=All"
+        runbook: "https://wikitech.wikimedia.org/wiki/Data_Platform/Systems/Turnilo"
+      expr: kube_deployment_status_replicas_available{deployment="turnilo-production", namespace="turnilo"} < 1
+      for: 5m
+      labels:
+        severity: critical
+        team: data-platform
