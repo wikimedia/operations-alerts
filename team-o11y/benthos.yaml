@@ -30,16 +30,16 @@ groups:
       #       Benthos instance generating metrics from events on topic `mediawiki.httpd.accesslog`
       #   * benthos-webrequest-sampled-live: role(syslog::centralserver)
       #       Benthos instance to sample webrequest "firehose" from kafka jumbo (defined below)
-      expr: sum by (exported_cluster, group) (kafka_burrow_partition_lag{exported_cluster=~"logging-.+",group=~"benthos-.+"}) > 1500
+      expr: avg by (exported_cluster, group) (kafka_burrow_partition_lag{exported_cluster=~"logging-.+",group=~"benthos-.+"}) > 1500
       for: 10m
       labels:
         severity: critical
         team: o11y
 
     - <<: *benthos_kafka_lag
-      expr: sum by (exported_cluster, group) (kafka_burrow_partition_lag{exported_cluster=~"logging-.+",group=~"benthos-.+"}) > 500000
+      expr: avg by (exported_cluster, group) (kafka_burrow_partition_lag{exported_cluster=~"logging-.+",group=~"benthos-.+"}) > 500000
       for: 2m
 
     - <<: *benthos_kafka_lag
-      expr: sum by (exported_cluster, group) (kafka_burrow_partition_lag{exported_cluster="jumbo-eqiad",group=~"benthos-webrequest.+"}) > 500000
+      expr: avg by (exported_cluster, group) (kafka_burrow_partition_lag{exported_cluster="jumbo-eqiad",group=~"benthos-webrequest.+"}) > 500000
       for: 10m

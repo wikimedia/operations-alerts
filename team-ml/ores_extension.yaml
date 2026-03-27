@@ -4,7 +4,7 @@ groups:
   - name: ores_extension
     rules:
       - alert: ORESFetchScoreJobKafkaLag
-        expr: sum by (exported_cluster, group) (kafka_burrow_partition_lag{group="cpjobqueue-ORESFetchScoreJob"}) > 100
+        expr: avg by (exported_cluster, group) (kafka_burrow_partition_lag{group="cpjobqueue-ORESFetchScoreJob"}) > 100
         for: 1h
         labels:
           team: ml
