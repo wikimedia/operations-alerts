@@ -123,3 +123,40 @@ tests:
               runbook: "https://w.wiki/HKer"
               description: "JVM Heap usage on the node os-node-9 in eqiad cluster is 95%."
               summary: "JVM Heap usage on the node is high"
+
+  - interval: 1m
+    input_series:
+      - series: 'opensearch_k8s_master_cert_expiry_seconds{pod="opensearch-example-masters-1",namespace="opensearch-example",site="eqiad"}'
+        values: '900000 800000 700000 600000 500000 400000 300000 200000 100000'
+    alert_rule_test:
+    # Warning threshold crossed (<7d ≈ 604800)
+    - eval_time: 8m
+      alertname: OpenSearchCertAlmostExpired
+      exp_alerts:
+      - exp_labels:
+          pod: opensearch-example-masters-1
+          namespace: opensearch-example
+          site: eqiad
+          severity: warning
+          team: data-platform
+        exp_annotations:
+          summary: "An OpenSearch pod certificate will expire in 1d 3h 46m 40s."
+          description: Certificate for OpenSearch pod opensearch-example-masters-1 in namespace opensearch-example and DC eqiad expires in 1d 3h 46m 40s.
+          runbook: https://wikitech.wikimedia.org/wiki/Data_Platform/Systems/OpenSearch-on-K8s/Administration#Renewing_TLS_Certificates
+          dashboard: https://grafana.wikimedia.org/d/c0a89788-c6fe-4d06-aeb2-70b63049599e/opensearch-on-k8s?orgId=1&from=now-30m&to=now&timezone=utc&var-datasource=PA878A9FF693AE41E&var-interval=1m&var-cluster=opensearch-ipoid&var-node=%24__all&var-shard_type=%24__all&var-pool_name=%24__all
+
+    # Critical threshold crossed (<4d ≈ 345600)
+    - eval_time: 11m
+      alertname: OpenSearchCertAlmostExpiredCritical
+      exp_alerts:
+      - exp_labels:
+          pod: opensearch-example-masters-1
+          namespace: opensearch-example
+          site: eqiad
+          severity: critical
+          team: data-platform
+        exp_annotations:
+          summary: "An OpenSearch pod certificate will expire in 1d 3h 46m 40s."
+          description: Certificate for OpenSearch pod opensearch-example-masters-1 in namespace opensearch-example and DC eqiad expires in 1d 3h 46m 40s.
+          runbook: https://wikitech.wikimedia.org/wiki/Data_Platform/Systems/OpenSearch-on-K8s/Administration#Renewing_TLS_Certificates
+          dashboard: https://grafana.wikimedia.org/d/c0a89788-c6fe-4d06-aeb2-70b63049599e/opensearch-on-k8s?orgId=1&from=now-30m&to=now&timezone=utc&var-datasource=PA878A9FF693AE41E&var-interval=1m&var-cluster=opensearch-ipoid&var-node=%24__all&var-shard_type=%24__all&var-pool_name=%24__all
