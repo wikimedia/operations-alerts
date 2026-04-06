@@ -80,25 +80,3 @@ groups:
       "labels":
         "severity": "critical"
         "team": "data-platform"
-
-    - &cert_expired
-      alert: OpenSearchCertAlmostExpired
-      # warn at one week
-      expr: opensearch_k8s_master_cert_expiry_seconds < (86400 * 7)
-      for: 5m
-      labels:
-        severity: warning
-        team: data-platform
-      annotations:
-        description: "Certificate for OpenSearch pod {{ $labels.pod }} in namespace {{ $labels.namespace }} and DC {{ $labels.site }} expires in {{ $value | humanizeDuration }}."
-        summary: "An OpenSearch pod certificate will expire in {{ $value | humanizeDuration }}."
-        runbook: https://wikitech.wikimedia.org/wiki/Data_Platform/Systems/OpenSearch-on-K8s/Administration#Renewing_TLS_Certificates
-        dashboard: 'https://grafana.wikimedia.org/d/c0a89788-c6fe-4d06-aeb2-70b63049599e/opensearch-on-k8s?orgId=1&from=now-30m&to=now&timezone=utc&var-datasource=PA878A9FF693AE41E&var-interval=1m&var-cluster=opensearch-ipoid&var-node=%24__all&var-shard_type=%24__all&var-pool_name=%24__all'
-
-    - <<: *cert_expired
-      alert: OpenSearchCertAlmostExpiredCritical
-        # go critical at 4 days
-      expr: opensearch_k8s_master_cert_expiry_seconds < (86400 * 4)
-      labels:
-        severity: critical
-        team: data-platform
