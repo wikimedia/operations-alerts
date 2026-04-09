@@ -8,8 +8,8 @@ groups:
 
     - alert: ThanosCompactHalted
       annotations:
-        description: Thanos Compact {{$labels.job}} has failed to run and now is halted.
-        summary: Thanos Compact has failed to run and is now halted.
+        description: Thanos Compact on {{$labels.instance | stripPort}} has failed to run and now is halted.
+        summary: Thanos Compact on {{$labels.instance | stripPort}} has failed to run and is now halted.
         dashboard: https://grafana.wikimedia.org/d/651943d05a8123e32867b4673963f42b/thanos-compact
         runbook: https://wikitech.wikimedia.org/wiki/Thanos#Alerts
       expr: thanos_compact_halted{job=~".*thanos-compact.*"} == 1
@@ -20,16 +20,16 @@ groups:
 
     - alert: ThanosCompactHighCompactionFailures
       annotations:
-        description: Thanos Compact {{$labels.job}} is failing to execute {{$value | humanize}}%
+        description: Thanos Compact on {{$labels.instance | stripPort}} is failing to execute {{$value | humanize}}%
           of compactions.
-        summary: Thanos Compact is failing to execute compactions.
+        summary: Thanos Compact on {{$labels.instance | stripPort}} is failing to execute compactions.
         dashboard: https://grafana.wikimedia.org/d/651943d05a8123e32867b4673963f42b/thanos-compact
         runbook: https://wikitech.wikimedia.org/wiki/Thanos#Alerts
       expr: |
         (
-          sum by (job) (rate(thanos_compact_group_compactions_failures_total{job=~".*thanos-compact.*"}[5m]))
+          sum by (job, instance) (rate(thanos_compact_group_compactions_failures_total{job=~".*thanos-compact.*"}[5m]))
         /
-          sum by (job) (rate(thanos_compact_group_compactions_total{job=~".*thanos-compact.*"}[5m]))
+          sum by (job, instance) (rate(thanos_compact_group_compactions_total{job=~".*thanos-compact.*"}[5m]))
         * 100 > 5
         )
       for: 15m
@@ -40,15 +40,15 @@ groups:
     - alert: ThanosCompactBucketHighOperationFailures
       annotations:
         description: Thanos Compact {{$labels.job}} Bucket is failing to execute {{$value
-          | humanize}}% of operations.
-        summary: Thanos Compact Bucket is having a high number of operation failures.
+          | humanize}}% of operations on {{$labels.instance | stripPort}}.
+        summary: Thanos Compact Bucket is having a high number of operation failures on {{$labels.instance | stripPort}}.
         dashboard: https://grafana.wikimedia.org/d/651943d05a8123e32867b4673963f42b/thanos-compact
         runbook: https://wikitech.wikimedia.org/wiki/Thanos#Alerts
       expr: |
         (
-          sum by (job) (rate(thanos_objstore_bucket_operation_failures_total{job=~".*thanos-compact.*"}[5m]))
+          sum by (job, instance) (rate(thanos_objstore_bucket_operation_failures_total{job=~".*thanos-compact.*"}[5m]))
         /
-          sum by (job) (rate(thanos_objstore_bucket_operations_total{job=~".*thanos-compact.*"}[5m]))
+          sum by (job, instance) (rate(thanos_objstore_bucket_operations_total{job=~".*thanos-compact.*"}[5m]))
         * 100 > 5
         )
       for: 15m
@@ -58,11 +58,11 @@ groups:
 
     - alert: ThanosCompactHasNotRun
       annotations:
-        description: Thanos Compact {{$labels.job}} has not uploaded anything for 24 hours.
-        summary: Thanos Compact has not uploaded anything for last 24 hours.
+        description: Thanos Compact on {{$labels.instance | stripPort}} has not uploaded anything for 24 hours.
+        summary: Thanos Compact on {{$labels.instance | stripPort}} has not uploaded anything for last 24 hours.
         dashboard: https://grafana.wikimedia.org/d/651943d05a8123e32867b4673963f42b/thanos-compact
         runbook: https://wikitech.wikimedia.org/wiki/Thanos#Alerts
-      expr: (time() - max by (job) (max_over_time(thanos_objstore_bucket_last_successful_upload_time{job=~".*thanos-compact.*"}[24h])))
+      expr: (time() - max by (job, instance) (max_over_time(thanos_objstore_bucket_last_successful_upload_time{job=~".*thanos-compact.*"}[24h])))
         / 60 / 60 > 24
       labels:
         severity: critical
@@ -70,12 +70,12 @@ groups:
 
     - alert: ThanosCompactDownsampleStalled
       annotations:
-        description: Thanos Compact has not performed the expected downsamples.
-        summary: Thanos Compact did not perform the expected downsamples.
+        description: Thanos Compact on {{$labels.instance | stripPort}} has not performed the expected downsamples.
+        summary: Thanos Compact on {{$labels.instance | stripPort}} did not perform the expected downsamples.
         dashboard: https://grafana.wikimedia.org/d/651943d05a8123e32867b4673963f42b/thanos-compact
         runbook: https://wikitech.wikimedia.org/wiki/Thanos#Alerts
       expr: |
-        sum_over_time( sum(thanos_compact_downsample_total) [1w:1h] ) < 30
+        sum_over_time( sum by (instance) (thanos_compact_downsample_total) [1w:1h] ) < 30
       for: 2d
       labels:
         severity: warning
