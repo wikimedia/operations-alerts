@@ -1,0 +1,53 @@
+# deploy-tag: ops
+# deploy-site: eqiad, codfw
+
+groups:
+- name: bgp
+  rules:
+  - alert: NodeBGPSessionStatusNotEstablished
+    expr: remote_instance:gnmi_bgp_neighbor_session_state{instance=~"(wikikube|kubestage).*"} != 6
+    for: 10m
+    labels:
+      team: serviceops
+      severity: task
+    annotations:
+      summary: "Kubernetes node {{$labels.instance}} has a BGP session which is not in the 'established' state."
+      description: "Kubernetes node {{$labels.instance}} has a BGP session which is not in the 'established' state. The node will not be able to establish connectivity to its switch ({{$labels.remote_instance}})."
+      runbook: https://wikitech.wikimedia.org/wiki/Kubernetes/Administration#NodeBGPSessionStatusNotEstablished
+      dashboard: https://grafana.wikimedia.org/d/ed8da087-4bcb-407d-9596-d158b8145d45/bgp-neighbor-detail-by-network-device?orgId=1&from=now-30m&to=now&timezone=utc&var-site={{$labels.site}}&var-device={{$labels.remote_instance}}&var-bgp_group={{$labels.peer_group}}&var-bgp_neighbor={{$labels.instance}}&refresh=30s
+
+  - alert: NodeBGPSessionStatusNotEstablished
+    expr: remote_instance:gnmi_bgp_neighbor_session_state{instance=~"(ml-serve|aux|dse-k8s).*"} != 6
+    for: 10m
+    labels:
+      team: sre
+      severity: critical
+    annotations:
+      summary: "Kubernetes node {{$labels.instance}} has a BGP session which is not in the 'established' state."
+      description: "Kubernetes node {{$labels.instance}} has a BGP session which is not in the 'established' state. The node will not be able to establish connectivity to its switch ({{$labels.remote_instance}})."
+      runbook: https://wikitech.wikimedia.org/wiki/Kubernetes/Administration#NodeBGPSessionStatusNotEstablished
+      dashboard: https://grafana.wikimedia.org/d/ed8da087-4bcb-407d-9596-d158b8145d45/bgp-neighbor-detail-by-network-device?orgId=1&from=now-30m&to=now&timezone=utc&var-site={{$labels.site}}&var-device={{$labels.remote_instance}}&var-bgp_group={{$labels.peer_group}}&var-bgp_neighbor={{$labels.instance}}&refresh=30s
+
+  - alert: NodeBGPRoutesRejected
+    expr: sum by (peer_descr, peer_group, instance, site) (gnmi_bgp_neighbor_prefixes_received{peer_descr=~"(wikikube|kubestage).*"} - gnmi_bgp_neighbor_prefixes_installed{peer_descr=~"(wikikube|kubestage).*"}) > 0
+    for: 1h
+    labels:
+      team: serviceops
+      severity: task
+    annotations:
+      summary: "Some BGP routes advertised by {{$labels.peer_descr}} are being rejected by its switch."
+      description: "Some BGP routes advertised by Kubernetes nodes are being rejected by their switches. Affected nodes will not be able to route all traffic effectively."
+      runbook: https://wikitech.wikimedia.org/wiki/Kubernetes/Administration#NodeBGPRoutesRejected
+      dashboard: https://grafana.wikimedia.org/d/ed8da087-4bcb-407d-9596-d158b8145d45/bgp-neighbor-detail-by-network-device?orgId=1&from=now-30m&to=now&timezone=utc&var-site={{$labels.site}}&var-device={{$labels.instance}}&var-bgp_group={{$labels.peer_group}}&var-bgp_neighbor={{$labels.peer_descr}}&refresh=30s
+
+  - alert: NodeBGPRoutesRejected
+    expr: sum by (peer_descr, peer_group, instance, site) (gnmi_bgp_neighbor_prefixes_received{peer_descr=~"(ml-serve|aux|dse-k8s).*"} - gnmi_bgp_neighbor_prefixes_installed{peer_descr=~"(ml-serve|aux|dse-k8s).*"}) > 0
+    for: 1h
+    labels:
+      team: sre
+      severity: critical
+    annotations:
+      summary: "Some BGP routes advertised by {{$labels.peer_descr}} are being rejected by its switch."
+      description: "Some BGP routes advertised by Kubernetes nodes are being rejected by their switches. Affected nodes will not be able to route all traffic effectively."
+      runbook: https://wikitech.wikimedia.org/wiki/Kubernetes/Administration#NodeBGPRoutesRejected
+      dashboard: https://grafana.wikimedia.org/d/ed8da087-4bcb-407d-9596-d158b8145d45/bgp-neighbor-detail-by-network-device?orgId=1&from=now-30m&to=now&timezone=utc&var-site={{$labels.site}}&var-device={{$labels.instance}}&var-bgp_group={{$labels.peer_group}}&var-bgp_neighbor={{$labels.peer_descr}}&refresh=30s

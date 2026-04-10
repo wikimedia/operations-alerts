@@ -1,0 +1,47 @@
+rule_files:
+- bgp.yaml
+evaluation_interval: 1m
+tests:
+- interval: 1m
+  input_series:
+  - series: 'remote_instance:gnmi_bgp_neighbor_session_state{instance="wikikube-goodbgp", peer_group="Kubernetes4", remote_instance="correct_switch", site="codfw"}'
+    values: "6x11"
+  - series: 'remote_instance:gnmi_bgp_neighbor_session_state{instance="wikikube-badbgp", peer_group="Kubernetes4", remote_instance="incorrect_switch", site="codfw"}'
+    values: "0x61"
+  - series: 'gnmi_bgp_neighbor_prefixes_received{peer_descr="wikikube-badbgp", peer_group="Kubernetes4", site="codfw", instance="incorrect_switch"}'
+    values: "5x61"
+  - series: 'gnmi_bgp_neighbor_prefixes_installed{peer_descr="wikikube-badbgp", peer_group="Kubernetes4", site="codfw", instance="incorrect_switch"}'
+    values: "4x61"
+
+  alert_rule_test:
+  - alertname: NodeBGPSessionStatusNotEstablished
+    eval_time: 11m
+    exp_alerts:
+    - exp_labels:
+        team: serviceops
+        severity: task
+        instance: wikikube-badbgp
+        peer_group: Kubernetes4
+        remote_instance: incorrect_switch
+        site: codfw
+      exp_annotations:
+        description: "Kubernetes node wikikube-badbgp has a BGP session which is not in the 'established' state. The node will not be able to establish connectivity to its switch (incorrect_switch)."
+        summary: "Kubernetes node wikikube-badbgp has a BGP session which is not in the 'established' state."
+        runbook: https://wikitech.wikimedia.org/wiki/Kubernetes/Administration#NodeBGPSessionStatusNotEstablished
+        dashboard: https://grafana.wikimedia.org/d/ed8da087-4bcb-407d-9596-d158b8145d45/bgp-neighbor-detail-by-network-device?orgId=1&from=now-30m&to=now&timezone=utc&var-site=codfw&var-device=incorrect_switch&var-bgp_group=Kubernetes4&var-bgp_neighbor=wikikube-badbgp&refresh=30s
+
+  - alertname: NodeBGPRoutesRejected
+    eval_time: 61m
+    exp_alerts:
+    - exp_labels:
+        team: serviceops
+        severity: task
+        peer_descr: wikikube-badbgp
+        peer_group: Kubernetes4
+        site: codfw
+        instance: incorrect_switch
+      exp_annotations:
+        description: "Some BGP routes advertised by Kubernetes nodes are being rejected by their switches. Affected nodes will not be able to route all traffic effectively."
+        summary: "Some BGP routes advertised by wikikube-badbgp are being rejected by its switch."
+        runbook: https://wikitech.wikimedia.org/wiki/Kubernetes/Administration#NodeBGPRoutesRejected
+        dashboard: https://grafana.wikimedia.org/d/ed8da087-4bcb-407d-9596-d158b8145d45/bgp-neighbor-detail-by-network-device?orgId=1&from=now-30m&to=now&timezone=utc&var-site=codfw&var-device=incorrect_switch&var-bgp_group=Kubernetes4&var-bgp_neighbor=wikikube-badbgp&refresh=30s
