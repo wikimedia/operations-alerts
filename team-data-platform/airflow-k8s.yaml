@@ -15,25 +15,39 @@ groups:
       labels:
         severity: critical
         team: data-platform
+
     - alert: AirflowDagBagEmpty
       annotations:
-        description: 'DagBag is empty on {{ $labels.namespace }}.dse-k8s-eqiad'
-        summary: 'DagBag is empty on {{ $labels.namespace }}.dse-k8s-eqiad'
-        dashboard: "https://grafana.wikimedia.org/d/lFXqBGxWk/airflow-instance?&var-airflow_instance={{ $labels.namespace }}"
+        description: 'DagBag is empty on {{ $labels.kubernetes_namespace }}.dse-k8s-eqiad'
+        summary: 'DagBag is empty on {{ $labels.kubernetes_namespace }}.dse-k8s-eqiad'
+        dashboard: "https://grafana.wikimedia.org/d/lFXqBGxWk/airflow-instance?&var-airflow_instance={{ $labels.kubernetes_namespace }}"
         runbook: "https://wikitech.wikimedia.org/wiki/Data_Platform/Systems/Airflow/Kubernetes#An_instance_DAG_Bag_is_empty"
-      expr: avg by (namespace) (airflow_dagbag_size{namespace=~"airflow-.*", namespace!="airflow-dev"}) == 0
-      for: 2m
+      expr: max by (kubernetes_namespace) (airflow_dagbag_size{kubernetes_namespace=~"airflow-.*", kubernetes_namespace!="airflow-dev"}) == 0
+      for: 5m
       labels:
         severity: critical
         team: data-platform
-    - alert: AirflowNonHeartbeatingSchedulerEmpty
+
+    - alert: AirflowNonHeartbeatingScheduler
       annotations:
         description: 'Airflow scheduler not heartbeating in {{ $labels.kubernetes_namespace }}.dse-k8s-eqiad'
         summary: 'Airflow scheduler not heartbeating in {{ $labels.kubernetes_namespace }}.dse-k8s-eqiad'
         dashboard: "https://grafana.wikimedia.org/d/lFXqBGxWk/airflow-instance?&var-airflow_instance={{ $labels.kubernetes_namespace }}"
         runbook: "https://wikitech.wikimedia.org/wiki/Data_Platform/Systems/Airflow/Kubernetes#The_scheduler_is_not_heartbeating"
-      expr: avg(changes(airflow_scheduler_heartbeat[5m])) by (kubernetes_namespace) == 0
+      expr: sum(changes(airflow_scheduler_heartbeat[5m])) by (kubernetes_namespace) == 0
       for: 5m
+      labels:
+        severity: critical
+        team: data-platform
+
+    - alert: AirflowElevatedSchedulerLoopTime
+      annotations:
+        description: 'Elevated airflow scheduler scheduler loop time in {{ $labels.kubernetes_namespace }}.dse-k8s-eqiad'
+        summary: 'Elevated airflow scheduler scheduler loop time in {{ $labels.kubernetes_namespace }}.dse-k8s-eqiad'
+        dashboard: "https://grafana.wikimedia.org/d/lFXqBGxWk/airflow-instance?&var-airflow_instance={{ $labels.kubernetes_namespace }}"
+        runbook: "https://wikitech.wikimedia.org/wiki/Data_Platform/Systems/Airflow/Kubernetes#The_scheduler_is_not_heartbeating"
+      expr: avg(airflow_scheduler_loop_duration{kubernetes_namespace!="airflow-dev"}) by (kubernetes_namespace) > 10000 # 10s
+      for: 30m
       labels:
         severity: critical
         team: data-platform

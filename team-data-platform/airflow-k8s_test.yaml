@@ -1,6 +1,7 @@
 rule_files:
   - airflow-k8s.yaml
 tests:
+
   - input_series:
     - series: kube_deployment_status_replicas_available{deployment="airflow-webserver", namespace="airflow-test-k8s"}
       values: 0
@@ -22,8 +23,9 @@ tests:
           deployment: airflow-webserver
           severity: critical
           team: data-platform
+
   - input_series:
-    - series: airflow_dagbag_size{namespace="airflow-test-k8s"}
+    - series: airflow_dagbag_size{kubernetes_namespace="airflow-test-k8s"}
       values: 0
     alert_rule_test:
     - alertname: AirflowDagBagEmpty
@@ -35,19 +37,61 @@ tests:
           dashboard: "https://grafana.wikimedia.org/d/lFXqBGxWk/airflow-instance?&var-airflow_instance=airflow-test-k8s"
           runbook: "https://wikitech.wikimedia.org/wiki/Data_Platform/Systems/Airflow/Kubernetes#An_instance_DAG_Bag_is_empty"
         exp_labels:
-          namespace: airflow-test-k8s
+          kubernetes_namespace: airflow-test-k8s
           severity: critical
           team: data-platform
-  - input_series:
+
+  - name: heartbeating_scheduler_no_alert_expected
+    interval: 1m
+    input_series:
     - series: airflow_scheduler_heartbeat{kubernetes_namespace="airflow-test-k8s"}
-      values: '1000 1000 1000 1000 1000'
+      values: '1000 2000 3000 4000 5000'
     alert_rule_test:
-    - alertname: AirflowNonHeartbeatingSchedulerEmpty
+    - alertname: AirflowNonHeartbeatingScheduler
+      eval_time: 5m
+      exp_alerts: []
+
+  - name: non_heartbeating_scheduler_alert_expected
+    interval: 1m
+    input_series:
+    - series: airflow_scheduler_heartbeat{kubernetes_namespace="airflow-test-k8s"}
+      values: 1000
+    alert_rule_test:
+    - alertname: AirflowNonHeartbeatingScheduler
       eval_time: 5m
       exp_alerts:
       - exp_annotations:
           description: Airflow scheduler not heartbeating in airflow-test-k8s.dse-k8s-eqiad
           summary: Airflow scheduler not heartbeating in airflow-test-k8s.dse-k8s-eqiad
+          dashboard: "https://grafana.wikimedia.org/d/lFXqBGxWk/airflow-instance?&var-airflow_instance=airflow-test-k8s"
+          runbook: "https://wikitech.wikimedia.org/wiki/Data_Platform/Systems/Airflow/Kubernetes#The_scheduler_is_not_heartbeating"
+        exp_labels:
+          kubernetes_namespace: airflow-test-k8s
+          severity: critical
+          team: data-platform
+
+  - name: low_scheduler_loop_duration_no_alert_expected
+    interval: 1m
+    input_series:
+    - series: airflow_scheduler_loop_duration{kubernetes_namespace="airflow-test-k8s"}
+      values: '100x35'
+    alert_rule_test:
+    - alertname: AirflowElevatedSchedulerLoopTime
+      eval_time: 30m
+      exp_alerts: []
+
+  - name: high_scheduler_loop_duration_alert_expected
+    interval: 1m
+    input_series:
+    - series: airflow_scheduler_loop_duration{kubernetes_namespace="airflow-test-k8s"}
+      values: '20000x35'
+    alert_rule_test:
+    - alertname: AirflowElevatedSchedulerLoopTime
+      eval_time: 30m
+      exp_alerts:
+      - exp_annotations:
+          description: Elevated airflow scheduler scheduler loop time in airflow-test-k8s.dse-k8s-eqiad
+          summary: Elevated airflow scheduler scheduler loop time in airflow-test-k8s.dse-k8s-eqiad
           dashboard: "https://grafana.wikimedia.org/d/lFXqBGxWk/airflow-instance?&var-airflow_instance=airflow-test-k8s"
           runbook: "https://wikitech.wikimedia.org/wiki/Data_Platform/Systems/Airflow/Kubernetes#The_scheduler_is_not_heartbeating"
         exp_labels:
