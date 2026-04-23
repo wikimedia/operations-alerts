@@ -1,0 +1,72 @@
+# https://prometheus.io/docs/prometheus/latest/configuration/unit_testing_rules/
+# Test locally using `promtool test rules mw-page-html-content-change-enrich_test.yaml`
+rule_files:
+  - mw-page-html-content-change-enrich.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 5m
+    input_series:
+      - series: 'flink_jobmanager_job_uptime{job_name="Some_Job", kubernetes_namespace="some-ns"}'
+        values: "2000000"
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: MediawikiPageHtmlContentChangeEnrichJobManagerNotRunning
+        eval_time: 5m
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              team: data-engineering
+              kubernetes_namespace: mw-page-html-content-change-enrich
+              release: production
+              job_name: "mw_page_html_content_change_enrich"
+            exp_annotations:
+              summary: "mw_page_html_content_change_enrich in eqiad is not running"
+              description: "The mw_page_html_content_change_enrich job is not running"
+              dashboard: 'https://grafana.wikimedia.org/d/K9x0c4aVk/flink-app?orgId=1&var-datasource=eqiad%20prometheus/k8s-dse&var-namespace=mw-page-html-content-change-enrich&var-helm_release=production&var-operator_name=All&var-flink_job_name=mw_page_html_content_change_enrich'
+              dashboard_overview: 'https://grafana.wikimedia.org/d/jadfx6h/html-2b-edit-types'
+              runbook: https://wikitech.wikimedia.org/wiki/MediaWiki_Event_Enrichment/HTML_Enrichment#Alerting
+  - interval: 1m
+    input_series:
+      - series: 'flink_jobmanager_numRegisteredTaskManagers{kubernetes_namespace="mw-page-html-content-change-enrich", release="production"}'
+        values: '0x6'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: MediawikiPageHtmlContentChangeEnrichTaskManagerNotRunning
+        eval_time: 5m
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              team: data-engineering
+              kubernetes_namespace: mw-page-html-content-change-enrich
+              release: production
+            exp_annotations:
+              summary: "The mw-page-html-content-change-enrich Flink cluster in eqiad has no registered TaskManagers"
+              description: "The mw-page-html-content-change-enrich Flink cluster in eqiad has no registered TaskManagers"
+              dashboard: 'https://grafana.wikimedia.org/d/K9x0c4aVk/flink-app?orgId=1&var-datasource=eqiad%20prometheus/k8s-dse&var-namespace=mw-page-html-content-change-enrich&var-helm_release=production&var-operator_name=All&var-flink_job_name=All'
+              dashboard_overview: 'https://grafana.wikimedia.org/d/jadfx6h/html-2b-edit-types'
+              runbook: https://wikitech.wikimedia.org/wiki/MediaWiki_Event_Enrichment/HTML_Enrichment#Alerting
+
+  - interval: 1m
+    input_series:
+      - series: 'flink_taskmanager_job_task_operator_KafkaSourceReader_KafkaConsumer_records_lag_max{kubernetes_namespace="mw-page-html-content-change-enrich", release="production", job_name="mw_page_html_content_change_enrich"}'
+        values: '2000x6'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: MediawikiPageHtmlContentChangeEnrichHighKafkaConsumerLag
+        eval_time: 5m
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              team: data-engineering
+              kubernetes_namespace: mw-page-html-content-change-enrich
+              release: production
+              job_name: "mw_page_html_content_change_enrich"
+            exp_annotations:
+              summary: "High Kafka consumer lag for mw_page_html_content_change_enrich in eqiad"
+              description: "Maximum lag of the consumed Kafka topic partition exceeds threshold"
+              dashboard: 'https://grafana.wikimedia.org/d/K9x0c4aVk/flink-app?orgId=1&var-datasource=eqiad%20prometheus/k8s-dse&var-namespace=mw-page-html-content-change-enrich&var-helm_release=production&var-operator_name=All&var-flink_job_name=mw_page_html_content_change_enrich'
+              dashboard_overview: 'https://grafana.wikimedia.org/d/jadfx6h/html-2b-edit-types'
+              runbook: https://wikitech.wikimedia.org/wiki/MediaWiki_Event_Enrichment/HTML_Enrichment#Alerting

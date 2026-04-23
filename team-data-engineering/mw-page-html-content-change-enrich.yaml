@@ -1,0 +1,51 @@
+# deploy-tag: k8s-dse
+# deploy-site: eqiad
+# Alerts are enabled only on dse-k8s.
+groups:
+  - name: mw-page-html-content-change-enrich
+    rules:
+      - alert: MediawikiPageHtmlContentChangeEnrichJobManagerNotRunning
+        expr: |
+          absent(flink_jobmanager_job_uptime{kubernetes_namespace="mw-page-html-content-change-enrich", release="production", job_name="mw_page_html_content_change_enrich"})
+        for: 5m
+        labels:
+          team: data-engineering
+          severity: critical
+        annotations:
+          summary: "{{ $labels.job_name }} in {{$externalLabels.site}} is not running"
+          description: "The {{ $labels.job_name }} job is not running"
+          dashboard: 'https://grafana.wikimedia.org/d/K9x0c4aVk/flink-app?orgId=1&var-datasource={{ $externalLabels.site }}%20prometheus/k8s-dse&var-namespace={{ $labels.kubernetes_namespace }}&var-helm_release={{ $labels.release }}&var-operator_name=All&var-flink_job_name={{ $labels.job_name }}'
+          dashboard_overview: 'https://grafana.wikimedia.org/d/jadfx6h/html-2b-edit-types'
+          runbook: https://wikitech.wikimedia.org/wiki/MediaWiki_Event_Enrichment/HTML_Enrichment#Alerting
+
+      - alert: MediawikiPageHtmlContentChangeEnrichTaskManagerNotRunning
+        # Task managers (workers) are not running. There is a valid deployment, but the application is not operating properly.
+        expr: |
+          flink_jobmanager_numRegisteredTaskManagers{kubernetes_namespace="mw-page-html-content-change-enrich", release="production"} == 0
+        for: 5m
+        labels:
+          team: data-engineering
+          severity: critical
+        annotations:
+          summary: "The {{ $labels.kubernetes_namespace }} Flink cluster in {{$externalLabels.site}} has no registered TaskManagers"
+          description: "The {{ $labels.kubernetes_namespace }} Flink cluster in {{$externalLabels.site}} has no registered TaskManagers"
+          dashboard: 'https://grafana.wikimedia.org/d/K9x0c4aVk/flink-app?orgId=1&var-datasource={{ $externalLabels.site }}%20prometheus/k8s-dse&var-namespace={{ $labels.kubernetes_namespace }}&var-helm_release={{ $labels.release }}&var-operator_name=All&var-flink_job_name=All'
+          dashboard_overview: 'https://grafana.wikimedia.org/d/jadfx6h/html-2b-edit-types'
+          runbook: https://wikitech.wikimedia.org/wiki/MediaWiki_Event_Enrichment/HTML_Enrichment#Alerting
+
+      - alert: MediawikiPageHtmlContentChangeEnrichHighKafkaConsumerLag
+        # The application is experiencing latency in consuming from Kafka brokers.
+        # This threshold and duration should match target SLO values
+        # Latency is around 30 seconds, throughput is around 20msg/sec. Threshold here is double (1200) but can be adjusted as needed.
+        expr: |
+          flink_taskmanager_job_task_operator_KafkaSourceReader_KafkaConsumer_records_lag_max{kubernetes_namespace="mw-page-html-content-change-enrich", release="production", job_name="mw_page_html_content_change_enrich"} > 1200
+        for: 5m
+        labels:
+          team: data-engineering
+          severity: warning
+        annotations:
+          summary: "High Kafka consumer lag for {{$labels.job_name}} in {{ $externalLabels.site }}"
+          description: "Maximum lag of the consumed Kafka topic partition exceeds threshold"
+          dashboard: 'https://grafana.wikimedia.org/d/K9x0c4aVk/flink-app?orgId=1&var-datasource={{ $externalLabels.site }}%20prometheus/k8s-dse&var-namespace={{ $labels.kubernetes_namespace }}&var-helm_release={{ $labels.release }}&var-operator_name=All&var-flink_job_name={{ $labels.job_name }}'
+          dashboard_overview: 'https://grafana.wikimedia.org/d/jadfx6h/html-2b-edit-types'
+          runbook: https://wikitech.wikimedia.org/wiki/MediaWiki_Event_Enrichment/HTML_Enrichment#Alerting
