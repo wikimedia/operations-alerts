@@ -33,6 +33,43 @@ groups:
           dashboard_overview: 'https://grafana.wikimedia.org/d/jadfx6h/html-2b-edit-types'
           runbook: https://wikitech.wikimedia.org/wiki/MediaWiki_Event_Enrichment/HTML_Enrichment#Alerting
 
+      - alert: MediawikiPageHtmlContentChangeEnrichHighErrorStreamRate
+        # The percentage of messages routed to the DLQ error topic has exceeded 2% for 10 minutes.
+        # Denominator is clamped to 1 to avoid division by zero when no messages are flowing.
+        expr: |
+          100 *
+            sum(increase(kafka_server_BrokerTopicMetrics_MessagesIn_total{kafka_cluster="jumbo-eqiad", topic=~"(eqiad|codfw)\\.mw_page_html_content_change_enrich\\.error"}[5m]))
+          /
+          clamp_min(
+            sum(increase(kafka_server_BrokerTopicMetrics_MessagesIn_total{kafka_cluster="jumbo-eqiad", topic=~"(eqiad|codfw)\\.(mw_page_html_content_change_enrich\\.error|mediawiki\\.page_html_content_change\\..*)"}[5m])),
+            1
+          )
+          > 2
+        for: 10m
+        labels:
+          team: data-engineering
+          severity: warning
+        annotations:
+          summary: "High DLQ error rate for mw-page-html-content-change-enrich in {{ $externalLabels.site }}."
+          description: "More than 2% of messages are being routed to the DLQ error topic for mw-page-html-content-change-enrich. Flink and Envoy should be checked."
+          dashboard: 'https://grafana.wikimedia.org/d/jadfx6h/html-2b-edit-types'
+          runbook: https://wikitech.wikimedia.org/wiki/MediaWiki_Event_Enrichment/HTML_Enrichment#Alerting
+
+      - alert: MediawikiPageHtmlContentChangeEnrichNoOutputMessages
+        # No messages have been successfully produced to the output topic in the last 30 minutes,
+        # suggesting the job has stalled or is exclusively routing to the DLQ.
+        expr: |
+          sum(increase(kafka_server_BrokerTopicMetrics_MessagesIn_total{kafka_cluster="jumbo-eqiad", topic=~"(eqiad|codfw)\\.mediawiki\\.page_html_content_change\\..*"}[30m])) == 0
+        for: 5m
+        labels:
+          team: data-engineering
+          severity: critical
+        annotations:
+          summary: "No output messages produced by mw-page-html-content-change-enrich in {{ $externalLabels.site }}"
+          description: "No messages have been successfully produced to the output topic in the last 30 minutes. Check if Flink and Envoy are running, and whether messages are being routed to the DLQ error topic or no messages are processed at all."
+          dashboard: 'https://grafana.wikimedia.org/d/jadfx6h/html-2b-edit-types'
+          runbook: https://wikitech.wikimedia.org/wiki/MediaWiki_Event_Enrichment/HTML_Enrichment#Alerting
+
       - alert: MediawikiPageHtmlContentChangeEnrichHighKafkaConsumerLag
         # The application is experiencing latency in consuming from Kafka brokers.
         # This threshold and duration should match target SLO values

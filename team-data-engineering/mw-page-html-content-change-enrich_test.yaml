@@ -50,6 +50,51 @@ tests:
 
   - interval: 1m
     input_series:
+      # Error topic: 10 messages/min → ~50 per 5m window (9% of total → above 2% threshold)
+      - series: 'kafka_server_BrokerTopicMetrics_MessagesIn_total{kafka_cluster="jumbo-eqiad", topic="eqiad.mw_page_html_content_change_enrich.error"}'
+        values: '0+10x12'
+      # Good topic: 100 messages/min → ~500 per 5m window
+      - series: 'kafka_server_BrokerTopicMetrics_MessagesIn_total{kafka_cluster="jumbo-eqiad", topic="eqiad.mediawiki.page_html_content_change.v1"}'
+        values: '0+100x12'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      # increase() needs 2 data points, so condition first true at t=1m; for: 10m fires at t=11m
+      - alertname: MediawikiPageHtmlContentChangeEnrichHighErrorStreamRate
+        eval_time: 11m
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              team: data-engineering
+            exp_annotations:
+              summary: "High DLQ error rate for mw-page-html-content-change-enrich in eqiad."
+              description: "More than 2% of messages are being routed to the DLQ error topic for mw-page-html-content-change-enrich. Flink and Envoy should be checked."
+              dashboard: 'https://grafana.wikimedia.org/d/jadfx6h/html-2b-edit-types'
+              runbook: https://wikitech.wikimedia.org/wiki/MediaWiki_Event_Enrichment/HTML_Enrichment#Alerting
+
+  - interval: 1m
+    input_series:
+      # Constant counter: increase([30m]) == 0 → no output messages
+      - series: 'kafka_server_BrokerTopicMetrics_MessagesIn_total{kafka_cluster="jumbo-eqiad", topic="eqiad.mediawiki.page_html_content_change.v1"}'
+        values: '100x8'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      # Condition first true at t=1m (needs 2 data points); for: 5m fires at t=6m
+      - alertname: MediawikiPageHtmlContentChangeEnrichNoOutputMessages
+        eval_time: 6m
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              team: data-engineering
+            exp_annotations:
+              summary: "No output messages produced by mw-page-html-content-change-enrich in eqiad"
+              description: "No messages have been successfully produced to the output topic in the last 30 minutes. Check if Flink and Envoy are running, and whether messages are being routed to the DLQ error topic or no messages are processed at all."
+              dashboard: 'https://grafana.wikimedia.org/d/jadfx6h/html-2b-edit-types'
+              runbook: https://wikitech.wikimedia.org/wiki/MediaWiki_Event_Enrichment/HTML_Enrichment#Alerting
+
+  - interval: 1m
+    input_series:
       - series: 'flink_taskmanager_job_task_operator_KafkaSourceReader_KafkaConsumer_records_lag_max{kubernetes_namespace="mw-page-html-content-change-enrich", release="production", job_name="mw_page_html_content_change_enrich"}'
         values: '2000x6'
     external_labels:
