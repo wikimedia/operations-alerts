@@ -1,0 +1,28 @@
+rule_files:
+  - gerrit.yaml
+evaluation_interval: 1m
+
+tests:
+  - interval: 1m
+    input_series:
+      - series: 'node_filesystem_avail_bytes{instance="gerrit2003:9100", mountpoint="/"}'
+        # We lose 1 byte per minute and start with 6 hours of runway.
+        # The alert becomes true at 2h (4 hours remaining) and should fire after 10m.
+        values: '360-1x131'
+    alert_rule_test:
+      - alertname: GerritDiskSpaceExhaustionIncoming
+        eval_time: 2h9m
+        exp_alerts: []
+      - alertname: GerritDiskSpaceExhaustionIncoming
+        eval_time: 2h10m
+        exp_alerts:
+          - exp_labels:
+              team: collaboration-services
+              severity: task
+              instance: gerrit2003:9100
+              mountpoint: /
+            exp_annotations:
+              summary: 'Gerrit disk space runway on gerrit2003:/ is too low'
+              description: 'Gerrit disk space on gerrit2003 for / will be exhausted in less than 4 hours at the current growth rate.'
+              runbook: https://wikitech.wikimedia.org/wiki/Gerrit/Operations#TODO
+              dashboard: 'https://grafana.wikimedia.org/d/rYdddlPWk/node-exporter-collaboration-services?var-job=node&var-nodename=gerrit2003&var-node=gerrit2003%3A9100&refresh=1m'

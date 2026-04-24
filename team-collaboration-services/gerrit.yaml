@@ -42,3 +42,17 @@ groups:
           description: "Gerrit replication on {{ $labels.instance }} is lagging for more than 15 minutes."
           runbook: https://wikitech.wikimedia.org/wiki/Gerrit/Operations#GerritReplicationUnavailable
           dashboard: https://grafana.wikimedia.org/goto/8VXsGHdDR?orgId=1
+
+      - alert: GerritDiskSpaceExhaustionIncoming
+        # Alert if Gerrit root or /srv disk space is projected to be exhausted within 4 hours.
+        expr: |
+          predict_linear(node_filesystem_avail_bytes{instance=~"gerrit.*", mountpoint=~"^/$|^/srv$"}[1h], 3600 * 4) <= 0
+        for: 10m
+        labels:
+          severity: task
+          team: collaboration-services
+        annotations:
+          summary: "Gerrit disk space runway on {{ $labels.instance | reReplaceAll \"^([^:]+).*\" \"${1}\" }}:{{ $labels.mountpoint }} is too low"
+          description: "Gerrit disk space on {{ $labels.instance | reReplaceAll \"^([^:]+).*\" \"${1}\" }} for {{ $labels.mountpoint }} will be exhausted in less than 4 hours at the current growth rate."
+          runbook: https://wikitech.wikimedia.org/wiki/Gerrit/Operations#TODO
+          dashboard: 'https://grafana.wikimedia.org/d/rYdddlPWk/node-exporter-collaboration-services?var-job=node&var-nodename={{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}&var-node={{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}%3A9100&refresh=1m'
