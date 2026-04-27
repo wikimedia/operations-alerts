@@ -115,6 +115,10 @@ groups:
           description: ''  # Not needed
           dashboard: 'https://grafana.wikimedia.org/d/fb403d62-5f03-434a-9dff-bd02b9fff504/network-device-overview?var-instance={{ $labels.instance }}'
           runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#Switch_interface_down'
+        # Need these two ignore rules, first as we may have no drops, and hence series not present, second because when that
+        # happens it is comparing the non-existant series to the existing one, and complains the labels are diffferent
+        # pint disable promql/series
+        # pint ignore/rule promql/vector_matching
       - alert: CoreRouterInterfaceDropPercent
         # the drop stat series are not exported if there is no drops, so we use "or on() vector(0)" to make the expression
         # evaluate to 0 if series not present, so the overall expression can still be evaluated
