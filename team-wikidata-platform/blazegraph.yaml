@@ -157,10 +157,13 @@ groups:
 
       - alert: BlazegraphFailedClientRatioIncrease
         expr: |
-          (
-            sum by (backend) (rate(trafficserver_backend_requests_seconds_count{backend=~"wdqs.*",status=~"4..", status!="403", status!="419"}[5m])) /
-            clamp_min(sum by (backend) (rate(trafficserver_backend_requests_seconds_count{backend=~"wdqs.*",status=~"[23].."}[5m])), 1)
-          ) > 0.02
+          label_replace(
+            (
+              sum by (backend) (rate(trafficserver_backend_requests_seconds_count{backend=~"wdqs.*",status=~"4..", status!="403", status!="419"}[5m])) /
+              clamp_min(sum by (backend) (rate(trafficserver_backend_requests_seconds_count{backend=~"wdqs.*",status=~"[23].."}[5m])), 1)
+            ) > 0.02,
+            "instance", "$1", "backend", "(.*)"
+          )
         for: 30m
         labels:
           team: wikidata-platform
@@ -176,10 +179,13 @@ groups:
 
       - alert: BlazegraphFailedServerRatioIncrease
         expr: |
-          (
-            sum by (backend) (rate(trafficserver_backend_requests_seconds_count{backend=~"wdqs.*",status=~"5.."}[5m])) /
-            clamp_min(sum by (backend) (rate(trafficserver_backend_requests_seconds_count{backend=~"wdqs.*",status=~"[23].."}[5m])), 1)
-          ) > 0.02
+          label_replace(
+            (
+              sum by (backend) (rate(trafficserver_backend_requests_seconds_count{backend=~"wdqs.*",status=~"5.."}[5m])) /
+              clamp_min(sum by (backend) (rate(trafficserver_backend_requests_seconds_count{backend=~"wdqs.*",status=~"[23].."}[5m])), 1)
+            ) > 0.02,
+            "instance", "$1", "backend", "(.*)"
+          )
         for: 45m
         labels:
           team: wikidata-platform

@@ -152,6 +152,7 @@ tests:
               team: wikidata-platform
               severity: warning
               backend: "wdqs-main.discovery.wmnet"
+              instance: "wdqs-main.discovery.wmnet"
             exp_annotations:
               summary: "Increased ratio of failed client requests on Blazegraph instance wdqs-main.discovery.wmnet (client error)"
               description: |
@@ -212,6 +213,7 @@ tests:
               team: wikidata-platform
               severity: warning
               backend: "wdqs-main.discovery.wmnet"
+              instance: "wdqs-main.discovery.wmnet"
             exp_annotations:
               summary: "Increased ratio of failed requests on Blazegraph instance wdqs-main.discovery.wmnet (server error)"
               description: |
