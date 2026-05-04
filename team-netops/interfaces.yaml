@@ -115,18 +115,27 @@ groups:
           description: ''  # Not needed
           dashboard: 'https://grafana.wikimedia.org/d/fb403d62-5f03-434a-9dff-bd02b9fff504/network-device-overview?var-instance={{ $labels.instance }}'
           runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#Switch_interface_down'
-        # Need these two ignore rules, first as we may have no drops, and hence series not present, second because when that
-        # happens it is comparing the non-existant series to the existing one, and complains the labels are diffferent
-        # pint disable promql/series
-        # pint ignore/rule promql/vector_matching
       - alert: CoreRouterInterfaceDropPercent
-        # the drop stat series are not exported if there is no drops, so we use "or on() vector(0)" to make the expression
-        # evaluate to 0 if series not present, so the overall expression can still be evaluated
+        # Effectively the <number of dropped packets> / <total number of packets>, ignoring queue 1 (low priority),
+        # so we are only looking at the drop level in 'normal' and 'high' priority traffic.  The series for drops are
+        # not present if there are no drops, so we need to use a trick to make the numerator a zero, but still having
+        # all the right labels.  To do this we can OR for the 'out_queue_pkts' series, multiplying its value by 0.
         expr: |
             (
-            ((sum by (instance, interface_name, interface_description, site) (increase(gnmi_interfaces_interface_state_counters_out_queue_red_drop_pkts{instance=~"cr.*", out_queue_queue_number!="1"}[5m])) or on() vector(0)) +
-            (sum by (instance, interface_name, interface_description, site) (increase(gnmi_interfaces_interface_state_counters_out_queue_tail_drop_pkts{instance=~"cr.*", out_queue_queue_number!="1"}[5m])) or on() vector(0))) /
-            sum by (instance, interface_name, interface_description, site) (increase(gnmi_interfaces_interface_state_counters_out_queue_pkts{instance=~"cr.*", out_queue_queue_number!="1"}[5m]))
+              (
+                sum by (instance, interface_name, interface_description, site) (
+                  increase(gnmi_interfaces_interface_state_counters_out_queue_red_drop_pkts{instance=~"cr.*", out_queue_queue_number!="1"}[5m])
+                  or count by (instance, interface_name, interface_description, site) (gnmi_interfaces_interface_state_counters_out_queue_pkts) * 0)
+                +
+                sum by (instance, interface_name, interface_description, site) (
+                  increase(gnmi_interfaces_interface_state_counters_out_queue_tail_drop_pkts{instance=~"cr.*", out_queue_queue_number!="1"}[5m])
+                  or count by (instance, interface_name, interface_description, site) (gnmi_interfaces_interface_state_counters_out_queue_pkts) * 0)
+              )
+              /
+              (
+                sum by (instance, interface_name, interface_description, site) (
+                  increase(gnmi_interfaces_interface_state_counters_out_queue_pkts{instance=~"cr.*", out_queue_queue_number!="1"}[5m]))
+              )
             ) > 0.02
         for: 5m
         labels:
