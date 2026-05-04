@@ -97,10 +97,10 @@ groups:
   - name: PrometheusCardinalityExplosion
     rules:
       - alert: PrometheusSeriesCountAnomalyHigh
-        expr: prometheus_site:prometheus_tsdb_head_series:zscore >= 5
-        for: 2h
+        expr: prometheus_site:prometheus_tsdb_head_series:zscore{prometheus=~"(k8s|ops)", site=~"(eqiad|codfw)"} >= 5
+        for: 24h
         labels:
-          severity: task
+          severity: critical
           team: o11y
         annotations:
           summary: "Anomalous increase in number of active series on {{ $labels.prometheus }} ({{ $labels.site }})"
@@ -114,10 +114,10 @@ groups:
           runbook: https://wikitech.wikimedia.org/wiki/Prometheus#Runbooks
 
       - alert: PrometheusSeriesCreationRateAnomalyHigh
-        expr: prometheus_site:prometheus_tsdb_head_series_created:zscore >= 5
-        for: 24h
+        expr: prometheus_site:prometheus_tsdb_head_series_created:zscore{prometheus=~"(k8s|ops)", site=~"(eqiad|codfw)"} >= 5
+        for: 40h
         labels:
-          severity: task
+          severity: critical
           team: o11y
         annotations:
           summary: "Anomalous increase in series creation rate on {{ $labels.prometheus }} ({{ $labels.site }})"
@@ -129,7 +129,8 @@ groups:
           dashboard: https://grafana.wikimedia.org/d/taff979/prometheus-tsdb-cardinality-monitoring?orgId=1&from=now-14d&to=now&timezone=utc&var-prometheus={{ $labels.prometheus }}&var-site={{ $labels.site }}
           runbook: https://wikitech.wikimedia.org/wiki/Prometheus#Runbooks
 
-      - alert: PrometheusZombieSeriesDetected
+      - &PrometheusZombieSeriesDetected
+        alert: PrometheusZombieSeriesDetected
         expr: |
           avg_over_time(prometheus_site:prometheus_tsdb_head_samples_appended_per_series:ratio_rate1d[1d])
             < on(prometheus, site) group_left()
@@ -138,7 +139,7 @@ groups:
                   1
                 /
                   avg by (prometheus, site) (
-                    prometheus_target_interval_length_seconds{quantile="0.5"}
+                    prometheus_target_interval_length_seconds{prometheus!="k8s-dse", quantile="0.5"}
                   )
               )
             *
@@ -146,7 +147,7 @@ groups:
           )
         for: 72h
         labels:
-          severity: task
+          severity: critical
           team: o11y
         annotations:
           summary: "Zombie series detected on {{ $labels.prometheus }} ({{ $labels.site }})"
@@ -159,3 +160,19 @@ groups:
             were never cleaned up. Current ratio: {{ $value | humanize }} samples/s per series.
           dashboard: https://grafana.wikimedia.org/d/taff979/prometheus-tsdb-cardinality-monitoring?orgId=1&from=now-14d&to=now&timezone=utc&var-prometheus={{ $labels.prometheus }}&var-site={{ $labels.site }}
           runbook: https://wikitech.wikimedia.org/wiki/Prometheus#Runbooks
+
+      - <<: *PrometheusZombieSeriesDetected
+        expr: |
+          avg_over_time(prometheus_site:prometheus_tsdb_head_samples_appended_per_series:ratio_rate1d[1d])
+            < on(prometheus, site) group_left()
+          (
+              (
+                  1
+                /
+                  avg by (prometheus, site) (
+                    prometheus_target_interval_length_seconds{prometheus="k8s-dse", quantile="0.5"}
+                  )
+              )
+            *
+              0.60
+          )
