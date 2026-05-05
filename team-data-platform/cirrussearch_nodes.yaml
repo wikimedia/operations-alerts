@@ -1,0 +1,79 @@
+# deploy-tag: ops
+# deploy-site: eqiad, codfw
+
+groups:
+  - name: cirrussearch
+    rules:
+
+### ========================
+### Main clusters (cirrussearch)
+### ========================
+
+      - alert: cirrusNodeMemoryStall
+        expr: |
+          rate(node_pressure_memory_stalled_seconds_total{
+            cluster="elasticsearch",
+            instance=~"cirrussearch[12][0-9]{3}:9100"
+          }[5m]) > 0.1
+        for: 5m
+        labels:
+          severity: critical
+          team: 'data-platform'
+        annotations:
+          description: 'Memory stalled on {{ $labels.instance }}'
+          summary: '{{ $labels.instance }} is stalled on memory, current value {{ humanizePercentage $value }}'
+          dashboard: 'https://grafana.wikimedia.org/d/popinski/node-exporter-cirrussearch-hosts?orgId=1&from=now-30m&to=now&timezone=browser&var-DS_PROMETHEUS=000000006&var-job=node&var-node={{ $labels.instance }}&refresh=1m'
+          runbook: 'TODO'
+
+      - alert: cirrusNodeIOStall
+        expr: |
+          rate(node_pressure_io_stalled_seconds_total{
+            cluster="elasticsearch",
+            instance=~"cirrussearch[12][0-9]{3}:9100"
+          }[5m]) > 0.1
+        for: 5m
+        labels:
+          severity: critical
+          team: 'data-platform'
+        annotations:
+          description: 'IO stalled on {{ $labels.instance }}'
+          summary: '{{ $labels.instance }} is stalled on IO, current value {{ humanizePercentage $value }}'
+          dashboard: 'https://grafana.wikimedia.org/d/popinski/node-exporter-cirrussearch-hosts?orgId=1&from=now-30m&to=now&timezone=browser&var-DS_PROMETHEUS=000000006&var-job=node&var-node={{ $labels.instance }}&refresh=1m'
+          runbook: 'TODO'
+
+
+### ========================
+### Cloudelastic
+### ========================
+
+      - alert: cloudelasticNodeMemoryStall
+        expr: |
+          rate(node_pressure_memory_stalled_seconds_total{
+            cluster="cloudelastic",
+            instance=~"cloudelastic[12][0-9]{3}:9100"
+          }[5m]) > 0.1
+        for: 5m
+        labels:
+          severity: warning
+          team: 'data-platform'
+        annotations:
+          description: 'Memory stalled on {{ $labels.instance }}'
+          summary: '{{ $labels.instance }} is stalled on memory, current value {{ humanizePercentage $value }}'
+          dashboard: 'https://grafana.wikimedia.org/d/popinski/node-exporter-cirrussearch-hosts?orgId=1&from=now-30m&to=now&timezone=browser&var-DS_PROMETHEUS=000000006&var-job=node&var-node={{ $labels.instance }}&refresh=1m'
+          runbook: 'TODO'
+
+      - alert: cloudelasticNodeIOStall
+        expr: |
+          rate(node_pressure_io_stalled_seconds_total{
+            cluster="cloudelastic",
+            instance=~"cloudelastic[12][0-9]{3}:9100"
+          }[5m]) > 0.1
+        for: 5m
+        labels:
+          severity: warning
+          team: 'data-platform'
+        annotations:
+          description: 'IO stalled on {{ $labels.instance }}'
+          summary: '{{ $labels.instance }} is stalled on IO, current value {{ humanizePercentage $value }}'
+          dashboard: 'https://grafana.wikimedia.org/d/popinski/node-exporter-cirrussearch-hosts?orgId=1&from=now-30m&to=now&timezone=browser&var-DS_PROMETHEUS=000000006&var-job=node&var-node={{ $labels.instance }}&refresh=1m'
+          runbook: 'TODO'
