@@ -120,6 +120,7 @@ groups:
         # so we are only looking at the drop level in 'normal' and 'high' priority traffic.  The series for drops are
         # not present if there are no drops, so we need to use a trick to make the numerator a zero, but still having
         # all the right labels.  To do this we can OR for the 'out_queue_pkts' series, multiplying its value by 0.
+        # pint disable promql/series
         expr: |
             (
               (
