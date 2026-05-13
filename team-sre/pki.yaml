@@ -7,22 +7,22 @@ groups:
     - &pki_cert_about_to_expire
       alert: PKICertificateExpiry
       annotations:
-        description: 'Intermediate certificate in the trust chain for {{ $labels.subject }} will expire in less than 30 days'
+        description: 'Intermediate certificate in the trust chain for {{ $labels.subject }} will expire in less than 90 days'
         summary: 'Intermediate certificate in the trust chain for {{ $labels.subject }} expires in {{ $value | humanizeDuration }}'
         dashboard: 'TODO'
         runbook: 'https://wikitech.wikimedia.org/wiki/PKI/CA_Operations'
-      expr: (86400 * 7) < x509_cert_expiry{cluster='pki'} - time() < (86400 * 30)
+      expr: (86400 * 30) < x509_cert_expiry{cluster='pki'} - time() < (86400 * 90)
       for: 10m
       labels:
         severity: warning
         team: 'infrastructure-foundations'
     - <<: *pki_cert_about_to_expire
       annotations:
-        description: 'Intermediate certificate in the trust chain for {{ $labels.subject }} will expire in less than 7 days'
+        description: 'Intermediate certificate in the trust chain for {{ $labels.subject }} will expire in less than 30 days'
         summary: 'Intermediate certificate in the trust chain for {{ $labels.subject }} expires in {{ $value | humanizeDuration }}'
         dashboard: 'TODO'
         runbook: 'https://wikitech.wikimedia.org/wiki/PKI/CA_Operations'
-      expr: x509_cert_expiry{cluster='pki'} - time() < (86400 * 7)
+      expr: x509_cert_expiry{cluster='pki'} - time() < (86400 * 30)
       labels:
         severity: critical
         team: 'infrastructure-foundations'
