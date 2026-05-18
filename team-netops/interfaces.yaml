@@ -98,7 +98,7 @@ groups:
           dashboard: 'https://grafana.wikimedia.org/d/d968a627-b6f6-47fc-9316-e058854a4945/throughput-network-device-interfaces?var-site={{ printf "%s prometheus/ops" $labels.site | urlquery }}&var-device={{ $labels.instance }}&var-interface={{ $labels.interface_name | urlquery }}'
           runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#Primary_outbound_port_utilization_over_90%'
       - alert: SwitchCoreInterfaceDown
-        # eqsin and ulsfo don't have the metrics matching the filters (old switches)
+        # eqsin doesn't have the metrics matching the filters (old switches)
         # To be removed after they're upgraded FY2526
         # pint disable promql/series
         expr: |
@@ -148,3 +148,27 @@ groups:
           description: ''  # Not needed
           dashboard: 'https://grafana.wikimedia.org/d/5p97dAASz/queue-and-error-stats-by-network-device?var-site={{ printf "%s prometheus/ops" $labels.site | urlquery }}&var-device={{ $labels.instance | stripPort }}&var-interface={{ $labels.interface_name | urlquery }}'
           runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#CoreRouterInterfaceDropPercent'
+      - alert: InterfaceOpticLowPower
+        expr: (gnmi_interfaces_interface_optics_lanediags_lane_lane_laser_receiver_power_low_warning == 1) * on (instance, interface_name, interface_description) group_left() (gnmi_interfaces_interface_state_oper_status == 1)
+        for: 2m
+        labels:
+          team: sre
+          severity: warning
+          scope: network
+        annotations:
+          summary: 'Too low optic power on - {{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}:{{ $labels.interface_name }} ({{ $labels.interface_description }})'
+          description: ''  # Not needed
+          dashboard: 'https://grafana.wikimedia.org/d/fb403d62-5f03-434a-9dff-bd02b9fff504/network-device-overview?var-instance={{ $labels.instance }}'
+          runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#InterfaceOpticLowPower'
+      - alert: InterfaceOpticHighPower
+        expr: (gnmi_interfaces_interface_optics_lanediags_lane_lane_laser_receiver_power_high_warning == 1) * on (instance, interface_name, interface_description) group_left() (gnmi_interfaces_interface_state_oper_status == 1)
+        for: 2m
+        labels:
+          team: sre
+          severity: warning
+          scope: network
+        annotations:
+          summary: 'Too high optic power on - {{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}:{{ $labels.interface_name }} ({{ $labels.interface_description }})'
+          description: ''  # Not needed
+          dashboard: 'https://grafana.wikimedia.org/d/fb403d62-5f03-434a-9dff-bd02b9fff504/network-device-overview?var-instance={{ $labels.instance }}'
+          runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#InterfaceOpticHighPower'

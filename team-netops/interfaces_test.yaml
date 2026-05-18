@@ -40,6 +40,13 @@ tests:
         values: '0+5000x15'     # 5000 RED drops per minute queue 0
       - series: 'gnmi_interfaces_interface_state_counters_out_queue_tail_drop_pkts{instance="cr2-esams:9804", interface_name="xe-0/1/2", interface_description="CCTID", out_queue_queue_number="2", site="esams"}'
         values: '0+5000x15'     # 5000 tail drops per minute on queue 2
+      - series: 'gnmi_interfaces_interface_state_oper_status{instance="cr3-ulsfo:9804", interface_name="xe-0/0/0", interface_description="mocked for tests"}'
+        values: '1 1'
+      - series: 'gnmi_interfaces_interface_optics_lanediags_lane_lane_laser_receiver_power_high_warning{instance="cr3-ulsfo:9804", interface_description="mocked for tests", interface_name="xe-0/0/0"}'
+        values: '1 1'
+      - series: 'gnmi_interfaces_interface_optics_lanediags_lane_lane_laser_receiver_power_low_warning{instance="cr3-ulsfo:9804", interface_description="mocked for tests", interface_name="xe-0/0/0"}'
+        values: '1 1'
+        
     alert_rule_test:
       - alertname: CoreRouterInterfaceDown
         eval_time: 2m
@@ -167,3 +174,33 @@ tests:
               description: ""
               dashboard: 'https://grafana.wikimedia.org/d/5p97dAASz/queue-and-error-stats-by-network-device?var-site=esams+prometheus%2Fops&var-device=cr2-esams&var-interface=xe-0%2F1%2F2'
               runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#CoreRouterInterfaceDropPercent'
+      - alertname: InterfaceOpticLowPower
+        eval_time: 2m
+        exp_alerts:
+          - exp_labels:
+              instance: cr3-ulsfo:9804
+              interface_name: xe-0/0/0
+              interface_description: "mocked for tests"
+              team: sre
+              severity: warning
+              scope: network
+            exp_annotations:
+              summary: "Too low optic power on - cr3-ulsfo:xe-0/0/0 (mocked for tests)"
+              description: ""
+              dashboard: 'https://grafana.wikimedia.org/d/fb403d62-5f03-434a-9dff-bd02b9fff504/network-device-overview?var-instance=cr3-ulsfo:9804'
+              runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#InterfaceOpticLowPower'
+      - alertname: InterfaceOpticHighPower
+        eval_time: 2m
+        exp_alerts:
+          - exp_labels:
+              instance: cr3-ulsfo:9804
+              interface_name: xe-0/0/0
+              interface_description: "mocked for tests"
+              team: sre
+              severity: warning
+              scope: network
+            exp_annotations:
+              summary: "Too high optic power on - cr3-ulsfo:xe-0/0/0 (mocked for tests)"
+              description: ""
+              dashboard: 'https://grafana.wikimedia.org/d/fb403d62-5f03-434a-9dff-bd02b9fff504/network-device-overview?var-instance=cr3-ulsfo:9804'
+              runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#InterfaceOpticHighPower'
