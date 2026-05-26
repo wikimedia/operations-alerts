@@ -1,5 +1,5 @@
 # deploy-tag: ops
-# deploy-site: eqiad
+# deploy-site: eqiad, codfw
 
 groups:
 - name: vrts
@@ -15,7 +15,7 @@ groups:
       summary: "High inode usage on {{ $labels.instance }}"
       description: "{{ $labels.instance }} inodes are almost exhausted"
       runbook: https://wikitech.wikimedia.org/wiki/VRT_System/Troubleshooting#VRTSHighInodeUsage
-      dashboard: https://grafana.wikimedia.org/goto/jbpjcxZvg?orgId=1
+      dashboard: https://grafana.wikimedia.org/goto/ffn7t1zgy1hc0a?orgId=1
   - alert: VRTSJunkQueueSize
     expr: sql_vrts_ticket_count{name="junk_queues"} > 20000
     for: 5m
@@ -26,4 +26,50 @@ groups:
       summary: "VRTS junk queue size is large"
       description: "The VRTS junk queue is above its usual threshold"
       runbook: https://wikitech.wikimedia.org/wiki/VRT_System/Troubleshooting#VRTSJunkQueueSize
-      dashboard: https://grafana.wikimedia.org/goto/jbpjcxZvg?orgId=1
+      dashboard: https://grafana.wikimedia.org/goto/ffn7t1zgy1hc0a?orgId=1
+  - alert: VRTSRspamdSqliteRunFailed
+    expr: vrts_rspamd_sqlite_last_run_success{instance=~"vrts.*"} == 0
+    for: 5m
+    labels:
+      severity: warning
+      team: collaboration-services
+    annotations:
+      summary: "VRTS Rspamd sqlite {{ $labels.operation }} failed on {{ $labels.instance }}"
+      description: "The last Rspamd sqlite {{ $labels.operation }} run on {{ $labels.instance }} reported a failure"
+      runbook: https://wikitech.wikimedia.org/wiki/VRT_System/Troubleshooting#VRTSRspamdSqliteRunFailed
+      dashboard: https://grafana.wikimedia.org/goto/ffn7t1zgy1hc0a?orgId=1
+  - alert: VRTSRspamdSqliteRunStale
+    expr: |
+      time() - vrts_rspamd_sqlite_last_run_timestamp_seconds{instance=~"vrts.*"} > 2 * 3600
+    for: 15m
+    labels:
+      severity: warning
+      team: collaboration-services
+    annotations:
+      summary: "VRTS Rspamd sqlite {{ $labels.operation }} has not run recently on {{ $labels.instance }}"
+      description: "The Rspamd sqlite {{ $labels.operation }} timer fires hourly but the last run on {{ $labels.instance }} is over 2 hours old"
+      runbook: https://wikitech.wikimedia.org/wiki/VRT_System/Troubleshooting#VRTSRspamdSqliteRunStale
+      dashboard: https://grafana.wikimedia.org/goto/ffn7t1zgy1hc0a?orgId=1
+  - alert: VRTSMailTrainingStale
+    expr: |
+      time() - train_mail_filters_last_run_timestamp_seconds{instance=~"vrts.*"} > 2 * 3600
+    for: 15m
+    labels:
+      severity: warning
+      team: collaboration-services
+    annotations:
+      summary: "VRTS mail filter training has not run recently on {{ $labels.instance }}"
+      description: "The train_mail_filters timer fires hourly but the last run on {{ $labels.instance }} is over 2 hours old"
+      runbook: https://wikitech.wikimedia.org/wiki/VRT_System/Troubleshooting#VRTSMailTrainingStale
+      dashboard: https://grafana.wikimedia.org/goto/ffn7t1zgy1hc0a?orgId=1
+  - alert: VRTSMailTrainingErrors
+    expr: train_mail_filters_last_run_messages{instance=~"vrts.*", status="error"} > 0
+    for: 5m
+    labels:
+      severity: warning
+      team: collaboration-services
+    annotations:
+      summary: "VRTS mail training reported errors for {{ $labels.backend }} ({{ $labels.label }}) on {{ $labels.instance }}"
+      description: "The last train_mail_filters run on {{ $labels.instance }} processed {{ $value }} {{ $labels.label }} message(s) with errors via {{ $labels.backend }}"
+      runbook: https://wikitech.wikimedia.org/wiki/VRT_System/Troubleshooting#VRTSMailTrainingErrors
+      dashboard: https://grafana.wikimedia.org/goto/ffn7t1zgy1hc0a?orgId=1

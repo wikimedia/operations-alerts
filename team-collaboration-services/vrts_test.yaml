@@ -1,9 +1,9 @@
 rule_files:
   - vrts.yaml
-evaluation_interval: 5m
+evaluation_interval: 1m
 
 tests:
-  # HighInodeUsage
+  # VRTSHighInodeUsage
   - interval: 1m
     input_series:
       - series: 'node_filesystem_files_free{instance="vrts1003:9100", fstype="ext4"}'
@@ -23,7 +23,9 @@ tests:
               summary: High inode usage on vrts1003:9100
               description: vrts1003:9100 inodes are almost exhausted
               runbook: https://wikitech.wikimedia.org/wiki/VRT_System/Troubleshooting#VRTSHighInodeUsage
-              dashboard: https://grafana.wikimedia.org/goto/jbpjcxZvg?orgId=1
+              dashboard: https://grafana.wikimedia.org/goto/ffn7t1zgy1hc0a?orgId=1
+
+  # VRTSJunkQueueSize
   - interval: 1m
     input_series:
       - series: 'sql_vrts_ticket_count{name="junk_queues"}'
@@ -40,4 +42,106 @@ tests:
               summary: VRTS junk queue size is large
               description: The VRTS junk queue is above its usual threshold
               runbook: https://wikitech.wikimedia.org/wiki/VRT_System/Troubleshooting#VRTSJunkQueueSize
-              dashboard: https://grafana.wikimedia.org/goto/jbpjcxZvg?orgId=1
+              dashboard: https://grafana.wikimedia.org/goto/ffn7t1zgy1hc0a?orgId=1
+
+  # VRTSRspamdSqliteRunFailed (backup, active host)
+  - interval: 1m
+    input_series:
+      - series: 'vrts_rspamd_sqlite_last_run_success{instance="vrts1003:9100", operation="backup"}'
+        values: '0x10'
+    alert_rule_test:
+      - alertname: VRTSRspamdSqliteRunFailed
+        eval_time: 6m
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              team: collaboration-services
+              instance: vrts1003:9100
+              operation: backup
+            exp_annotations:
+              summary: VRTS Rspamd sqlite backup failed on vrts1003:9100
+              description: The last Rspamd sqlite backup run on vrts1003:9100 reported a failure
+              runbook: https://wikitech.wikimedia.org/wiki/VRT_System/Troubleshooting#VRTSRspamdSqliteRunFailed
+              dashboard: https://grafana.wikimedia.org/goto/ffn7t1zgy1hc0a?orgId=1
+
+  # VRTSRspamdSqliteRunFailed (restore, passive host)
+  - interval: 1m
+    input_series:
+      - series: 'vrts_rspamd_sqlite_last_run_success{instance="vrts2002:9100", operation="restore"}'
+        values: '0x10'
+    alert_rule_test:
+      - alertname: VRTSRspamdSqliteRunFailed
+        eval_time: 6m
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              team: collaboration-services
+              instance: vrts2002:9100
+              operation: restore
+            exp_annotations:
+              summary: VRTS Rspamd sqlite restore failed on vrts2002:9100
+              description: The last Rspamd sqlite restore run on vrts2002:9100 reported a failure
+              runbook: https://wikitech.wikimedia.org/wiki/VRT_System/Troubleshooting#VRTSRspamdSqliteRunFailed
+              dashboard: https://grafana.wikimedia.org/goto/ffn7t1zgy1hc0a?orgId=1
+
+  # VRTSRspamdSqliteRunStale — last run >2h ago
+  - interval: 5m
+    input_series:
+      # Timestamp frozen at t=0 — the test clock advances while the gauge stays put
+      - series: 'vrts_rspamd_sqlite_last_run_timestamp_seconds{instance="vrts1003:9100", operation="backup"}'
+        values: '0x60'
+    alert_rule_test:
+      - alertname: VRTSRspamdSqliteRunStale
+        eval_time: 2h30m
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              team: collaboration-services
+              instance: vrts1003:9100
+              operation: backup
+            exp_annotations:
+              summary: VRTS Rspamd sqlite backup has not run recently on vrts1003:9100
+              description: The Rspamd sqlite backup timer fires hourly but the last run on vrts1003:9100 is over 2 hours old
+              runbook: https://wikitech.wikimedia.org/wiki/VRT_System/Troubleshooting#VRTSRspamdSqliteRunStale
+              dashboard: https://grafana.wikimedia.org/goto/ffn7t1zgy1hc0a?orgId=1
+
+  # VRTSMailTrainingStale
+  - interval: 5m
+    input_series:
+      - series: 'train_mail_filters_last_run_timestamp_seconds{instance="vrts1003:9100"}'
+        values: '0x60'
+    alert_rule_test:
+      - alertname: VRTSMailTrainingStale
+        eval_time: 2h30m
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              team: collaboration-services
+              instance: vrts1003:9100
+            exp_annotations:
+              summary: VRTS mail filter training has not run recently on vrts1003:9100
+              description: The train_mail_filters timer fires hourly but the last run on vrts1003:9100 is over 2 hours old
+              runbook: https://wikitech.wikimedia.org/wiki/VRT_System/Troubleshooting#VRTSMailTrainingStale
+              dashboard: https://grafana.wikimedia.org/goto/ffn7t1zgy1hc0a?orgId=1
+
+  # VRTSMailTrainingErrors
+  - interval: 1m
+    input_series:
+      - series: 'train_mail_filters_last_run_messages{instance="vrts1003:9100", backend="rspamd", label="spam", status="error"}'
+        values: '3x10'
+    alert_rule_test:
+      - alertname: VRTSMailTrainingErrors
+        eval_time: 6m
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              team: collaboration-services
+              instance: vrts1003:9100
+              backend: rspamd
+              label: spam
+              status: error
+            exp_annotations:
+              summary: VRTS mail training reported errors for rspamd (spam) on vrts1003:9100
+              description: The last train_mail_filters run on vrts1003:9100 processed 3 spam message(s) with errors via rspamd
+              runbook: https://wikitech.wikimedia.org/wiki/VRT_System/Troubleshooting#VRTSMailTrainingErrors
+              dashboard: https://grafana.wikimedia.org/goto/ffn7t1zgy1hc0a?orgId=1
