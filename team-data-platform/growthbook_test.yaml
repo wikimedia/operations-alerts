@@ -1,0 +1,34 @@
+rule_files:
+  - growthbook.yaml
+tests:
+  - input_series:
+    - series: growthbook_sync_seats_total{job="growthbook_ldap_sync"}
+      values: 301
+    alert_rule_test:
+    - alertname: ElevatedGrowthbookLicenseSeatsCount
+      eval_time: 5m
+      exp_alerts:
+      - exp_annotations:
+          description: 'Used Growthbook seat count over 90% of all available seats'
+          summary: 'Used Growthbook seat count over 90% of all available seats'
+          dashboard: "https://grafana.wikimedia.org/d/br5nggx/growthbook-ldap-sync?orgId=1&from=now-30m&to=now&timezone=utc&var-query0=growthbook_ldap_sync&var-instance=growthbook_ldap_sync"
+          runbook: "TODO"
+        exp_labels:
+          severity: warning
+          team: data-platform
+
+  - input_series:
+    - series: growthbook_sync_seats_total{job="growthbook_ldap_sync"}
+      values: 330
+    alert_rule_test:
+    - alertname: ExceededGrowthbookLicenseSeatsCount
+      eval_time: 5m
+      exp_alerts:
+      - exp_annotations:
+          description: 'Used Growthbook seat count over limit'
+          summary: 'Used Growthbook seat count over limit'
+          dashboard: "https://grafana.wikimedia.org/d/br5nggx/growthbook-ldap-sync?orgId=1&from=now-30m&to=now&timezone=utc&var-query0=growthbook_ldap_sync&var-instance=growthbook_ldap_sync"
+          runbook: "TODO"
+        exp_labels:
+          severity: critical
+          team: data-platform

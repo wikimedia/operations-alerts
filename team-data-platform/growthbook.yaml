@@ -1,0 +1,29 @@
+# deploy-tag: k8s-dse
+# deploy-site: eqiad
+
+groups:
+  - name: growtbook
+    rules:
+    - alert: ElevatedGrowthbookLicenseSeatsCount
+      annotations:
+        description: 'Used Growthbook seat count over 90% of all available seats'
+        summary: 'Used Growthbook seat count over 90% of all available seats'
+        dashboard: "https://grafana.wikimedia.org/d/br5nggx/growthbook-ldap-sync?orgId=1&from=now-30m&to=now&timezone=utc&var-query0=growthbook_ldap_sync&var-instance=growthbook_ldap_sync"
+        runbook: "TODO"
+      expr: sum(growthbook_sync_seats_total{job="growthbook_ldap_sync"}) / 330 * 100 > 90  # 90% of max count (330)
+      for: 5m
+      labels:
+        severity: warning
+        team: data-platform
+
+    - alert: ExceededGrowthbookLicenseSeatsCount
+      annotations:
+        description: 'Used Growthbook seat count over limit'
+        summary: 'Used Growthbook seat count over limit'
+        dashboard: "https://grafana.wikimedia.org/d/br5nggx/growthbook-ldap-sync?orgId=1&from=now-30m&to=now&timezone=utc&var-query0=growthbook_ldap_sync&var-instance=growthbook_ldap_sync"
+        runbook: "TODO"
+      expr: sum(growthbook_sync_seats_total{job="growthbook_ldap_sync"}) >= 330  # over max count
+      for: 5m
+      labels:
+        severity: critical
+        team: data-platform
