@@ -77,10 +77,9 @@ groups:
       - alert: MediawikiPageHtmlFeatureCountsChangeEnrichHighKafkaConsumerLag
         # The application is experiencing latency in consuming from Kafka brokers.
         # This threshold and duration should match target SLO values
-        # Latency is around 30 seconds, throughput is around 20msg/sec. Threshold here is double (1200) but can be adjusted as needed.
         expr: |
-          flink_taskmanager_job_task_operator_KafkaSourceReader_KafkaConsumer_records_lag_max{kubernetes_namespace="mw-page-html-feature-counts-change-enrich", release="production", job_name="mw_page_html_feature_counts_change_enrich"} > 1200
-        for: 5m
+          flink_taskmanager_job_task_operator_KafkaSourceReader_KafkaConsumer_records_lag_max{kubernetes_namespace="mw-page-html-feature-counts-change-enrich", release="production", job_name="mw_page_html_feature_counts_change_enrich"} > 5000
+        for: 10m
         labels:
           team: data-engineering
           severity: warning
