@@ -18,6 +18,8 @@ groups:
       dashboard: https://grafana.wikimedia.org/goto/ffn7t1zgy1hc0a?orgId=1
   - alert: VRTSJunkQueueSize
     expr: sql_vrts_ticket_count{name="junk_queues"} > 20000
+    # VRTS is active/passive, so this series is not guaranteed to exist in every site.
+    # pint disable promql/series
     for: 5m
     labels:
       severity: warning
@@ -53,6 +55,8 @@ groups:
   - alert: VRTSMailTrainingStale
     expr: |
       time() - train_mail_filters_last_run_timestamp_seconds{instance=~"vrts.*"} > 2 * 3600
+    # Training runs only on the active VRTS host, which can move between sites.
+    # pint disable promql/series
     for: 15m
     labels:
       severity: warning
@@ -64,6 +68,8 @@ groups:
       dashboard: https://grafana.wikimedia.org/goto/ffn7t1zgy1hc0a?orgId=1
   - alert: VRTSMailTrainingErrors
     expr: train_mail_filters_last_run_messages{instance=~"vrts.*", status="error"} > 0
+    # Training runs only on the active VRTS host, which can move between sites.
+    # pint disable promql/series
     for: 5m
     labels:
       severity: warning
