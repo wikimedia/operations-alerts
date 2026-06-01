@@ -54,3 +54,19 @@ groups:
           description: ''
           dashboard: 'https://grafana.wikimedia.org/d/ed8da087-4bcb-407d-9596-d158b8145d45/bgp-neighbors-detail?orgId=1&var-site={{ $externalLabels.site }}&var-device={{ $labels.instance }}&var-bgp_group={{ $labels.peer_group }}&var-bgp_neighbor={{ $labels.peer_descr | urlquery }}'
           runbook: 'https://wikitech.wikimedia.org/wiki/Peering_management#Managing_down_sessions'
+      - alert: RejectingBGPPrefixes
+        expr: |
+          (gnmi_bgp_neighbor_prefixes_rejected{peer_group!~"(IX|Private-Peer|Transit|ibgp)[4|6]"} > 0) or 
+          (gnmi_bgp_neighbor_prefixes_received_pre_policy{peer_group!~"(IX|Private-Peer|Transit|ibgp)[4|6]"} - gnmi_bgp_neighbor_prefixes_received{peer_group!~"(IX|Private-Peer|Transit|ibgp)[4|6]"}) > 0
+        for: 10m
+        labels:
+          team: sre
+          severity: critical
+          scope: network
+        annotations:
+          summary: 'Rejecting {{ $value }} BGP prefixes - {{ $labels.peer_descr }} ({{ $labels.address }} - group {{ $labels.peer_group }})'
+          description: ''
+          dashboard: 'https://grafana.wikimedia.org/d/ed8da087-4bcb-407d-9596-d158b8145d45/bgp-neighbors-detail?orgId=1&var-site={{ $externalLabels.site }}&var-device={{ $labels.instance }}&var-bgp_group={{ $labels.peer_group }}&var-bgp_neighbor={{ $labels.peer_descr | urlquery }}'
+          runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#RejectingBGPPrefixes'
+
+
