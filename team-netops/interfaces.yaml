@@ -172,3 +172,15 @@ groups:
           description: ''  # Not needed
           dashboard: 'https://grafana.wikimedia.org/d/fb403d62-5f03-434a-9dff-bd02b9fff504/network-device-overview?var-instance={{ $labels.instance }}'
           runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#InterfaceOpticHighPower'
+      - alert: InterfaceNoDescription
+        expr: gnmi_interfaces_interface_state_oper_status{interface_description='', interface_name=~"(xe|ge|et|Ethernet)-?.*"} == 1
+        for: 7d
+        labels:
+          team: dcops
+          severity: task
+          scope: network
+        annotations:
+          summary: 'Interface UP for 7 days with no description - {{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}:{{ $labels.interface_name }}'
+          description: ''  # Not needed
+          dashboard: 'https://grafana.wikimedia.org/d/fb403d62-5f03-434a-9dff-bd02b9fff504/network-device-overview?var-instance={{ $labels.instance }}'
+          runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#InterfaceNoDescription'

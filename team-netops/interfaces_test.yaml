@@ -46,6 +46,8 @@ tests:
         values: '1 1'
       - series: 'gnmi_interfaces_interface_optics_lanediags_lane_lane_laser_receiver_power_low_warning{instance="cr3-ulsfo:9804", interface_description="mocked for tests", interface_name="xe-0/0/0"}'
         values: '1 1'
+      - series: 'gnmi_interfaces_interface_state_oper_status{instance="cr3-ulsfo:9804", interface_name="xe-0/0/12", interface_description=""}'
+        values: '1x1000000'
         
     alert_rule_test:
       - alertname: CoreRouterInterfaceDown
@@ -204,3 +206,17 @@ tests:
               description: ""
               dashboard: 'https://grafana.wikimedia.org/d/fb403d62-5f03-434a-9dff-bd02b9fff504/network-device-overview?var-instance=cr3-ulsfo:9804'
               runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#InterfaceOpticHighPower'
+      - alertname: InterfaceNoDescription
+        eval_time: 8d
+        exp_alerts:
+          - exp_labels:
+              instance: cr3-ulsfo:9804
+              interface_name: xe-0/0/12
+              team: dcops
+              severity: task
+              scope: network
+            exp_annotations:
+              summary: "Interface UP for 7 days with no description - cr3-ulsfo:xe-0/0/12"
+              description: ""
+              dashboard: 'https://grafana.wikimedia.org/d/fb403d62-5f03-434a-9dff-bd02b9fff504/network-device-overview?var-instance=cr3-ulsfo:9804'
+              runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#InterfaceNoDescription'
