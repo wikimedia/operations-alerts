@@ -169,12 +169,12 @@ tests:
               interface_description: "CCTID"
               site: esams
               team: sre
-              severity: critical
+              severity: page
               scope: network
             exp_annotations:
-              summary: "Core router normal + high priority queue drops are high on cr2-esams:xe-0/1/2 (CCTID)"
+              summary: "Excess priority packet drops on cr2-esams:xe-0/1/2 (CCTID) #page"
               description: ""
-              dashboard: 'https://grafana.wikimedia.org/d/5p97dAASz/queue-and-error-stats-by-network-device?var-site=esams+prometheus%2Fops&var-device=cr2-esams&var-interface=xe-0%2F1%2F2'
+              dashboard: 'https://grafana.wikimedia.org/d/5p97dAASz?var-site=esams+prometheus%2Fops&var-device=cr2-esams&var-interface=xe-0%2F1%2F2'
               runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#CoreRouterInterfaceDropPercent'
       - alertname: InterfaceOpticLowPower
         eval_time: 2m
