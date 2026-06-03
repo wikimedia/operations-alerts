@@ -10,6 +10,11 @@ tests:
         values: '0 0 0 0 0 0'
       - series: 'go_goroutines{instance="netflow2003:7890", job="gnmic"}'
         values: '15000x6'
+      - series: 'probe_ssl_earliest_cert_expiry{module="gnmi_connect", instance="lsw1-f2-codfw.mgmt.codfw.wmnet:32767"}'
+        values: '777600-60x6 604800-60x6'
+      - series: 'probe_ssl_earliest_cert_expiry{module="gnmi_connect", instance="lsw1-f1-codfw.mgmt.codfw.wmnet:32767"}'
+        values: '604800-60x6 345600-60x6'
+
     alert_rule_test:
       - alertname: GnmiTargetDown
         eval_time: 6m
@@ -38,3 +43,39 @@ tests:
               description: ""
               dashboard: 'https://grafana.wikimedia.org/d/eab73c60-a402-4f9b-a4a7-ea489b374458/gnmic'
               runbook: 'https://wikitech.wikimedia.org/wiki/Network_telemetry#GoRoutinesTooHigh'
+      - alertname: CertAlmostExpired
+        eval_time: 10m
+        exp_alerts:
+          - exp_labels:
+              module: gnmi_connect
+              team: sre
+              scope: network
+              severity: warning
+              instance: lsw1-f1-codfw.mgmt.codfw.wmnet:32767
+            exp_annotations:
+              summary: gNMI TLS certificate for lsw1-f1-codfw.mgmt.codfw.wmnet is going to expire in 6d 23h 45m 0s
+              description: ''
+              runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#CertAlmostExpired'
+              dashboard: https://grafana.wikimedia.org/d/eab73c60-a402-4f9b-a4a7-ea489b374458/gnmic?var-site=codfw
+          - exp_labels:
+              module: gnmi_connect
+              team: sre
+              scope: network
+              severity: warning
+              instance: lsw1-f2-codfw.mgmt.codfw.wmnet:32767
+            exp_annotations:
+              summary: gNMI TLS certificate for lsw1-f2-codfw.mgmt.codfw.wmnet is going to expire in 8d 23h 45m 0s
+              description: ''
+              runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#CertAlmostExpired'
+              dashboard: https://grafana.wikimedia.org/d/eab73c60-a402-4f9b-a4a7-ea489b374458/gnmic?var-site=codfw
+          - exp_labels:
+              module: gnmi_connect
+              team: sre
+              scope: network
+              severity: critical
+              instance: lsw1-f1-codfw.mgmt.codfw.wmnet:32767
+            exp_annotations:
+              summary: gNMI TLS certificate for lsw1-f1-codfw.mgmt.codfw.wmnet is going to expire in 6d 23h 45m 0s
+              description: ''
+              runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#CertAlmostExpired'
+              dashboard: https://grafana.wikimedia.org/d/eab73c60-a402-4f9b-a4a7-ea489b374458/gnmic?var-site=codfw

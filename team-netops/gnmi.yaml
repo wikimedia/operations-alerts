@@ -28,3 +28,23 @@ groups:
           description: ''  # Not needed
           dashboard: 'https://grafana.wikimedia.org/d/eab73c60-a402-4f9b-a4a7-ea489b374458/gnmic'
           runbook: 'https://wikitech.wikimedia.org/wiki/Network_telemetry#GoRoutinesTooHigh'
+      - &cert_expired
+        alert: CertAlmostExpired
+        annotations:
+          description: '' # Not needed
+          summary: 'gNMI TLS certificate for {{ $labels.instance | stripPort }} is going to expire in {{ $value | humanizeDuration }}'
+          runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#CertAlmostExpired'
+          dashboard: https://grafana.wikimedia.org/d/eab73c60-a402-4f9b-a4a7-ea489b374458/gnmic?var-site={{ $externalLabels.site }}
+        expr: probe_ssl_earliest_cert_expiry{module="gnmi_connect"} - time() < (86400 * 9)
+        for: 5m
+        labels:
+          severity: warning
+          team: sre
+          scope: network
+
+      - <<: *cert_expired
+        expr: probe_ssl_earliest_cert_expiry{module="gnmi_connect"} - time() < (86400 * 7)
+        labels:
+          severity: critical
+          team: sre
+          scope: network
