@@ -1,5 +1,10 @@
 # deploy-tag: ops
 
+# T426809
+# Liberica is not yet deployed in eqiad and codfw.
+# TODO: Re-enable pint alerts for eqiad/codfw once Liberica is deployed there.
+# pint file/disable promql/series
+
 groups:
   - name: liberica
     rules:
@@ -33,7 +38,6 @@ groups:
           dashboard: 'https://grafana.wikimedia.org/d/fa4de97a-7114-48c7-a91a-f56089ef554f/liberica?orgId=1&viewPanel=10&var-site={{ $externalLabels.site }}&var-instance={{ $labels.hostname }}'
           runbook: 'https://wikitech.wikimedia.org/wiki/Liberica#LibericaStaleConfig'
       - alert: LibericaEtcdErrors
-        # pint disable promql/series
         expr: |
           sum by (key, instance) (
             increase(liberica_etcd_errors_total[5m])
