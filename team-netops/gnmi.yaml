@@ -43,7 +43,16 @@ groups:
           scope: network
 
       - <<: *cert_expired
-        expr: probe_ssl_earliest_cert_expiry{module="gnmi_connect"} - time() < (86400 * 7)
+        expr: |
+          (
+            probe_ssl_earliest_cert_expiry{module="gnmi_connect"} - time()
+          ) < 7 * 24 * 3600
+          or (
+          (
+            up{module="gnmi_connect"} == 1
+            unless
+            probe_ssl_earliest_cert_expiry{module="gnmi_connect"}
+          ) * 0 )
         labels:
           severity: critical
           team: sre
