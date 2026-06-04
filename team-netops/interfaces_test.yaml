@@ -42,13 +42,13 @@ tests:
         values: '0+5000x15'     # 5000 tail drops per minute on queue 2
       - series: 'gnmi_interfaces_interface_state_oper_status{instance="cr3-ulsfo:9804", interface_name="xe-0/0/0", interface_description="mocked for tests"}'
         values: '1 1'
-      - series: 'gnmi_interfaces_interface_optics_lanediags_lane_lane_laser_receiver_power_high_warning{instance="cr3-ulsfo:9804", interface_description="mocked for tests", interface_name="xe-0/0/0"}'
+      - series: 'gnmi_interfaces_interface_optics_lanediags_lane_lane_laser_receiver_power_high_alarm{instance="cr3-ulsfo:9804", interface_description="mocked for tests", interface_name="xe-0/0/0"}'
         values: '1 1'
       - series: 'gnmi_interfaces_interface_optics_lanediags_lane_lane_laser_receiver_power_low_warning{instance="cr3-ulsfo:9804", interface_description="mocked for tests", interface_name="xe-0/0/0"}'
         values: '1 1'
       - series: 'gnmi_interfaces_interface_state_oper_status{instance="cr3-ulsfo:9804", interface_name="xe-0/0/12", interface_description=""}'
         values: '1x1000000'
-        
+
     alert_rule_test:
       - alertname: CoreRouterInterfaceDown
         eval_time: 2m

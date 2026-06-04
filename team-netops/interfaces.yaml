@@ -161,7 +161,7 @@ groups:
           dashboard: 'https://grafana.wikimedia.org/d/fb403d62-5f03-434a-9dff-bd02b9fff504/network-device-overview?var-instance={{ $labels.instance }}'
           runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#InterfaceOpticLowPower'
       - alert: InterfaceOpticHighPower
-        expr: (gnmi_interfaces_interface_optics_lanediags_lane_lane_laser_receiver_power_high_warning == 1) * on (instance, interface_name, interface_description) group_left() (gnmi_interfaces_interface_state_oper_status == 1)
+        expr: (gnmi_interfaces_interface_optics_lanediags_lane_lane_laser_receiver_power_high_alarm == 1) * on (instance, interface_name, interface_description) group_left() (gnmi_interfaces_interface_state_oper_status == 1)
         for: 2m
         labels:
           team: sre
