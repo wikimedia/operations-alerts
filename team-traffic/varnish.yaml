@@ -46,19 +46,25 @@ groups:
         annotations: *VarnishHighMmapCountAnn
 
       - alert: VarnishHighThreadCount
-        expr: varnish_main_threads_used_percent >= 70
+        expr: varnish_main_threads_used_percent >= 80
+        for: 30m
         labels:
           team: traffic
           severity: warning
-        annotations: &VarnishHighThreadCountAnn
-          summary: "Varnish's thread count on {{ $labels.instance }} is high"
+        annotations:
+          summary: "{{ $labels.instance }}'s Varnish thread count nearly maxed out"
           description: "Varnish on {{ $labels.instance }} ({{ $externalLabels.site }}) is at {{ $value }}% of the maximum limit."
           dashboard: 'https://grafana.wikimedia.org/d/wiU3SdEWk/cache-host-drilldown?viewPanel=99&var-site={{ $externalLabels.site }}&var-instance={{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}'
           runbook: *wt-varnish
 
       - alert: VarnishHighThreadCount
         expr: varnish_main_threads_used_percent >= 80
+        for: 60m
         labels:
           team: traffic
           severity: critical
-        annotations: *VarnishHighThreadCountAnn
+        annotations:
+          summary: "{{ $labels.instance }}'s Varnish thread count nearly maxed out for an hour"
+          description: "Varnish on {{ $labels.instance }} ({{ $externalLabels.site }}) is at {{ $value }}% of the maximum limit."
+          dashboard: 'https://grafana.wikimedia.org/d/wiU3SdEWk/cache-host-drilldown?viewPanel=99&var-site={{ $externalLabels.site }}&var-instance={{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}'
+          runbook: *wt-varnish

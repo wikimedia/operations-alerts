@@ -112,40 +112,65 @@ tests:
     external_labels:
       site: eqiad
     input_series:
+      - series: 'varnish_main_threads_used_percent{instance="cp1233:0"}'
+        values: '70x61'
+      # Simulating a typical prod spike that slowly decreases
       - series: 'varnish_main_threads_used_percent{instance="cp1234:0"}'
-        values: '60 69'
+        values: '85x20 86 87 88 89 90 89 88 87 86 85 84 83 82 81 80 79 78 77 0x40'
       - series: 'varnish_main_threads_used_percent{instance="cp1235:0"}'
-        values: '60 70'
+        values: '85x40 60x21'
+      # A spike happened but threads aren't being freed: We're getting hammered!
       - series: 'varnish_main_threads_used_percent{instance="cp1236:0"}'
-        values: '70 80'
+        values: '81x61'
     alert_rule_test:
       - alertname: VarnishHighThreadCount
-        eval_time: 2m
+        eval_time: 30m
         exp_alerts:
-         - exp_labels:
-             severity: warning
-             team: traffic
-             instance: "cp1235:0"
-           exp_annotations:
-             summary: "Varnish's thread count on cp1235:0 is high"
-             description: "Varnish on cp1235:0 (eqiad) is at 70% of the maximum limit."
-             dashboard: 'https://grafana.wikimedia.org/d/wiU3SdEWk/cache-host-drilldown?viewPanel=99&var-site=eqiad&var-instance=cp1235'
-             runbook: "https://wikitech.wikimedia.org/wiki/Varnish"
-         - exp_labels:
-             severity: warning
-             team: traffic
-             instance: "cp1236:0"
-           exp_annotations:
-             summary: "Varnish's thread count on cp1236:0 is high"
-             description: "Varnish on cp1236:0 (eqiad) is at 80% of the maximum limit."
-             dashboard: 'https://grafana.wikimedia.org/d/wiU3SdEWk/cache-host-drilldown?viewPanel=99&var-site=eqiad&var-instance=cp1236'
-             runbook: "https://wikitech.wikimedia.org/wiki/Varnish"
-         - exp_labels:
-             severity: critical
-             team: traffic
-             instance: "cp1236:0"
-           exp_annotations:
-             summary: "Varnish's thread count on cp1236:0 is high"
-             description: "Varnish on cp1236:0 (eqiad) is at 80% of the maximum limit."
-             dashboard: 'https://grafana.wikimedia.org/d/wiU3SdEWk/cache-host-drilldown?viewPanel=99&var-site=eqiad&var-instance=cp1236'
-             runbook: "https://wikitech.wikimedia.org/wiki/Varnish"
+          - exp_labels:
+              severity: warning
+              team: traffic
+              instance: "cp1234:0"
+            exp_annotations:
+              summary: "cp1234:0's Varnish thread count nearly maxed out"
+              description: "Varnish on cp1234:0 (eqiad) is at 85% of the maximum limit."
+              dashboard: 'https://grafana.wikimedia.org/d/wiU3SdEWk/cache-host-drilldown?viewPanel=99&var-site=eqiad&var-instance=cp1234'
+              runbook: "https://wikitech.wikimedia.org/wiki/Varnish"
+          - exp_labels:
+              severity: warning
+              team: traffic
+              instance: "cp1235:0"
+            exp_annotations:
+              summary: "cp1235:0's Varnish thread count nearly maxed out"
+              description: "Varnish on cp1235:0 (eqiad) is at 85% of the maximum limit."
+              dashboard: 'https://grafana.wikimedia.org/d/wiU3SdEWk/cache-host-drilldown?viewPanel=99&var-site=eqiad&var-instance=cp1235'
+              runbook: "https://wikitech.wikimedia.org/wiki/Varnish"
+          - exp_labels:
+              severity: warning
+              team: traffic
+              instance: "cp1236:0"
+            exp_annotations:
+              summary: "cp1236:0's Varnish thread count nearly maxed out"
+              description: "Varnish on cp1236:0 (eqiad) is at 81% of the maximum limit."
+              dashboard: 'https://grafana.wikimedia.org/d/wiU3SdEWk/cache-host-drilldown?viewPanel=99&var-site=eqiad&var-instance=cp1236'
+              runbook: "https://wikitech.wikimedia.org/wiki/Varnish"
+      - alertname: VarnishHighThreadCount
+        eval_time: 60m
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              team: traffic
+              instance: "cp1236:0"
+            exp_annotations:
+              summary: "cp1236:0's Varnish thread count nearly maxed out"
+              description: "Varnish on cp1236:0 (eqiad) is at 81% of the maximum limit."
+              dashboard: 'https://grafana.wikimedia.org/d/wiU3SdEWk/cache-host-drilldown?viewPanel=99&var-site=eqiad&var-instance=cp1236'
+              runbook: "https://wikitech.wikimedia.org/wiki/Varnish"
+          - exp_labels:
+              severity: critical
+              team: traffic
+              instance: "cp1236:0"
+            exp_annotations:
+              summary: "cp1236:0's Varnish thread count nearly maxed out for an hour"
+              description: "Varnish on cp1236:0 (eqiad) is at 81% of the maximum limit."
+              dashboard: 'https://grafana.wikimedia.org/d/wiU3SdEWk/cache-host-drilldown?viewPanel=99&var-site=eqiad&var-instance=cp1236'
+              runbook: "https://wikitech.wikimedia.org/wiki/Varnish"
