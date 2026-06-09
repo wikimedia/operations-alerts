@@ -1,0 +1,34 @@
+# deploy-tag: ops
+# deploy-site: eqiad, codfw
+
+groups:
+- name: mailman
+  rules:
+  - alert: MailmanStaleSubsJanitorStale
+    expr: |
+      time() - mailman_stale_subs_last_run_timestamp_seconds{instance=~"lists.*"} > 2 * 86400
+    # The discard_stale_subscriptions timer runs daily, and only on the active
+    # lists host, so this series may be absent on the passive one.
+    # pint disable promql/series
+    for: 1h
+    labels:
+      severity: warning
+      team: collaboration-services
+    annotations:
+      summary: "Mailman stale-subscription janitor has not run recently on {{ $labels.instance }}"
+      description: "The discard_stale_subscriptions timer fires daily but the last run on {{ $labels.instance }} is over 2 days old; the pending-request backlog can grow back and slow down lists.wikimedia.org (T353891)."
+      runbook: https://wikitech.wikimedia.org/wiki/Mailman
+      dashboard: TODO
+  - alert: MailmanStaleSubsJanitorFailed
+    expr: mailman_stale_subs_last_run_success{instance=~"lists.*"} == 0
+    # Series only present on the active lists host.
+    # pint disable promql/series
+    for: 1h
+    labels:
+      severity: warning
+      team: collaboration-services
+    annotations:
+      summary: "Mailman stale-subscription janitor did not complete cleanly on {{ $labels.instance }}"
+      description: "The last discard_stale_subscriptions run on {{ $labels.instance }} reported errors (see mailman_stale_subs_last_run_errors and journalctl -u discard_stale_subscriptions)."
+      runbook: https://wikitech.wikimedia.org/wiki/Mailman
+      dashboard: TODO

@@ -1,0 +1,43 @@
+rule_files:
+  - mailman.yaml
+evaluation_interval: 1m
+
+tests:
+  # MailmanStaleSubsJanitorStale — last run frozen, clock advances past 2 days
+  - interval: 5m
+    input_series:
+      # Timestamp frozen at t=0; the test clock advances while the gauge stays put.
+      - series: 'mailman_stale_subs_last_run_timestamp_seconds{instance="lists1004:9100"}'
+        values: '0x600'
+    alert_rule_test:
+      - alertname: MailmanStaleSubsJanitorStale
+        eval_time: 50h
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              team: collaboration-services
+              instance: lists1004:9100
+            exp_annotations:
+              summary: "Mailman stale-subscription janitor has not run recently on lists1004:9100"
+              description: "The discard_stale_subscriptions timer fires daily but the last run on lists1004:9100 is over 2 days old; the pending-request backlog can grow back and slow down lists.wikimedia.org (T353891)."
+              runbook: https://wikitech.wikimedia.org/wiki/Mailman
+              dashboard: TODO
+
+  # MailmanStaleSubsJanitorFailed — last run reported errors
+  - interval: 1m
+    input_series:
+      - series: 'mailman_stale_subs_last_run_success{instance="lists1004:9100"}'
+        values: '0x70'
+    alert_rule_test:
+      - alertname: MailmanStaleSubsJanitorFailed
+        eval_time: 1h5m
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              team: collaboration-services
+              instance: lists1004:9100
+            exp_annotations:
+              summary: "Mailman stale-subscription janitor did not complete cleanly on lists1004:9100"
+              description: "The last discard_stale_subscriptions run on lists1004:9100 reported errors (see mailman_stale_subs_last_run_errors and journalctl -u discard_stale_subscriptions)."
+              runbook: https://wikitech.wikimedia.org/wiki/Mailman
+              dashboard: TODO
