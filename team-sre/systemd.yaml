@@ -14,11 +14,11 @@ groups:
             instance_name:node_systemd_unit_state_failed:count1
               * on (instance,name) group_left(team) systemd_unit_owner
           ) == 1
-          # Then fall back to using role_owner (WMCS has its own alerts T333315)
+          # Then fall back to using role_owner
           or ignoring(team)
           (
             instance_name:node_systemd_unit_state_failed:count1
-              * on (instance) group_left(team) role_owner{team!="wmcs"}
+              * on (instance) group_left(team) role_owner
           ) == 1
         for: 3m
         labels:
@@ -44,7 +44,7 @@ groups:
           or ignoring(team)
           (
             increase(node_systemd_service_restart_total[10m])
-              * on (instance) group_left(team) role_owner{team!="wmcs"}
+              * on (instance) group_left(team) role_owner
           ) > 12
         for: 2m
         labels:
