@@ -5,7 +5,7 @@ groups:
 - name: mirrors
   rules:
   - alert: MirrorHighLag
-    expr: time() - node_file_age_timestamp_seconds_total{path=~"/srv/mirrors/(debian|ubuntu)"} > 14 * 3600
+    expr: time() - node_file_age_timestamp_seconds_total{path="/srv/mirrors/debian"} > 14 * 3600
     for: 10m
     labels:
       severity: warning
