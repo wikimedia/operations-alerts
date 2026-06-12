@@ -3,6 +3,76 @@ rule_files:
 evaluation_interval: 1m
 
 tests:
+  # Active host: ~100 req/s total (well above the 20 req/s guard), 10% 4xx and
+  # 5% 5xx: both ratio alerts fire.
+  - interval: 1m
+    input_series:
+      - series: 'apache_http_status_total{instance="gerrit2003:9117", status="200"}'
+        values: '0+5100x30'
+      - series: 'apache_http_status_total{instance="gerrit2003:9117", status="404"}'
+        values: '0+600x30'
+      - series: 'apache_http_status_total{instance="gerrit2003:9117", status="500"}'
+        values: '0+300x30'
+    alert_rule_test:
+      - alertname: GerritHigh4xxRatio
+        eval_time: 20m
+        exp_alerts:
+          - exp_labels:
+              team: collaboration-services
+              severity: warning
+              instance: gerrit2003:9117
+            exp_annotations:
+              summary: 'High rate of HTTP 4xx responses on gerrit2003 (probable scraper)'
+              description: 'More than 5% of HTTP requests to Gerrit on gerrit2003 returned a 4xx status over the last 10 minutes, this is usually caused by a scraper.'
+              runbook: TODO
+              dashboard: https://grafana.wikimedia.org/d/nX8li17Sk/gerrit-overview-sre-collab
+      - alertname: GerritHigh5xxRatio
+        eval_time: 20m
+        exp_alerts:
+          - exp_labels:
+              team: collaboration-services
+              severity: task
+              instance: gerrit2003:9117
+            exp_annotations:
+              summary: 'High rate of HTTP 5xx responses on gerrit2003'
+              description: 'More than 1% of HTTP requests to Gerrit on gerrit2003 returned a 5xx status over the last 5 minutes.'
+              runbook: TODO
+              dashboard: https://grafana.wikimedia.org/d/nX8li17Sk/gerrit-overview-sre-collab
+
+  # Active host with enough volume but 1% 4xx and 0.5% 5xx: below both ratio
+  # thresholds, no alert.
+  - interval: 1m
+    input_series:
+      - series: 'apache_http_status_total{instance="gerrit2003:9117", status="200"}'
+        values: '0+5910x30'
+      - series: 'apache_http_status_total{instance="gerrit2003:9117", status="404"}'
+        values: '0+60x30'
+      - series: 'apache_http_status_total{instance="gerrit2003:9117", status="500"}'
+        values: '0+30x30'
+    alert_rule_test:
+      - alertname: GerritHigh4xxRatio
+        eval_time: 20m
+        exp_alerts: []
+      - alertname: GerritHigh5xxRatio
+        eval_time: 20m
+        exp_alerts: []
+
+  # Replica: very high ratios (98% 4xx, ~1.7% 5xx) but only ~10 req/s total,
+  # below the 20 req/s guard: neither alert fires.
+  - interval: 1m
+    input_series:
+      - series: 'apache_http_status_total{instance="gerrit2002:9117", status="404"}'
+        values: '0+590x30'
+      - series: 'apache_http_status_total{instance="gerrit2002:9117", status="500"}'
+        values: '0+10x30'
+    alert_rule_test:
+      - alertname: GerritHigh4xxRatio
+        eval_time: 20m
+        exp_alerts: []
+      - alertname: GerritHigh5xxRatio
+        eval_time: 20m
+        exp_alerts: []
+
   - interval: 1m
     input_series:
       - series: 'node_filesystem_avail_bytes{instance="gerrit2003:9100", mountpoint="/"}'

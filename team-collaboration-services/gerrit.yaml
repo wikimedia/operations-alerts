@@ -44,6 +44,51 @@ groups:
           runbook: https://wikitech.wikimedia.org/wiki/Gerrit/Operations#GerritReplicationUnavailable
           dashboard: https://grafana.wikimedia.org/goto/8VXsGHdDR?orgId=1
 
+      - alert: GerritHigh4xxRatio
+        # Alert if more than 5% of HTTP requests result in a 4xx status,
+        # usually the sign of a scraper crawling Gerrit. The total request rate
+        # guard (> 20 req/s) keeps low-traffic replicas, whose ratio is naturally
+        # high, from firing; only the active host sustains that volume.
+        expr: |
+          (
+            sum by (instance) (rate(apache_http_status_total{instance=~"gerrit.*", status=~"4.*"}[5m]))
+            /
+            sum by (instance) (rate(apache_http_status_total{instance=~"gerrit.*"}[5m]))
+          ) * 100 > 5
+          and
+          sum by (instance) (rate(apache_http_status_total{instance=~"gerrit.*"}[5m])) > 20
+        for: 10m
+        labels:
+          severity: warning
+          team: collaboration-services
+        annotations:
+          summary: 'High rate of HTTP 4xx responses on {{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }} (probable scraper)'
+          description: 'More than 5% of HTTP requests to Gerrit on {{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }} returned a 4xx status over the last 10 minutes, this is usually caused by a scraper.'
+          runbook: TODO
+          dashboard: https://grafana.wikimedia.org/d/nX8li17Sk/gerrit-overview-sre-collab
+
+      - alert: GerritHigh5xxRatio
+        # Alert if more than 1% of HTTP requests result in a 5xx status. The
+        # total request rate guard (> 20 req/s) keeps low-traffic replicas from
+        # firing; only the active host sustains that volume.
+        expr: |
+          (
+            sum by (instance) (rate(apache_http_status_total{instance=~"gerrit.*", status=~"5.*"}[5m]))
+            /
+            sum by (instance) (rate(apache_http_status_total{instance=~"gerrit.*"}[5m]))
+          ) * 100 > 1
+          and
+          sum by (instance) (rate(apache_http_status_total{instance=~"gerrit.*"}[5m])) > 20
+        for: 5m
+        labels:
+          severity: task
+          team: collaboration-services
+        annotations:
+          summary: 'High rate of HTTP 5xx responses on {{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}'
+          description: 'More than 1% of HTTP requests to Gerrit on {{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }} returned a 5xx status over the last 5 minutes.'
+          runbook: TODO
+          dashboard: https://grafana.wikimedia.org/d/nX8li17Sk/gerrit-overview-sre-collab
+
       - alert: GerritDiskSpaceExhaustionIncoming
         # Alert if Gerrit root or /srv disk space is projected to be exhausted within 4 hours.
         expr: |
