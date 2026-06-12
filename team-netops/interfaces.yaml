@@ -63,6 +63,7 @@ groups:
           description: ''  # Not needed
           dashboard: 'https://grafana.wikimedia.org/d/d968a627-b6f6-47fc-9316-e058854a4945/throughput-network-device-interfaces?var-site={{ printf "%s prometheus/ops" $labels.site | urlquery }}&var-device={{ $labels.instance }}&var-interface={{ $labels.interface_name | urlquery }}'
           runbook: 'https://w.wiki/Gbyf'
+          noalertnameonirc: true
       - alert: TransitPeeringInSaturation
         expr: |
           (

@@ -113,6 +113,7 @@ tests:
               description: ""
               dashboard: 'https://grafana.wikimedia.org/d/d968a627-b6f6-47fc-9316-e058854a4945/throughput-network-device-interfaces?var-site=esams+prometheus%2Fops&var-device=cr2-esams:9804&var-interface=xe-0%2F1%2F0'
               runbook: 'https://w.wiki/Gbyf'
+              noalertnameonirc: true
       - alertname: CoreOutboundSaturation
         eval_time: 20m
         exp_alerts:
