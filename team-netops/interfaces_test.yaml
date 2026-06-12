@@ -16,13 +16,13 @@ tests:
         values: '0+4x15'
       - series: 'gnmi_interfaces_interface_state_counters_out_errors{instance="cr3-ulsfo:9804", interface_name="xe-0/1/7", site="ulsfo", interface_description="Core: cr4-ulsfo:xe-0/1/7 {#1074}"}'
         values: '0+4x15'
-      - series: 'gnmi_interfaces_interface_state_counters_out_octets{instance="cr2-esams:9804", interface_description="Peering: Test peering", interface_name="xe-0/1/0", site="esams"}'
+      - series: 'gnmi_interfaces_interface_state_counters_out_octets{instance="cr2-esams:9804", interface_description="Peering: Test peering (something) {#cableid}", interface_name="xe-0/1/0", site="esams"}'
         values: '0+144000000000x10' # 1200000000 * 2 * 60
       - series: 'gnmi_interfaces_interface_state_counters_out_octets{instance="cr2-esams:9804", interface_description="Core: Test core", interface_name="xe-0/1/1", site="esams"}'
         values: '0+144000000000x10' # 1200000000 * 2 * 60
-      - series: 'gnmi_interfaces_interface_state_counters_in_octets{instance="cr2-esams:9804", interface_description="Peering: Test peering", interface_name="xe-0/1/0", site="esams"}'
+      - series: 'gnmi_interfaces_interface_state_counters_in_octets{instance="cr2-esams:9804", interface_description="Peering: Test peering (something) {#cableid}", interface_name="xe-0/1/0", site="esams"}'
         values: '0+144000000000x10' # 1200000000 * 2 * 60
-      - series: 'gnmi_interfaces_interface_state_high_speed{instance="cr2-esams:9804", interface_description="Peering: Test peering", interface_name="xe-0/1/0", site="esams"}'
+      - series: 'gnmi_interfaces_interface_state_high_speed{instance="cr2-esams:9804", interface_description="Peering: Test peering (something) {#cableid}", interface_name="xe-0/1/0", site="esams"}'
         values: '10000x10'
       - series: 'gnmi_interfaces_interface_state_high_speed{instance="cr2-esams:9804", interface_description="Core: Test core", interface_name="xe-0/1/1", site="esams"}'
         values: '10000x10'
@@ -103,13 +103,13 @@ tests:
           - exp_labels:
               instance: cr2-esams:9804
               interface_name: xe-0/1/0
-              interface_description: "Peering: Test peering"
+              interface_description: "Peering: Test peering (something) {#cableid}"
               site: esams
               team: sre
               severity: page
               scope: network
             exp_annotations:
-              summary: "Transit, peering or transport OUT traffic above 90% capacity - cr2-esams:xe-0/1/0 (Peering: Test peering) #page"
+              summary: "Transit, peering or transport OUT traffic above 90% capacity - cr2-esams:xe-0/1/0 (Peering: Test peering (something)) #page"
               description: ""
               dashboard: 'https://grafana.wikimedia.org/d/d968a627-b6f6-47fc-9316-e058854a4945/throughput-network-device-interfaces?var-site=esams+prometheus%2Fops&var-device=cr2-esams:9804&var-interface=xe-0%2F1%2F0'
               runbook: 'https://w.wiki/Gbyf'
@@ -135,13 +135,13 @@ tests:
           - exp_labels:
               instance: cr2-esams:9804
               interface_name: xe-0/1/0
-              interface_description: "Peering: Test peering"
+              interface_description: "Peering: Test peering (something) {#cableid}"
               site: esams
               team: sre
               severity: page
               scope: network
             exp_annotations:
-              summary: "Transit or peering IN traffic above 90% capacity - cr2-esams:xe-0/1/0 (Peering: Test peering) #page"
+              summary: "Transit or peering IN traffic above 90% capacity - cr2-esams:xe-0/1/0 (Peering: Test peering (something)) #page"
               description: ""
               dashboard: 'https://grafana.wikimedia.org/d/d968a627-b6f6-47fc-9316-e058854a4945/throughput-network-device-interfaces?var-site=esams+prometheus%2Fops&var-device=cr2-esams:9804&var-interface=xe-0%2F1%2F0'
               runbook: 'https://w.wiki/Gbyg'
