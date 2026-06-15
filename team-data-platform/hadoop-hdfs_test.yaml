@@ -122,3 +122,65 @@ tests:
             summary: The HDFS FSImage on analytics-hadoop:an-master1001:10080 is too old.
             dashboard: https://grafana.wikimedia.org/d/000000585/hadoop?var-hadoop_cluster=analytics-hadoop&viewPanel=129&fullscreen
             runbook: https://wikitech.wikimedia.org/wiki/Analytics/Cluster/Hadoop/Alerts#HDFS_FSImage_too_old
+
+## No active HDFS NameNode
+    - interval: 1m
+      input_series:
+        # Both NameNodes report HA state, neither is active.
+        - series: Hadoop_NameNode_HAState{hadoop_cluster="analytics-hadoop", instance="an-master1001:10080", name="FSNamesystem", state="standby"}
+          values: '1x10'
+        - series: Hadoop_NameNode_HAState{hadoop_cluster="analytics-hadoop", instance="an-master1002:10080", name="FSNamesystem", state="standby"}
+          values: '1x10'
+      alert_rule_test:
+      - alertname: HdfsNoActiveNameNode
+        eval_time: 5m
+        exp_alerts:
+        - exp_labels:
+            severity: critical
+            team: data-platform
+            hadoop_cluster: analytics-hadoop
+          exp_annotations:
+            description: No HDFS NameNode is in the active state on the analytics-hadoop HDFS cluster. HDFS is unavailable until a NameNode becomes active.
+            summary: No active HDFS NameNode on the analytics-hadoop HDFS cluster.
+            dashboard: https://grafana.wikimedia.org/d/000000585/hadoop?var-hadoop_cluster=analytics-hadoop&orgId=1
+            runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#No_active_HDFS_Namenode_running
+
+## Active NameNode present -> no alert
+    - interval: 1m
+      input_series:
+        - series: Hadoop_NameNode_HAState{hadoop_cluster="analytics-hadoop", instance="an-master1001:10080", name="FSNamesystem", state="active"}
+          values: '1x10'
+        - series: Hadoop_NameNode_HAState{hadoop_cluster="analytics-hadoop", instance="an-master1002:10080", name="FSNamesystem", state="standby"}
+          values: '1x10'
+      alert_rule_test:
+      - alertname: HdfsNoActiveNameNode
+        eval_time: 5m
+        exp_alerts: []
+      - alertname: HdfsSplitBrainNameNode
+        eval_time: 5m
+        exp_alerts: []
+
+## HDFS split brain (more than one node)
+    - interval: 1m
+      input_series:
+        # Both NameNodes report the active state.
+        - series: Hadoop_NameNode_HAState{hadoop_cluster="analytics-hadoop", instance="an-master1001:10080", name="FSNamesystem", state="active"}
+          values: '1x10'
+        - series: Hadoop_NameNode_HAState{hadoop_cluster="analytics-hadoop", instance="an-master1002:10080", name="FSNamesystem", state="active"}
+          values: '1x10'
+      alert_rule_test:
+      - alertname: HdfsSplitBrainNameNode
+        eval_time: 5m
+        exp_alerts:
+        - exp_labels:
+            severity: critical
+            team: data-platform
+            hadoop_cluster: analytics-hadoop
+          exp_annotations:
+            description: More than one HDFS NameNode is in the active state on the analytics-hadoop HDFS cluster. This split brain condition can lead to metadata corruption.
+            summary: HDFS NameNode split brain on the analytics-hadoop HDFS cluster.
+            dashboard: https://grafana.wikimedia.org/d/000000585/hadoop?var-hadoop_cluster=analytics-hadoop&orgId=1
+            runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#No_active_HDFS_Namenode_running
+      - alertname: HdfsNoActiveNameNode
+        eval_time: 5m
+        exp_alerts: []

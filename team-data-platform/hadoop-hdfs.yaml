@@ -104,3 +104,36 @@ groups:
       labels:
         severity: warning
         team: data-platform
+
+## No active HDFS NameNode
+    - alert: HdfsNoActiveNameNode
+      annotations:
+        description: No HDFS NameNode is in the active state on the {{ $labels.hadoop_cluster }} HDFS cluster. HDFS is unavailable until a NameNode becomes active.
+        summary: No active HDFS NameNode on the {{ $labels.hadoop_cluster }} HDFS cluster.
+        dashboard: https://grafana.wikimedia.org/d/000000585/hadoop?var-hadoop_cluster={{ $labels.hadoop_cluster }}&orgId=1
+        runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#No_active_HDFS_Namenode_running
+      # Fire for a cluster that has NameNodes reporting HA state but none active.
+      # Use `* 0` here to count to 0 when there are no no active nodes at all
+      expr: |
+        (
+          count by (hadoop_cluster) (Hadoop_NameNode_HAState{state="active"})
+            or
+          count by (hadoop_cluster) (Hadoop_NameNode_HAState) * 0
+        ) < 1
+      for: 5m
+      labels:
+        severity: critical
+        team: data-platform
+
+## More than one active HDFS NameNode
+    - alert: HdfsSplitBrainNameNode
+      annotations:
+        description: More than one HDFS NameNode is in the active state on the {{ $labels.hadoop_cluster }} HDFS cluster. This split brain condition can lead to metadata corruption.
+        summary: HDFS NameNode split brain on the {{ $labels.hadoop_cluster }} HDFS cluster.
+        dashboard: https://grafana.wikimedia.org/d/000000585/hadoop?var-hadoop_cluster={{ $labels.hadoop_cluster }}&orgId=1
+        runbook: https://wikitech.wikimedia.org/wiki/Analytics/Systems/Cluster/Hadoop/Alerts#No_active_HDFS_Namenode_running
+      expr: count by (hadoop_cluster) (Hadoop_NameNode_HAState{state="active"}) > 1
+      for: 5m
+      labels:
+        severity: critical
+        team: data-platform
