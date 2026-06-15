@@ -29,6 +29,7 @@ groups:
       - alert: NeutronAgentAdminDown
         # We alert based on the series existing, thus it not existing is fine.
         # pint disable promql/series
+        # pint disable alerts/comparison
         expr: openstack_neutron_agent_state{adminState="down"}
         for: 1h
         labels:
