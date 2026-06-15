@@ -1,0 +1,24 @@
+# deploy-tag: ops
+# deploy-site: eqiad
+
+# Different file than neutron.yaml because we're targeting Prometheus 'ops' instance due to
+# node-exporter-level metrics.
+
+groups:
+  - name: neutron_conntrack
+    rules:
+      - alert: NeutronConntrackUsage
+        annotations:
+          description: 'Neutron network namespace conntrack table is {{ humanize $value}}% full on {{ $labels.hostname }} (namespace: {{ $labels.namespace }})'
+          summary: 'Elevated conntrack usage in neutron namespace {{ $labels.namespace }} on {{ $labels.hostname }}'
+          dashboard: 'https://grafana.wikimedia.org/d/wKnDJf97z/wmcs-neutron-eqiad1'
+          runbook: 'https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Troubleshooting#Networking_failures'
+        expr: |
+          neutron_netns_nf_conntrack_count
+            /
+          neutron_netns_nf_conntrack_max
+            * 100
+          >= 90
+        labels:
+          team: wmcs
+          severity: critical

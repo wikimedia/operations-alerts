@@ -1,0 +1,32 @@
+rule_files:
+  - neutron_conntrack.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    input_series:
+      - series: 'neutron_netns_nf_conntrack_count{hostname="cloudnet1001",namespace="qdhcp-1"}'
+        values: '50000x100'
+      - series: 'neutron_netns_nf_conntrack_max{hostname="cloudnet1001",namespace="qdhcp-1"}'
+        values: '262144x100'
+      - series: 'neutron_netns_nf_conntrack_count{hostname="cloudnet1002",namespace="qdhcp-2"}'
+        values: '220000x100'
+      - series: 'neutron_netns_nf_conntrack_max{hostname="cloudnet1002",namespace="qdhcp-2"}'
+        values: '262144x100'
+      - series: 'neutron_netns_nf_conntrack_count{hostname="cloudnet1003",namespace="qdhcp-3"}'
+        values: '245000x100'
+      - series: 'neutron_netns_nf_conntrack_max{hostname="cloudnet1003",namespace="qdhcp-3"}'
+        values: '262144x100'
+    alert_rule_test:
+      - alertname: NeutronConntrackUsage
+        eval_time: 1m
+        exp_alerts:
+          - exp_labels:
+              team: wmcs
+              severity: critical
+              hostname: cloudnet1003
+              namespace: qdhcp-3
+            exp_annotations:
+              description: 'Neutron network namespace conntrack table is 93.46% full on cloudnet1003 (namespace: qdhcp-3)'
+              summary: 'Elevated conntrack usage in neutron namespace qdhcp-3 on cloudnet1003'
+              dashboard: 'https://grafana.wikimedia.org/d/wKnDJf97z/wmcs-neutron-eqiad1'
+              runbook: 'https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Troubleshooting#Networking_failures'
