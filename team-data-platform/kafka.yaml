@@ -1,0 +1,24 @@
+# deploy-tag: analytics
+# deploy-site: eqiad
+
+groups:
+  - name: kafka
+    rules:
+    - alert: LargeKafkaPartitionSize
+      annotations:
+        description: Average topic partition size is above 50GB in {{ $labels.kafka_cluster }}/{{ $labels.topic }}
+        summary: Average topic partition size is above 50GB in {{ $labels.kafka_cluster }}/{{ $labels.topic }}
+        dashboard: https://grafana.wikimedia.org/d/000000234/kafka-by-topic?orgId=1&from=now-24h&to=now&timezone=utc&var-datasource=000000006&var-kafka_cluster={{ $labels.kafka_cluster }}&var-kafka_broker=%24__all&var-topic={{ $labels.topic }}
+        runbook: https://wikitech.wikimedia.org/wiki/Kafka/Administration#Increase_a_topic's_partition_count_to_keep_partition_size_under_a_threshold
+      # total partition sizes by topic divided by number of partitions per topic, in GB > 50
+      expr: |
+        sum(
+          avg(kafka_log_Size{kafka_cluster="jumbo-eqiad", topic!="webrequest_frontend_text"}) by (kafka_cluster, topic, partition)
+        ) by (kafka_cluster, topic)
+        / count(kafka_cluster_Partition_ReplicasCount{kafka_cluster="jumbo-eqiad"} > 0) by (kafka_cluster, topic)
+        / 1e9
+        > 50
+      for: 12h
+      labels:
+        severity: critical
+        team: data-platform
