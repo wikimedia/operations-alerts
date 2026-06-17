@@ -45,6 +45,9 @@ groups:
           dashboard: https://grafana.wikimedia.org/goto/8VXsGHdDR?orgId=1
 
       - alert: GerritHigh4xxRatio
+        # pint disable promql/series
+        # 4xx series can be absent during very quiet periods, so the live linter
+        # would otherwise flap on "series not found".
         # Alert if more than 5% of HTTP requests result in a 4xx status,
         # usually the sign of a scraper crawling Gerrit. The total request rate
         # guard (> 20 req/s) keeps low-traffic replicas, whose ratio is naturally
@@ -68,6 +71,9 @@ groups:
           dashboard: https://grafana.wikimedia.org/d/nX8li17Sk/gerrit-overview-sre-collab
 
       - alert: GerritHigh5xxRatio
+        # pint disable promql/series
+        # 5xx series are absent whenever there are no server errors, so the live
+        # linter would otherwise flap on "series not found".
         # Alert if more than 1% of HTTP requests result in a 5xx status. The
         # total request rate guard (> 20 req/s) keeps low-traffic replicas from
         # firing; only the active host sustains that volume.
