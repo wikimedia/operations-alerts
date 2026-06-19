@@ -57,10 +57,10 @@ groups:
             sum by (instance) (rate(apache_http_status_total{instance=~"gerrit.*", status=~"4.*"}[5m]))
             /
             sum by (instance) (rate(apache_http_status_total{instance=~"gerrit.*"}[5m]))
-          ) * 100 > 5
+          ) * 100 > 7.5
           and
           sum by (instance) (rate(apache_http_status_total{instance=~"gerrit.*"}[5m])) > 20
-        for: 10m
+        for: 15m
         labels:
           severity: warning
           team: collaboration-services
