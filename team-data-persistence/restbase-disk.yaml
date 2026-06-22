@@ -1,0 +1,31 @@
+# deploy-tag: ops
+# deploy-site: eqiad, codfw
+groups:
+  - name: restbase_disk
+    rules:
+      # warning at <30% free, critical at <20% free.
+      - alert: RestbaseInstanceDataLowDiskSpace
+        expr: |
+          1.0 - node_filesystem_avail_bytes{cluster="restbase", mountpoint="/srv/cassandra/instance-data"} / node_filesystem_size_bytes{cluster="restbase", mountpoint="/srv/cassandra/instance-data"} > 0.70
+        # wait for 10m because there are occasional spikes for cassandra compaction etc
+        for: 10m
+        labels:
+          severity: warning
+          team: data-persistence
+        annotations:
+          description: "Cassandra instance-data disk usage on {{ $labels.instance | stripPort }} is high: {{ $value | humanizePercentage }} used on {{ $labels.mountpoint }}"
+          summary: "RESTBase Cassandra instance-data free space is low on {{ $labels.instance | stripPort }}"
+          dashboard: 'https://grafana.wikimedia.org/d/000000377/host-overview?orgId=1&viewPanel=12&var-server={{ $labels.instance | stripPort }}'
+          runbook: 'https://wikitech.wikimedia.org/wiki/RESTBase#instance-data'
+      - alert: RestbaseInstanceDataLowDiskSpace
+        expr: |
+          1.0 - node_filesystem_avail_bytes{cluster="restbase", mountpoint="/srv/cassandra/instance-data"} / node_filesystem_size_bytes{cluster="restbase", mountpoint="/srv/cassandra/instance-data"} > 0.80
+        for: 10m
+        labels:
+          severity: critical
+          team: data-persistence
+        annotations:
+          description: "Cassandra instance-data disk usage on {{ $labels.instance | stripPort }} is critically high: {{ $value | humanizePercentage }} used on {{ $labels.mountpoint }}"
+          summary: "RESTBase Cassandra instance-data free space is critically low on {{ $labels.instance | stripPort }}"
+          dashboard: 'https://grafana.wikimedia.org/d/000000377/host-overview?orgId=1&viewPanel=12&var-server={{ $labels.instance | stripPort }}'
+          runbook: 'https://wikitech.wikimedia.org/wiki/RESTBase#instance-data'

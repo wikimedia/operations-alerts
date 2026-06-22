@@ -1,0 +1,37 @@
+rule_files:
+  - restbase-disk.yaml
+evaluation_interval: 1m
+tests:
+  # 85% used (<20% free) -> both warning and critical fire.
+  - interval: 1m
+    input_series:
+      - series: 'node_filesystem_avail_bytes{cluster="restbase", instance="restbase2024:9100", mountpoint="/srv/cassandra/instance-data"}'
+        values: '15+0x15'
+      - series: 'node_filesystem_size_bytes{cluster="restbase", instance="restbase2024:9100", mountpoint="/srv/cassandra/instance-data"}'
+        values: '100+0x15'
+    alert_rule_test:
+      - alertname: RestbaseInstanceDataLowDiskSpace
+        eval_time: 12m
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              team: data-persistence
+              cluster: restbase
+              instance: restbase2024:9100
+              mountpoint: /srv/cassandra/instance-data
+            exp_annotations:
+              description: "Cassandra instance-data disk usage on restbase2024 is high: 85% used on /srv/cassandra/instance-data"
+              summary: "RESTBase Cassandra instance-data free space is low on restbase2024"
+              dashboard: 'https://grafana.wikimedia.org/d/000000377/host-overview?orgId=1&viewPanel=12&var-server=restbase2024'
+              runbook: 'https://wikitech.wikimedia.org/wiki/RESTBase#instance-data'
+          - exp_labels:
+              severity: critical
+              team: data-persistence
+              cluster: restbase
+              instance: restbase2024:9100
+              mountpoint: /srv/cassandra/instance-data
+            exp_annotations:
+              description: "Cassandra instance-data disk usage on restbase2024 is critically high: 85% used on /srv/cassandra/instance-data"
+              summary: "RESTBase Cassandra instance-data free space is critically low on restbase2024"
+              dashboard: 'https://grafana.wikimedia.org/d/000000377/host-overview?orgId=1&viewPanel=12&var-server=restbase2024'
+              runbook: 'https://wikitech.wikimedia.org/wiki/RESTBase#instance-data'
