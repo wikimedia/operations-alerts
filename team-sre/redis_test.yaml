@@ -62,3 +62,97 @@ tests:
               summary: 'Redis replica down rdb1014:16378 redis_misc'
               dashboard: 'https://grafana.wikimedia.org/d/000000174/redis?orgId=1&var-site=eqiad&var-job=redis_misc&var-instance=rdb1014:16378'
               runbook: 'https://wikitech.wikimedia.org/wiki/Redis#Cluster_redis_misc'
+
+  # RedisInstanceDown: redis reachable by exporter but reporting down.
+  - interval: 1m
+    input_series:
+      - series: 'redis_up{instance="rdb1014:16378", job="redis_misc", site="eqiad"}'
+        values: '0x10'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: RedisInstanceDown
+        eval_time: 6m
+        exp_alerts:
+          - exp_labels:
+              team: sre
+              severity: critical
+              job: redis_misc
+              instance: rdb1014:16378
+              site: eqiad
+            exp_annotations:
+              description: 'The redis instance at rdb1014:16378 redis_misc is not responding'
+              summary: 'Redis instance down rdb1014:16378 redis_misc'
+              dashboard: 'https://grafana.wikimedia.org/d/000000174/redis?orgId=1&var-site=eqiad&var-job=redis_misc&var-instance=rdb1014:16378'
+              runbook: 'https://wikitech.wikimedia.org/wiki/Redis#Cluster_redis_misc'
+
+  # RedisInstanceDown: exporter itself unreachable
+  - interval: 1m
+    input_series:
+      - series: 'up{instance="rdb2012:16378", job="redis_misc", site="codfw"}'
+        values: '0x10'
+    external_labels:
+      site: codfw
+    alert_rule_test:
+      - alertname: RedisInstanceDown
+        eval_time: 6m
+        exp_alerts:
+          - exp_labels:
+              team: sre
+              severity: critical
+              job: redis_misc
+              instance: rdb2012:16378
+              site: codfw
+            exp_annotations:
+              description: 'The redis instance at rdb2012:16378 redis_misc is not responding'
+              summary: 'Redis instance down rdb2012:16378 redis_misc'
+              dashboard: 'https://grafana.wikimedia.org/d/000000174/redis?orgId=1&var-site=codfw&var-job=redis_misc&var-instance=rdb2012:16378'
+              runbook: 'https://wikitech.wikimedia.org/wiki/Redis#Cluster_redis_misc'
+
+  # Healthy, ie no RedisInstanceDown
+  - interval: 1m
+    input_series:
+      - series: 'redis_up{instance="rdb1014:16378", job="redis_misc", site="eqiad"}'
+        values: '1x10'
+      - series: 'up{instance="rdb1014:16378", job="redis_misc", site="eqiad"}'
+        values: '1x10'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: RedisInstanceDown
+        eval_time: 6m
+        exp_alerts: []
+
+  # RedisReplicationLag: 700s behind - fire a critical
+  - interval: 1m
+    input_series:
+      - series: 'redis_master_last_io_seconds_ago{instance="rdb1014:16378", job="redis_misc", site="eqiad"}'
+        values: '700x10'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: RedisReplicationLag
+        eval_time: 6m
+        exp_alerts:
+          - exp_labels:
+              team: sre
+              severity: critical
+              job: redis_misc
+              instance: rdb1014:16378
+              site: eqiad
+            exp_annotations:
+              description: 'The redis replica at rdb1014:16378 redis_misc is 11m 40s behind its master'
+              summary: 'Redis replication lag on rdb1014:16378 redis_misc'
+              dashboard: 'https://grafana.wikimedia.org/d/000000174/redis?orgId=1&var-site=eqiad&var-job=redis_misc&var-instance=rdb1014:16378'
+              runbook: 'https://wikitech.wikimedia.org/wiki/Redis#Cluster_redis_misc'
+          - exp_labels:
+              team: sre
+              severity: warning
+              job: redis_misc
+              instance: rdb1014:16378
+              site: eqiad
+            exp_annotations:
+              description: 'The redis replica at rdb1014:16378 redis_misc is 11m 40s behind its master'
+              summary: 'Redis replication lag on rdb1014:16378 redis_misc'
+              dashboard: 'https://grafana.wikimedia.org/d/000000174/redis?orgId=1&var-site=eqiad&var-job=redis_misc&var-instance=rdb1014:16378'
+              runbook: 'https://wikitech.wikimedia.org/wiki/Redis#Cluster_redis_misc'

@@ -27,3 +27,39 @@ groups:
         labels:
           severity: critical
           team: sre
+
+      - alert: RedisInstanceDown
+        annotations:
+          description: 'The redis instance at {{ $labels.instance }} {{ $labels.job }} is not responding'
+          summary: 'Redis instance down {{ $labels.instance }} {{ $labels.job }}'
+          dashboard: 'https://grafana.wikimedia.org/d/000000174/redis?orgId=1&var-site={{ $externalLabels.site }}&var-job={{ $labels.job }}&var-instance={{ $labels.instance }}'
+          runbook: 'https://wikitech.wikimedia.org/wiki/Redis#Cluster_{{ $labels.job }}'
+        expr: redis_up == 0 or up{job=~"redis.*"} == 0
+        for: 5m
+        labels:
+          severity: critical
+          team: sre
+
+      - alert: RedisReplicationLag
+        annotations:
+          description: 'The redis replica at {{ $labels.instance }} {{ $labels.job }} is {{ $value | humanizeDuration }} behind its master'
+          summary: 'Redis replication lag on {{ $labels.instance }} {{ $labels.job }}'
+          dashboard: 'https://grafana.wikimedia.org/d/000000174/redis?orgId=1&var-site={{ $externalLabels.site }}&var-job={{ $labels.job }}&var-instance={{ $labels.instance }}'
+          runbook: 'https://wikitech.wikimedia.org/wiki/Redis#Cluster_{{ $labels.job }}'
+        expr: redis_master_last_io_seconds_ago > 60
+        for: 5m
+        labels:
+          severity: warning
+          team: sre
+
+      - alert: RedisReplicationLag
+        annotations:
+          description: 'The redis replica at {{ $labels.instance }} {{ $labels.job }} is {{ $value | humanizeDuration }} behind its master'
+          summary: 'Redis replication lag on {{ $labels.instance }} {{ $labels.job }}'
+          dashboard: 'https://grafana.wikimedia.org/d/000000174/redis?orgId=1&var-site={{ $externalLabels.site }}&var-job={{ $labels.job }}&var-instance={{ $labels.instance }}'
+          runbook: 'https://wikitech.wikimedia.org/wiki/Redis#Cluster_{{ $labels.job }}'
+        expr: redis_master_last_io_seconds_ago > 600
+        for: 5m
+        labels:
+          severity: critical
+          team: sre
