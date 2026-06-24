@@ -1,0 +1,30 @@
+# deploy-tag: ops
+# deploy-site: eqiad,codfw
+
+groups:
+  - name: helmfile_admin_ng_pending_changes
+    rules:
+    - alert: HelmfileAdminNGPendingChangesDse
+      annotations:
+        description: 'Pending admin_ng changes on {{ $labels.exported_cluster }}'
+        summary: 'Pending admin_ng changes on {{ $labels.exported_cluster }}'
+        dashboard: "https://grafana.wikimedia.org/d/d15d3135-ff1c-4c6f-bebe-ee57b136df70/helmfile-admin-ng-pending-changes?orgId=1&var-kubernetes_cluster={{ $labels.exported_cluster }}"
+        runbook: "https://wikitech.wikimedia.org/wiki/Kubernetes/Add_a_new_service#Deploy_changes_to_helmfile.d%2Fadmin_ng"
+      expr: max by (exported_cluster) (helmfile_admin_ng_pending_changes{exported_cluster=~"dse-k8s-.*"}) > 0 <= 2
+      for: 1d
+      labels:
+        severity: warning
+        team: data-platform
+  - name: helmfile_dse_k8s_pending_changes
+    rules:
+    - alert: HelmfilePendingChangesDse
+      annotations:
+        description: 'Pending dse-k8s changes for {{ $labels.service }} on {{ $labels.exported_cluster }}'
+        summary: 'Pending dse-k8s changes for {{ $labels.service }} on {{ $labels.exported_cluster }}'
+        dashboard: 'https://grafana.wikimedia.org/d/UT4GtK3nz/helm-releases?orgId=1&from=now-6h&to=now&timezone=utc&var-datasource=000000026&var-site={{ $labels.exported_cluster | reReplaceAll "^.*-" "" }}&var-cluster=k8s-dse&var-namespace={{ $labels.service }}&var-status=%24__all'
+        runbook: "https://wikitech.wikimedia.org/wiki/Kubernetes/"
+      expr: max by (service, exported_cluster) (helmfile_dse_k8s_services_pending_changes) > 0 <= 2
+      for: 1d
+      labels:
+        severity: warning
+        team: data-platform

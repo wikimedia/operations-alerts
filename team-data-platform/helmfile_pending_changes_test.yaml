@@ -1,11 +1,11 @@
 rule_files:
-  - helmfile_admin_ng_pending_changes.yaml
+  - helmfile_pending_changes.yaml
 evaluation_interval: 1h
 tests:
   - interval: 1h
     input_series:
     - series: helmfile_admin_ng_pending_changes{exported_cluster="dse-k8s-eqiad"}
-      values: '1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1'
+      values: 1x25
     alert_rule_test:
     - alertname: HelmfileAdminNGPendingChangesDse
       eval_time: 1d
@@ -23,7 +23,7 @@ tests:
   - interval: 1h
     input_series:
     - series: helmfile_admin_ng_pending_changes{exported_cluster="dse-k8s-codfw"}
-      values: '1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1'
+      values: 1x25
     alert_rule_test:
     - alertname: HelmfileAdminNGPendingChangesDse
       eval_time: 1d
@@ -40,6 +40,25 @@ tests:
           team: data-platform
   - interval: 1h
     input_series:
-    - series: helmfile_admin_ng_pending_changes{exported_cluster="eqiad"}
-      values: '1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1'
+    - series: helmfile_dse_k8s_services_pending_changes{exported_cluster="eqiad"}
+      values: 1x25
     alert_rule_test: []
+  - interval: 1h
+    input_series:
+    - series: helmfile_dse_k8s_services_pending_changes{exported_cluster="dse-k8s-codfw", service="echoserver"}
+      values: 1x25
+    alert_rule_test:
+    - alertname: HelmfilePendingChangesDse
+      eval_time: 1d
+      exp_alerts:
+      - exp_annotations:
+          description: 'Pending dse-k8s changes for echoserver on dse-k8s-codfw'
+          summary: 'Pending dse-k8s changes for echoserver on dse-k8s-codfw'
+          dashboard: "https://grafana.wikimedia.org/d/UT4GtK3nz/helm-releases?orgId=1&from=now-6h&to=now&timezone=utc&var-datasource=000000026&var-site=codfw&var-cluster=k8s-dse&var-namespace=echoserver&var-status=%24__all"
+          runbook: "https://wikitech.wikimedia.org/wiki/Kubernetes/"
+        exp_labels:
+          alertname: HelmfilePendingChangesDse
+          service: echoserver
+          exported_cluster: dse-k8s-codfw
+          severity: warning
+          team: data-platform
