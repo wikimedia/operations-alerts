@@ -3,14 +3,14 @@ rule_files:
 evaluation_interval: 1m
 
 tests:
-  # Active host: ~100 req/s total (well above the 20 req/s guard), 10% 4xx and
+  # Active host: 100 req/s total (well above the 20 req/s guard), 15% 4xx and
   # 5% 5xx: both ratio alerts fire.
   - interval: 1m
     input_series:
       - series: 'apache_http_status_total{instance="gerrit2003:9117", status="200"}'
-        values: '0+5100x30'
+        values: '0+4800x30'
       - series: 'apache_http_status_total{instance="gerrit2003:9117", status="404"}'
-        values: '0+600x30'
+        values: '0+900x30'
       - series: 'apache_http_status_total{instance="gerrit2003:9117", status="500"}'
         values: '0+300x30'
     alert_rule_test:
@@ -23,7 +23,7 @@ tests:
               instance: gerrit2003:9117
             exp_annotations:
               summary: 'High rate of HTTP 4xx responses on gerrit2003 (probable scraper)'
-              description: 'More than 5% of HTTP requests to Gerrit on gerrit2003 returned a 4xx status over the last 10 minutes, this is usually caused by a scraper.'
+              description: 'More than 10% of HTTP requests to Gerrit on gerrit2003 returned a 4xx status over the last 10 minutes, this is usually caused by a scraper.'
               runbook: TODO
               dashboard: https://grafana.wikimedia.org/d/nX8li17Sk/gerrit-overview-sre-collab
       - alertname: GerritHigh5xxRatio
