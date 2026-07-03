@@ -18,10 +18,10 @@ groups:
 
       - alert: InterfaceSpeedError
         annotations:
-          description: '{{$labels.device}} on {{ $labels.instance }} has the wrong speed: {{$value}}.'
-          summary: '{{$labels.device}} on {{ $labels.instance }} has the wrong speed: {{$value}}.'
-          dashboard: https://grafana.wikimedia.org/d/000000562
-          runbook: https://wikitech.wikimedia.org/wiki/Monitoring/check_eth
+          summary: 'Interface {{$labels.device}} on {{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }} has the wrong speed'
+          description: 'Interface {{$labels.device}} is running at {{ $value | humanize }}B/s, expected at least 1Gb/s.'
+          dashboard: 'https://grafana.wikimedia.org/d/000000377/host-overview?orgId=1&var-server={{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}'
+          runbook: https://wikitech.wikimedia.org/wiki/Monitoring/check_eth#InterfaceSpeedError
         # ignore unknown values (0 or -1)
         # https://git.kernel.org/pub/scm/network/ethtool/ethtool.git/tree/netlink/settings.c?id=89e6096b8b0bb505f91200cd923da042cd21983e#n471
         # TODO: use --collector.netclass.ignore-invalid-speed when everything on bookworm

@@ -33,7 +33,7 @@ tests:
               operstate: up
               device: eno1
             exp_annotations:
-              description: 'eno1 on alerts1001:9100 has the wrong speed: 1.'
-              summary: 'eno1 on alerts1001:9100 has the wrong speed: 1.'
-              dashboard: https://grafana.wikimedia.org/d/000000562
-              runbook: https://wikitech.wikimedia.org/wiki/Monitoring/check_eth
+              summary: 'Interface eno1 on alerts1001 has the wrong speed'
+              description: 'Interface eno1 is running at 1B/s, expected at least 1Gb/s.'
+              dashboard: 'https://grafana.wikimedia.org/d/000000377/host-overview?orgId=1&var-server=alerts1001'
+              runbook: https://wikitech.wikimedia.org/wiki/Monitoring/check_eth#InterfaceSpeedError
