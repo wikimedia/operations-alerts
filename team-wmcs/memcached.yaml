@@ -1,0 +1,17 @@
+# deploy-tag: ops
+# deploy-site: eqiad, codfw
+
+groups:
+  - name: Memcached
+    rules:
+      - alert: MemcachedDown
+        annotations:
+          description: 'Memcached cannot be reached on {{ $labels.instance | stripPort }}'
+          summary: 'Memcached is down on {{ $labels.instance | stripPort }}'
+          dashboard: 'https://grafana.wikimedia.org/d/000000316/memcached?orgId=1&from=now-6h&to=now&timezone=utc&var-site={{ $externalLabels.site }}&var-cluster={{ $labels.cluster }}&var-instance={{ $labels.instance | stripPort }}'
+          runbook: TODO
+        expr: memcached_up{cluster="wmcs"} == 0
+        for: 1m
+        labels:
+          team: wmcs
+          severity: critical
