@@ -25,8 +25,10 @@ tests:
         remote_instance: incorrect_switch
         site: codfw
       exp_annotations:
-        description: "Kubernetes node wikikube-badbgp has a BGP session which is not in the 'established' state. The node will not be able to establish connectivity to its switch (incorrect_switch)."
-        summary: "Kubernetes node wikikube-badbgp has a BGP session which is not in the 'established' state."
+        description: >
+          Kubernetes node wikikube-badbgp has a BGP session which is not in the 'established' state. The node will not be able to establish connectivity to its switch (incorrect_switch).
+        summary: >
+          Kubernetes node wikikube-badbgp has a BGP session which is not in the 'established' state.
         runbook: https://wikitech.wikimedia.org/wiki/Kubernetes/Administration#NodeBGPSessionStatusNotEstablished
         dashboard: https://grafana.wikimedia.org/d/ed8da087-4bcb-407d-9596-d158b8145d45/bgp-neighbor-detail-by-network-device?orgId=1&from=now-30m&to=now&timezone=utc&var-site=codfw&var-device=incorrect_switch&var-bgp_group=Kubernetes4&var-bgp_neighbor=wikikube-badbgp&refresh=30s
 
