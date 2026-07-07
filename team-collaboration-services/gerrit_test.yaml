@@ -76,15 +76,19 @@ tests:
   - interval: 1m
     input_series:
       - series: 'node_filesystem_avail_bytes{instance="gerrit2003:9100", mountpoint="/"}'
-        # We lose 1 byte per minute and start with 6 hours of runway.
-        # The alert becomes true at 2h (4 hours remaining) and should fire after 10m.
-        values: '360-1x131'
+        # We lose 1 byte per minute on a 1000-byte filesystem, starting with
+        # 6 hours of runway. predict_linear projects exhaustion from 2h
+        # (4 hours remaining), the 20% fullness guard passes at 2h41m
+        # (199/1000 < 0.20) and the alert fires 10m later.
+        values: '360-1x240'
+      - series: 'node_filesystem_size_bytes{instance="gerrit2003:9100", mountpoint="/"}'
+        values: '1000x240'
     alert_rule_test:
       - alertname: GerritDiskSpaceExhaustionIncoming
-        eval_time: 2h9m
+        eval_time: 2h50m
         exp_alerts: []
       - alertname: GerritDiskSpaceExhaustionIncoming
-        eval_time: 2h10m
+        eval_time: 2h51m
         exp_alerts:
           - exp_labels:
               team: collaboration-services
@@ -93,6 +97,23 @@ tests:
               mountpoint: /
             exp_annotations:
               summary: 'Gerrit disk space runway on gerrit2003:/ is too low'
-              description: 'Gerrit disk space on gerrit2003 for / will be exhausted in less than 4 hours at the current growth rate.'
+              description: 'Gerrit disk space on gerrit2003 for / is below 20% and will be exhausted in less than 4 hours at the current growth rate.'
               runbook: https://wikitech.wikimedia.org/wiki/Gerrit/Operations#TODO
               dashboard: 'https://grafana.wikimedia.org/d/rYdddlPWk/node-exporter-collaboration-services?var-job=node&var-nodename=gerrit2003&var-node=gerrit2003%3A9100&refresh=1m'
+
+  # A one-off large write (e.g. a Java heap dump) steepens the slope enough
+  # for predict_linear to project exhaustion, but most of the disk is still
+  # free: the alert must not fire.
+  - interval: 1m
+    input_series:
+      - series: 'node_filesystem_avail_bytes{instance="gerrit2003:9100", mountpoint="/srv"}'
+        values: '800x60 500x120'
+      - series: 'node_filesystem_size_bytes{instance="gerrit2003:9100", mountpoint="/srv"}'
+        values: '1000x180'
+    alert_rule_test:
+      - alertname: GerritDiskSpaceExhaustionIncoming
+        eval_time: 1h20m
+        exp_alerts: []
+      - alertname: GerritDiskSpaceExhaustionIncoming
+        eval_time: 1h30m
+        exp_alerts: []
