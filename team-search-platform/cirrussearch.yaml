@@ -133,26 +133,3 @@ groups:
         description: "Disk space {{$labels.instance}}:{{$labels.mountpoint}} ({{$labels.fstype}})"
         dashboard: 'https://grafana.wikimedia.org/d/000000377/host-overview?orgId=1&viewPanel=12&var-server={{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}'
         runbook: https://wikitech.wikimedia.org/wiki/Monitoring/Disk_space
-
-    - alert: CirrusSearchBreakerTripped
-      expr: clamp_max(sum by (breaker, exported_cluster) (increase(elasticsearch_breakers_tripped{name=~"cirrussearch.*"}[1h])), 100) > 0
-      for: 5m
-      labels:
-        team: search-platform
-        severity: warning
-      annotations:
-        summary: 'OpenSearch breaker {{ $labels.breaker }} has tripped on {{ $labels.exported_cluster }} {{ $value }} times in past hour'
-        description: 'Warning alert that triggers if breaker only tripped a few times during an hour and then the condition went away'
-        runbook: 'https://wikitech.wikimedia.org/wiki/Search#Health/Activity_Monitoring'
-        dashboard: 'https://w.wiki/SEVN'
-    - alert: CirrusSearchBreakerTripped
-      expr: clamp_max(sum by (breaker, exported_cluster) (increase(elasticsearch_breakers_tripped{name=~"cirrussearch.*"}[3h])), 100) > 0
-      for: 3h
-      labels:
-        team: search-platform
-        severity: critical
-      annotations:
-        summary: 'OpenSearch breaker {{ $labels.breaker }} has tripped on {{ $labels.exported_cluster }} {{ $value }} times in past 3 hours'
-        description: 'Critical alert that triggers if breaker is continuosly tripping for more that 3 hours'
-        runbook: 'https://wikitech.wikimedia.org/wiki/Search#Health/Activity_Monitoring'
-        dashboard: 'https://w.wiki/SEVN'
