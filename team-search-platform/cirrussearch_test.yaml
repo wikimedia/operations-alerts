@@ -151,3 +151,51 @@ tests:
               description: "Check hot shards and consider banning the node to force shard reallocation"
               runbook: 'https://w.wiki/DTaY'
               dashboard: 'https://grafana.wikimedia.org/goto/aoZBw8pNR?orgId=1'
+
+  - interval: 1m
+    input_series:
+      - series: 'elasticsearch_breakers_tripped{breaker="parent", exported_cluster="production-search-codfw", name="cirrussearch2063-production-search-codfw"}'
+        values: '0 15x60'
+    alert_rule_test:
+      - alertname: CirrusSearchBreakerTripped
+        eval_time: 6m
+        exp_alerts:
+          - exp_labels:
+              breaker: parent
+              exported_cluster: production-search-codfw
+              team: search-platform
+              severity: warning
+            exp_annotations:
+              summary: "OpenSearch breaker parent has tripped on production-search-codfw 15 times in past hour"
+              description: "Warning alert that triggers if breaker only tripped a few times during an hour and then the condition went away"
+              runbook: 'https://wikitech.wikimedia.org/wiki/Search#Health/Activity_Monitoring'
+              dashboard: 'https://w.wiki/SEVN'
+
+  - interval: 1m
+    input_series:
+      - series: 'elasticsearch_breakers_tripped{breaker="parent", exported_cluster="production-search-codfw", name="cirrussearch2063-production-search-codfw"}'
+        values: '0+10x600'
+    alert_rule_test:
+      - alertname: CirrusSearchBreakerTripped
+        eval_time: 4h
+        exp_alerts:
+          - exp_labels:
+              breaker: parent
+              exported_cluster: production-search-codfw
+              team: search-platform
+              severity: critical
+            exp_annotations:
+              summary: "OpenSearch breaker parent has tripped on production-search-codfw 100 times in past 3 hours"
+              description: "Critical alert that triggers if breaker is continuosly tripping for more that 3 hours"
+              runbook: 'https://wikitech.wikimedia.org/wiki/Search#Health/Activity_Monitoring'
+              dashboard: 'https://w.wiki/SEVN'
+          - exp_labels:
+              breaker: parent
+              exported_cluster: production-search-codfw
+              team: search-platform
+              severity: warning
+            exp_annotations:
+              summary: "OpenSearch breaker parent has tripped on production-search-codfw 100 times in past hour"
+              description: "Warning alert that triggers if breaker only tripped a few times during an hour and then the condition went away"
+              runbook: 'https://wikitech.wikimedia.org/wiki/Search#Health/Activity_Monitoring'
+              dashboard: 'https://w.wiki/SEVN'
