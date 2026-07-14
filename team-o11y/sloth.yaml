@@ -1,0 +1,54 @@
+# deploy-tag: global
+
+groups:
+
+  - name: sloth
+    rules:
+
+      - alert: SlothSliErrorRatioRateAbsent
+        annotations:
+          summary: SLI error ratio rate is absent
+            ({{ $labels.sloth_service }} / {{ $labels.sloth_slo }})
+          description: At least one of the slo:sli_error:ratio_rate<window>
+            metric is missing for the SLO {{ $labels.sloth_id }}. This may
+            indicate that the SLO recording rules are not being evaluated or
+            that the underlying metrics are unavailable.
+          dashboard: "https://grafana.wikimedia.org/d/slot-pilot-slo-detail/sloth-slo-detail?var-sli_window=5m&var-service={{ $labels.sloth_service }}&var-slo={{ $labels.sloth_slo }}"
+          runbook: TODO
+        expr: |
+          sloth_slo_info
+            unless on(sloth_service, sloth_slo, revision)
+          (
+            count by (sloth_service, sloth_slo, revision) (
+              {__name__ =~ "slo:sli_error:ratio_rate(5m|30m|1h|6h)"}
+            ) >= 4
+          )
+        for: 36h
+        labels:
+          sloth_severity: page
+          severity: warning
+          team: o11y
+
+      - alert: SlothSliErrorRatioRateAbsent
+        annotations:
+          summary: SLI error ratio rate is absent
+            ({{ $labels.sloth_service }} / {{ $labels.sloth_slo }})
+          description: At least one of the slo:sli_error:ratio_rate<window>
+            metric is missing for the SLO {{ $labels.sloth_id }}. This may
+            indicate that the SLO recording rules are not being evaluated or
+            that the underlying metrics are unavailable.
+          dashboard: "https://grafana.wikimedia.org/d/slot-pilot-slo-detail/sloth-slo-detail?var-sli_window=2h&var-service={{ $labels.sloth_service }}&var-slo={{ $labels.sloth_slo }}"
+          runbook: TODO
+        expr: |
+          sloth_slo_info
+            unless on(sloth_service, sloth_slo, revision)
+          (
+            count by (sloth_service, sloth_slo, revision) (
+              {__name__ =~ "slo:sli_error:ratio_rate(2h|6h|1d|3d)"}
+            ) >= 4
+          )
+        for: 36h
+        labels:
+          sloth_severity: ticket
+          severity: warning
+          team: o11y

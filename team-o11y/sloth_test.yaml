@@ -1,0 +1,57 @@
+rule_files:
+  - sloth.yaml
+evaluation_interval: 1m
+tests:
+ - interval: 1m
+   input_series:
+    - series: sloth_slo_info{recorder="thanos-rule@main", revision="2", sloth_id="test-kitchen-combined-latency-success", sloth_mode="cli-gen-prom", sloth_objective="95", sloth_service="test-kitchen", sloth_slo="combined-latency-success", sloth_spec="prometheus/v1", sloth_version="c74a1a3"}
+      values: '1x2161'
+   alert_rule_test:
+    - alertname: SlothSliErrorRatioRateAbsent
+      eval_time: 2161m
+      exp_alerts:
+       - exp_labels:
+           severity: warning
+           sloth_severity: page
+           team: o11y
+           recorder: "thanos-rule@main"
+           revision: "2"
+           sloth_id: "test-kitchen-combined-latency-success"
+           sloth_mode: "cli-gen-prom"
+           sloth_objective: "95"
+           sloth_service: "test-kitchen"
+           sloth_slo: "combined-latency-success"
+           sloth_spec: "prometheus/v1"
+           sloth_version: "c74a1a3"
+         exp_annotations:
+           description: At least one of the slo:sli_error:ratio_rate<window>
+            metric is missing for the SLO test-kitchen-combined-latency-success.
+            This may indicate that the SLO recording rules are not being
+            evaluated or that the underlying metrics are unavailable.
+           summary: SLI error ratio rate is absent
+            (test-kitchen / combined-latency-success)
+           dashboard: "https://grafana.wikimedia.org/d/slot-pilot-slo-detail/sloth-slo-detail?var-sli_window=5m&var-service=test-kitchen&var-slo=combined-latency-success"
+           runbook: TODO
+
+       - exp_labels:
+           severity: warning
+           sloth_severity: ticket
+           team: o11y
+           recorder: "thanos-rule@main"
+           revision: "2"
+           sloth_id: "test-kitchen-combined-latency-success"
+           sloth_mode: "cli-gen-prom"
+           sloth_objective: "95"
+           sloth_service: "test-kitchen"
+           sloth_slo: "combined-latency-success"
+           sloth_spec: "prometheus/v1"
+           sloth_version: "c74a1a3"
+         exp_annotations:
+           description: At least one of the slo:sli_error:ratio_rate<window>
+            metric is missing for the SLO test-kitchen-combined-latency-success.
+            This may indicate that the SLO recording rules are not being
+            evaluated or that the underlying metrics are unavailable.
+           summary: SLI error ratio rate is absent
+            (test-kitchen / combined-latency-success)
+           dashboard: "https://grafana.wikimedia.org/d/slot-pilot-slo-detail/sloth-slo-detail?var-sli_window=2h&var-service=test-kitchen&var-slo=combined-latency-success"
+           runbook: TODO
