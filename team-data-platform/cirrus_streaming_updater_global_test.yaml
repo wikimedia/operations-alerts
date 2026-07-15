@@ -1,0 +1,21 @@
+rule_files:
+  - cirrus_streaming_updater_global.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    input_series:
+      - series: 'swift_account_stats_bytes_total{account="AUTH_search-update-pipeline"}'
+        values: 214748364801
+    alert_rule_test:
+      - alertname: CirrusStreamingUpdaterSpaceUsageTooHigh
+        eval_time: 1m
+        exp_alerts:
+          - exp_labels:
+              severity: task
+              team: data-platform
+              account: AUTH_search-update-pipeline
+            exp_annotations:
+              summary: "The Cirrus Streaming Updater is using more than 200GiB of storage"
+              description: "The containers owned by AUTH_search-update-pipeline are using 200Gi, this is more than expected."
+              runbook: https://wikitech.wikimedia.org/wiki/Wikidata_Query_Service/Streaming_Updater#Clean_up_object_storage
+              dashboard: https://grafana.wikimedia.org/d/jKqki4MSk/cirrus-streaming-updater
