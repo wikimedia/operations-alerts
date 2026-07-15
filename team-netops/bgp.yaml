@@ -56,8 +56,8 @@ groups:
           runbook: 'https://wikitech.wikimedia.org/wiki/Peering_management#Managing_down_sessions'
       - alert: RejectingBGPPrefixes
         expr: |
-          (gnmi_bgp_neighbor_prefixes_rejected{peer_group!~"(IX|Private-Peer|Transit|ibgp)[4|6]"} > 0) or 
-          (gnmi_bgp_neighbor_prefixes_received_pre_policy{peer_group!~"(IX|Private-Peer|Transit|ibgp)[4|6]"} - gnmi_bgp_neighbor_prefixes_received{peer_group!~"(IX|Private-Peer|Transit|ibgp)[4|6]"}) > 0
+          (gnmi_bgp_neighbor_prefixes_rejected{peer_group!~"(IX|Private-Peer|Transit)[4|6]"} > 0) or
+          (gnmi_bgp_neighbor_prefixes_received_pre_policy{peer_group!~"(IX|Private-Peer|Transit)[4|6]"} - gnmi_bgp_neighbor_prefixes_received{peer_group!~"(IX|Private-Peer|Transit)[4|6]"}) > 0
         for: 10m
         labels:
           team: sre
