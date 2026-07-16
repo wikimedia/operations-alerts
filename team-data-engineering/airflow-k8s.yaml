@@ -1,0 +1,53 @@
+# deploy-tag: k8s-dse
+# deploy-site: eqiad
+
+groups:
+  - name: airflow
+    rules:
+    - alert: AirflowDeploymentUnavailable
+      annotations:
+        description: '{{ $labels.deployment }}.{{ $labels.namespace }} is unavailable on dse-k8s-eqiad'
+        summary: '{{ $labels.deployment }}.{{ $labels.namespace }} is unavailable on dse-k8s-eqiad'
+        dashboard: "https://grafana.wikimedia.org/d/hyl18XgMk/kubernetes-container-details?orgId=1&var-datasource=eqiad%2Bprometheus/k8s-dse&var-namespace={{ $labels.namespace }}&var-container=All"
+        runbook: "https://wikitech.wikimedia.org/wiki/Data_Platform/Systems/Airflow/Kubernetes#Pods_are_not_running"
+      expr: max by (namespace, deployment) (kube_deployment_status_replicas_available{namespace="airflow-main", deployment=~"airflow-.*"}) < 1
+      for: 5m
+      labels:
+        severity: critical
+        team: data-engineering
+
+    - alert: AirflowDagBagEmpty
+      annotations:
+        description: 'DagBag is empty on {{ $labels.kubernetes_namespace }}.dse-k8s-eqiad'
+        summary: 'DagBag is empty on {{ $labels.kubernetes_namespace }}.dse-k8s-eqiad'
+        dashboard: "https://grafana.wikimedia.org/d/lFXqBGxWk/airflow-instance?&var-airflow_instance={{ $labels.kubernetes_namespace }}"
+        runbook: "https://wikitech.wikimedia.org/wiki/Data_Platform/Systems/Airflow/Kubernetes#An_instance_DAG_Bag_is_empty"
+      expr: airflow_dagbag_size{kubernetes_namespace="airflow-main"} == 0
+      for: 5m
+      labels:
+        severity: critical
+        team: data-engineering
+
+    - alert: AirflowNonHeartbeatingScheduler
+      annotations:
+        description: 'Airflow scheduler not heartbeating in {{ $labels.kubernetes_namespace }}.dse-k8s-eqiad'
+        summary: 'Airflow scheduler not heartbeating in {{ $labels.kubernetes_namespace }}.dse-k8s-eqiad'
+        dashboard: "https://grafana.wikimedia.org/d/lFXqBGxWk/airflow-instance?&var-airflow_instance={{ $labels.kubernetes_namespace }}"
+        runbook: "https://wikitech.wikimedia.org/wiki/Data_Platform/Systems/Airflow/Kubernetes#The_scheduler_is_not_heartbeating"
+      expr: changes(airflow_scheduler_heartbeat{kubernetes_namespace="airflow-main"}[5m]) < 1
+      for: 5m
+      labels:
+        severity: critical
+        team: data-engineering
+
+    - alert: AirflowElevatedSchedulerLoopTime
+      annotations:
+        description: 'Elevated airflow scheduler scheduler loop time in {{ $labels.kubernetes_namespace }}.dse-k8s-eqiad'
+        summary: 'Elevated airflow scheduler scheduler loop time in {{ $labels.kubernetes_namespace }}.dse-k8s-eqiad'
+        dashboard: "https://grafana.wikimedia.org/d/lFXqBGxWk/airflow-instance?&var-airflow_instance={{ $labels.kubernetes_namespace }}"
+        runbook: "https://wikitech.wikimedia.org/wiki/Data_Platform/Systems/Airflow/Kubernetes#The_scheduler_is_not_heartbeating"
+      expr: avg_over_time(airflow_scheduler_loop_duration{kubernetes_namespace="airflow-main"}[30m]) > 10000 # 10s
+      for: 5m
+      labels:
+        severity: critical
+        team: data-engineering
