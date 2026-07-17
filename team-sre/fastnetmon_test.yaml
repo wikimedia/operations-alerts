@@ -33,7 +33,7 @@ tests:
       eval_time: 20m
       exp_alerts:
        - exp_labels:
-           team: sre
+           team: infrastructure-foundations
            severity: critical
            path: /run/fastnetmon-actions
          exp_annotations:
