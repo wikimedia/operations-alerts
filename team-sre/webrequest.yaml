@@ -16,4 +16,4 @@ groups:
         for: 15m
         labels:
           severity: critical
-          team: sre
+          team: data-engineering

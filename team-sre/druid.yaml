@@ -16,7 +16,7 @@ groups:
       for: 5m
       labels:
         severity: critical
-        team: sre
+        team: data-engineering
 
     - alert: DruidWebrequestSampledNoEvents
       annotations:
@@ -28,4 +28,4 @@ groups:
       for: 5m
       labels:
         severity: warning
-        team: sre
+        team: data-engineering

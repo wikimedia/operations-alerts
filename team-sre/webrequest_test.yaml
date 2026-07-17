@@ -17,7 +17,7 @@ tests:
         exp_alerts:
           - exp_labels:
               severity: critical
-              team: sre
+              team: data-engineering
             exp_annotations:
               description: Webrequests are not ingested into Druid.
               summary: Webrequests are not ingested into Druid. Kafka read rate for topic webrequest_sampled is zero.
