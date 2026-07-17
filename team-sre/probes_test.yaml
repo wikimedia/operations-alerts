@@ -100,6 +100,10 @@ tests:
         values: '777600-60x6 604800-60x6'
       - series: 'probe_ssl_earliest_cert_expiry{job="probes/custom", instance="custom_service:443"}'
         values: '777600-60x6 604800-60x6'
+      - series: 'service_catalog_info{instance="service:443", team="sre"}'
+        values: '1+0x30'
+      - series: 'service_catalog_info{instance="custom_service:443", team="sre"}'
+        values: '1+0x30'
     external_labels:
       site: eqiad
     alert_rule_test:
