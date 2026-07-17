@@ -16,7 +16,7 @@ tests:
               cluster: liberica
               instance: lvs4008:9100
               severity: critical
-              team: sre
+              team: traffic
             exp_annotations:
               summary: "Liberica instance lvs4008:9100 control plane status doesn't match with forwarding plane status"
               description: "At least one service shows discrepancies between control plane and forwarding plane on lvs4008:9100"
@@ -44,7 +44,7 @@ tests:
              hostname: 'lvs4009'
              cluster: "liberica"
              severity: critical
-             team: sre
+             team: traffic
            exp_annotations:
              summary: "Liberica instance lvs4009 is running a stale configuration"
              description: "Liberica control plane daemon isn't using the latest configuration deployed by puppet on lvs4009"
@@ -64,7 +64,7 @@ tests:
               instance: 'lvs3008:3003'
               key: '/conftool/v1/pools/esams/ncredir/nginx'
               severity: critical
-              team: sre
+              team: traffic
             exp_annotations:
               summary: "Liberica instance lvs3008:3003 is experiencing etcd issues"
               description: "Liberica control plane daemon is failing to watch etcd key /conftool/v1/pools/esams/ncredir/nginx on lvs3008:3003"
@@ -84,7 +84,7 @@ tests:
               instance: 'lvs5005:3003'
               service: 'upload-httpslb6_443'
               severity: critical
-              team: sre
+              team: traffic
               site: eqsin
             exp_annotations:
               summary: "Liberica service upload-httpslb6_443 has 2 unhealthy realservers pooled on lvs5005:3003"

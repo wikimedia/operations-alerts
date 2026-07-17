@@ -16,7 +16,7 @@ tests:
         exp_alerts:
           - exp_labels:
               severity: warning
-              team: sre
+              team: traffic
               instance: aqs1010:0
               service: aqs_7232
             exp_annotations:

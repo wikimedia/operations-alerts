@@ -37,7 +37,7 @@ tests:
       eval_time: 10m
       exp_alerts:
        - exp_labels:
-           team: sre
+           team: traffic
            severity: critical
            type: tcp.timed_out
            country: US
@@ -58,7 +58,7 @@ tests:
       eval_time: 10m
       exp_alerts:
        - exp_labels:
-           team: sre
+           team: traffic
            severity: critical
          exp_annotations:
            description: 'The metric log_w3c_networkerror_type_doc_count has disappeared, NEL alerting will not work'
@@ -77,7 +77,7 @@ tests:
       eval_time: 10m
       exp_alerts:
        - exp_labels:
-           team: sre
+           team: traffic
            severity: critical
          exp_annotations:
            description: 'The metric log_w3c_networkerror_by_country_type_country_doc_count has disappeared, NEL alerting will not work'

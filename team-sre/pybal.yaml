@@ -29,7 +29,7 @@ groups:
           dashboard: TODO
         labels:
           severity: warning
-          team: sre
+          team: traffic
       - alert: PyBalBGPUnstable
         # pint disable promql/series
         expr: pybal_bgp_session_established != 1 and ignoring (local_asn, peer) pybal_bgp_enabled == 1

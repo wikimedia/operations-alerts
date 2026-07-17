@@ -12,7 +12,7 @@ groups:
         expr: liberica_cp_match_fp != 1
         for: 2m
         labels:
-          team: sre
+          team: traffic
           severity: critical
         annotations:
           summary: "Liberica instance {{ $labels.instance }} control plane status doesn't match with forwarding plane status"
@@ -30,7 +30,7 @@ groups:
           ) >= 3600
         for: 1m
         labels:
-          team: sre
+          team: traffic
           severity: critical
         annotations:
           summary: "Liberica instance {{ $labels.hostname }} is running a stale configuration"
@@ -45,7 +45,7 @@ groups:
 
         for: 1m
         labels:
-          team: sre
+          team: traffic
           severity: critical
         annotations:
           summary: "Liberica instance {{ $labels.instance }} is experiencing etcd issues"
@@ -57,7 +57,7 @@ groups:
           liberica_cp_unhealthy_pooled_realservers_total > 0
         for: 3m
         labels:
-          team: sre
+          team: traffic
           # TODO: bump to page
           severity: critical
         annotations:

@@ -35,7 +35,7 @@ groups:
      for: 5m
      labels:
        severity: critical
-       team: sre
+       team: traffic
 
    - alert: NELNotReported
      annotations:
@@ -47,7 +47,7 @@ groups:
      for: 1m
      labels:
        severity: critical
-       team: sre
+       team: traffic
 
    - alert: NELByCountryNotReported
      annotations:
@@ -59,4 +59,4 @@ groups:
      for: 1m
      labels:
        severity: critical
-       team: sre
+       team: traffic
