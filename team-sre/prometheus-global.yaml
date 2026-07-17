@@ -48,4 +48,4 @@ groups:
       for: 5m
       labels:
         severity: critical
-        team: sre
+        team: o11y

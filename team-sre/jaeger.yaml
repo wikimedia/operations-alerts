@@ -19,7 +19,7 @@ groups:
       for: 15m
       labels:
         severity: warning
-        team: sre
+        team: o11y
 
     - alert: JaegerQueryReqsFailing
       annotations:
@@ -36,4 +36,4 @@ groups:
       for: 15m
       labels:
         severity: warning
-        team: sre
+        team: o11y

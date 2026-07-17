@@ -14,7 +14,7 @@ tests:
         eval_time: 11m
         exp_alerts:
         - exp_labels:
-            team: sre
+            team: o11y
             severity: critical
             instance: 10.64.32.116:6443
             job: k8s-api

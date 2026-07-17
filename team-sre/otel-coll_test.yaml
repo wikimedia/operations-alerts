@@ -19,7 +19,7 @@ tests:
       exp_alerts:
        - exp_labels:
            processor: memory_limiter
-           team: sre
+           team: o11y
            severity: critical
          exp_annotations:
            summary: Some spans have been dropped by processor memory_limiter on foo
@@ -32,7 +32,7 @@ tests:
       exp_alerts:
        - exp_labels:
            receiver: otlp
-           team: sre
+           team: o11y
            severity: critical
          exp_annotations:
            summary: Some spans have been refused by receiver otlp on foo
@@ -45,7 +45,7 @@ tests:
       exp_alerts:
        - exp_labels:
            exporter: logging
-           team: sre
+           team: o11y
            severity: critical
          exp_annotations:
           summary: Some spans have been enqueued by exporter logging on foo

@@ -21,4 +21,4 @@ groups:
       for: 5m
       labels:
         severity: warning
-        team: sre
+        team: o11y

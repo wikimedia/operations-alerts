@@ -17,7 +17,7 @@ tests:
            site: eqiad
            prometheus: ops
            exporter: mysql
-           team: sre
+           team: o11y
            severity: warning
          exp_annotations:
            description: The exporter mysql for job mysql-misc running on ops@eqiad

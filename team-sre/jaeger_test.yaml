@@ -22,7 +22,7 @@ tests:
        - exp_labels:
            job: k8s-pods
            kubernetes_namespace: jaeger
-           team: sre
+           team: o11y
            severity: warning
            instance: 10.67.83.216:666
          exp_annotations:
@@ -37,7 +37,7 @@ tests:
        - exp_labels:
            job: k8s-pods
            kubernetes_namespace: jaeger
-           team: sre
+           team: o11y
            severity: warning
            instance: 10.67.83.247:666
            operation: find_trace_ids

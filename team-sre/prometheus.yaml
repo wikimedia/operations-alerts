@@ -19,13 +19,13 @@ groups:
       for: 5m
       labels:
         severity: warning
-        team: sre
+        team: o11y
 
     - <<: *job_unavailable
       expr: 0.5 >= sum by (job) (up{job!~"(netbox_device_statistics|rails)"}) / count by (job) (up)
       labels:
         severity: critical
-        team: sre
+        team: o11y
 
     - &lint_problem
       alert: AlertLintProblem

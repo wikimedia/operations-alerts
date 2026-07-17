@@ -12,7 +12,7 @@ groups:
         for: 5m
         labels:
           severity: critical
-          team: sre
+          team: o11y
         annotations:
           summary: Some spans have been dropped by processor {{ $labels.processor }} on {{ $externalLabels.prometheus }}
           description: Maybe collector has received non standard spans or it reached some limits
@@ -24,7 +24,7 @@ groups:
         for: 5m
         labels:
           severity: critical
-          team: sre
+          team: o11y
         annotations:
           summary: Some spans have been refused by receiver {{ $labels.receiver }} on {{ $externalLabels.prometheus }}
           description: Maybe collector has received non standard spans or it reached some limits
@@ -36,7 +36,7 @@ groups:
         for: 5m
         labels:
           severity: critical
-          team: sre
+          team: o11y
         annotations:
           summary: Some spans have been enqueued by exporter {{ $labels.exporter }} on {{ $externalLabels.prometheus }}
           description: Maybe used destination has a problem or used payload is not correct

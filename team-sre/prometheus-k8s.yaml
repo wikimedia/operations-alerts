@@ -10,7 +10,7 @@ groups:
       expr: up{job="k8s-api"} == 0
       for: 5m
       labels:
-        team: sre
+        team: o11y
         severity: critical
       annotations:
         description: "Prometheus has failed to scrape the k8s api. A restart might be needed."
