@@ -12,9 +12,9 @@ groups:
         team: search-platform
         severity: warning
       annotations:
-        summary: "Elasticsearch instance {{$labels.name}} is running the old gc excessively"
-        description: "Elasticsearch is out of memory and will have degraded latency"
-        runbook: https://wikitech.wikimedia.org/wiki/Search/Elasticsearch_Administration#Stuck_in_old_GC_hell
+        summary: "OpenSearch instance {{$labels.name}} is running the old gc excessively"
+        description: "OpenSearch is out of memory and will have degraded latency"
+        runbook: https://wikitech.wikimedia.org/wiki/Search/OpenSearch/Administration#Alerts/Dashboards
         dashboard: https://grafana.wikimedia.org/d/000000462/elasticsearch-memory
 
     - alert: CirrusSearchIndexTooOld
@@ -26,7 +26,7 @@ groups:
       annotations:
         summary: "{{$labels.index}} index in {{$labels.exported_cluster}} is ready for reindexing"
         description: "The reindexing process should be run to ensure multi-lingual analysis chain updates are applied"
-        runbook: TODO
+        runbook: https://wikitech.wikimedia.org/wiki/Search/OpenSearch/Administration#Alerts/Dashboards
         dashboard: TODO
 
     - alert: CirrusSearchJobQueueBacklogTooBig
@@ -45,7 +45,7 @@ groups:
       annotations:
         summary: 'CirrusSearch job topic {{$labels.topic}} is heavily backlogged with {{ $value | humanize }} messages'
         description: "CirrusSearch job backlog is too big"
-        runbook: TODO
+        runbook: https://wikitech.wikimedia.org/wiki/Search/OpenSearch/Administration#Alerts/Dashboards
         dashboard: 'https://grafana.wikimedia.org/d/CbmStnlGk/jobqueue-job?orgId=1&var-dc={{ $externalLabels.site }}%20prometheus/k8s&var-job={{ $labels.topic | reReplaceAll ".*[.]([^.]*$)" "${1}"}}'
 
     - alert: CirrusSearchUpdaterKafkaMessagesInTooLow
@@ -57,7 +57,7 @@ groups:
       annotations:
         summary: 'The summed message update rate of `(eqiad|codfw).cirrussearch.update_pipeline.update.v1` is too low'
         description: "Unexpectedly low Kafka topic message-in rate for the last 5 minutes"
-        runbook: TODO
+        runbook: https://wikitech.wikimedia.org/wiki/Search/OpenSearch/Administration#Alerts/Dashboards
         dashboard: 'https://grafana.wikimedia.org/d/000000234/kafka-by-topic?orgId=1&var-dc={{ $externalLabels.site }}%2520prometheus%252Fops&var-kafka_cluster=main-eqiad&var-kafka_broker=All&from=now-1h&to=now&refresh=5m&var-topic=codfw.cirrussearch.update_pipeline.update.v1&var-topic=eqiad.cirrussearch.update_pipeline.update.v1&viewPanel=6'
 
     - alert: CirrusSearchNodeIndexingNotIncreasing
@@ -67,9 +67,9 @@ groups:
         team: search-platform
         severity: warning
       annotations:
-        summary: "Elasticsearch instance {{$labels.name}} is not indexing"
-        description: "An Elasticsearch instance is not performing index work; find out why"
-        runbook: https://wikitech.wikimedia.org/wiki/Search/Elasticsearch_Administration#Indexing_hung_and_not_making_progress
+        summary: "OpenSearch instance {{$labels.name}} is not indexing"
+        description: "An OpenSearch instance is not performing index work; find out why"
+        runbook: https://wikitech.wikimedia.org/wiki/Search/OpenSearch/Administration#Alerts/Dashboards
         dashboard: 'https://grafana.wikimedia.org/d/JLK3I_siz/elasticsearch-indexing?orgId=1&from=now-3d&to=now&viewPanel=57'
 
     - alert: CirrusSearchTitleSuggestIndexTooOld
@@ -81,7 +81,7 @@ groups:
       annotations:
         summary: "Some search indices that power autocomplete have not been updated recently"
         description: "The daily build process for autocomplete indices is probably having issues and should be investigated."
-        runbook: https://wikitech.wikimedia.org/wiki/Search/Elasticsearch_Administration#CirrusSearch_titlesuggest_index_is_too_old
+        runbook: https://wikitech.wikimedia.org/wiki/Search/OpenSearch/Administration#Alerts/Dashboards
         dashboard: 'TODO'
 
     - alert: CirrusSearchThreadPoolRejectionsTooHigh
@@ -94,7 +94,7 @@ groups:
       annotations:
         summary: "{{ $labels.name }} is rejecting excessive amounts of queries due to a full thread pool"
         description: "Check hot shards and consider banning the node to force shard reallocation"
-        runbook: 'https://w.wiki/DTaY'
+        runbook: https://wikitech.wikimedia.org/wiki/Search/OpenSearch/Administration#Alerts/Dashboards
         dashboard: 'https://grafana.wikimedia.org/goto/aoZBw8pNR?orgId=1'
 
  # search platform hosts change critical and warning thresholds from the usual thresholds (team-sre/resources.yaml)
@@ -114,7 +114,7 @@ groups:
         summary: "Disk space {{$labels.instance}}:{{$labels.mountpoint}} {{ $value | humanizePercentage }} free"
         description: "Disk space {{$labels.instance}}:{{$labels.mountpoint}} ({{$labels.fstype}})"
         dashboard: 'https://grafana.wikimedia.org/d/000000377/host-overview?orgId=1&viewPanel=12&var-server={{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}'
-        runbook: https://wikitech.wikimedia.org/wiki/Monitoring/Disk_space
+        runbook: https://wikitech.wikimedia.org/wiki/Search/OpenSearch/Administration#Alerts/Dashboards
 
     - alert: DiskSpace
       expr: |
@@ -132,4 +132,4 @@ groups:
         summary: "Disk space {{$labels.instance}}:{{$labels.mountpoint}} {{ $value | humanizePercentage }} free"
         description: "Disk space {{$labels.instance}}:{{$labels.mountpoint}} ({{$labels.fstype}})"
         dashboard: 'https://grafana.wikimedia.org/d/000000377/host-overview?orgId=1&viewPanel=12&var-server={{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}'
-        runbook: https://wikitech.wikimedia.org/wiki/Monitoring/Disk_space
+        runbook: https://wikitech.wikimedia.org/wiki/Search/OpenSearch/Administration#Alerts/Dashboards
