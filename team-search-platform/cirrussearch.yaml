@@ -114,7 +114,7 @@ groups:
         summary: "Disk space {{$labels.instance}}:{{$labels.mountpoint}} {{ $value | humanizePercentage }} free"
         description: "Disk space {{$labels.instance}}:{{$labels.mountpoint}} ({{$labels.fstype}})"
         dashboard: 'https://grafana.wikimedia.org/d/000000377/host-overview?orgId=1&viewPanel=12&var-server={{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}'
-        runbook: https://wikitech.wikimedia.org/wiki/Search/OpenSearch/Administration#Alerts/Dashboards
+        runbook: https://wikitech.wikimedia.org/wiki/Monitoring/Disk_space
 
     - alert: DiskSpace
       expr: |
@@ -132,4 +132,90 @@ groups:
         summary: "Disk space {{$labels.instance}}:{{$labels.mountpoint}} {{ $value | humanizePercentage }} free"
         description: "Disk space {{$labels.instance}}:{{$labels.mountpoint}} ({{$labels.fstype}})"
         dashboard: 'https://grafana.wikimedia.org/d/000000377/host-overview?orgId=1&viewPanel=12&var-server={{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}'
+        runbook: https://wikitech.wikimedia.org/wiki/Monitoring/Disk_space
+
+    - alert: CirrusSearchAPIsUnreachable
+      annotations:
+        summary: OpenSearch API endpoint not reachable on instance {{ $labels.instance }}
+        description: OpenSearch API endpoint not reachable on instance {{ $labels.instance }}
+        dashboard:
+          "https://grafana.wikimedia.org/d/e7d7fa18-7bc3-4548-bb07-ef261a9d3b8b/opensearch-cluster-health\
+          ?var-cluster={{ $labels.exported_cluster }}"
         runbook: https://wikitech.wikimedia.org/wiki/Search/OpenSearch/Administration#Alerts/Dashboards
+      expr: >
+        (label_replace(
+          sum by (cluster, exported_cluster, instance) (
+            up{job="elasticsearch"}
+            * on (instance) group_left(exported_cluster)
+            max by (instance, exported_cluster) (
+              1 + last_over_time(elasticsearch_clusterinfo_version_info{exported_cluster=~"production-search-.*"}[1d])
+            )
+          )
+        , "nodename", "$1", "instance", "(.*):.*")
+        * on(cluster, nodename) group_left(team)
+        label_replace(
+          max by(cluster, instance, team) (
+            last_over_time(role_owner{cluster=~"elasticsearch|cloudelastic", team!="unknown"}[1d])
+          )
+        , "nodename", "$1", "instance", "(.*):.*"))
+         < 1
+      for: 5m
+      labels:
+        severity: warning
+
+    - &cirrussearch_cluster_health
+      alert: CirrusSearchClusterHealth
+      annotations:
+        summary: OpenSearch cluster health reported as {{ $labels.color }}
+        description: OpenSearch cluster health reported as {{ $labels.color }}
+        dashboard:
+          "https://grafana.wikimedia.org/d/e7d7fa18-7bc3-4548-bb07-ef261a9d3b8b/opensearch-cluster-health\
+          ?var-cluster={{ $labels.exported_cluster }}"
+        runbook: https://wikitech.wikimedia.org/wiki/Search/OpenSearch/Administration#Alerts/Dashboards
+      expr: >
+        max without (nodename) ( max (label_replace(elasticsearch_cluster_health_status{color="yellow", exported_cluster=~"production-search-.*"}, "nodename", "$1", "instance", "(.*):.*")) by (cluster, exported_cluster, nodename, color)
+        * on(cluster, nodename) group_left(team)
+        label_replace(role_owner{cluster=~"elasticsearch|cloudelastic", team!="unknown"}, "nodename", "$1", "instance", "(.*):.*"))
+        > 0
+      for: 12h
+      labels:
+        severity: warning
+
+    - <<: *cirrussearch_cluster_health
+      expr: >
+        max without (nodename) ( sum (label_replace(elasticsearch_cluster_health_status{color="red", exported_cluster=~"production-search-.*"}, "nodename", "$1", "instance", "(.*):.*")) by (cluster, exported_cluster, nodename, color)
+        * on(cluster, nodename) group_left(team)
+        label_replace(role_owner{cluster=~"elasticsearch|cloudelastic", team!="unknown"}, "nodename", "$1", "instance", "(.*):.*"))
+        > 0
+      for: 5m
+      labels:
+        severity: critical
+
+    - alert: CirrusSearchUnassignedOrInitializingShardsRatio
+      annotations:
+        summary: Unassigned+Initializing shards exceed the allowed ratio
+        description: Unassigned+Initializing shards exceed the allowed ratio
+        dashboard:
+          "https://grafana.wikimedia.org/d/e7d7fa18-7bc3-4548-bb07-ef261a9d3b8b/opensearch-cluster-health\
+          ?var-cluster={{ $labels.exported_cluster }}"
+        runbook: https://wikitech.wikimedia.org/wiki/Search/OpenSearch/Administration#Alerts/Dashboards
+      expr: >
+        (max by (cluster, exported_cluster, team)
+          (sum
+            (label_replace({__name__=~"elasticsearch_cluster_health_(unassigned|initializing)_shards", exported_cluster=~"production-search-.*"}, "nodename", "$1", "instance", "(.*):.*"))
+          by (cluster, exported_cluster, nodename)
+          * on(cluster, nodename) group_left(team)
+            label_replace(role_owner{cluster=~"elasticsearch|cloudelastic", team!="unknown"}, "nodename", "$1", "instance", "(.*):.*"))
+        /
+        max by (cluster, exported_cluster, team)
+          (sum
+            (label_replace({__name__=~"elasticsearch_cluster_health_(unassigned|initializing|active|relocating|active_primary|delayed_unassigned)_shards"}, "nodename", "$1", "instance", "(.*):.*"))
+          by (cluster, exported_cluster, nodename)
+          * on(cluster, nodename) group_left(team)
+            label_replace(role_owner{cluster=~"elasticsearch|cloudelastic", team!="unknown"}, "nodename", "$1", "instance", "(.*):.*"))
+        ) * 100
+        > 5
+      for: 12h
+      labels:
+        severity: critical
+
