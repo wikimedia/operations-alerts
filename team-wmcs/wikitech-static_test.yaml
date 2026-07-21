@@ -1,0 +1,48 @@
+rule_files:
+  - wikitech-static.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    input_series:
+      # time() will return eval_time in seconds, not UNIX epoch
+      # https://github.com/prometheus/prometheus/issues/4817#issuecomment-514765285
+      - series: 'wikitech_static_update_timestamp_seconds'
+        values: '0+0x9600'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: WikitechStaticStale
+        eval_time: 2d
+        exp_alerts: []
+      - alertname: WikitechStaticStale
+        eval_time: 5d
+        exp_alerts:
+          - exp_labels:
+              team: wmcs
+              severity: warning
+              service: wikitech
+            exp_annotations:
+              summary: 'Wikitech static content update is older than 3 days on eqiad'
+              description: 'The wikitech static content update timestamp is 5d 0h 0m 0s old. It should be updated at least every 3 days.'
+              dashboard: 'TODO'
+              runbook: https://wikitech.wikimedia.org/wiki/Wikitech-static#What_alerts_should_we_watch_out_for?
+  - interval: 1m
+    input_series: []
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: WikitechStaticScrapeMissing
+        eval_time: 23h
+        exp_alerts: []
+      - alertname: WikitechStaticScrapeMissing
+        eval_time: 25h
+        exp_alerts:
+          - exp_labels:
+              team: wmcs
+              severity: warning
+              service: wikitech
+            exp_annotations:
+              summary: 'Wikitech static scrape missing on eqiad'
+              description: 'The wikitech_static_update_timestamp_seconds metric is absent for more than 1 day. The service may be unreachable or stopped exposing metrics.'
+              dashboard: 'TODO'
+              runbook: https://wikitech.wikimedia.org/wiki/Wikitech-static#What_alerts_should_we_watch_out_for?

@@ -1,0 +1,32 @@
+# deploy-tag: ext
+# deploy-site: eqiad, codfw
+
+groups:
+  - name: wikitech_static
+    rules:
+      - alert: WikitechStaticStale
+        expr: time() - wikitech_static_update_timestamp_seconds > 3 * 24 * 3600
+        for: 1h
+        labels:
+          severity: warning
+          team: wmcs
+          service: wikitech
+        annotations:
+          summary: "Wikitech static content update is older than 3 days on {{ $externalLabels.site }}"
+          description: "The wikitech static content update timestamp is {{ $value | humanizeDuration }} old. It should be updated at least every 3 days."
+          dashboard: TODO
+          runbook: https://wikitech.wikimedia.org/wiki/Wikitech-static#What_alerts_should_we_watch_out_for?
+
+      - alert: WikitechStaticScrapeMissing
+        expr: |
+          absent(wikitech_static_update_timestamp_seconds)
+        for: 24h
+        labels:
+          severity: warning
+          team: wmcs
+          service: wikitech
+        annotations:
+          summary: "Wikitech static scrape missing on {{ $externalLabels.site }}"
+          description: "The wikitech_static_update_timestamp_seconds metric is absent for more than 1 day. The service may be unreachable or stopped exposing metrics."
+          dashboard: TODO
+          runbook: https://wikitech.wikimedia.org/wiki/Wikitech-static#What_alerts_should_we_watch_out_for?
