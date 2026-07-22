@@ -1,6 +1,6 @@
 # deploy-tag: k8s
 groups:
-  - name: api-gateway
+  - name: rest-gateway
     rules:
       - alert: RESTGatewayBackendErrorsHigh
         annotations:
