@@ -126,7 +126,11 @@ tests:
 
   - interval: 1m
     input_series:
-      - series: 'flink_taskmanager_job_task_operator_bulk_change_type_result_actions{app="flink-app-consumer-cloudelastic"}'
+      - series: 'flink_taskmanager_job_task_operator_bulk_change_type_result_actions{app="flink-app-consumer-cloudelastic", release="consumer-cloudelastic"}'
+        values: 0 0 0 0 0 0 0 0 0 0 0 0
+      # backfill jobs run at whatever rate their batch produces; a low
+      # rate must not alert
+      - series: 'flink_taskmanager_job_task_operator_bulk_change_type_result_actions{app="flink-app-consumer-cloudelastic-backfill", release="consumer-cloudelastic-backfill"}'
         values: 0 0 0 0 0 0 0 0 0 0 0 0
     alert_rule_test:
       - alertname: CirrusStreamingUpdaterRateTooLow
