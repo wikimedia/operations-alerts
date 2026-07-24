@@ -14,6 +14,10 @@ tests:
         values: '34359738368x100'
       - series: 'remote_instance:gnmi_bgp_neighbor_session_state{instance="ganeti2033:0", peer_group="Ganeti4", remote_instance="lsw1-b7-codfw:9804", site="codfw"}'
         values: '1 1'
+      - series: 'remote_instance:gnmi_bgp_neighbor_prefixes_received_pre_policy{instance="ganeti2033:0", peer_group="Ganeti4", remote_instance="lsw1-b7-codfw:9804", site="codfw"}'
+        values: '0 0'
+      - series: 'node_network_carrier{cluster="ganeti", device="tap0", instance="ganeti2033:9100", job="node", site="ulsfo"}'
+        values: '1 1'
       - series: 'ganeti_ca_cert_expiry{cluster="ganeti", instance="ganeti1003:9100", job="node", prometheus="ops", site="eqiad", clustername="ganeti01.codfw.wmnet"}'
         values: '7689600x100' # 89 days remaining on certificate.
       - series: 'ganeti_ca_cert_expiry{cluster="ganeti", instance="ganeti1004:9100", job="node", prometheus="ops", site="eqiad", clustername="ganeti01.codfw.wmnet"}'
@@ -64,6 +68,22 @@ tests:
               description: ""
               dashboard: 'https://grafana.wikimedia.org/d/ed8da087-4bcb-407d-9596-d158b8145d45/bgp-neighbors-detail?orgId=1&var-site=codfw&var-device=lsw1-b7-codfw:9804&var-bgp_group=Ganeti4&var-bgp_neighbor=ganeti2033'
               runbook: 'https://wikitech.wikimedia.org/wiki/Ganeti#GanetiBGPDown'
+      - alertname: GanetiBGPNoInPrefixes
+        eval_time: 2m
+        exp_alerts:
+          - exp_labels:
+              peer_group: Ganeti4
+              instance: ganeti2033:0
+              remote_instance: lsw1-b7-codfw:9804
+              team: sre
+              severity: critical
+              scope: network
+              site: codfw
+            exp_annotations:
+              summary: "ganeti2033 is not sending any prefix to lsw1-b7-codfw - group Ganeti4"
+              description: ""
+              dashboard: 'https://grafana.wikimedia.org/d/ed8da087-4bcb-407d-9596-d158b8145d45/bgp-neighbors-detail?orgId=1&var-site=codfw&var-device=lsw1-b7-codfw:9804&var-bgp_group=Ganeti4&var-bgp_neighbor=ganeti2033'
+              runbook: 'https://wikitech.wikimedia.org/wiki/Ganeti#GanetiBGPNoInPrefixes'
       - alertname: GanetiCACertificateAboutToExpire
         eval_time: 15m
         exp_alerts:

@@ -22,7 +22,7 @@ groups:
           team: 'infrastructure-foundations'
 
       - alert: GanetiBGPDown
-        # To be removed once we have Routed Ganeti running in all the sites
+        # To be removed once we have Routed Ganeti running in all the sites (eqiad/drmrs are left so far)
         # pint disable promql/series
         expr: remote_instance:gnmi_bgp_neighbor_session_state{instance=~"ganeti.*"} < 6
         for: 2m
@@ -35,6 +35,36 @@ groups:
           description: ''  # Not needed
           dashboard: 'https://grafana.wikimedia.org/d/ed8da087-4bcb-407d-9596-d158b8145d45/bgp-neighbors-detail?orgId=1&var-site={{ $labels.site }}&var-device={{ $labels.remote_instance }}&var-bgp_group={{ $labels.peer_group }}&var-bgp_neighbor={{ $labels.instance | stripPort }}'
           runbook: 'https://wikitech.wikimedia.org/wiki/Ganeti#GanetiBGPDown'
+
+        # alert only if there are VMs on the host (based on the number of "tap" interfaces)
+        # re-label node_network_carrier instance to match the :0 of the "remote_instance" host lavel
+      - alert: GanetiBGPNoInPrefixes
+        # To be removed once we have Routed Ganeti running in all the sites (eqiad/drmrs are left so far)
+        # pint disable promql/series
+        expr: |
+          (
+            remote_instance:gnmi_bgp_neighbor_prefixes_received_pre_policy{instance=~"ganeti.*"} == 0
+          )
+          and on(instance)
+          (
+            count by (instance) (
+              label_replace(
+                node_network_carrier{instance=~"ganeti.*", device=~"tap.*"},
+                "instance", "${1}:0", "instance", "([^:]+):.*"
+              )
+            ) > 0
+          )
+
+        for: 2m
+        labels:
+          team: sre
+          severity: critical
+          scope: network
+        annotations:
+          summary: '{{ $labels.instance | stripPort }} is not sending any prefix to {{ $labels.remote_instance | stripPort }} - group {{ $labels.peer_group }}'
+          description: ''  # Not needed
+          dashboard: 'https://grafana.wikimedia.org/d/ed8da087-4bcb-407d-9596-d158b8145d45/bgp-neighbors-detail?orgId=1&var-site={{ $labels.site }}&var-device={{ $labels.remote_instance }}&var-bgp_group={{ $labels.peer_group }}&var-bgp_neighbor={{ $labels.instance | stripPort }}'
+          runbook: 'https://wikitech.wikimedia.org/wiki/Ganeti#GanetiBGPNoInPrefixes'
 
       - &ganeti_ca_cert_about_to_expire
         alert: GanetiCACertificateAboutToExpire
