@@ -1,0 +1,100 @@
+rule_files:
+  - airflow-k8s.yaml
+tests:
+
+  - input_series:
+    - series: kube_deployment_status_replicas_available{deployment="airflow-webserver", namespace="airflow-main"}
+      values: '0x5'
+    - series: kube_deployment_status_replicas_available{deployment="airflow-scheduler", namespace="airflow-main"}
+      values: '1x5'
+    - series: kube_deployment_status_replicas_available{deployment="airflow-kerberos", namespace="airflow-main"}
+      values: '1x5'
+    alert_rule_test:
+    - alertname: AirflowDeploymentUnavailable
+      eval_time: 5m
+      exp_alerts:
+      - exp_annotations:
+          description: airflow-webserver.airflow-main is unavailable on dse-k8s-eqiad
+          summary: 'airflow-webserver.airflow-main is unavailable on dse-k8s-eqiad #page'
+          dashboard: "https://grafana.wikimedia.org/d/hyl18XgMk/kubernetes-container-details?orgId=1&var-datasource=eqiad%2Bprometheus/k8s-dse&var-namespace=airflow-main&var-container=All"
+          runbook: "https://wikitech.wikimedia.org/wiki/Data_Platform/Systems/Airflow/Kubernetes#Pods_are_not_running"
+        exp_labels:
+          namespace: airflow-main
+          deployment: airflow-webserver
+          severity: page
+          team: data-engineering
+
+  - input_series:
+    - series: airflow_dagbag_size{kubernetes_namespace="airflow-main"}
+      values: '0x5'
+    alert_rule_test:
+    - alertname: AirflowDagBagEmpty
+      eval_time: 5m
+      exp_alerts:
+      - exp_annotations:
+          description: DagBag is empty on airflow-main.dse-k8s-eqiad
+          summary: 'DagBag is empty on airflow-main.dse-k8s-eqiad #page'
+          dashboard: "https://grafana.wikimedia.org/d/lFXqBGxWk/airflow-instance?&var-airflow_instance=airflow-main"
+          runbook: "https://wikitech.wikimedia.org/wiki/Data_Platform/Systems/Airflow/Kubernetes#An_instance_DAG_Bag_is_empty"
+        exp_labels:
+          kubernetes_namespace: airflow-main
+          severity: page
+          team: data-engineering
+
+  - name: heartbeating_scheduler_no_alert_expected
+    interval: 1m
+    input_series:
+    - series: airflow_scheduler_heartbeat{kubernetes_namespace="airflow-main"}
+      values: '1000 2000 3000 4000 5000'
+    alert_rule_test:
+    - alertname: AirflowNonHeartbeatingScheduler
+      eval_time: 5m
+      exp_alerts: []
+
+  - name: non_heartbeating_scheduler_alert_expected
+    interval: 1m
+    input_series:
+    - series: airflow_scheduler_heartbeat{kubernetes_namespace="airflow-main"}
+      values: '1000x5'
+    alert_rule_test:
+    - alertname: AirflowNonHeartbeatingScheduler
+      eval_time: 5m
+      exp_alerts:
+      - exp_annotations:
+          description: Airflow scheduler not heartbeating in airflow-main.dse-k8s-eqiad
+          summary: 'Airflow scheduler not heartbeating in airflow-main.dse-k8s-eqiad #page'
+          dashboard: "https://grafana.wikimedia.org/d/lFXqBGxWk/airflow-instance?&var-airflow_instance=airflow-main"
+          runbook: "https://wikitech.wikimedia.org/wiki/Data_Platform/Systems/Airflow/Kubernetes#The_scheduler_is_not_heartbeating"
+        exp_labels:
+          kubernetes_namespace: airflow-main
+          severity: page
+          team: data-engineering
+
+  - name: low_scheduler_loop_duration_no_alert_expected
+    interval: 1m
+    input_series:
+    - series: airflow_scheduler_loop_duration{kubernetes_namespace="airflow-main"}
+      values: '100x35'
+    alert_rule_test:
+    - alertname: AirflowElevatedSchedulerLoopTime
+      eval_time: 30m
+      exp_alerts: []
+
+  - name: high_scheduler_loop_duration_alert_expected
+    interval: 1m
+    input_series:
+    - series: airflow_scheduler_loop_duration{kubernetes_namespace="airflow-main"}
+      values: '20000x35'
+    alert_rule_test:
+    - alertname: AirflowElevatedSchedulerLoopTime
+      eval_time: 30m
+      exp_alerts:
+      - exp_annotations:
+          description: Elevated airflow scheduler loop time in airflow-main.dse-k8s-eqiad
+          summary: 'Elevated airflow scheduler loop time in airflow-main.dse-k8s-eqiad #page'
+          dashboard: "https://grafana.wikimedia.org/d/lFXqBGxWk/airflow-instance?&var-airflow_instance=airflow-main"
+          runbook: "https://wikitech.wikimedia.org/wiki/Data_Platform/Systems/Airflow/Kubernetes#I'm_getting_paged"
+        exp_labels:
+          kubernetes_namespace: airflow-main
+          severity: page
+          team: data-engineering
