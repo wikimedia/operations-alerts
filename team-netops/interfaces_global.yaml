@@ -1,0 +1,26 @@
+# deploy-tag: global
+
+groups:
+  - name: interfaces_global
+    rules:
+      - alert: TransportLinksInUsageNoRedundancy
+        expr: |
+            (
+              sum by (site) (
+                irate(gnmi_interfaces_interface_state_counters_in_octets{site!~"(eqiad|codfw)",interface_description=~"Transport.*", subinterface_index=""}[5m])
+              )
+              /
+              (
+                min by (site) (gnmi_interfaces_interface_state_high_speed{site!~"(eqiad|codfw)",interface_description=~"Transport.*"}/8*1000000)
+              )
+            ) > 0.9
+        for: 30m
+        labels:
+          team: sre
+          severity: critical
+          scope: network
+        annotations:
+          summary: '{{ $labels.site }} inbound transports link usage is at redundancy capacity'
+          description: 'The sum of all the inbound transport traffic for {{ $labels.site }} is at 90% of the smaller transport link. When the redundant link goes down, the remaining one will saturate.'
+          dashboard: 'https://grafana.wikimedia.org/d/c4eb2910-ee2b-459b-8df6-369803085a1b/bandwidth-site-totals?var-site={{ $labels.site }}'
+          runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#TransportLinksInUsageNoRedundancy'

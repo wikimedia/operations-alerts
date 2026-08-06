@@ -1,0 +1,26 @@
+rule_files:
+  - interfaces_global.yaml
+evaluation_interval: 2m
+tests:
+  - interval: 2m
+    external_labels:
+      site: ulsfo
+    input_series:
+      - series: 'gnmi_interfaces_interface_state_high_speed{instance="cr2-ulsfo:9804", interface_description="Transport: Mock transport 1", interface_name="et-0/0/0", site="ulsfo"}'
+        values: '10000x35'  # 20G interface
+      - series: 'gnmi_interfaces_interface_state_counters_in_octets{instance="cr3-ulsfo:9804", interface_description="Transport: Mock transport 2", interface_name="et-0/0/0", subinterface_index="", site="ulsfo"}'
+        values: '0+144000000000x35' # 1 200 000 000 * 2 * 60
+    alert_rule_test:
+      - alertname: TransportLinksInUsageNoRedundancy
+        eval_time: 35m
+        exp_alerts:
+          - exp_labels:
+              site: ulsfo
+              team: sre
+              severity: critical
+              scope: network
+            exp_annotations:
+              summary: "ulsfo inbound transports link usage is at redundancy capacity"
+              description: "The sum of all the inbound transport traffic for ulsfo is at 90% of the smaller transport link. When the redundant link goes down, the remaining one will saturate."
+              dashboard: 'https://grafana.wikimedia.org/d/c4eb2910-ee2b-459b-8df6-369803085a1b/bandwidth-site-totals?var-site=ulsfo'
+              runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#TransportLinksInUsageNoRedundancy'
