@@ -58,3 +58,54 @@ groups:
       description: "The trusted gitlab-runner {{ $labels.description }}, ID {{ $labels.description }} is missing a config"
       dashboard: https://grafana.wikimedia.org/d/Chb-gC07k/gitlab-ci-overview
       runbook: https://wikitech.wikimedia.org/wiki/GitLab/Runbook#GitLabRunnerTrustedConfigMissing
+  # The three staleness alerts below consume the metrics pushed by
+  # gitlab-backup.sh (primary) and gitlab-restore.sh (replicas) to the
+  # pushgateway. They only advance on success, so their age is the time since
+  # the last successful run. The pushgateway only exists in one core site,
+  # hence the pint disable: the series are absent from the other site.
+  - alert: GitLabBackupStale
+    # max() keeps this immune to leftover pushgateway groups from hosts that
+    # no longer take backups (e.g. an ex-primary after a failover).
+    # pint disable promql/series
+    expr: time() - max(gitlab_backup_last_run{type="full"}) > 30 * 3600
+    labels:
+      severity: task
+      team: collaboration-services
+    annotations:
+      summary: "GitLab - no successful full backup in the last 30h"
+      description: "The most recent successful GitLab full backup is more than 30 hours old, check the full-backup timer on the primary."
+      dashboard: https://grafana.wikimedia.org/d/R_1IvBZnz/gitlab-omnibus-overview
+      runbook: https://wikitech.wikimedia.org/wiki/GitLab/Backup_and_Restore
+  - alert: GitLabRestoreStale
+    # Restores run daily at 01:30 on the replicas. The host filter excludes the
+    # frozen series of the legacy job-level pushgateway groups (pre host-grouping
+    # pushes), which linger until the next pushgateway restart. After a failover,
+    # delete the ex-replica's frozen group to silence this alert (or wait for a
+    # pushgateway restart, it has no persistence):
+    # curl -X DELETE http://prometheus-pushgateway.discovery.wmnet/metrics/job/gitlab_restore/host/<host>
+    # pint disable promql/series
+    expr: time() - gitlab_restore_last_run{host=~".+"} > 30 * 3600
+    labels:
+      severity: task
+      team: collaboration-services
+    annotations:
+      summary: "GitLab - replica {{ $labels.instance }} has not completed a restore in 30h"
+      description: "The gitlab-backup-restore timer on {{ $labels.instance }} has not reported a successful restore for more than 30 hours."
+      dashboard: https://grafana.wikimedia.org/d/R_1IvBZnz/gitlab-omnibus-overview
+      runbook: https://wikitech.wikimedia.org/wiki/GitLab/Backup_and_Restore
+  - alert: GitLabReplicaDataStale
+    # Age of the backup the replica last restored: covers the whole
+    # backup -> rsync -> restore chain, including an rsync that silently stops
+    # transferring fresh backups while restores keep succeeding on an old tar.
+    # 54h = two daily cycles + slack, so one slow backup night does not flap.
+    # The host filter excludes the frozen legacy job-level groups, see above.
+    # pint disable promql/series
+    expr: time() - gitlab_restore_backup_created{host=~".+"} > 54 * 3600
+    labels:
+      severity: task
+      team: collaboration-services
+    annotations:
+      summary: "GitLab - replica {{ $labels.instance }} serves data older than 54h"
+      description: "The backup last restored on {{ $labels.instance }} was created more than 54 hours ago, the backup, rsync or restore chain is stale."
+      dashboard: https://grafana.wikimedia.org/d/R_1IvBZnz/gitlab-omnibus-overview
+      runbook: https://wikitech.wikimedia.org/wiki/GitLab/Backup_and_Restore

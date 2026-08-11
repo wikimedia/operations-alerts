@@ -1,0 +1,97 @@
+rule_files:
+  - gitlab.yaml
+evaluation_interval: 1m
+
+tests:
+  # Backup pushed once at t=0 and never again: stale at 31h, fine at 20h.
+  - interval: 1m
+    input_series:
+      - series: 'gitlab_backup_last_run{host="gitlab1004", instance="gitlab1004:0", type="full"}'
+        values: '0x1900'
+    alert_rule_test:
+      - alertname: GitLabBackupStale
+        eval_time: 20h
+        exp_alerts: []
+      - alertname: GitLabBackupStale
+        eval_time: 31h
+        exp_alerts:
+          - exp_labels:
+              team: collaboration-services
+              severity: task
+            exp_annotations:
+              summary: 'GitLab - no successful full backup in the last 30h'
+              description: 'The most recent successful GitLab full backup is more than 30 hours old, check the full-backup timer on the primary.'
+              dashboard: https://grafana.wikimedia.org/d/R_1IvBZnz/gitlab-omnibus-overview
+              runbook: https://wikitech.wikimedia.org/wiki/GitLab/Backup_and_Restore
+
+  # rsync (or backup creation) silently broken: the replica keeps restoring
+  # successfully (last_run tracks now) but always from the same old tar
+  # (backup_created frozen at t=0). Only the data staleness alert fires.
+  - interval: 1m
+    input_series:
+      - series: 'gitlab_restore_last_run{host="gitlab1003", instance="gitlab1003:0", type="restore"}'
+        values: '0+60x3310'
+      - series: 'gitlab_restore_backup_created{host="gitlab1003", instance="gitlab1003:0", type="restore"}'
+        values: '0x3310'
+    alert_rule_test:
+      - alertname: GitLabRestoreStale
+        eval_time: 55h
+        exp_alerts: []
+      - alertname: GitLabReplicaDataStale
+        eval_time: 50h
+        exp_alerts: []
+      - alertname: GitLabReplicaDataStale
+        eval_time: 55h
+        exp_alerts:
+          - exp_labels:
+              team: collaboration-services
+              severity: task
+              host: gitlab1003
+              instance: 'gitlab1003:0'
+              type: restore
+            exp_annotations:
+              summary: 'GitLab - replica gitlab1003:0 serves data older than 54h'
+              description: 'The backup last restored on gitlab1003:0 was created more than 54 hours ago, the backup, rsync or restore chain is stale.'
+              dashboard: https://grafana.wikimedia.org/d/R_1IvBZnz/gitlab-omnibus-overview
+              runbook: https://wikitech.wikimedia.org/wiki/GitLab/Backup_and_Restore
+
+  # Restore stopped running on one replica: its last_run froze at t=0.
+  - interval: 1m
+    input_series:
+      - series: 'gitlab_restore_last_run{host="gitlab2002", instance="gitlab2002:0", type="restore"}'
+        values: '0x1900'
+    alert_rule_test:
+      - alertname: GitLabRestoreStale
+        eval_time: 20h
+        exp_alerts: []
+      - alertname: GitLabRestoreStale
+        eval_time: 31h
+        exp_alerts:
+          - exp_labels:
+              team: collaboration-services
+              severity: task
+              host: gitlab2002
+              instance: 'gitlab2002:0'
+              type: restore
+            exp_annotations:
+              summary: 'GitLab - replica gitlab2002:0 has not completed a restore in 30h'
+              description: 'The gitlab-backup-restore timer on gitlab2002:0 has not reported a successful restore for more than 30 hours.'
+              dashboard: https://grafana.wikimedia.org/d/R_1IvBZnz/gitlab-omnibus-overview
+              runbook: https://wikitech.wikimedia.org/wiki/GitLab/Backup_and_Restore
+
+  # Frozen series from the legacy job-level pushgateway groups (no host label,
+  # from before the per-host grouping key): they linger until the pushgateway
+  # restarts and must never fire the per-replica staleness alerts.
+  - interval: 1m
+    input_series:
+      - series: 'gitlab_restore_last_run{instance="gitlab1003:0", type="restore"}'
+        values: '0x3310'
+      - series: 'gitlab_restore_backup_created{instance="gitlab1003:0", type="restore"}'
+        values: '0x3310'
+    alert_rule_test:
+      - alertname: GitLabRestoreStale
+        eval_time: 55h
+        exp_alerts: []
+      - alertname: GitLabReplicaDataStale
+        eval_time: 55h
+        exp_alerts: []
