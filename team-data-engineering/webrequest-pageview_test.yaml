@@ -1,0 +1,188 @@
+# https://prometheus.io/docs/prometheus/latest/configuration/unit_testing_rules/
+# Test locally using `promtool test rules webrequest-pageview_test.yaml`
+rule_files:
+  - webrequest-pageview.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 5m
+    input_series:
+      - series: 'flink_jobmanager_job_uptime{job_name="Some_Job", kubernetes_namespace="some-ns"}'
+        values: "2000000"
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: WebrequestPageviewJobManagerNotRunning
+        eval_time: 5m
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              team: data-engineering
+              kubernetes_namespace: webrequest-pageview
+              release: production
+              job_name: "page_view"
+            exp_annotations:
+              summary: "page_view in eqiad is not running"
+              description: "The page_view job is not running"
+              dashboard: 'https://grafana.wikimedia.org/d/K9x0c4aVk/flink-app?orgId=1&var-datasource=eqiad%20prometheus/k8s-dse&var-namespace=webrequest-pageview&var-helm_release=production&var-operator_name=All&var-flink_job_name=page_view'
+              dashboard_overview: 'https://grafana.wikimedia.org/d/relative-trending-pipeline/relative-trending-pipeline'
+              runbook: https://wikitech.wikimedia.org/wiki/MediaWiki_Event_Enrichment/Webrequest_Pageview
+  - interval: 1m
+    input_series:
+      - series: 'flink_jobmanager_numRegisteredTaskManagers{kubernetes_namespace="webrequest-pageview", release="production"}'
+        values: '0x6'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: WebrequestPageviewTaskManagerNotRunning
+        eval_time: 5m
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              team: data-engineering
+              kubernetes_namespace: webrequest-pageview
+              release: production
+            exp_annotations:
+              summary: "The webrequest-pageview Flink cluster in eqiad has no registered TaskManagers"
+              description: "The webrequest-pageview Flink cluster in eqiad has no registered TaskManagers"
+              dashboard: 'https://grafana.wikimedia.org/d/K9x0c4aVk/flink-app?orgId=1&var-datasource=eqiad%20prometheus/k8s-dse&var-namespace=webrequest-pageview&var-helm_release=production&var-operator_name=All&var-flink_job_name=All'
+              dashboard_overview: 'https://grafana.wikimedia.org/d/relative-trending-pipeline/relative-trending-pipeline'
+              runbook: https://wikitech.wikimedia.org/wiki/MediaWiki_Event_Enrichment/Webrequest_Pageview
+
+  - interval: 1m
+    input_series:
+      # 1000 records/min enter filter-missing-key, 800 leave it → 20% dropped, above the 15% threshold
+      - series: 'flink_taskmanager_job_task_operator_numRecordsOut{kubernetes_namespace="webrequest-pageview", release="production", job_name="page_view", operator_name="enrich", subtask_index="0"}'
+        values: '0+1000x35'
+      - series: 'flink_taskmanager_job_task_operator_numRecordsOut{kubernetes_namespace="webrequest-pageview", release="production", job_name="page_view", operator_name="filter_missing_key", subtask_index="0"}'
+        values: '0+800x35'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      # increase() needs 2 data points, so the condition is first true at t=1m; for: 30m fires at t=31m
+      - alertname: WebrequestPageviewHighDroppedRecordsRate
+        eval_time: 31m
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              team: data-engineering
+            exp_annotations:
+              summary: "High dropped record rate for webrequest-pageview in eqiad."
+              description: "More than 15% of enriched pageviews have been dropped by filter-missing-key for 30 minutes because wiki_id or page_id is null. These pageviews are lost. Check the SiteMatrix loader and the page_id extraction against the upstream webrequest data."
+              dashboard: 'https://grafana.wikimedia.org/d/relative-trending-pipeline/relative-trending-pipeline'
+              runbook: https://wikitech.wikimedia.org/wiki/MediaWiki_Event_Enrichment/Webrequest_Pageview
+
+  - interval: 1m
+    input_series:
+      # The normal ~9% drop rate must not alert
+      - series: 'flink_taskmanager_job_task_operator_numRecordsOut{kubernetes_namespace="webrequest-pageview", release="production", job_name="page_view", operator_name="enrich", subtask_index="0"}'
+        values: '0+1000x35'
+      - series: 'flink_taskmanager_job_task_operator_numRecordsOut{kubernetes_namespace="webrequest-pageview", release="production", job_name="page_view", operator_name="filter_missing_key", subtask_index="0"}'
+        values: '0+910x35'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: WebrequestPageviewHighDroppedRecordsRate
+        eval_time: 31m
+        exp_alerts: []
+
+  - interval: 1m
+    input_series:
+      # A 10 minute spike above the threshold must not alert; only sustained loss is actionable.
+      # 20% dropped for the first 10 minutes, then back to 9%.
+      - series: 'flink_taskmanager_job_task_operator_numRecordsOut{kubernetes_namespace="webrequest-pageview", release="production", job_name="page_view", operator_name="enrich", subtask_index="0"}'
+        values: '0+1000x35'
+      - series: 'flink_taskmanager_job_task_operator_numRecordsOut{kubernetes_namespace="webrequest-pageview", release="production", job_name="page_view", operator_name="filter_missing_key", subtask_index="0"}'
+        values: '0+800x10 8000+910x25'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: WebrequestPageviewHighDroppedRecordsRate
+        eval_time: 31m
+        exp_alerts: []
+
+  - interval: 1m
+    input_series:
+      # No traffic at all must not alert (clamp_min guards the denominator)
+      - series: 'flink_taskmanager_job_task_operator_numRecordsOut{kubernetes_namespace="webrequest-pageview", release="production", job_name="page_view", operator_name="enrich", subtask_index="0"}'
+        values: '1000x35'
+      - series: 'flink_taskmanager_job_task_operator_numRecordsOut{kubernetes_namespace="webrequest-pageview", release="production", job_name="page_view", operator_name="filter_missing_key", subtask_index="0"}'
+        values: '910x35'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: WebrequestPageviewHighDroppedRecordsRate
+        eval_time: 31m
+        exp_alerts: []
+
+  - interval: 1m
+    input_series:
+      - series: 'flink_taskmanager_job_task_operator_KafkaSourceReader_KafkaConsumer_records_lag_max{kubernetes_namespace="webrequest-pageview", release="production", job_name="page_view"}'
+        values: '150000x11'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: WebrequestPageviewHighKafkaConsumerLag
+        eval_time: 10m
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              team: data-engineering
+              kubernetes_namespace: webrequest-pageview
+              release: production
+              job_name: "page_view"
+            exp_annotations:
+              summary: "High Kafka consumer lag for page_view in eqiad"
+              description: "Maximum lag of the consumed Kafka topic partition exceeds threshold"
+              dashboard: 'https://grafana.wikimedia.org/d/K9x0c4aVk/flink-app?orgId=1&var-datasource=eqiad%20prometheus/k8s-dse&var-namespace=webrequest-pageview&var-helm_release=production&var-operator_name=All&var-flink_job_name=page_view'
+              dashboard_overview: 'https://grafana.wikimedia.org/d/relative-trending-pipeline/relative-trending-pipeline'
+              runbook: https://wikitech.wikimedia.org/wiki/MediaWiki_Event_Enrichment/Webrequest_Pageview
+
+  - interval: 1m
+    input_series:
+      # 30 pageviews/s out of 2000 webrequests/s = 1.5%, below the 5% threshold
+      - series: 'flink_taskmanager_job_task_operator_numRecordsOutPerSecond{kubernetes_namespace="webrequest-pageview", release="production", job_name="page_view", operator_name="filter_pageviews", subtask_index="0"}'
+        values: '30x31'
+      - series: 'flink_taskmanager_job_task_operator_numRecordsOutPerSecond{kubernetes_namespace="webrequest-pageview", release="production", job_name="page_view", operator_name="Source:_webrequest_frontend_text_v1_source", subtask_index="0"}'
+        values: '2000x31'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: WebrequestPageviewLowPageviewRatio
+        eval_time: 30m
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              team: data-engineering
+            exp_annotations:
+              summary: "Low pageview ratio for webrequest-pageview in eqiad"
+              description: "Less than 5% of incoming webrequest_frontend_text records are being classified as pageviews (normally around 8%). The pageview filter or the upstream webrequest data may have changed."
+              dashboard: 'https://grafana.wikimedia.org/d/relative-trending-pipeline/relative-trending-pipeline'
+              runbook: https://wikitech.wikimedia.org/wiki/MediaWiki_Event_Enrichment/Webrequest_Pageview
+
+  - interval: 1m
+    input_series:
+      # Healthy ratio (8%) must not alert
+      - series: 'flink_taskmanager_job_task_operator_numRecordsOutPerSecond{kubernetes_namespace="webrequest-pageview", release="production", job_name="page_view", operator_name="filter_pageviews", subtask_index="0"}'
+        values: '160x31'
+      - series: 'flink_taskmanager_job_task_operator_numRecordsOutPerSecond{kubernetes_namespace="webrequest-pageview", release="production", job_name="page_view", operator_name="Source:_webrequest_frontend_text_v1_source", subtask_index="0"}'
+        values: '2000x31'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: WebrequestPageviewLowPageviewRatio
+        eval_time: 30m
+        exp_alerts: []
+
+  - interval: 1m
+    input_series:
+      # A low ratio while the source is idle must not alert; the NotRunning alerts cover that case
+      - series: 'flink_taskmanager_job_task_operator_numRecordsOutPerSecond{kubernetes_namespace="webrequest-pageview", release="production", job_name="page_view", operator_name="filter_pageviews", subtask_index="0"}'
+        values: '0x31'
+      - series: 'flink_taskmanager_job_task_operator_numRecordsOutPerSecond{kubernetes_namespace="webrequest-pageview", release="production", job_name="page_view", operator_name="Source:_webrequest_frontend_text_v1_source", subtask_index="0"}'
+        values: '10x31'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: WebrequestPageviewLowPageviewRatio
+        eval_time: 30m
+        exp_alerts: []
