@@ -38,10 +38,10 @@ tests:
         eval_time: 55h
         exp_alerts: []
       - alertname: GitLabReplicaDataStale
-        eval_time: 50h
+        eval_time: 20h
         exp_alerts: []
       - alertname: GitLabReplicaDataStale
-        eval_time: 55h
+        eval_time: 31h
         exp_alerts:
           - exp_labels:
               team: collaboration-services
@@ -50,8 +50,8 @@ tests:
               instance: 'gitlab1003:0'
               type: restore
             exp_annotations:
-              summary: 'GitLab - replica gitlab1003:0 serves data older than 54h'
-              description: 'The backup last restored on gitlab1003:0 was created more than 54 hours ago, the backup, rsync or restore chain is stale.'
+              summary: 'GitLab - replica gitlab1003:0 serves data older than 30h'
+              description: 'The backup last restored on gitlab1003:0 was created more than 30 hours ago, the backup, rsync or restore chain is stale.'
               dashboard: https://grafana.wikimedia.org/d/R_1IvBZnz/gitlab-omnibus-overview
               runbook: https://wikitech.wikimedia.org/wiki/GitLab/Backup_and_Restore
 

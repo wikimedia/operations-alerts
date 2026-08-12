@@ -63,9 +63,14 @@ groups:
   # pushgateway. They only advance on success, so their age is the time since
   # the last successful run. The pushgateway only exists in one core site,
   # hence the pint disable: the series are absent from the other site.
+  # The whole chain runs twice a day (hieradata/role/common/gitlab.yaml):
+  # full backup 13:04 and 23:04, rsync 01:00 and 14:00, restore 02:00 and 16:00.
+  # Thresholds are sized so a single missed cycle never fires.
   - alert: GitLabBackupStale
     # max() keeps this immune to leftover pushgateway groups from hosts that
     # no longer take backups (e.g. an ex-primary after a failover).
+    # 30h: the longest normal gap is 14h (23:04 to 13:04) plus the backup
+    # duration, so one missed backup stays quiet and two fire.
     # pint disable promql/series
     expr: time() - max(gitlab_backup_last_run{type="full"}) > 30 * 3600
     labels:
@@ -77,7 +82,8 @@ groups:
       dashboard: https://grafana.wikimedia.org/d/R_1IvBZnz/gitlab-omnibus-overview
       runbook: https://wikitech.wikimedia.org/wiki/GitLab/Backup_and_Restore
   - alert: GitLabRestoreStale
-    # Restores run daily at 01:30 on the replicas. The host filter excludes the
+    # Restores run at 02:00 and 16:00 on the replicas, so 30h leaves room for
+    # one missed run plus its duration. The host filter excludes the
     # frozen series of the legacy job-level pushgateway groups (pre host-grouping
     # pushes), which linger until the next pushgateway restart. After a failover,
     # delete the ex-replica's frozen group to silence this alert (or wait for a
@@ -97,15 +103,17 @@ groups:
     # Age of the backup the replica last restored: covers the whole
     # backup -> rsync -> restore chain, including an rsync that silently stops
     # transferring fresh backups while restores keep succeeding on an old tar.
-    # 54h = two daily cycles + slack, so one slow backup night does not flap.
+    # In steady state a restore picks up a backup created ~3h earlier, and that
+    # age peaks at ~17h just before the next restore. A single missed backup
+    # peaks at ~27h, so 30h absorbs one missed cycle and fires on the second.
     # The host filter excludes the frozen legacy job-level groups, see above.
     # pint disable promql/series
-    expr: time() - gitlab_restore_backup_created{host=~".+"} > 54 * 3600
+    expr: time() - gitlab_restore_backup_created{host=~".+"} > 30 * 3600
     labels:
       severity: task
       team: collaboration-services
     annotations:
-      summary: "GitLab - replica {{ $labels.instance }} serves data older than 54h"
-      description: "The backup last restored on {{ $labels.instance }} was created more than 54 hours ago, the backup, rsync or restore chain is stale."
+      summary: "GitLab - replica {{ $labels.instance }} serves data older than 30h"
+      description: "The backup last restored on {{ $labels.instance }} was created more than 30 hours ago, the backup, rsync or restore chain is stale."
       dashboard: https://grafana.wikimedia.org/d/R_1IvBZnz/gitlab-omnibus-overview
       runbook: https://wikitech.wikimedia.org/wiki/GitLab/Backup_and_Restore
