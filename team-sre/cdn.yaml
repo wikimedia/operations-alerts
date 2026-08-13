@@ -2,6 +2,28 @@
 groups:
   - name: ats
     rules:
+      # record backend rps in a rule in order to reuse in ATSBackendErrorsHigh
+      - record: ats_backend:trafficserver_backend_requests:rate5m
+        expr: |
+          sum by (backend, cluster, status) (
+            rate(trafficserver_backend_requests_seconds_count{backend!~"localhost|127.0.0.1"}[5m])
+          )
+
+      # record per-backend availability in a rule in order to reuse in ATSBackendErrorsHigh.
+      # The 'or' clause makes sure backends without any 5xx get an explicit 1
+      # instead of dropping out of the result altogether.
+      - record: ats_backend:trafficserver_backend_availability:ratio5m
+        expr: |
+          1 - (
+            (
+              sum by (backend, cluster) (ats_backend:trafficserver_backend_requests:rate5m{status=~"5[0-9][0-9]"})
+              or
+              0 * sum by (backend, cluster) (ats_backend:trafficserver_backend_requests:rate5m)
+            )
+            /
+            sum by (backend, cluster) (ats_backend:trafficserver_backend_requests:rate5m)
+          )
+
       - alert: ATSBackendErrorsHigh
         annotations:
           description: 'High number of 5xx responses from {{ $labels.backend }} to ATS in {{ $externalLabels.site }}'
