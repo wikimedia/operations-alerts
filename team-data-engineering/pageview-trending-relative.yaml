@@ -1,0 +1,53 @@
+# deploy-tag: k8s-dse
+# deploy-site: eqiad
+# Alerts are enabled only on dse-k8s.
+groups:
+  - name: pageview-trending-relative
+    rules:
+      - alert: PageviewTrendingRelativeJobManagerNotRunning
+        expr: |
+          absent(flink_jobmanager_job_uptime{kubernetes_namespace="pageview-trending-relative", release="production", job_name="page_trending"})
+        for: 5m
+        labels:
+          team: data-engineering
+          severity: critical
+        annotations:
+          summary: "{{ $labels.job_name }} in {{$externalLabels.site}} is not running"
+          description: "The {{ $labels.job_name }} job is not running"
+          dashboard: 'https://grafana.wikimedia.org/d/K9x0c4aVk/flink-app?orgId=1&var-datasource={{ $externalLabels.site }}%20prometheus/k8s-dse&var-namespace={{ $labels.kubernetes_namespace }}&var-helm_release={{ $labels.release }}&var-operator_name=All&var-flink_job_name={{ $labels.job_name }}'
+          dashboard_overview: 'https://grafana.wikimedia.org/d/relative-trending-pipeline/relative-trending-pipeline'
+          runbook: https://wikitech.wikimedia.org/wiki/MediaWiki_Event_Enrichment/Pageview_Trending_Relative
+
+      - alert: PageviewTrendingRelativeTaskManagerNotRunning
+        # Task managers (workers) are not running. There is a valid deployment, but the application is not operating properly.
+        expr: |
+          flink_jobmanager_numRegisteredTaskManagers{kubernetes_namespace="pageview-trending-relative", release="production"} == 0
+        for: 5m
+        labels:
+          team: data-engineering
+          severity: critical
+        annotations:
+          summary: "The {{ $labels.kubernetes_namespace }} Flink cluster in {{$externalLabels.site}} has no registered TaskManagers"
+          description: "The {{ $labels.kubernetes_namespace }} Flink cluster in {{$externalLabels.site}} has no registered TaskManagers"
+          dashboard: 'https://grafana.wikimedia.org/d/K9x0c4aVk/flink-app?orgId=1&var-datasource={{ $externalLabels.site }}%20prometheus/k8s-dse&var-namespace={{ $labels.kubernetes_namespace }}&var-helm_release={{ $labels.release }}&var-operator_name=All&var-flink_job_name=All'
+          dashboard_overview: 'https://grafana.wikimedia.org/d/relative-trending-pipeline/relative-trending-pipeline'
+          runbook: https://wikitech.wikimedia.org/wiki/MediaWiki_Event_Enrichment/Pageview_Trending_Relative
+
+      # PageviewTrendingRelativeNoOutputMessages is in relative-trending-kafka.yaml.
+
+      - alert: PageviewTrendingRelativeHighKafkaConsumerLag
+        # The application is experiencing latency in consuming from Kafka brokers.
+        # This threshold and duration should match target SLO values
+        # Lag is bursty here because the hop window drains in batches: p50 is 0 but p95 is ~84k.
+        expr: |
+          flink_taskmanager_job_task_operator_KafkaSourceReader_KafkaConsumer_records_lag_max{kubernetes_namespace="pageview-trending-relative", release="production", job_name="page_trending"} > 150000
+        for: 10m
+        labels:
+          team: data-engineering
+          severity: warning
+        annotations:
+          summary: "High Kafka consumer lag for {{$labels.job_name}} in {{ $externalLabels.site }}"
+          description: "Maximum lag of the consumed Kafka topic partition exceeds threshold"
+          dashboard: 'https://grafana.wikimedia.org/d/K9x0c4aVk/flink-app?orgId=1&var-datasource={{ $externalLabels.site }}%20prometheus/k8s-dse&var-namespace={{ $labels.kubernetes_namespace }}&var-helm_release={{ $labels.release }}&var-operator_name=All&var-flink_job_name={{ $labels.job_name }}'
+          dashboard_overview: 'https://grafana.wikimedia.org/d/relative-trending-pipeline/relative-trending-pipeline'
+          runbook: https://wikitech.wikimedia.org/wiki/MediaWiki_Event_Enrichment/Pageview_Trending_Relative

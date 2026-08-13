@@ -1,0 +1,73 @@
+# https://prometheus.io/docs/prometheus/latest/configuration/unit_testing_rules/
+# Test locally using `promtool test rules pageview-trending-relative_test.yaml`
+rule_files:
+  - pageview-trending-relative.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 5m
+    input_series:
+      - series: 'flink_jobmanager_job_uptime{job_name="Some_Job", kubernetes_namespace="some-ns"}'
+        values: "2000000"
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: PageviewTrendingRelativeJobManagerNotRunning
+        eval_time: 5m
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              team: data-engineering
+              kubernetes_namespace: pageview-trending-relative
+              release: production
+              job_name: "page_trending"
+            exp_annotations:
+              summary: "page_trending in eqiad is not running"
+              description: "The page_trending job is not running"
+              dashboard: 'https://grafana.wikimedia.org/d/K9x0c4aVk/flink-app?orgId=1&var-datasource=eqiad%20prometheus/k8s-dse&var-namespace=pageview-trending-relative&var-helm_release=production&var-operator_name=All&var-flink_job_name=page_trending'
+              dashboard_overview: 'https://grafana.wikimedia.org/d/relative-trending-pipeline/relative-trending-pipeline'
+              runbook: https://wikitech.wikimedia.org/wiki/MediaWiki_Event_Enrichment/Pageview_Trending_Relative
+
+  - interval: 1m
+    input_series:
+      - series: 'flink_jobmanager_numRegisteredTaskManagers{kubernetes_namespace="pageview-trending-relative", release="production"}'
+        values: '0x6'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: PageviewTrendingRelativeTaskManagerNotRunning
+        eval_time: 5m
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              team: data-engineering
+              kubernetes_namespace: pageview-trending-relative
+              release: production
+            exp_annotations:
+              summary: "The pageview-trending-relative Flink cluster in eqiad has no registered TaskManagers"
+              description: "The pageview-trending-relative Flink cluster in eqiad has no registered TaskManagers"
+              dashboard: 'https://grafana.wikimedia.org/d/K9x0c4aVk/flink-app?orgId=1&var-datasource=eqiad%20prometheus/k8s-dse&var-namespace=pageview-trending-relative&var-helm_release=production&var-operator_name=All&var-flink_job_name=All'
+              dashboard_overview: 'https://grafana.wikimedia.org/d/relative-trending-pipeline/relative-trending-pipeline'
+              runbook: https://wikitech.wikimedia.org/wiki/MediaWiki_Event_Enrichment/Pageview_Trending_Relative
+
+  - interval: 1m
+    input_series:
+      - series: 'flink_taskmanager_job_task_operator_KafkaSourceReader_KafkaConsumer_records_lag_max{kubernetes_namespace="pageview-trending-relative", release="production", job_name="page_trending"}'
+        values: '200000x11'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: PageviewTrendingRelativeHighKafkaConsumerLag
+        eval_time: 10m
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              team: data-engineering
+              kubernetes_namespace: pageview-trending-relative
+              release: production
+              job_name: "page_trending"
+            exp_annotations:
+              summary: "High Kafka consumer lag for page_trending in eqiad"
+              description: "Maximum lag of the consumed Kafka topic partition exceeds threshold"
+              dashboard: 'https://grafana.wikimedia.org/d/K9x0c4aVk/flink-app?orgId=1&var-datasource=eqiad%20prometheus/k8s-dse&var-namespace=pageview-trending-relative&var-helm_release=production&var-operator_name=All&var-flink_job_name=page_trending'
+              dashboard_overview: 'https://grafana.wikimedia.org/d/relative-trending-pipeline/relative-trending-pipeline'
+              runbook: https://wikitech.wikimedia.org/wiki/MediaWiki_Event_Enrichment/Pageview_Trending_Relative
