@@ -89,14 +89,34 @@ groups:
     # delete the ex-replica's frozen group to silence this alert (or wait for a
     # pushgateway restart, it has no persistence):
     # curl -X DELETE http://prometheus-pushgateway.discovery.wmnet/metrics/job/gitlab_restore/host/<host>
+    # The unless clause hands the version-mismatch case over to
+    # GitLabRestoreVersionMismatch below, which names the actual cause.
     # pint disable promql/series
-    expr: time() - gitlab_restore_last_run{host=~".+"} > 30 * 3600
+    expr: (time() - gitlab_restore_last_run{host=~".+"} > 30 * 3600) unless on (host) (gitlab_restore_version_mismatch == 1)
     labels:
       severity: task
       team: collaboration-services
     annotations:
       summary: "GitLab - replica {{ $labels.instance }} has not completed a restore in 30h"
-      description: "The gitlab-backup-restore timer on {{ $labels.instance }} has not reported a successful restore for more than 30 hours."
+      description: "The gitlab-backup-restore timer on {{ $labels.instance }} has not reported a successful restore for more than 30 hours, check journalctl -u gitlab-backup-restore on the replica for the failure reason."
+      dashboard: https://grafana.wikimedia.org/d/R_1IvBZnz/gitlab-omnibus-overview
+      runbook: https://wikitech.wikimedia.org/wiki/GitLab/Backup_and_Restore
+  - alert: GitLabRestoreVersionMismatch
+    # The restore script refuses a backup produced by a different GitLab
+    # version and pushes this marker instead of restoring. The state is
+    # expected while an upgrade rolls through (a replica upgrades before the
+    # primary's next backup arrives): with backups at 13:04/23:04 and restores
+    # at 02:00/16:00 the worst normal window is ~13h, so only a marker older
+    # than 18h means the chain is stuck (e.g. the primary was never upgraded).
+    # pint disable promql/series
+    expr: gitlab_restore_version_mismatch{host=~".+"} == 1
+    for: 18h
+    labels:
+      severity: task
+      team: collaboration-services
+    annotations:
+      summary: "GitLab - restore blocked on {{ $labels.instance }} by a version mismatch"
+      description: "{{ $labels.instance }} runs GitLab {{ $labels.installed_version }} but the latest available backup is from GitLab {{ $labels.backup_version }}, so restores are skipped. This resolves once a backup of the matching version arrives, investigate why it has not."
       dashboard: https://grafana.wikimedia.org/d/R_1IvBZnz/gitlab-omnibus-overview
       runbook: https://wikitech.wikimedia.org/wiki/GitLab/Backup_and_Restore
   - alert: GitLabReplicaDataStale

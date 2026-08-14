@@ -55,10 +55,13 @@ tests:
               dashboard: https://grafana.wikimedia.org/d/R_1IvBZnz/gitlab-omnibus-overview
               runbook: https://wikitech.wikimedia.org/wiki/GitLab/Backup_and_Restore
 
-  # Restore stopped running on one replica: its last_run froze at t=0.
+  # Restore stopped running on one replica: its last_run froze at t=0. The
+  # cleared version-mismatch marker (0) must not suppress the alert.
   - interval: 1m
     input_series:
       - series: 'gitlab_restore_last_run{host="gitlab2002", instance="gitlab2002:0", type="restore"}'
+        values: '0x1900'
+      - series: 'gitlab_restore_version_mismatch{host="gitlab2002", instance="gitlab2002:0", type="restore"}'
         values: '0x1900'
     alert_rule_test:
       - alertname: GitLabRestoreStale
@@ -75,7 +78,44 @@ tests:
               type: restore
             exp_annotations:
               summary: 'GitLab - replica gitlab2002:0 has not completed a restore in 30h'
-              description: 'The gitlab-backup-restore timer on gitlab2002:0 has not reported a successful restore for more than 30 hours.'
+              description: 'The gitlab-backup-restore timer on gitlab2002:0 has not reported a successful restore for more than 30 hours, check journalctl -u gitlab-backup-restore on the replica for the failure reason.'
+              dashboard: https://grafana.wikimedia.org/d/R_1IvBZnz/gitlab-omnibus-overview
+              runbook: https://wikitech.wikimedia.org/wiki/GitLab/Backup_and_Restore
+      - alertname: GitLabRestoreVersionMismatch
+        eval_time: 31h
+        exp_alerts: []
+
+  # Upgrade window: the replica was upgraded before a matching backup arrived,
+  # the restore script pushes the mismatch marker instead of restoring. The
+  # ambiguous staleness alert must stay quiet, the dedicated one fires once the
+  # marker persists past 18h (a normal upgrade window resolves in ~13h).
+  - interval: 1m
+    input_series:
+      - series: 'gitlab_restore_last_run{host="gitlab1003", instance="gitlab1003:0", type="restore"}'
+        values: '0x1900'
+      - series: 'gitlab_restore_version_mismatch{host="gitlab1003", instance="gitlab1003:0", type="restore", installed_version="19.0.6", backup_version="19.0.5"}'
+        values: '1x1900'
+    alert_rule_test:
+      - alertname: GitLabRestoreStale
+        eval_time: 31h
+        exp_alerts: []
+      - alertname: GitLabRestoreVersionMismatch
+        eval_time: 17h
+        exp_alerts: []
+      - alertname: GitLabRestoreVersionMismatch
+        eval_time: 31h
+        exp_alerts:
+          - exp_labels:
+              team: collaboration-services
+              severity: task
+              host: gitlab1003
+              instance: 'gitlab1003:0'
+              type: restore
+              installed_version: '19.0.6'
+              backup_version: '19.0.5'
+            exp_annotations:
+              summary: 'GitLab - restore blocked on gitlab1003:0 by a version mismatch'
+              description: 'gitlab1003:0 runs GitLab 19.0.6 but the latest available backup is from GitLab 19.0.5, so restores are skipped. This resolves once a backup of the matching version arrives, investigate why it has not.'
               dashboard: https://grafana.wikimedia.org/d/R_1IvBZnz/gitlab-omnibus-overview
               runbook: https://wikitech.wikimedia.org/wiki/GitLab/Backup_and_Restore
 
