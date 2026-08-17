@@ -4,12 +4,14 @@ evaluation_interval: 1m
 tests:
   - interval: 1m
     input_series:
-      - series: 'openstack_nova_agent_state{cluster="wmcs", instance="cloudvirt1044", job="openstack", service="nova-compute"}'
+      - series: 'openstack_nova_agent_state{cluster="wmcs", instance="cloudvirt1044", job="openstack", service="nova-compute", adminState="enabled"}'
         values: "1x120"
-      - series: 'openstack_nova_agent_state{cluster="wmcs", instance="cloudvirt1045", job="openstack", service="nova-compute"}'
+      - series: 'openstack_nova_agent_state{cluster="wmcs", instance="cloudvirt1045", job="openstack", service="nova-compute", adminState="enabled"}'
         values: "1x120"
-      - series: 'openstack_nova_agent_state{cluster="wmcs", instance="cloudvirt1046", job="openstack", service="nova-compute"}'
+      - series: 'openstack_nova_agent_state{cluster="wmcs", instance="cloudvirt1046", job="openstack", service="nova-compute", adminState="enabled"}'
         values: "0x120"
+      - series: 'openstack_nova_agent_state{cluster="wmcs", instance="cloudvirt1047", job="openstack", service="nova-compute", adminState="disabled"}'
+        values: "1x120"
     alert_rule_test:
       - alertname: NovaComputeUnavailable
         eval_time: 1h

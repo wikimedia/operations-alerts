@@ -6,9 +6,9 @@ groups:
     rules:
       - alert: NovaComputeUnavailable
         expr: |
-          sum (openstack_nova_agent_state{service="nova-compute"})
+          sum (openstack_nova_agent_state{service="nova-compute",adminState="enabled"})
             /
-          count (openstack_nova_agent_state{service="nova-compute"})
+          count (openstack_nova_agent_state{service="nova-compute",adminState="enabled"})
             < 0.9
         for: 1h
         labels:
