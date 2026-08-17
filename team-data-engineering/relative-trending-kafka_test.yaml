@@ -1,0 +1,106 @@
+# https://prometheus.io/docs/prometheus/latest/configuration/unit_testing_rules/
+# Test locally using `promtool test rules relative-trending-kafka_test.yaml`
+rule_files:
+  - relative-trending-kafka.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    input_series:
+      # Constant counter: increase([30m]) == 0 → no output messages
+      - series: 'kafka_server_BrokerTopicMetrics_MessagesIn_total{kafka_cluster="jumbo-eqiad", topic="eqiad.pageview.v1"}'
+        values: '100x8'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      # Condition first true at t=1m (needs 2 data points); for: 5m fires at t=6m
+      - alertname: WebrequestPageviewNoOutputMessages
+        eval_time: 6m
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              team: data-engineering
+            exp_annotations:
+              summary: "No output messages produced by webrequest-pageview in eqiad"
+              description: "No messages have been successfully produced to the output topic in the last 30 minutes. Check if Flink is running, and whether webrequest_frontend_text is still being produced."
+              dashboard: 'https://grafana.wikimedia.org/d/relative-trending-pipeline/relative-trending-pipeline'
+              runbook: https://wikitech.wikimedia.org/wiki/MediaWiki_Event_Enrichment/Webrequest_Pageview
+
+  - interval: 1m
+    input_series:
+      # A topic that is still being produced to must not alert
+      - series: 'kafka_server_BrokerTopicMetrics_MessagesIn_total{kafka_cluster="jumbo-eqiad", topic="eqiad.pageview.v1"}'
+        values: '0+1000x8'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: WebrequestPageviewNoOutputMessages
+        eval_time: 6m
+        exp_alerts: []
+
+  - interval: 1m
+    input_series:
+      # The pageview.v1 alert must not match the trending topic
+      - series: 'kafka_server_BrokerTopicMetrics_MessagesIn_total{kafka_cluster="jumbo-eqiad", topic="eqiad.pageview.trending.relative.v1"}'
+        values: '100x8'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: WebrequestPageviewNoOutputMessages
+        eval_time: 6m
+        exp_alerts: []
+      - alertname: PageviewTrendingRelativeNoOutputMessages
+        eval_time: 6m
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              team: data-engineering
+            exp_annotations:
+              summary: "No output messages produced by pageview-trending-relative in eqiad"
+              description: "No messages have been successfully produced to the output topic in the last 30 minutes. Check if Flink is running, and whether pageview.v1 is still being produced."
+              dashboard: 'https://grafana.wikimedia.org/d/relative-trending-pipeline/relative-trending-pipeline'
+              runbook: https://wikitech.wikimedia.org/wiki/MediaWiki_Event_Enrichment/Pageview_Trending_Relative
+
+  - interval: 1m
+    input_series:
+      # A trending topic that is still being produced to must not alert
+      - series: 'kafka_server_BrokerTopicMetrics_MessagesIn_total{kafka_cluster="jumbo-eqiad", topic="eqiad.pageview.trending.relative.v1"}'
+        values: '0+1000x8'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: PageviewTrendingRelativeNoOutputMessages
+        eval_time: 6m
+        exp_alerts: []
+
+  - interval: 5m
+    input_series:
+      # Constant counter: increase([10d]) == 0 → the baseline topic has stopped receiving messages
+      - series: 'kafka_server_BrokerTopicMetrics_MessagesIn_total{kafka_cluster="jumbo-eqiad", topic="eqiad.pageview.stats.v1"}'
+        values: '5000x14'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      # Condition first true at t=5m (needs 2 data points); for: 1h fires at t=1h5m
+      - alertname: PageviewStatsBaselineStale
+        eval_time: 65m
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              team: data-engineering
+            exp_annotations:
+              summary: "Trending baseline pageview.stats.v1 is stale in eqiad"
+              description: "No messages have been produced to the baseline topic in the last 10 days. The weekly pageview-stats dbt job has probably stopped running."
+              dashboard: 'https://grafana.wikimedia.org/d/relative-trending-pipeline/relative-trending-pipeline'
+              runbook: https://wikitech.wikimedia.org/wiki/MediaWiki_Event_Enrichment/Pageview_Trending_Relative
+
+  - interval: 5m
+    input_series:
+      # A baseline that is still being regenerated must not alert
+      - series: 'kafka_server_BrokerTopicMetrics_MessagesIn_total{kafka_cluster="jumbo-eqiad", topic="eqiad.pageview.stats.v1"}'
+        values: '0+5000x14'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: PageviewStatsBaselineStale
+        eval_time: 65m
+        exp_alerts: []

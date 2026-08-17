@@ -1,0 +1,50 @@
+# deploy-tag: ops
+# deploy-site: eqiad
+# Kafka broker metrics for the relative trending pipeline.
+groups:
+  - name: relative-trending-kafka
+    rules:
+      - alert: WebrequestPageviewNoOutputMessages
+        # No messages have been successfully produced to the output topic in the last 30 minutes,
+        # suggesting the job has stalled.
+        expr: |
+          sum(increase(kafka_server_BrokerTopicMetrics_MessagesIn_total{kafka_cluster="jumbo-eqiad", topic=~"(eqiad|codfw)\\.pageview\\.v1"}[30m])) == 0
+        for: 5m
+        labels:
+          team: data-engineering
+          severity: critical
+        annotations:
+          summary: "No output messages produced by webrequest-pageview in {{ $externalLabels.site }}"
+          description: "No messages have been successfully produced to the output topic in the last 30 minutes. Check if Flink is running, and whether webrequest_frontend_text is still being produced."
+          dashboard: 'https://grafana.wikimedia.org/d/relative-trending-pipeline/relative-trending-pipeline'
+          runbook: https://wikitech.wikimedia.org/wiki/MediaWiki_Event_Enrichment/Webrequest_Pageview
+
+      - alert: PageviewTrendingRelativeNoOutputMessages
+        # No messages have been successfully produced to the output topic in the last 30 minutes,
+        # suggesting the job has stalled.
+        expr: |
+          sum(increase(kafka_server_BrokerTopicMetrics_MessagesIn_total{kafka_cluster="jumbo-eqiad", topic=~"(eqiad|codfw)\\.pageview\\.trending\\.relative\\.v1"}[30m])) == 0
+        for: 5m
+        labels:
+          team: data-engineering
+          severity: critical
+        annotations:
+          summary: "No output messages produced by pageview-trending-relative in {{ $externalLabels.site }}"
+          description: "No messages have been successfully produced to the output topic in the last 30 minutes. Check if Flink is running, and whether pageview.v1 is still being produced."
+          dashboard: 'https://grafana.wikimedia.org/d/relative-trending-pipeline/relative-trending-pipeline'
+          runbook: https://wikitech.wikimedia.org/wiki/MediaWiki_Event_Enrichment/Pageview_Trending_Relative
+
+      - alert: PageviewStatsBaselineStale
+        # The baseline is regenerated weekly by the pageview-stats dbt job. Nothing in 10 days means
+        # trending scores are being computed against an out-of-date baseline.
+        expr: |
+          sum(increase(kafka_server_BrokerTopicMetrics_MessagesIn_total{kafka_cluster="jumbo-eqiad", topic=~"(eqiad|codfw)\\.pageview\\.stats\\.v1"}[10d])) == 0
+        for: 1h
+        labels:
+          team: data-engineering
+          severity: warning
+        annotations:
+          summary: "Trending baseline pageview.stats.v1 is stale in {{ $externalLabels.site }}"
+          description: "No messages have been produced to the baseline topic in the last 10 days. The weekly pageview-stats dbt job has probably stopped running."
+          dashboard: 'https://grafana.wikimedia.org/d/relative-trending-pipeline/relative-trending-pipeline'
+          runbook: https://wikitech.wikimedia.org/wiki/MediaWiki_Event_Enrichment/Pageview_Trending_Relative
