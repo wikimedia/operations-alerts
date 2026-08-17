@@ -6,6 +6,8 @@ tests:
     input_series:
       - series: 'openstack_neutron_agent_state{adminState="up",hostname="cloudnet1003",service="neutron-metadata-agent"}'
         values: "1 1 1 0+0x150"
+      - series: 'openstack_nova_agent_state{adminState="enabled",hostname="cloudnet1003",service="nova-compute"}'
+        values: "1x300"
     alert_rule_test:
       - alertname: NeutronAgentDown
         eval_time: 5m
@@ -39,8 +41,25 @@ tests:
 
   - interval: 1m
     input_series:
+      - series: 'openstack_neutron_agent_state{adminState="up",hostname="cloudnet1005",service="neutron-metadata-agent"}'
+        values: "1 1 1 0+0x150"
+      - series: 'openstack_nova_agent_state{adminState="disabled",hostname="cloudnet1005",service="nova-compute"}'
+        values: "1x300"
+    alert_rule_test:
+      # Agent is down but the host's nova-compute is administratively disabled, no alert
+      - alertname: NeutronAgentDown
+        eval_time: 5m
+        exp_alerts: []
+      - alertname: NeutronAgentDownForLong
+        eval_time: 125m
+        exp_alerts: []
+
+  - interval: 1m
+    input_series:
       - series: 'openstack_neutron_agent_state{adminState="down",hostname="cloudnet1004",service="neutron-metadata-agent"}'
         values: "0 0 0 1+0x150"
+      - series: 'openstack_nova_agent_state{adminState="enabled",hostname="cloudnet1004",service="nova-compute"}'
+        values: "1x300"
     alert_rule_test:
       - alertname: NeutronAgentAdminDown
         eval_time: 125m
