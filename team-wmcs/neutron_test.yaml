@@ -24,9 +24,11 @@ tests:
               runbook: https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Troubleshooting#Networking_failures
               dashboard: https://grafana.wikimedia.org/d/wKnDJf97z/wmcs-neutron-eqiad1
       # Check that after two hours the priority increases to critical
-      - alertname: NeutronAgentDownForLong
+      - alertname: NeutronAgentDown
         eval_time: 125m # a bit more than two hours
         exp_alerts:
+          - exp_labels: *warning_labels
+            exp_annotations: *alert_annotations
           - exp_labels:
               severity: critical
               team: wmcs
@@ -50,7 +52,7 @@ tests:
       - alertname: NeutronAgentDown
         eval_time: 5m
         exp_alerts: []
-      - alertname: NeutronAgentDownForLong
+      - alertname: NeutronAgentDown
         eval_time: 125m
         exp_alerts: []
 
