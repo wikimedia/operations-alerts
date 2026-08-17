@@ -18,3 +18,18 @@ groups:
         labels:
           severity: page
           team: wmcs
+
+      - alert: CloudVirtDisabled
+        annotations:
+          summary: '{{ $labels.instance }} out of service for long'
+          description: >
+            The cloudvirt node {{ $labels.instance }} has been in maintenance
+            for multiple days. Check whether the host is meant to be out of
+            service.
+          dashboard: 'https://grafana.wikimedia.org/d/000000377/host-overview?orgId=1&var-server={{ $labels.instance }}'
+          runbook: TODO
+        expr: openstack_nova_agent_state{adminState="disabled"} == 1
+        for: 10d
+        labels:
+          severity: warning
+          team: wmcs

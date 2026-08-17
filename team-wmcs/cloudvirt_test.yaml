@@ -76,3 +76,46 @@ tests:
       - alertname: CloudVirtDown
         eval_time: 1h
         exp_alerts: []
+
+  - interval: 1m
+    input_series:
+      - series: 'openstack_nova_agent_state{cluster="wmcs", instance="cloudvirt1047", job="openstack", service="nova-compute", adminState="disabled"}'
+        values: "1x14460"
+    alert_rule_test:
+      # Host has been disabled for more than 10 days, alert
+      - alertname: CloudVirtDisabled
+        eval_time: 14460m # 10 days + 1h
+        exp_alerts:
+          - exp_labels:
+              team: wmcs
+              severity: warning
+              cluster: wmcs
+              instance: cloudvirt1047
+              job: openstack
+              service: nova-compute
+              adminState: disabled
+            exp_annotations:
+              summary: "cloudvirt1047 out of service for long"
+              description: "The cloudvirt node cloudvirt1047 has been in maintenance for multiple days. Check whether the host is meant to be out of service.\n"
+              dashboard: "https://grafana.wikimedia.org/d/000000377/host-overview?orgId=1&var-server=cloudvirt1047"
+              runbook: TODO
+
+  - interval: 1m
+    input_series:
+      - series: 'openstack_nova_agent_state{cluster="wmcs", instance="cloudvirt1048", job="openstack", service="nova-compute", adminState="disabled"}'
+        values: "1x120"
+    alert_rule_test:
+      # Host disabled for less than 10 days, no alert
+      - alertname: CloudVirtDisabled
+        eval_time: 1h
+        exp_alerts: []
+
+  - interval: 1m
+    input_series:
+      - series: 'openstack_nova_agent_state{cluster="wmcs", instance="cloudvirt1049", job="openstack", service="nova-compute", adminState="enabled"}'
+        values: "1x120"
+    alert_rule_test:
+      # Host is enabled, no alert
+      - alertname: CloudVirtDisabled
+        eval_time: 1h
+        exp_alerts: []
