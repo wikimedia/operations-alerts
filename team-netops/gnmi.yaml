@@ -57,3 +57,20 @@ groups:
           severity: critical
           team: sre
           scope: network
+
+      - alert: GnmiInterfaceCountersDrop
+        expr: |
+          (
+            quantile_over_time(0.9, instance:gnmic_metrics_interfaces:count[30m]) /
+            quantile_over_time(0.9, instance:gnmic_metrics_interfaces:count[30m] offset 24h)
+          ) <= 0.5
+        for: 30m
+        labels:
+          team: sre
+          severity: critical
+          scope: network
+        annotations:
+          summary: '{{ $labels.instance | stripPort }} is exporting less than half the gNMI interface counters it had 24h ago'
+          description: ''  # Not needed
+          runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#GnmiInterfaceCountersDrop'
+          dashboard: 'https://grafana.wikimedia.org/d/fb403d62-5f03-434a-9dff-bd02b9fff504/network-device-overview?orgId=1&from=now-24h&to=now&var-site=%24__all&var-instance={{ $labels.instance }}&viewPanel=panel-19'

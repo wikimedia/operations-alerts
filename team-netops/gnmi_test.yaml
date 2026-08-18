@@ -94,3 +94,29 @@ tests:
               description: ''
               runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#CertAlmostExpired'
               dashboard: https://grafana.wikimedia.org/d/eab73c60-a402-4f9b-a4a7-ea489b374458/gnmic?var-site=codfw
+
+  - interval: 2m
+    external_labels:
+      site: codfw
+    input_series:
+      # flat: no alert
+      - series: 'instance:gnmic_metrics_interfaces:count{instance="cr1-codfw:9804"}'
+        values: '1000x735'
+      # drops 1000 -> 300 at t=1400m: alert
+      - series: 'instance:gnmic_metrics_interfaces:count{instance="cr1-eqiad:9804"}'
+        values: '1000x699 300x35'
+    alert_rule_test:
+      - alertname: GnmiInterfaceCountersDrop
+        eval_time: 24h30m
+        exp_alerts:
+          - exp_labels:
+              instance: "cr1-eqiad:9804"
+              team: sre
+              severity: critical
+              scope: network
+            exp_annotations:
+              summary: 'cr1-eqiad is exporting less than half the gNMI interface counters it had 24h ago'
+              description: ''
+              runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#GnmiInterfaceCountersDrop'
+              dashboard: 'https://grafana.wikimedia.org/d/fb403d62-5f03-434a-9dff-bd02b9fff504/network-device-overview?orgId=1&from=now-24h&to=now&var-site=%24__all&var-instance=cr1-eqiad:9804&viewPanel=panel-19'
+
