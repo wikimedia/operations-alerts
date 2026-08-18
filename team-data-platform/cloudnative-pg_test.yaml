@@ -229,17 +229,36 @@ tests:
       eval_time: 5m
       exp_alerts: []
 
-  # The primary is lagging behind WAL uploads
-  - input_series:
+  # The archiver's most recent attempt succeeded: no failure alert, even
+  # though the last success was a while ago (idle cluster).
+  - interval: 1m
+    input_series:
+    - series: cnpg_pg_stat_archiver_seconds_since_last_failure{cnpg_io_cluster="postgresql-test", kubernetes_namespace="postgresql-test", kubernetes_pod_name="postgresql-test-3", role="primary"}
+      values: '86400x80'
     - series: cnpg_pg_stat_archiver_seconds_since_last_archival{cnpg_io_cluster="postgresql-test", kubernetes_namespace="postgresql-test", kubernetes_pod_name="postgresql-test-3", role="primary"}
-      values: 1200
+      values: '7200x80'
     alert_rule_test:
-    - alertname: CloudnativePGLastArchiveAgeTooHighWarning
-      eval_time: 5m
+    - alertname: CloudnativePGWalArchivingFailingWarning
+      eval_time: 20m
+      exp_alerts: []
+    - alertname: CloudnativePGWalArchivingFailingCritical
+      eval_time: 70m
+      exp_alerts: []
+
+  # The archiver's most recent attempt failed and it keeps failing
+  - interval: 1m
+    input_series:
+    - series: cnpg_pg_stat_archiver_seconds_since_last_failure{cnpg_io_cluster="postgresql-test", kubernetes_namespace="postgresql-test", kubernetes_pod_name="postgresql-test-3", role="primary"}
+      values: '30x80'
+    - series: cnpg_pg_stat_archiver_seconds_since_last_archival{cnpg_io_cluster="postgresql-test", kubernetes_namespace="postgresql-test", kubernetes_pod_name="postgresql-test-3", role="primary"}
+      values: '7200x80'
+    alert_rule_test:
+    - alertname: CloudnativePGWalArchivingFailingWarning
+      eval_time: 20m
       exp_alerts:
       - exp_annotations:
-          description: 'postgresql-test-3.postgresql-test is not archiving WALs'
-          summary: 'postgresql-test-3.postgresql-test is not archiving WALs'
+          description: 'WAL archiving is failing on postgresql-test-3.postgresql-test'
+          summary: 'WAL archiving is failing on postgresql-test-3.postgresql-test'
           dashboard: "https://grafana.wikimedia.org/d/cloudnative-pg/cloudnativepg?forceLogin=&from=now-15m&orgId=1&refresh=30s&to=now&var-DS_PROMETHEUS=eqiad%2Bprometheus%252Fk8s-dse&var-cluster=postgresql-test&var-instances=All&var-namespace=postgresql-test&var-operatorNamespace=cloudnative-pg-operator"
           runbook: "https://wikitech.wikimedia.org/wiki/Data_Platform/Systems/CloudnativePG/Clusters#Investigate_why_WALs_are_not_being_archived"
         exp_labels:
@@ -248,18 +267,12 @@ tests:
           cnpg_io_cluster: postgresql-test
           severity: warning
           team: data-platform
-
-  # The primary is critically behind WAL uploads
-  - input_series:
-    - series: cnpg_pg_stat_archiver_seconds_since_last_archival{cnpg_io_cluster="postgresql-test", kubernetes_namespace="postgresql-test", kubernetes_pod_name="postgresql-test-3", role="primary"}
-      values: 4000
-    alert_rule_test:
-    - alertname: CloudnativePGLastArchiveAgeTooHighCritical
-      eval_time: 5m
+    - alertname: CloudnativePGWalArchivingFailingCritical
+      eval_time: 70m
       exp_alerts:
       - exp_annotations:
-          description: 'postgresql-test-3.postgresql-test is not archiving WALs'
-          summary: 'postgresql-test-3.postgresql-test is not archiving WALs'
+          description: 'WAL archiving is failing on postgresql-test-3.postgresql-test'
+          summary: 'WAL archiving is failing on postgresql-test-3.postgresql-test'
           dashboard: "https://grafana.wikimedia.org/d/cloudnative-pg/cloudnativepg?forceLogin=&from=now-15m&orgId=1&refresh=30s&to=now&var-DS_PROMETHEUS=eqiad%2Bprometheus%252Fk8s-dse&var-cluster=postgresql-test&var-instances=All&var-namespace=postgresql-test&var-operatorNamespace=cloudnative-pg-operator"
           runbook: "https://wikitech.wikimedia.org/wiki/Data_Platform/Systems/CloudnativePG/Clusters#Investigate_why_WALs_are_not_being_archived"
         exp_labels:
@@ -267,4 +280,66 @@ tests:
           kubernetes_pod_name: postgresql-test-3
           cnpg_io_cluster: postgresql-test
           severity: critical
+          team: data-platform
+
+  # WAL segments are queueing for the archiver and not draining
+  - interval: 1m
+    input_series:
+    - series: cnpg_collector_pg_wal_archive_status{cnpg_io_cluster="postgresql-test", kubernetes_namespace="postgresql-test", kubernetes_pod_name="postgresql-test-3", value="ready"}
+      values: '5x50'
+    alert_rule_test:
+    - alertname: CloudnativePGWalArchiveBacklog
+      eval_time: 35m
+      exp_alerts:
+      - exp_annotations:
+          description: 'postgresql-test-3.postgresql-test has WAL segments queued for archiving that are not draining'
+          summary: 'postgresql-test-3.postgresql-test has WAL segments queued for archiving that are not draining'
+          dashboard: "https://grafana.wikimedia.org/d/cloudnative-pg/cloudnativepg?forceLogin=&from=now-15m&orgId=1&refresh=30s&to=now&var-DS_PROMETHEUS=eqiad%2Bprometheus%252Fk8s-dse&var-cluster=postgresql-test&var-instances=All&var-namespace=postgresql-test&var-operatorNamespace=cloudnative-pg-operator"
+          runbook: "https://wikitech.wikimedia.org/wiki/Data_Platform/Systems/CloudnativePG/Clusters#Investigate_why_WALs_are_not_being_archived"
+        exp_labels:
+          kubernetes_namespace: postgresql-test
+          kubernetes_pod_name: postgresql-test-3
+          cnpg_io_cluster: postgresql-test
+          severity: critical
+          team: data-platform
+
+  # An empty archive queue does not fire the backlog alert
+  - interval: 1m
+    input_series:
+    - series: cnpg_collector_pg_wal_archive_status{cnpg_io_cluster="postgresql-test", kubernetes_namespace="postgresql-test", kubernetes_pod_name="postgresql-test-3", value="ready"}
+      values: '0x50'
+    alert_rule_test:
+    - alertname: CloudnativePGWalArchiveBacklog
+      eval_time: 35m
+      exp_alerts: []
+
+  # Nothing archived for just under a day: no staleness warning
+  - interval: 1m
+    input_series:
+    - series: cnpg_pg_stat_archiver_seconds_since_last_archival{cnpg_io_cluster="postgresql-test", kubernetes_namespace="postgresql-test", kubernetes_pod_name="postgresql-test-3", role="primary"}
+      values: '90000x20'
+    alert_rule_test:
+    - alertname: CloudnativePGLastArchiveAgeTooHighWarning
+      eval_time: 10m
+      exp_alerts: []
+
+  # Nothing archived for over a day
+  - interval: 1m
+    input_series:
+    - series: cnpg_pg_stat_archiver_seconds_since_last_archival{cnpg_io_cluster="postgresql-test", kubernetes_namespace="postgresql-test", kubernetes_pod_name="postgresql-test-3", role="primary"}
+      values: '100000x20'
+    alert_rule_test:
+    - alertname: CloudnativePGLastArchiveAgeTooHighWarning
+      eval_time: 10m
+      exp_alerts:
+      - exp_annotations:
+          description: 'postgresql-test-3.postgresql-test has not archived any WALs for more than a day'
+          summary: 'postgresql-test-3.postgresql-test has not archived any WALs for more than a day'
+          dashboard: "https://grafana.wikimedia.org/d/cloudnative-pg/cloudnativepg?forceLogin=&from=now-15m&orgId=1&refresh=30s&to=now&var-DS_PROMETHEUS=eqiad%2Bprometheus%252Fk8s-dse&var-cluster=postgresql-test&var-instances=All&var-namespace=postgresql-test&var-operatorNamespace=cloudnative-pg-operator"
+          runbook: "https://wikitech.wikimedia.org/wiki/Data_Platform/Systems/CloudnativePG/Clusters#Investigate_why_WALs_are_not_being_archived"
+        exp_labels:
+          kubernetes_namespace: postgresql-test
+          kubernetes_pod_name: postgresql-test-3
+          cnpg_io_cluster: postgresql-test
+          severity: warning
           team: data-platform

@@ -112,26 +112,66 @@ groups:
         severity: critical
         team: data-platform
 
-    - alert: CloudnativePGLastArchiveAgeTooHighWarning
+    # The archiver's most recent attempt failed. PostgreSQL keeps retrying a
+    # failing WAL segment, so while this condition persists the archiver
+    # really is broken (S3 endpoint, credentials, bucket), regardless of how
+    # long ago the last archive succeeded. It clears as soon as a WAL is
+    # archived successfully. An idle cluster that archives nothing does not
+    # fire this alert.
+    - alert: CloudnativePGWalArchivingFailingWarning
       annotations:
-        description: '{{$labels.kubernetes_pod_name}}.{{$labels.kubernetes_namespace}} is not archiving WALs'
-        summary: '{{$labels.kubernetes_pod_name}}.{{$labels.kubernetes_namespace}} is not archiving WALs'
+        description: 'WAL archiving is failing on {{$labels.kubernetes_pod_name}}.{{$labels.kubernetes_namespace}}'
+        summary: 'WAL archiving is failing on {{$labels.kubernetes_pod_name}}.{{$labels.kubernetes_namespace}}'
         dashboard: "https://grafana.wikimedia.org/d/cloudnative-pg/cloudnativepg?forceLogin=&from=now-15m&orgId=1&refresh=30s&to=now&var-DS_PROMETHEUS=eqiad%2Bprometheus%252Fk8s-dse&var-cluster={{$labels.cnpg_io_cluster}}&var-instances=All&var-namespace={{$labels.kubernetes_namespace}}&var-operatorNamespace=cloudnative-pg-operator"
         runbook: "https://wikitech.wikimedia.org/wiki/Data_Platform/Systems/CloudnativePG/Clusters#Investigate_why_WALs_are_not_being_archived"
-      expr: max by (cnpg_io_cluster, kubernetes_namespace, kubernetes_pod_name) (cnpg_pg_stat_archiver_seconds_since_last_archival{role="primary"}) > 900
-      for: 5m
+      expr: max by (cnpg_io_cluster, kubernetes_namespace, kubernetes_pod_name) (cnpg_pg_stat_archiver_seconds_since_last_failure{role="primary"}) < max by (cnpg_io_cluster, kubernetes_namespace, kubernetes_pod_name) (cnpg_pg_stat_archiver_seconds_since_last_archival{role="primary"})
+      for: 15m
       labels:
         severity: warning
         team: data-platform
 
-    - alert: CloudnativePGLastArchiveAgeTooHighCritical
+    - alert: CloudnativePGWalArchivingFailingCritical
       annotations:
-        description: '{{$labels.kubernetes_pod_name}}.{{$labels.kubernetes_namespace}} is not archiving WALs'
-        summary: '{{$labels.kubernetes_pod_name}}.{{$labels.kubernetes_namespace}} is not archiving WALs'
+        description: 'WAL archiving is failing on {{$labels.kubernetes_pod_name}}.{{$labels.kubernetes_namespace}}'
+        summary: 'WAL archiving is failing on {{$labels.kubernetes_pod_name}}.{{$labels.kubernetes_namespace}}'
         dashboard: "https://grafana.wikimedia.org/d/cloudnative-pg/cloudnativepg?forceLogin=&from=now-15m&orgId=1&refresh=30s&to=now&var-DS_PROMETHEUS=eqiad%2Bprometheus%252Fk8s-dse&var-cluster={{$labels.cnpg_io_cluster}}&var-instances=All&var-namespace={{$labels.kubernetes_namespace}}&var-operatorNamespace=cloudnative-pg-operator"
         runbook: "https://wikitech.wikimedia.org/wiki/Data_Platform/Systems/CloudnativePG/Clusters#Investigate_why_WALs_are_not_being_archived"
-      expr: max by (cnpg_io_cluster, kubernetes_namespace, kubernetes_pod_name) (cnpg_pg_stat_archiver_seconds_since_last_archival{role="primary"}) > 3600
-      for: 5m
+      expr: max by (cnpg_io_cluster, kubernetes_namespace, kubernetes_pod_name) (cnpg_pg_stat_archiver_seconds_since_last_failure{role="primary"}) < max by (cnpg_io_cluster, kubernetes_namespace, kubernetes_pod_name) (cnpg_pg_stat_archiver_seconds_since_last_archival{role="primary"})
+      for: 1h
       labels:
         severity: critical
+        team: data-platform
+
+    # WAL segments are queueing for the archiver and not draining. This also
+    # covers a cluster where archiving has never succeeded at all, for which
+    # the last-archival and last-failure metrics may not exist. No role
+    # filter: replicas hold no ready segments, and this way the alert
+    # follows the WALs across a promotion.
+    - alert: CloudnativePGWalArchiveBacklog
+      annotations:
+        description: '{{$labels.kubernetes_pod_name}}.{{$labels.kubernetes_namespace}} has WAL segments queued for archiving that are not draining'
+        summary: '{{$labels.kubernetes_pod_name}}.{{$labels.kubernetes_namespace}} has WAL segments queued for archiving that are not draining'
+        dashboard: "https://grafana.wikimedia.org/d/cloudnative-pg/cloudnativepg?forceLogin=&from=now-15m&orgId=1&refresh=30s&to=now&var-DS_PROMETHEUS=eqiad%2Bprometheus%252Fk8s-dse&var-cluster={{$labels.cnpg_io_cluster}}&var-instances=All&var-namespace={{$labels.kubernetes_namespace}}&var-operatorNamespace=cloudnative-pg-operator"
+        runbook: "https://wikitech.wikimedia.org/wiki/Data_Platform/Systems/CloudnativePG/Clusters#Investigate_why_WALs_are_not_being_archived"
+      expr: max by (cnpg_io_cluster, kubernetes_namespace, kubernetes_pod_name) (cnpg_collector_pg_wal_archive_status{value="ready"}) > 2
+      for: 30m
+      labels:
+        severity: critical
+        team: data-platform
+
+    # Nothing has been archived for over a day. On a busy cluster this is a
+    # late signal that the archiver is stuck. On an idle cluster it usually
+    # means that no WAL has been produced at all: nothing is broken, but the
+    # WAL segment covering the recent base backups has not reached the
+    # archive, so those backups cannot be restored until it does.
+    - alert: CloudnativePGLastArchiveAgeTooHighWarning
+      annotations:
+        description: '{{$labels.kubernetes_pod_name}}.{{$labels.kubernetes_namespace}} has not archived any WALs for more than a day'
+        summary: '{{$labels.kubernetes_pod_name}}.{{$labels.kubernetes_namespace}} has not archived any WALs for more than a day'
+        dashboard: "https://grafana.wikimedia.org/d/cloudnative-pg/cloudnativepg?forceLogin=&from=now-15m&orgId=1&refresh=30s&to=now&var-DS_PROMETHEUS=eqiad%2Bprometheus%252Fk8s-dse&var-cluster={{$labels.cnpg_io_cluster}}&var-instances=All&var-namespace={{$labels.kubernetes_namespace}}&var-operatorNamespace=cloudnative-pg-operator"
+        runbook: "https://wikitech.wikimedia.org/wiki/Data_Platform/Systems/CloudnativePG/Clusters#Investigate_why_WALs_are_not_being_archived"
+      expr: max by (cnpg_io_cluster, kubernetes_namespace, kubernetes_pod_name) (cnpg_pg_stat_archiver_seconds_since_last_archival{role="primary"}) > 93600
+      for: 5m
+      labels:
+        severity: warning
         team: data-platform
