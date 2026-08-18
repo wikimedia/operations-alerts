@@ -26,13 +26,24 @@ groups:
 
       - alert: ATSBackendErrorsHigh
         annotations:
-          description: 'High number of 5xx responses from {{ $labels.backend }} to ATS in {{ $externalLabels.site }}'
-          summary: 'ATS: elevated 5xx errors from {{ $labels.backend }} in {{ $externalLabels.site }} #page'
+          description: '{{ $value | humanizePercentage }} of requests from ATS to {{ $labels.backend }} in {{ $externalLabels.site }} returning 5xx'
+          summary: 'ATS: elevated 5xx error ratio from {{ $labels.backend }} in {{ $externalLabels.site }} #page'
           dashboard: 'https://grafana.wikimedia.org/d/1T_4O08Wk/ats-backends-origin-servers-overview?orgId=1&viewPanel=12&var-site={{ $externalLabels.site }}&var-cluster={{ $labels.cluster | reReplaceAll "cache_" ""}}&var-origin={{ $labels.backend }}'
           runbook: 'https://wikitech.wikimedia.org/wiki/Apache_Traffic_Server#Debugging'
-        # Historically only real outages would've triggered this alert by keeping errors over 3 per second per backend for over 15 minutes.
-        # We exclude explicitly the API gateways as we have individual alerts for them. See team-sre/api-gateway.yaml
-        expr: sum(rate(trafficserver_backend_requests_seconds_count{status=~"5[0-9][0-9]", backend!~"localhost|127.0.0.1|((api|rest)-gateway(-ro)?|performance|phabricator|wcqs|wdqs-(main|scholarly)).discovery.wmnet"}[2m])) by (backend, cluster) > 3
+        # page on ratio of failed requests factoring in overall
+        # traffic rate.
+        # The >= 5 is to account for services with very low RPS
+        # potentially triggering this alert erroneously.
+        expr: |
+          (
+            1 - ats_backend:trafficserver_backend_availability:ratio5m{
+                    backend!~"((api|rest)-gateway(-ro)?|performance|phabricator|wcqs|wdqs-(main|scholarly)).discovery.wmnet"
+                }
+          ) > 0.05
+          and on (backend, cluster)
+          (
+            sum by (backend, cluster) (ats_backend:trafficserver_backend_requests:rate5m) >= 5
+          )
         for: 15m
         labels:
           severity: page
