@@ -11,7 +11,7 @@ tests:
       eval_time: 2161m
       exp_alerts:
        - exp_labels:
-           severity: warning
+           severity: critical
            sloth_severity: page
            team: o11y
            recorder: "thanos-rule@main"
@@ -34,7 +34,7 @@ tests:
            runbook: TODO
 
        - exp_labels:
-           severity: warning
+           severity: critical
            sloth_severity: ticket
            team: o11y
            recorder: "thanos-rule@main"

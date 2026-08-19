@@ -21,12 +21,12 @@ groups:
           (
             count by (sloth_service, sloth_slo, revision) (
               {__name__ =~ "slo:sli_error:ratio_rate(5m|30m|1h|6h)"}
-            ) >= 4
+            ) == 4
           )
         for: 36h
         labels:
           sloth_severity: page
-          severity: warning
+          severity: critical
           team: o11y
 
       - alert: SlothSliErrorRatioRateAbsent
@@ -45,10 +45,10 @@ groups:
           (
             count by (sloth_service, sloth_slo, revision) (
               {__name__ =~ "slo:sli_error:ratio_rate(2h|6h|1d|3d)"}
-            ) >= 4
+            ) == 4
           )
         for: 36h
         labels:
           sloth_severity: ticket
-          severity: warning
+          severity: critical
           team: o11y
