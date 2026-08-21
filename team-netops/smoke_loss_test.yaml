@@ -1,0 +1,34 @@
+rule_files:
+  - smoke_loss.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 30s
+    input_series:
+      - series: 'probe_duration_seconds{address="198.35.26.196",family="ip4",instance="cr1-magru:0",job="smoke/icmp",module="icmp_ip4",prometheus="ops",site="eqiad",target_site="magru"}'
+        values: '0.164x59 2.5007x29 0.164x30'
+      - series: 'probe_duration_seconds{address="198.35.26.197",family="ip4",instance="cr2-magru:0",job="smoke/icmp",module="icmp_ip4",prometheus="ops",site="eqiad",target_site="magru"}'
+        values: '0.169x59 2.5008x29 0.169x30'
+      - series: 'probe_duration_seconds{address="2620:0:863:ffff::1",family="ip6",instance="cr1-magru:0",job="smoke/icmp",module="icmp_ip6",prometheus="ops",site="eqiad",target_site="magru"}'
+        values: '0.164x59 2.5007x29 0.164x30'
+      - series: 'probe_duration_seconds{address="2620:0:863:ffff::2",family="ip6",instance="cr2-magru:0",job="smoke/icmp",module="icmp_ip6",prometheus="ops",site="eqiad",target_site="magru"}'
+        values: '0.169x59 2.5009x29 0.169x30'
+    alert_rule_test:
+      # Healthy: window sits entirely before the outage
+      - alertname: PingLossPercent
+        eval_time: 25m
+        exp_alerts: []
+      # Outage covers 30 of the 61 subquery steps in the sliding 30m window
+      - alertname: PingLossPercent
+        eval_time: 55m
+        exp_alerts:
+          - exp_labels:
+              team: sre
+              severity: critical
+              scope: network
+              site: eqiad
+              target_site: magru
+            exp_annotations:
+              summary: 'Blackbox probe packet loss 49.59% from eqiad to magru'
+              description: ''
+              dashboard: 'https://grafana.wikimedia.org/d/c4eb2910-ee2b-459b-8df6-369803085a1b/?from=now-3h&to=now&var-site=magru'
+              runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#PingLossPercent'

@@ -1,0 +1,27 @@
+# deploy-tag: global
+groups:
+  - name: ping_loss_percent
+    rules:
+      - alert: PingLossPercent
+        # A RTT result in this series of 2.5s means it has timed out, so we work out the number of those versus total number of samples.
+        expr: |
+          avg by (site, target_site) (
+            avg_over_time(
+              (
+                  probe_duration_seconds{instance=~"cr.*",job="smoke/icmp",site=~"eqiad|codfw",target_site!~"eqiad|codfw"}
+                >= bool
+                  2.5
+              )[30m:15s]
+            )
+          )
+          > 0.03
+        for: 5m
+        labels:
+          team: sre
+          severity: critical
+          scope: network
+        annotations:
+          summary: "Blackbox probe packet loss {{ $value | humanizePercentage }} from {{ $labels.site }} to {{ $labels.target_site }}"
+          description: ''  # Not needed
+          dashboard: 'https://grafana.wikimedia.org/d/c4eb2910-ee2b-459b-8df6-369803085a1b/?from=now-3h&to=now&var-site={{ $labels.target_site }}'
+          runbook: 'https://wikitech.wikimedia.org/wiki/Network_monitoring#PingLossPercent'
