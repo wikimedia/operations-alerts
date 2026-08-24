@@ -17,7 +17,7 @@ tests:
       exp_alerts:
        - exp_labels:
            job: fail
-           team: o11y
+           team: sre
            severity: warning
          exp_annotations:
            description: The Prometheus job fail running on foo@eqiad reports 0% of its targets
@@ -27,7 +27,7 @@ tests:
            runbook: 'https://wikitech.wikimedia.org/wiki/Prometheus#Prometheus_job_unavailable'
        - exp_labels:
            job: fail
-           team: o11y
+           team: sre
            severity: critical
          exp_annotations:
            description: The Prometheus job fail running on foo@eqiad reports 0% of its targets

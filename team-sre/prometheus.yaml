@@ -16,16 +16,16 @@ groups:
       # See https://phabricator.wikimedia.org/T276749 for netbox_device_statistics
       # 'rails' excluded until Alertmanager migration https://phabricator.wikimedia.org/T289454
       expr: 0.6 >= sum by (job) (up{job!~"(netbox_device_statistics|rails)"}) / count by (job) (up)
-      for: 5m
+      for: 10m
       labels:
         severity: warning
-        team: o11y
+        team: sre
 
     - <<: *job_unavailable
       expr: 0.5 >= sum by (job) (up{job!~"(netbox_device_statistics|rails)"}) / count by (job) (up)
       labels:
         severity: critical
-        team: o11y
+        team: sre
 
     - &lint_problem
       alert: AlertLintProblem
