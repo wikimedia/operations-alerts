@@ -74,8 +74,8 @@ groups:
         # The application is experiencing latency in consuming from Kafka brokers.
         # This threshold and duration should match target SLO values
         expr: |
-          flink_taskmanager_job_task_operator_KafkaSourceReader_KafkaConsumer_records_lag_max{kubernetes_namespace="mw-page-html-content-change-enrich", release="production", job_name="mw_page_html_content_change_enrich"} > 2400
-        for: 10m
+          flink_taskmanager_job_task_operator_KafkaSourceReader_KafkaConsumer_records_lag_max{kubernetes_namespace="mw-page-html-content-change-enrich", release="production", job_name="mw_page_html_content_change_enrich"} > 10000
+        for: 30m
         labels:
           team: data-engineering
           severity: warning
