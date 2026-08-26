@@ -1,0 +1,60 @@
+rule_files:
+  - memcached.yaml
+evaluation_interval: 1m
+tests:
+
+  # Test case for memcached cert expiring soon, but not emergency soon.
+  - interval: 1m
+    input_series:
+      - series: x509_cert_expiry{cert="/var/lib/memcached/ssl/discovery2026__mc1000_eqiad_wmnet.pem", cluster="memcached", instance="mc1000:9100", job="node", prometheus="ops", site="eqiad", subject="mc1000.eqiad.wmnet"}
+        # # 777600 seconds is 9 days.
+        values: '777600+10x60'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: CertificateExpiringSoon
+        eval_time: 10m
+        exp_alerts:
+          - exp_labels:
+              team: serviceops
+              severity: task
+              cert: "/var/lib/memcached/ssl/discovery2026__mc1000_eqiad_wmnet.pem"
+              cluster: "memcached"
+              instance: "mc1000:9100"
+              job: "node"
+              prometheus: "ops"
+              subject: "mc1000.eqiad.wmnet"
+              site: "eqiad"
+            exp_annotations:
+              description: 'The SSL certificate for mc1000.eqiad.wmnet in eqiad has failed to automatically renew.'
+              summary: 'The SSL certificate for mc1000.eqiad.wmnet in eqiad will expire in under 9 days.'
+              dashboard: 'https://grafana.wikimedia.org/d/bl2ncd4/memcached-certificate-expiration?from=now-6h&to=now&timezone=utc'
+              runbook: 'https://wikitech.wikimedia.org/wiki/Mw-mcrouter#Certificates_failed_to_renew'
+
+  # Test case for memcached cert expiring emergency soon.
+  - interval: 1m
+    input_series:
+      - series: x509_cert_expiry{cert="/var/lib/memcached/ssl/discovery2026__mc1000_eqiad_wmnet.pem", cluster="memcached", instance="mc1000:9100", job="node", prometheus="ops", site="eqiad", subject="mc1000.eqiad.wmnet"}
+        # # 432000 seconds is 5 days.
+        values: '432000+10x60'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: CertificateExpiringImminently
+        eval_time: 10m
+        exp_alerts:
+          - exp_labels:
+              team: sre
+              severity: page
+              cert: "/var/lib/memcached/ssl/discovery2026__mc1000_eqiad_wmnet.pem"
+              cluster: "memcached"
+              instance: "mc1000:9100"
+              job: "node"
+              prometheus: "ops"
+              subject: "mc1000.eqiad.wmnet"
+              site: "eqiad"
+            exp_annotations:
+              description: 'The SSL certificate for mc1000.eqiad.wmnet in eqiad has failed to automatically renew. The certificate should be manually renewed (or the Puppet integration should be fixed) as soon as possible.'
+              summary: 'The SSL certificate for mc1000.eqiad.wmnet in eqiad will expire in under 5 days. #page'
+              dashboard: 'https://grafana.wikimedia.org/d/bl2ncd4/memcached-certificate-expiration?from=now-6h&to=now&timezone=utc'
+              runbook: 'https://wikitech.wikimedia.org/wiki/Mw-mcrouter#Certificates_failed_to_renew'

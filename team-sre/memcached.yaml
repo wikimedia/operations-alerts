@@ -1,0 +1,31 @@
+# deploy-tag: ops
+# deploy-site: eqiad, codfw
+
+groups:
+  - name: memcached
+    rules:
+      - alert: CertificateExpiringSoon
+        # 777600 seconds is 9 days.
+        expr: x509_cert_expiry{cluster="memcached"} - timestamp(x509_cert_expiry{cluster="memcached"}) < 777600
+        for: 5m
+        annotations:
+          summary: 'The SSL certificate for {{ $labels.subject }} in {{ $externalLabels.site}} will expire in under 9 days.'
+          description: 'The SSL certificate for {{ $labels.subject }} in {{ $externalLabels.site }} has failed to automatically renew.'
+          runbook: https://wikitech.wikimedia.org/wiki/Mw-mcrouter#Certificates_failed_to_renew
+          dashboard: 'https://grafana.wikimedia.org/d/bl2ncd4/memcached-certificate-expiration?from=now-6h&to=now&timezone=utc'
+        labels:
+          severity: task
+          team: serviceops
+
+      - alert: CertificateExpiringImminently
+        # 432000 seconds is 5 days.
+        expr: x509_cert_expiry{cluster="memcached"} - timestamp(x509_cert_expiry{cluster="memcached"}) < 432000
+        for: 5m
+        annotations:
+          summary: 'The SSL certificate for {{ $labels.subject }} in {{ $externalLabels.site}} will expire in under 5 days. #page'
+          description: 'The SSL certificate for mc1000.eqiad.wmnet in eqiad has failed to automatically renew. The certificate should be manually renewed (or the Puppet integration should be fixed) as soon as possible.'
+          runbook: https://wikitech.wikimedia.org/wiki/Mw-mcrouter#Certificates_failed_to_renew
+          dashboard: 'https://grafana.wikimedia.org/d/bl2ncd4/memcached-certificate-expiration?from=now-6h&to=now&timezone=utc'
+        labels:
+          severity: page
+          team: sre
