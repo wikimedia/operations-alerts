@@ -5,6 +5,37 @@ groups:
   - name: druid
     rules:
 
+## Druid node PSI alerts
+    - alert: DruidNodeMemoryStall
+      expr: |
+        rate(node_pressure_memory_stalled_seconds_total{
+          cluster="druid_analytics"
+        }[5m]) > 0.1
+      for: 5m
+      labels:
+        severity: critical
+        team: 'data-platform'
+      annotations:
+        description: 'Memory stalled on {{ $labels.instance }}'
+        summary: '{{ $labels.instance }} is stalled on memory, current value {{ humanizePercentage $value }}'
+        dashboard: 'https://grafana.wikimedia.org/d/000000342/node-exporter-server-metrics?timezone=utc&var-datasource=000000006&var-node={{ $labels.instance }}&var-disk_device=%24__all&var-net_dev=%24__all&viewPanel=panel-322'
+        runbook: 'TODO'
+
+    - alert: DruidNodeIOStall
+      expr: |
+        rate(node_pressure_io_stalled_seconds_total{
+          cluster="druid_analytics"
+        }[5m]) > 0.1
+      for: 5m
+      labels:
+        severity: critical
+        team: 'data-platform'
+      annotations:
+        description: 'IO stalled on {{ $labels.instance }}'
+        summary: '{{ $labels.instance }} is stalled on IO, current value {{ humanizePercentage $value }}'
+        dashboard: 'https://grafana.wikimedia.org/d/000000342/node-exporter-server-metrics?timezone=utc&var-datasource=000000006&var-node={{ $labels.instance }}&var-disk_device=%24__all&var-net_dev=%24__all&viewPanel=panel-322'
+        runbook: 'TODO'
+
 ## Druid Realtime Ingestion alerts
     - alert: DruidNetflowSupervisor
       annotations:
