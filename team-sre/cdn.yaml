@@ -37,7 +37,7 @@ groups:
         expr: |
           (
             1 - ats_backend:trafficserver_backend_availability:ratio5m{
-                    backend!~"((api|rest)-gateway(-ro)?|performance|phabricator|wcqs|wdqs-(main|scholarly)|gitlab-replica-[a-z]).discovery.wmnet"
+                    backend!~"((api|rest)-gateway(-ro)?|lists|performance|phabricator|wcqs|wdqs-(main|scholarly)|gitlab-replica-[a-z]).discovery.wmnet"
                 }
           ) > 0.05
           and on (backend, cluster)
@@ -47,4 +47,28 @@ groups:
         for: 15m
         labels:
           severity: page
+          team: sre
+
+      - alert: ATSBackendErrorsHighTicket
+        annotations:
+          description: '{{ $value | humanizePercentage }} of requests from ATS to {{ $labels.backend }} in {{ $externalLabels.site }} returning 5xx'
+          summary: 'ATS: elevated 5xx error ratio from {{ $labels.backend }} in {{ $externalLabels.site }}'
+          dashboard: 'https://grafana.wikimedia.org/d/1T_4O08Wk/ats-backends-origin-servers-overview?orgId=1&viewPanel=12&var-site={{ $externalLabels.site }}&var-cluster={{ $labels.cluster | reReplaceAll "cache_" ""}}&var-origin={{ $labels.backend }}'
+          runbook: 'https://wikitech.wikimedia.org/wiki/Apache_Traffic_Server#Debugging'
+        # Same thresholds as ATSBackendErrorsHigh, but for backends that should
+        # not page: add a backend to the list below (and to the exclude list in
+        # ATSBackendErrorsHigh) to get a task instead of a page.
+        expr: |
+          (
+            1 - ats_backend:trafficserver_backend_availability:ratio5m{
+                    backend=~"(lists|performance).discovery.wmnet"
+                }
+          ) > 0.05
+          and on (backend, cluster)
+          (
+            sum by (backend, cluster) (ats_backend:trafficserver_backend_requests:rate5m) >= 5
+          )
+        for: 15m
+        labels:
+          severity: task
           team: sre

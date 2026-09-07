@@ -51,3 +51,30 @@ tests:
       - alertname: ATSBackendErrorsHigh
         eval_time: 25m
         exp_alerts: []
+
+  # Ensure that a non-paging backend gets a task, and not a page
+  - interval: 1m
+    input_series:
+      - series: trafficserver_backend_requests_seconds_count{backend="lists.discovery.wmnet",cluster="cache_text",instance="cp2",job="trafficserver-text",method="GET",prog="atsbackend.mtail",site="codfw",status="500"}
+        values: '0+120x30'
+      - series: trafficserver_backend_requests_seconds_count{backend="lists.discovery.wmnet",cluster="cache_text",instance="cp2",job="trafficserver-text",method="GET",prog="atsbackend.mtail",site="codfw",status="200"}
+        values: '0+1080x30'
+    external_labels:
+      site: codfw
+    alert_rule_test:
+      - alertname: ATSBackendErrorsHigh
+        eval_time: 25m
+        exp_alerts: []
+      - alertname: ATSBackendErrorsHighTicket
+        eval_time: 25m
+        exp_alerts:
+          - exp_labels:
+              severity: task
+              team: sre
+              backend: 'lists.discovery.wmnet'
+              cluster: 'cache_text'
+            exp_annotations:
+              summary: 'ATS: elevated 5xx error ratio from lists.discovery.wmnet in codfw'
+              description: '10% of requests from ATS to lists.discovery.wmnet in codfw returning 5xx'
+              runbook: https://wikitech.wikimedia.org/wiki/Apache_Traffic_Server#Debugging
+              dashboard: https://grafana.wikimedia.org/d/1T_4O08Wk/ats-backends-origin-servers-overview?orgId=1&viewPanel=12&var-site=codfw&var-cluster=text&var-origin=lists.discovery.wmnet
