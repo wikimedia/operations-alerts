@@ -17,7 +17,7 @@ tests:
               severity: critical
               job: ceph
             exp_annotations:
-              description: "eqiad Cephosd cluster is unable to serve traffic."
+              description: "eqiad Cephosd cluster requires attention."
               summary: "#warning Cephosd cluster in eqiad is in error status"
               dashboard: "https://grafana.wikimedia.org/d/tbO9LAiZK/cephosd-cluster?orgId=1&search=open&tag=cephosd"
               runbook: "https://wikitech.wikimedia.org/wiki/Data_Platform/Systems/Ceph"
@@ -37,7 +37,7 @@ tests:
               severity: warning
               job: ceph
             exp_annotations:
-              description: "High availability of the Ceph cluster in eqiad is compromised, but things should still be working as expected."
+              description: "Ceph cluster in eqiad is exhibiting a warning."
               summary: "Ceph cluster in eqiad is in warning status"
               dashboard: "https://grafana.wikimedia.org/d/tbO9LAiZK/cephosd-cluster?orgId=1&search=open&tag=cephosd"
               runbook: "https://wikitech.wikimedia.org/wiki/Data_Platform/Systems/Ceph"

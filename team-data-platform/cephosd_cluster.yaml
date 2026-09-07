@@ -7,7 +7,7 @@ groups:
     rules:
       - alert: CephOSDClusterInError
         annotations:
-          description: "{{ $externalLabels.site }} Cephosd cluster is unable to serve traffic."
+          description: "{{ $externalLabels.site }} Cephosd cluster requires attention."
           summary: "#warning Cephosd cluster in {{ $externalLabels.site }} is in error status"
           dashboard: "https://grafana.wikimedia.org/d/tbO9LAiZK/cephosd-cluster?orgId=1&search=open&tag=cephosd"
           runbook: "https://wikitech.wikimedia.org/wiki/Data_Platform/Systems/Ceph"
@@ -19,7 +19,7 @@ groups:
 
       - alert: CephOSDClusterInWarning
         annotations:
-          description: "High availability of the Ceph cluster in {{ $externalLabels.site }} is compromised, but things should still be working as expected."
+          description: "Ceph cluster in {{ $externalLabels.site }} is exhibiting a warning."
           summary: "Ceph cluster in {{ $externalLabels.site }} is in warning status"
           dashboard: "https://grafana.wikimedia.org/d/tbO9LAiZK/cephosd-cluster?orgId=1&search=open&tag=cephosd"
           runbook: "https://wikitech.wikimedia.org/wiki/Data_Platform/Systems/Ceph"
