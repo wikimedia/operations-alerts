@@ -37,7 +37,7 @@ groups:
         expr: |
           (
             1 - ats_backend:trafficserver_backend_availability:ratio5m{
-                    backend!~"((api|rest)-gateway(-ro)?|performance|phabricator|wcqs|wdqs-(main|scholarly)).discovery.wmnet"
+                    backend!~"((api|rest)-gateway(-ro)?|performance|phabricator|wcqs|wdqs-(main|scholarly)|gitlab-replica-[a-z]).discovery.wmnet"
                 }
           ) > 0.05
           and on (backend, cluster)
