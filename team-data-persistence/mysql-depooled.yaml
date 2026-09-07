@@ -1,0 +1,18 @@
+# deploy-tag: k8s-aux
+# deploy-site: eqiad, codfw
+
+groups:
+- name: mysql-depooled-not-silenced
+  rules:
+  - alert: MySQLDepooledNotSilenced
+    # pint disable promql/series
+    expr: ( max(mysql_instance_pooled{}) by (hostname,instance_group,section) == 0 ) and ( max(mysql_instance_silenced{}) by (hostname,instance_group,section) == 0 )
+    for: 3m
+    labels:
+      severity: critical
+      team: data-persistence
+    annotations:
+      summary: "MySQL instance {{ $labels.hostname }} {{ $labels.section }} depooled but not silenced"
+      runbook: https://wikitech.wikimedia.org/wiki/MariaDB/troubleshooting
+      description: "Instance {{ $labels.hostname }} {{ $labels.section }} depooled but not silenced"
+      dashboard: https://grafana.wikimedia.org/d/fc7sbw8/mariadb-pooling-and-silences-overview
