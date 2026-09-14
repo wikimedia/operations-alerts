@@ -245,6 +245,20 @@ tests:
       eval_time: 70m
       exp_alerts: []
 
+  - interval: 1m
+    input_series:
+    - series: cnpg_pg_stat_archiver_seconds_since_last_failure{cnpg_io_cluster="postgresql-test", kubernetes_namespace="postgresql-test", kubernetes_pod_name="postgresql-test-3", role="primary"}
+      values: '-1'
+    - series: cnpg_pg_stat_archiver_seconds_since_last_archival{cnpg_io_cluster="postgresql-test", kubernetes_namespace="postgresql-test", kubernetes_pod_name="postgresql-test-3", role="primary"}
+      values: '-1'
+    alert_rule_test:
+    - alertname: CloudnativePGWalArchivingFailingWarning
+      eval_time: 20m
+      exp_alerts: []
+    - alertname: CloudnativePGWalArchivingFailingCritical
+      eval_time: 70m
+      exp_alerts: []
+
   # The archiver's most recent attempt failed and it keeps failing
   - interval: 1m
     input_series:
