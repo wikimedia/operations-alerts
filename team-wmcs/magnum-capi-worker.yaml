@@ -1,0 +1,44 @@
+# deploy-tag: ops
+# deploy-site: eqiad
+
+groups:
+  - name: magnum-cluster-api
+    rules:
+      - alert: CloudVPSMagnumCapiClusterDown
+        expr: openstack_magnum_capi_worker_node_ready_count < 1.0
+        for: 10m
+        labels:
+          team: wmcs
+          severity: warning
+          service: cloudvps
+        annotations:
+          summary: "Magnum cluster api worker node is not ready"
+          description: "The k3s cluster running the cluster-api worker is not ready. Cluster management will likely fail."
+          runbook: https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/Magnum
+          dashboard: https://grafana.wikimedia.org/d/anbc675/wmcs-openstack-magnum-status
+
+      - alert: CloudVPSMagnumCapiClusterMissingCapiPod
+        expr: openstack_magnum_capi_worker_pod_running_count{namespace="capi-system"} < 1.0
+        for: 10m
+        labels:
+          team: wmcs
+          severity: warning
+          service: cloudvps
+        annotations:
+          summary: "No capi pod running in the magnum cluster api worker cluster"
+          description: "The 'capi-system' pod in the cluster-api worker cluster is not running. Cluster management will likely fail."
+          runbook: https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/Magnum
+          dashboard: https://grafana.wikimedia.org/d/anbc675/wmcs-openstack-magnum-status
+
+      - alert: CloudVPSMagnumCapiClusterMissingCapoPod
+        expr: openstack_magnum_capi_worker_pod_running_count{namespace="capo-system"} < 1.0
+        for: 10m
+        labels:
+          team: wmcs
+          severity: warning
+          service: cloudvps
+        annotations:
+          summary: "No capo pod running in the magnum cluster api worker cluster"
+          description: "The 'capo-system' pod in the cluster-api worker cluster is not running. Cluster management will likely fail."
+          runbook: https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/Magnum
+          dashboard: https://grafana.wikimedia.org/d/anbc675/wmcs-openstack-magnum-status
