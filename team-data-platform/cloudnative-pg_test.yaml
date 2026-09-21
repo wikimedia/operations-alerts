@@ -337,11 +337,15 @@ tests:
       eval_time: 10m
       exp_alerts: []
 
-  # Nothing archived for over a day
+  # Nothing archived for over a day and WAL archives failed
   - interval: 1m
     input_series:
     - series: cnpg_pg_stat_archiver_seconds_since_last_archival{cnpg_io_cluster="postgresql-test", kubernetes_namespace="postgresql-test", kubernetes_pod_name="postgresql-test-3", role="primary"}
       values: '100000x20'
+    - series: cnpg_pg_stat_archiver_failed_count{cnpg_io_cluster="postgresql-test", kubernetes_namespace="postgresql-test", kubernetes_pod_name="postgresql-test-3", role="primary"}
+      values: '0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19'
+    - series: cnpg_pg_stat_archiver_archived_count{cnpg_io_cluster="postgresql-test", kubernetes_namespace="postgresql-test", kubernetes_pod_name="postgresql-test-3", role="primary"}
+      values: '0x20'
     alert_rule_test:
     - alertname: CloudnativePGLastArchiveAgeTooHighWarning
       eval_time: 10m
@@ -357,3 +361,17 @@ tests:
           cnpg_io_cluster: postgresql-test
           severity: warning
           team: data-platform
+
+  # Nothing archived for over a day BUT no wals archived were attempted
+  - interval: 1m
+    input_series:
+    - series: cnpg_pg_stat_archiver_seconds_since_last_archival{cnpg_io_cluster="postgresql-test", kubernetes_namespace="postgresql-test", kubernetes_pod_name="postgresql-test-3", role="primary"}
+      values: '100000x20'
+    - series: cnpg_pg_stat_archiver_failed_count{cnpg_io_cluster="postgresql-test", kubernetes_namespace="postgresql-test", kubernetes_pod_name="postgresql-test-3", role="primary"}
+      values: '0'
+    - series: cnpg_pg_stat_archiver_archived_count{cnpg_io_cluster="postgresql-test", kubernetes_namespace="postgresql-test", kubernetes_pod_name="postgresql-test-3", role="primary"}
+      values: '0'
+    alert_rule_test:
+    - alertname: CloudnativePGLastArchiveAgeTooHighWarning
+      eval_time: 10m
+      exp_alerts: []

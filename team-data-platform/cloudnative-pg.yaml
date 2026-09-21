@@ -170,7 +170,15 @@ groups:
         summary: '{{$labels.kubernetes_pod_name}}.{{$labels.kubernetes_namespace}} has not archived any WALs for more than a day'
         dashboard: "https://grafana.wikimedia.org/d/cloudnative-pg/cloudnativepg?forceLogin=&from=now-15m&orgId=1&refresh=30s&to=now&var-DS_PROMETHEUS=eqiad%2Bprometheus%252Fk8s-dse&var-cluster={{$labels.cnpg_io_cluster}}&var-instances=All&var-namespace={{$labels.kubernetes_namespace}}&var-operatorNamespace=cloudnative-pg-operator"
         runbook: "https://wikitech.wikimedia.org/wiki/Data_Platform/Systems/CloudnativePG/Clusters#Investigate_why_WALs_are_not_being_archived"
-      expr: max by (cnpg_io_cluster, kubernetes_namespace, kubernetes_pod_name) (cnpg_pg_stat_archiver_seconds_since_last_archival{role="primary"}) > 93600
+      expr: |
+        avg by (cnpg_io_cluster, kubernetes_namespace, kubernetes_pod_name) (
+          cnpg_pg_stat_archiver_seconds_since_last_archival{role="primary"}
+          and (
+            increase(cnpg_pg_stat_archiver_failed_count{role="primary"}[5m]) > 0
+            or
+            increase(cnpg_pg_stat_archiver_archived_count{role="primary"}[5m]) > 0
+          )
+        ) > 86400
       for: 5m
       labels:
         severity: warning
