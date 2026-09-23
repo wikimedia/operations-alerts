@@ -4,7 +4,7 @@ evaluation_interval: 1m
 tests:
   - interval: 1m
     input_series:
-      - series: memcached_up{cluster="wmcs", instance="cloudcontrol1006:9150", job="memcached"}
+      - series: memcached_up{cluster="cloudcontrol", instance="cloudcontrol1006:9150", job="memcached"}
         values: '1x10 0x10'
     external_labels:
       prometheus: ops
@@ -19,11 +19,11 @@ tests:
           - exp_labels:
               team: wmcs
               severity: critical
-              cluster: wmcs
+              cluster: cloudcontrol
               instance: cloudcontrol1006:9150
               job: memcached
             exp_annotations:
               summary: "Memcached is down on cloudcontrol1006"
               description: "Memcached cannot be reached on cloudcontrol1006"
               runbook: TODO
-              dashboard: https://grafana.wikimedia.org/d/000000316/memcached?orgId=1&from=now-6h&to=now&timezone=utc&var-site=eqiad&var-cluster=wmcs&var-instance=cloudcontrol1006
+              dashboard: https://grafana.wikimedia.org/d/000000316/memcached?orgId=1&from=now-6h&to=now&timezone=utc&var-site=eqiad&var-cluster=cloudcontrol&var-instance=cloudcontrol1006

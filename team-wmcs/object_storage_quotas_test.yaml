@@ -5,9 +5,9 @@ tests:
   # size quota, non-managed user does nothing
   - interval: 1h
     input_series:
-      - series: ceph_rgw_quota_size_kb_used{cluster="wmcs", user="testuser1"}
+      - series: ceph_rgw_quota_size_kb_used{cluster="cloudcontrol", user="testuser1"}
         values: "86+0x9"
-      - series: ceph_rgw_quota_size_kb_total{cluster="wmcs", user="testuser1"}
+      - series: ceph_rgw_quota_size_kb_total{cluster="cloudcontrol", user="testuser1"}
         values: "100+0x9"
     external_labels:
       site: eqiad
@@ -19,9 +19,9 @@ tests:
   # size quota, managed projects both warn and crit
   - interval: 1h
     input_series:
-      - series: ceph_rgw_quota_size_kb_used{cluster="wmcs", user="tools"}
+      - series: ceph_rgw_quota_size_kb_used{cluster="cloudcontrol", user="tools"}
         values: "96+0x9"
-      - series: ceph_rgw_quota_size_kb_total{cluster="wmcs", user="tools"}
+      - series: ceph_rgw_quota_size_kb_total{cluster="cloudcontrol", user="tools"}
         values: "100+0x9"
     external_labels:
       site: eqiad
@@ -55,9 +55,9 @@ tests:
   # objects quota, non-managed users, do nothing
   - interval: 1h
     input_series:
-      - series: ceph_rgw_quota_objects_used{cluster="wmcs", user="testuser1"}
+      - series: ceph_rgw_quota_objects_used{cluster="cloudcontrol", user="testuser1"}
         values: "86+0x9"
-      - series: ceph_rgw_quota_objects_total{cluster="wmcs", user="testuser1"}
+      - series: ceph_rgw_quota_objects_total{cluster="cloudcontrol", user="testuser1"}
         values: "100+0x9"
     external_labels:
       site: eqiad
@@ -69,9 +69,9 @@ tests:
   # objects quota, managed projects both warn and crit
   - interval: 1h
     input_series:
-      - series: ceph_rgw_quota_objects_used{cluster="wmcs", user="tools"}
+      - series: ceph_rgw_quota_objects_used{cluster="cloudcontrol", user="tools"}
         values: "96+0x9"
-      - series: ceph_rgw_quota_objects_total{cluster="wmcs", user="tools"}
+      - series: ceph_rgw_quota_objects_total{cluster="cloudcontrol", user="tools"}
         values: "100+0x9"
     external_labels:
       site: eqiad

@@ -4,7 +4,7 @@ evaluation_interval: 1m
 tests:
   - interval: 1m
     input_series:
-      - series: 'openstack_nova_agent_state{cluster="wmcs", instance="cloudvirt1001", job="openstack", service="nova-compute", adminState="enabled"}'
+      - series: 'openstack_nova_agent_state{cluster="cloudcontrol", instance="cloudvirt1001", job="openstack", service="nova-compute", adminState="enabled"}'
         values: "1x3 0x117"
     alert_rule_test:
       - alertname: CloudVirtDown
@@ -13,7 +13,7 @@ tests:
           - exp_labels:
               team: wmcs
               severity: page
-              cluster: wmcs
+              cluster: cloudcontrol
               instance: cloudvirt1001
               job: openstack
               service: nova-compute
@@ -26,7 +26,7 @@ tests:
 
   - interval: 1m
     input_series:
-      - series: 'openstack_nova_agent_state{cluster="wmcs", instance="cloudvirt-wdqs1001", job="openstack", service="nova-compute", adminState="enabled"}'
+      - series: 'openstack_nova_agent_state{cluster="cloudcontrol", instance="cloudvirt-wdqs1001", job="openstack", service="nova-compute", adminState="enabled"}'
         values: "1x3 0x117"
     alert_rule_test:
       - alertname: CloudVirtDown
@@ -35,7 +35,7 @@ tests:
           - exp_labels:
               team: wmcs
               severity: page
-              cluster: wmcs
+              cluster: cloudcontrol
               instance: cloudvirt-wdqs1001
               job: openstack
               service: nova-compute
@@ -48,7 +48,7 @@ tests:
 
   - interval: 1m
     input_series:
-      - series: 'openstack_nova_agent_state{cluster="wmcs", instance="cloudvirtlocal1001", job="openstack", service="nova-compute", adminState="enabled"}'
+      - series: 'openstack_nova_agent_state{cluster="cloudcontrol", instance="cloudvirtlocal1001", job="openstack", service="nova-compute", adminState="enabled"}'
         values: "1x3 0x117"
     alert_rule_test:
       - alertname: CloudVirtDown
@@ -57,7 +57,7 @@ tests:
           - exp_labels:
               team: wmcs
               severity: page
-              cluster: wmcs
+              cluster: cloudcontrol
               instance: cloudvirtlocal1001
               job: openstack
               service: nova-compute
@@ -70,7 +70,7 @@ tests:
 
   - interval: 1m
     input_series:
-      - series: 'openstack_nova_agent_state{cluster="wmcs", instance="cloudvirt1047", job="openstack", service="nova-compute", adminState="disabled"}'
+      - series: 'openstack_nova_agent_state{cluster="cloudcontrol", instance="cloudvirt1047", job="openstack", service="nova-compute", adminState="disabled"}'
         values: "0x120"
     alert_rule_test:
       - alertname: CloudVirtDown
@@ -79,7 +79,7 @@ tests:
 
   - interval: 1m
     input_series:
-      - series: 'openstack_nova_agent_state{cluster="wmcs", instance="cloudvirt1047", job="openstack", service="nova-compute", adminState="disabled"}'
+      - series: 'openstack_nova_agent_state{cluster="cloudcontrol", instance="cloudvirt1047", job="openstack", service="nova-compute", adminState="disabled"}'
         values: "1x14460"
     alert_rule_test:
       # Host has been disabled for more than 10 days, alert
@@ -89,7 +89,7 @@ tests:
           - exp_labels:
               team: wmcs
               severity: warning
-              cluster: wmcs
+              cluster: cloudcontrol
               instance: cloudvirt1047
               job: openstack
               service: nova-compute
@@ -102,7 +102,7 @@ tests:
 
   - interval: 1m
     input_series:
-      - series: 'openstack_nova_agent_state{cluster="wmcs", instance="cloudvirt1048", job="openstack", service="nova-compute", adminState="disabled"}'
+      - series: 'openstack_nova_agent_state{cluster="cloudcontrol", instance="cloudvirt1048", job="openstack", service="nova-compute", adminState="disabled"}'
         values: "1x120"
     alert_rule_test:
       # Host disabled for less than 10 days, no alert
@@ -112,7 +112,7 @@ tests:
 
   - interval: 1m
     input_series:
-      - series: 'openstack_nova_agent_state{cluster="wmcs", instance="cloudvirt1049", job="openstack", service="nova-compute", adminState="enabled"}'
+      - series: 'openstack_nova_agent_state{cluster="cloudcontrol", instance="cloudvirt1049", job="openstack", service="nova-compute", adminState="enabled"}'
         values: "1x120"
     alert_rule_test:
       # Host is enabled, no alert

@@ -4,10 +4,8 @@ evaluation_interval: 1m
 tests:
   - interval: 1m
     input_series:
-      - series: 'up{job="node", instance="dummynode1:9000", cluster="wmcs"}'
+      - series: 'up{job="node", instance="dummynode1:9000", cluster="cloudfoo"}'
         values: "1 0+0x300"
-    external_labels:
-      cluster: wmcs
     alert_rule_test:
       - alertname: NodeDown
         eval_time: 7m
@@ -16,7 +14,7 @@ tests:
               team: wmcs
               severity: warning
               instance: dummynode1:9000
-              cluster: wmcs
+              cluster: cloudfoo
               job: node
             exp_annotations:
               summary: "Node dummynode1 is down."
@@ -30,7 +28,7 @@ tests:
               team: wmcs
               severity: critical
               instance: dummynode1:9000
-              cluster: wmcs
+              cluster: cloudfoo
               job: node
             exp_annotations:
               summary: "Node dummynode1 has been down for long."
@@ -41,7 +39,7 @@ tests:
               team: wmcs
               severity: warning
               instance: dummynode1:9000
-              cluster: wmcs
+              cluster: cloudfoo
               job: node
             exp_annotations:
               summary: "Node dummynode1 is down."

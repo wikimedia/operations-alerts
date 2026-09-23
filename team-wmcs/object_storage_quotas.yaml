@@ -5,7 +5,7 @@ groups:
   - name: object_storage_quota
     rules:
       - alert: ObjectStorageSizeQuotaFull
-        expr: (sum by(user) (ceph_rgw_quota_size_kb_used) / sum by(user) (ceph_rgw_quota_size_kb_total{cluster="wmcs", user=~"(tools.*|admin|quarry|metricsinfra|paws|tofu|cloudinfra)"})) > 0.8
+        expr: (sum by(user) (ceph_rgw_quota_size_kb_used) / sum by(user) (ceph_rgw_quota_size_kb_total{cluster="cloudcontrol", user=~"(tools.*|admin|quarry|metricsinfra|paws|tofu|cloudinfra)"})) > 0.8
         for: 5h
         labels:
           team: wmcs
@@ -19,7 +19,7 @@ groups:
           dashboard: https://grafana.wikimedia.org/d/7120b794-4638-49f5-bccd-9716efc60f24/wmcs-object-storage-quotas
 
       - alert: ObjectStorageSizeQuotaFull
-        expr: (sum by(user) (ceph_rgw_quota_size_kb_used) / sum by(user) (ceph_rgw_quota_size_kb_total{cluster="wmcs", user=~"(tools.*|admin|quarry|metricsinfra|paws|tofu|cloudinfra)"})) > 0.95
+        expr: (sum by(user) (ceph_rgw_quota_size_kb_used) / sum by(user) (ceph_rgw_quota_size_kb_total{cluster="cloudcontrol", user=~"(tools.*|admin|quarry|metricsinfra|paws|tofu|cloudinfra)"})) > 0.95
         for: 5h
         labels:
           team: wmcs
@@ -33,7 +33,7 @@ groups:
           dashboard: https://grafana.wikimedia.org/d/7120b794-4638-49f5-bccd-9716efc60f24/wmcs-object-storage-quotas
 
       - alert: ObjectStorageObjectQuotaFull
-        expr: (sum by(user) (ceph_rgw_quota_objects_used) / sum by(user) (ceph_rgw_quota_objects_total{cluster="wmcs", user=~"(tools.*|admin|quarry|metricsinfra|paws|tofu|cloudinfra)"})) > 0.8
+        expr: (sum by(user) (ceph_rgw_quota_objects_used) / sum by(user) (ceph_rgw_quota_objects_total{cluster="cloudcontrol", user=~"(tools.*|admin|quarry|metricsinfra|paws|tofu|cloudinfra)"})) > 0.8
         for: 5h
         labels:
           team: wmcs
@@ -47,7 +47,7 @@ groups:
           dashboard: https://grafana.wikimedia.org/d/7120b794-4638-49f5-bccd-9716efc60f24/wmcs-object-storage-quotas
 
       - alert: ObjectStorageObjectQuotaFull
-        expr: (sum by(user) (ceph_rgw_quota_objects_used) / sum by(user) (ceph_rgw_quota_objects_total{cluster="wmcs", user=~"(tools.*|admin|quarry|metricsinfra|paws|tofu|cloudinfra)"})) > 0.95
+        expr: (sum by(user) (ceph_rgw_quota_objects_used) / sum by(user) (ceph_rgw_quota_objects_total{cluster="cloudcontrol", user=~"(tools.*|admin|quarry|metricsinfra|paws|tofu|cloudinfra)"})) > 0.95
         for: 5h
         labels:
           team: wmcs

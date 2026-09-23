@@ -11,7 +11,7 @@ groups:
           description: 'The node {{  $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }} has been down for more than 5 minutes.'
           dashboard: 'https://grafana.wikimedia.org/d/000000377/host-overview?orgId=1&var-server={{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}'
           runbook: "https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/NodeDown"
-        expr: up{job="node", cluster="wmcs", instance!~"cloudvirt(-wdqs|local)?1.*"} == 0
+        expr: up{job="node", cluster=~"cloud.*", instance!~"cloudvirt(-wdqs|local)?1.*"} == 0
         for: 5m
         labels:
           severity: warning
@@ -23,7 +23,7 @@ groups:
           description: 'The node {{  $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }} has been down for more than two hours.'
           dashboard: 'https://grafana.wikimedia.org/d/000000377/host-overview?orgId=1&var-server={{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}'
           runbook: "https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/NodeDown"
-        expr: up{job="node", cluster="wmcs", instance!~"cloudvirt(-wdqs|local)?1.*"} == 0
+        expr: up{job="node", cluster=~"cloud.*", instance!~"cloudvirt(-wdqs|local)?1.*"} == 0
         for: 2h
         labels:
           severity: critical
@@ -42,7 +42,7 @@ groups:
           summary: Prometheus in {{ $externalLabels.site }} can't scrape node metrics from WMCS.
           runbook: TODO
           dashboard: TODO
-        expr: 0.2 >= sum (up{job="node",cluster="wmcs"}) / count (up{job="node",cluster="wmcs"})
+        expr: 0.2 >= sum (up{job="node",cluster=~"cloud.*"}) / count (up{job="node",cluster=~"cloud.*"})
         for: 5m
         labels:
           severity: warning

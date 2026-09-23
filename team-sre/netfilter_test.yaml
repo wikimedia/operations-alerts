@@ -18,9 +18,9 @@ tests:
         values: '250000x100'
       - series: 'node_nf_conntrack_entries_limit{cluster="api_appserver",instance="mw2002:9100",job="node",site="codfw"}'
         values: '262144x100'
-      - series: 'node_nf_conntrack_entries{cluster="wmcs",instance="cloud2002:9100",job="node",site="codfw"}'
+      - series: 'node_nf_conntrack_entries{cluster="cloud",instance="cloud2002:9100",job="node",site="codfw"}'
         values: '250000x100'
-      - series: 'node_nf_conntrack_entries_limit{cluster="wmcs",instance="cloud2002:9100",job="node",site="codfw"}'
+      - series: 'node_nf_conntrack_entries_limit{cluster="cloud",instance="cloud2002:9100",job="node",site="codfw"}'
         values: '262144x100'
     external_labels:
       site: codfw
@@ -57,7 +57,7 @@ tests:
               severity: critical
               job: node
               instance: cloud2002:9100
-              cluster: wmcs
+              cluster: cloud
               site: codfw
             exp_annotations:
               description: 'Connection tracking table is almost full (95.37%) on cloud2002:9100'
