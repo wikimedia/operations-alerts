@@ -1,0 +1,305 @@
+rule_files:
+  - backup.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    input_series:
+      - series: 'wmcs_backup_collector_error{cluster="cloud", instance="cloudbackup1003:9100", job="node"}'
+        values: "0x15 1x30"
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: BackupCollectorError
+        eval_time: 10m
+        exp_alerts: []
+      - alertname: BackupCollectorError
+        eval_time: 30m
+        exp_alerts:
+          - exp_labels:
+              cluster: cloud
+              instance: cloudbackup1003:9100
+              job: node
+              severity: critical
+              team: wmcs
+              service: cloudvps
+            exp_annotations:
+              summary: "Backup collector on cloudbackup1003:9100 failed to list backups"
+              description: "The backup collector on cloudbackup1003:9100 (eqiad) is failing to list the backy2 backups, so all backup metrics from this node are untrustworthy."
+              dashboard: TODO
+              runbook: TODO
+
+  - interval: 1m
+    input_series:
+      - series: 'wmcs_backup_collector_error{cluster="cloud", instance="cloudbackup2003:9100", job="node"}'
+        values: "0x30"
+    external_labels:
+      site: codfw
+    alert_rule_test:
+      - alertname: BackupCollectorError
+        eval_time: 30m
+        exp_alerts: []
+
+  - interval: 1m
+    input_series:
+      - series: 'wmcs_backup_entries{cluster="cloud", instance="cloudbackup2003:9100", job="node", kind="volume"}'
+        values: "5x1810"
+      - series: 'wmcs_backup_newest_timestamp_seconds{cluster="cloud", instance="cloudbackup2003:9100", job="node", kind="volume"}'
+        values: "10000x1810"
+    external_labels:
+      site: codfw
+    alert_rule_test:
+      - alertname: BackupStale
+        eval_time: 10h
+        exp_alerts: []
+      - alertname: BackupStale
+        eval_time: 30h
+        exp_alerts:
+          - exp_labels:
+              cluster: cloud
+              instance: cloudbackup2003:9100
+              job: node
+              kind: volume
+              severity: critical
+              team: wmcs
+              service: cloudvps
+            exp_annotations:
+              summary: "Newest volume backup on cloudbackup2003:9100 is 1d 3h 13m 20s old"
+              description: "The newest volume backup on cloudbackup2003:9100 (codfw) has not been updated for 1d 3h 13m 20s. Backups should be created at least daily; the backup job may have stopped."
+              dashboard: TODO
+              runbook: TODO
+
+  - interval: 1m
+    input_series:
+      - series: 'wmcs_backup_entries{cluster="cloud", instance="cloudbackup2004:9100", job="node", kind="volume"}'
+        values: "325x1810"
+      - series: 'wmcs_backup_newest_timestamp_seconds{cluster="cloud", instance="cloudbackup2004:9100", job="node", kind="volume"}'
+        values: "100000x1810"
+    external_labels:
+      site: codfw
+    alert_rule_test:
+      - alertname: BackupStale
+        eval_time: 30h
+        exp_alerts: []
+
+  - interval: 1m
+    input_series:
+      - series: 'wmcs_backup_entries{cluster="cloud", instance="cloudbackup2003:9100", job="node", kind="volume"}'
+        values: "5x10400 0x2000"
+    external_labels:
+      site: codfw
+    alert_rule_test:
+      - alertname: BackupKindGone
+        eval_time: 11000m
+        exp_alerts: []
+      - alertname: BackupKindGone
+        eval_time: 11900m
+        exp_alerts:
+          - exp_labels:
+              cluster: cloud
+              instance: cloudbackup2003:9100
+              job: node
+              kind: volume
+              severity: critical
+              team: wmcs
+              service: cloudvps
+            exp_annotations:
+              summary: "volume backups are gone on cloudbackup2003:9100"
+              description: "The volume backup set on cloudbackup2003:9100 (codfw) has no backup entries, while 7 days ago it had some. Check for accidental deletion or a broken backup job."
+              dashboard: TODO
+              runbook: TODO
+
+  - interval: 1m
+    input_series:
+      - series: 'wmcs_backup_entries{cluster="cloud", instance="cloudbackup1001-dev:9100", job="node", kind="image"}'
+        values: "0x12400"
+      - series: 'wmcs_backup_entries{cluster="cloud", instance="cloudbackup1002-dev:9100", job="node", kind="volume"}'
+        values: "10x12400"
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: BackupKindGone
+        eval_time: 11900m
+        exp_alerts: []
+
+  - interval: 1m
+    input_series:
+      - series: 'wmcs_backup_distinct_backed_up{cluster="cloud", instance="cloudbackup1003:9100", job="node", kind="instance"}'
+        values: "348x10100 174x2000"
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: BackupCoverageDrop
+        eval_time: 10110m
+        exp_alerts: []
+      - alertname: BackupCoverageDrop
+        eval_time: 10200m
+        exp_alerts:
+          - exp_labels:
+              cluster: cloud
+              instance: cloudbackup1003:9100
+              job: node
+              kind: instance
+              severity: critical
+              team: wmcs
+              service: cloudvps
+            exp_annotations:
+              summary: "instance backup coverage dropped on cloudbackup1003:9100"
+              description: "Only 174 distinct instance objects are backed up on cloudbackup1003:9100 (eqiad), below 90% of the level 24h ago. Some backups may have been lost."
+              dashboard: TODO
+              runbook: TODO
+
+  - interval: 1m
+    input_series:
+      - series: 'wmcs_backup_distinct_backed_up{cluster="cloud", instance="cloudbackup2003:9100", job="node", kind="volume"}'
+        values: "408x12100"
+    external_labels:
+      site: codfw
+    alert_rule_test:
+      - alertname: BackupCoverageDrop
+        eval_time: 10200m
+        exp_alerts: []
+
+  - interval: 1m
+    input_series:
+      - series: 'wmcs_backup_entries_invalid{cluster="cloud", instance="cloudbackup1004:9100", job="node", kind="instance"}'
+        values: "15x160"
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: BackupInvalidSpike
+        eval_time: 30m
+        exp_alerts: []
+      - alertname: BackupInvalidSpike
+        eval_time: 75m
+        exp_alerts:
+          - exp_labels:
+              cluster: cloud
+              instance: cloudbackup1004:9100
+              job: node
+              kind: instance
+              severity: warning
+              team: wmcs
+              service: cloudvps
+            exp_annotations:
+              summary: "Many invalid instance backups on cloudbackup1004:9100"
+              description: "15 invalid instance backup versions on cloudbackup1004:9100 (eqiad). Invalid backups cannot be restored and may indicate corruption."
+              dashboard: TODO
+              runbook: TODO
+
+  - interval: 1m
+    input_series:
+      - series: 'wmcs_backup_entries_invalid{cluster="cloud", instance="cloudbackup2004:9100", job="node", kind="volume"}'
+        values: "1x1439 5x130"
+    external_labels:
+      site: codfw
+    alert_rule_test:
+      - alertname: BackupInvalidSpike
+        eval_time: 1450m
+        exp_alerts: []
+      - alertname: BackupInvalidSpike
+        eval_time: 1520m
+        exp_alerts:
+          - exp_labels:
+              cluster: cloud
+              instance: cloudbackup2004:9100
+              job: node
+              kind: volume
+              severity: warning
+              team: wmcs
+              service: cloudvps
+            exp_annotations:
+              summary: "Many invalid volume backups on cloudbackup2004:9100"
+              description: "4 invalid volume backup versions on cloudbackup2004:9100 (codfw). Invalid backups cannot be restored and may indicate corruption."
+              dashboard: TODO
+              runbook: TODO
+
+  - interval: 1m
+    input_series:
+      - series: 'wmcs_backup_entries_invalid{cluster="cloud", instance="cloudbackup1003:9100", job="node", kind="volume"}'
+        values: "3x160"
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: BackupInvalidSpike
+        eval_time: 75m
+        exp_alerts: []
+
+  - interval: 1m
+    input_series:
+      - series: 'wmcs_backup_oldest_timestamp_seconds{cluster="cloud", instance="cloudbackup2003:9100", job="node", kind="volume"}'
+        values: "1000x58000"
+      - series: 'wmcs_backup_entries{cluster="cloud", instance="cloudbackup2003:9100", job="node", kind="volume"}'
+        values: "5x58000"
+    external_labels:
+      site: codfw
+    alert_rule_test:
+      - alertname: BackupGcStalled
+        eval_time: 20d
+        exp_alerts: []
+      - alertname: BackupGcStalled
+        eval_time: 40d
+        exp_alerts:
+          - exp_labels:
+              cluster: cloud
+              instance: cloudbackup2003:9100
+              job: node
+              kind: volume
+              severity: warning
+              team: wmcs
+              service: cloudvps
+            exp_annotations:
+              summary: "Oldest volume backup on cloudbackup2003:9100 is 39d 23h 43m 20s old"
+              description: "The oldest volume backup on cloudbackup2003:9100 (codfw) is 39d 23h 43m 20s old while backup entries still exist. The purge/GC may not be removing expired backups."
+              dashboard: TODO
+              runbook: TODO
+
+  - interval: 1m
+    input_series:
+      - series: 'wmcs_backup_oldest_timestamp_seconds{cluster="cloud", instance="cloudbackup1001-dev:9100", job="node", kind="volume"}'
+        values: "0x58000"
+      - series: 'wmcs_backup_entries{cluster="cloud", instance="cloudbackup1001-dev:9100", job="node", kind="volume"}'
+        values: "0x58000"
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: BackupGcStalled
+        eval_time: 40d
+        exp_alerts: []
+
+  - interval: 1m
+    input_series:
+      - series: 'wmcs_backup_size_bytes{cluster="cloud", instance="cloudbackup1003:9100", job="node", kind="instance"}'
+        values: "57000000000000x10400 90000000000000x2000"
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: BackupSizeAnomaly
+        eval_time: 10430m
+        exp_alerts: []
+      - alertname: BackupSizeAnomaly
+        eval_time: 10500m
+        exp_alerts:
+          - exp_labels:
+              cluster: cloud
+              instance: cloudbackup1003:9100
+              job: node
+              kind: instance
+              severity: warning
+              team: wmcs
+              service: cloudvps
+            exp_annotations:
+              summary: "instance backup size on cloudbackup1003:9100 grew by more than 50% in a week"
+              description: "The instance backup size on cloudbackup1003:9100 (eqiad) grew by more than 50% compared to a week ago. Check for unexpected growth or a runaway backup job."
+              dashboard: TODO
+              runbook: TODO
+
+  - interval: 1m
+    input_series:
+      - series: 'wmcs_backup_size_bytes{cluster="cloud", instance="cloudbackup2003:9100", job="node", kind="volume"}'
+        values: "315000000000000x12400"
+    external_labels:
+      site: codfw
+    alert_rule_test:
+      - alertname: BackupSizeAnomaly
+        eval_time: 10500m
+        exp_alerts: []

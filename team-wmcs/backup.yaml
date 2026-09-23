@@ -1,0 +1,115 @@
+# deploy-tag: cloud
+# deploy-site: eqiad, codfw
+
+# Alerts for the WMCS backup collector (backy2)
+groups:
+  - name: backup
+    rules:
+      - alert: BackupCollectorError
+        annotations:
+          summary: "Backup collector on {{ $labels.instance }} failed to list backups"
+          description: "The backup collector on {{ $labels.instance }} ({{ $externalLabels.site }}) is failing to list the backy2 backups, so all backup metrics from this node are untrustworthy."
+          dashboard: TODO
+          runbook: TODO
+        expr: wmcs_backup_collector_error == 1
+        for: 10m
+        labels:
+          severity: critical
+          team: wmcs
+          service: cloudvps
+
+      - alert: BackupStale
+        # Only check kinds this node actually backs up (entries > 0), so nodes
+        # that are not responsible for a kind do not fire on its zero value.
+        annotations:
+          summary: "Newest {{ $labels.kind }} backup on {{ $labels.instance }} is {{ $value | humanizeDuration }} old"
+          description: "The newest {{ $labels.kind }} backup on {{ $labels.instance }} ({{ $externalLabels.site }}) has not been updated for {{ $value | humanizeDuration }}. Backups should be created at least daily; the backup job may have stopped."
+          dashboard: TODO
+          runbook: TODO
+        expr: |
+          (time() - wmcs_backup_newest_timestamp_seconds > 26 * 3600)
+          and (wmcs_backup_entries > 0)
+        for: 30m
+        labels:
+          severity: critical
+          team: wmcs
+          service: cloudvps
+
+      - alert: BackupKindGone
+        # A kind that had backups a week ago is now completely empty on a node.
+        annotations:
+          summary: "{{ $labels.kind }} backups are gone on {{ $labels.instance }}"
+          description: "The {{ $labels.kind }} backup set on {{ $labels.instance }} ({{ $externalLabels.site }}) has no backup entries, while 7 days ago it had some. Check for accidental deletion or a broken backup job."
+          dashboard: TODO
+          runbook: TODO
+        expr: |
+          (wmcs_backup_entries == 0)
+          and (wmcs_backup_entries offset 7d > 0)
+        for: 24h
+        labels:
+          severity: critical
+          team: wmcs
+          service: cloudvps
+
+      - alert: BackupCoverageDrop
+        annotations:
+          summary: "{{ $labels.kind }} backup coverage dropped on {{ $labels.instance }}"
+          description: "Only {{ $value }} distinct {{ $labels.kind }} objects are backed up on {{ $labels.instance }} ({{ $externalLabels.site }}), below 90% of the level 24h ago. Some backups may have been lost."
+          dashboard: TODO
+          runbook: TODO
+        expr: |
+          (wmcs_backup_distinct_backed_up < (wmcs_backup_distinct_backed_up offset 24h) * 0.9)
+          and (wmcs_backup_distinct_backed_up offset 24h > 0)
+        for: 30m
+        labels:
+          severity: critical
+          team: wmcs
+          service: cloudvps
+
+      - alert: BackupInvalidSpike
+        annotations:
+          summary: "Many invalid {{ $labels.kind }} backups on {{ $labels.instance }}"
+          description: "{{ $value }} invalid {{ $labels.kind }} backup versions on {{ $labels.instance }} ({{ $externalLabels.site }}). Invalid backups cannot be restored and may indicate corruption."
+          dashboard: TODO
+          runbook: TODO
+        expr: |
+          (delta(wmcs_backup_entries_invalid[24h]) > 3)
+          or (wmcs_backup_entries_invalid > 10)
+        for: 1h
+        labels:
+          severity: warning
+          team: wmcs
+          service: cloudvps
+
+      - alert: BackupGcStalled
+        # Only check kinds this node actually backs up (entries > 0), so nodes
+        # that are not responsible for a kind do not fire on its zero value.
+        annotations:
+          summary: "Oldest {{ $labels.kind }} backup on {{ $labels.instance }} is {{ $value | humanizeDuration }} old"
+          description: "The oldest {{ $labels.kind }} backup on {{ $labels.instance }} ({{ $externalLabels.site }}) is {{ $value | humanizeDuration }} old while backup entries still exist. The purge/GC may not be removing expired backups."
+          dashboard: TODO
+          runbook: TODO
+        expr: |
+          (time() - wmcs_backup_oldest_timestamp_seconds > 30 * 24 * 3600)
+          and (wmcs_backup_entries > 0)
+        for: 24h
+        labels:
+          severity: warning
+          team: wmcs
+          service: cloudvps
+
+      - alert: BackupSizeAnomaly
+        # The 10GB floor avoids noise from small dev backup sets.
+        annotations:
+          summary: "{{ $labels.kind }} backup size on {{ $labels.instance }} grew by more than 50% in a week"
+          description: "The {{ $labels.kind }} backup size on {{ $labels.instance }} ({{ $externalLabels.site }}) grew by more than 50% compared to a week ago. Check for unexpected growth or a runaway backup job."
+          dashboard: TODO
+          runbook: TODO
+        expr: |
+          (wmcs_backup_size_bytes > (wmcs_backup_size_bytes offset 7d) * 1.5)
+          and (wmcs_backup_size_bytes > 10 * 1e9)
+        for: 1h
+        labels:
+          severity: warning
+          team: wmcs
+          service: cloudvps
