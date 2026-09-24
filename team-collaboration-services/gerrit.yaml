@@ -99,14 +99,15 @@ groups:
         # Alert if Gerrit root or /srv disk space is below 20% and projected to be
         # exhausted within 4 hours. The fullness guard keeps one-off large writes
         # (e.g. a Java heap dump) from firing on the slope alone while most of the
-        # disk is still free.
+        # disk is still free. The 30m hold rides out write bursts during a
+        # failover or switchover (T439039).
         expr: |
           (
             node_filesystem_avail_bytes{instance=~"gerrit.*", mountpoint=~"^/$|^/srv$"}
             / node_filesystem_size_bytes{instance=~"gerrit.*", mountpoint=~"^/$|^/srv$"}
           ) < 0.20
           and predict_linear(node_filesystem_avail_bytes{instance=~"gerrit.*", mountpoint=~"^/$|^/srv$"}[1h], 3600 * 4) <= 0
-        for: 10m
+        for: 30m
         labels:
           severity: task
           team: collaboration-services

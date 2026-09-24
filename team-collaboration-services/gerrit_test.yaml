@@ -79,16 +79,16 @@ tests:
         # We lose 1 byte per minute on a 1000-byte filesystem, starting with
         # 6 hours of runway. predict_linear projects exhaustion from 2h
         # (4 hours remaining), the 20% fullness guard passes at 2h41m
-        # (199/1000 < 0.20) and the alert fires 10m later.
+        # (199/1000 < 0.20) and the alert fires 30m later.
         values: '360-1x240'
       - series: 'node_filesystem_size_bytes{instance="gerrit2003:9100", mountpoint="/"}'
         values: '1000x240'
     alert_rule_test:
       - alertname: GerritDiskSpaceExhaustionIncoming
-        eval_time: 2h50m
+        eval_time: 3h10m
         exp_alerts: []
       - alertname: GerritDiskSpaceExhaustionIncoming
-        eval_time: 2h51m
+        eval_time: 3h11m
         exp_alerts:
           - exp_labels:
               team: collaboration-services
