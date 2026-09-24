@@ -1,0 +1,402 @@
+rule_files:
+  - revision-feature-counts.yaml
+evaluation_interval: 1m
+tests:
+  # --- the deployment has no pod that can serve --------------------------
+  - interval: 1m
+    input_series:
+      - series: 'kube_deployment_status_replicas_available{namespace="lac-lambdas", deployment="lac-lambdas-revision-feature-counts"}'
+        values: '0x10'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: RevisionFeatureCountsDown
+        eval_time: 5m
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              team: data-engineering
+              namespace: lac-lambdas
+              deployment: lac-lambdas-revision-feature-counts
+            exp_annotations:
+              summary: "RevisionFeatureCounts has no pod serving in eqiad"
+              description: "The deployment lac-lambdas-revision-feature-counts in lac-lambdas has no available replica."
+              dashboard: https://grafana.wikimedia.org/d/revision-feature-counts/revision-feature-counts?orgId=1&var-site=eqiad&var-prometheus=k8s
+              runbook: https://wikitech.wikimedia.org/wiki/Revision_Feature_Counts#RevisionFeatureCountsDown
+
+  # A healthy deployment must not alert.
+  - interval: 1m
+    input_series:
+      - series: 'kube_deployment_status_replicas_available{namespace="lac-lambdas", deployment="lac-lambdas-revision-feature-counts"}'
+        values: '4x10'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: RevisionFeatureCountsDown
+        eval_time: 10m
+        exp_alerts: []
+
+  # --- the service-side error rate ---------------------------------------
+  # The statuses in the regex are summed. 2 errors a minute against 10 calls
+  # a minute is 20%, and 30 errors in the window.
+  - interval: 1m
+    input_series:
+      - series: 'rfc_request_duration_seconds_count{kubernetes_namespace="lac-lambdas", grpc_code="UNAVAILABLE", reason="fetch_error"}'
+        values: '0+1x40'
+      - series: 'rfc_request_duration_seconds_count{kubernetes_namespace="lac-lambdas", grpc_code="DEADLINE_EXCEEDED", reason="deadline_exceeded"}'
+        values: '0+1x40'
+      - series: 'rfc_request_duration_seconds_count{kubernetes_namespace="lac-lambdas", grpc_code="OK", reason="ok"}'
+        values: '0+8x40'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: RevisionFeatureCountsHighErrorRate
+        eval_time: 31m
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              team: data-engineering
+            exp_annotations:
+              summary: "RevisionFeatureCounts fails more than 5% of calls in eqiad"
+              description: "More than 5% of GetRevisionArtifact calls fail in a way this service answers for. Break the rate down by the reason for more details."
+              dashboard: https://grafana.wikimedia.org/d/revision-feature-counts/revision-feature-counts?orgId=1&var-site=eqiad&var-prometheus=k8s&viewPanel=20
+              runbook: https://wikitech.wikimedia.org/wiki/Revision_Feature_Counts#RevisionFeatureCountsHighErrorRate
+
+  # A caller asking for wikis and pages that do not exist is not our fault.
+  # 100% of calls fail, and none of them counts.
+  - interval: 1m
+    input_series:
+      - series: 'rfc_request_duration_seconds_count{kubernetes_namespace="lac-lambdas", grpc_code="INVALID_ARGUMENT", reason="unknown_wiki"}'
+        values: '0+5x40'
+      - series: 'rfc_request_duration_seconds_count{kubernetes_namespace="lac-lambdas", grpc_code="NOT_FOUND", reason="not_found"}'
+        values: '0+5x40'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: RevisionFeatureCountsHighErrorRate
+        eval_time: 31m
+        exp_alerts: []
+
+  # A high ratio over tiny volume must not alert: 100% errors, but only 3
+  # of them in the window, below the floor of 10.
+  - interval: 1m
+    input_series:
+      - series: 'rfc_request_duration_seconds_count{kubernetes_namespace="lac-lambdas", grpc_code="INTERNAL", reason="internal_error"}'
+        values: '0 0 0 0 0 1 1 1 1 1 2 2 2 2 2 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: RevisionFeatureCountsHighErrorRate
+        eval_time: 30m
+        exp_alerts: []
+
+  # --- latency of the calls that worked ----------------------------------
+  # Every successful call lands above the 5s bucket, so p95 is above 5s.
+  - interval: 1m
+    input_series:
+      - series: 'rfc_request_duration_seconds_bucket{kubernetes_namespace="lac-lambdas", grpc_code="OK", reason="ok", le="5.0"}'
+        values: '0x40'
+      - series: 'rfc_request_duration_seconds_bucket{kubernetes_namespace="lac-lambdas", grpc_code="OK", reason="ok", le="10.0"}'
+        values: '0+10x40'
+      - series: 'rfc_request_duration_seconds_bucket{kubernetes_namespace="lac-lambdas", grpc_code="OK", reason="ok", le="+Inf"}'
+        values: '0+10x40'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: RevisionFeatureCountsLatencyHigh
+        eval_time: 31m
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              team: data-engineering
+            exp_annotations:
+              summary: "RevisionFeatureCounts is slow in eqiad: p95 above 5s"
+              description: "The 95th percentile of the calls that succeeded is above 5 seconds. A cache miss on a large page is expected to take seconds, so read the html fetch and the parse panels to tell a slow MediaWiki from a slow parse."
+              dashboard: https://grafana.wikimedia.org/d/revision-feature-counts/revision-feature-counts?orgId=1&var-site=eqiad&var-prometheus=k8s&viewPanel=30
+              runbook: https://wikitech.wikimedia.org/wiki/Revision_Feature_Counts#RevisionFeatureCountsLatencyHigh
+
+  # Slow failures must not raise the latency figure. The same slow calls,
+  # recorded against deadline_exceeded.
+  - interval: 1m
+    input_series:
+      - series: 'rfc_request_duration_seconds_bucket{kubernetes_namespace="lac-lambdas", grpc_code="DEADLINE_EXCEEDED", reason="deadline_exceeded", le="5.0"}'
+        values: '0x40'
+      - series: 'rfc_request_duration_seconds_bucket{kubernetes_namespace="lac-lambdas", grpc_code="DEADLINE_EXCEEDED", reason="deadline_exceeded", le="+Inf"}'
+        values: '0+10x40'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: RevisionFeatureCountsLatencyHigh
+        eval_time: 31m
+        exp_alerts: []
+
+  # --- the wiki map is not being read again ------------------------------
+  # The gauge holds the time the map was last read. promtool starts its
+  # clock at 0, so a negative value means "last read this many seconds
+  # before the test began". -604800 is a map that is already seven days old
+  # at t=0, which is what the rule measures.
+  - interval: 1m
+    input_series:
+      - series: 'rfc_wiki_map_updated_timestamp_seconds{kubernetes_namespace="lac-lambdas", kubernetes_pod_name="lac-lambdas-revision-feature-counts-abc123"}'
+        values: '-604800x40'
+      # A second pod that is up to date. One stale pod is enough to alert
+      - series: 'rfc_wiki_map_updated_timestamp_seconds{kubernetes_namespace="lac-lambdas", kubernetes_pod_name="lac-lambdas-revision-feature-counts-def456"}'
+        values: '0x40'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      # Already 604800 seconds old at t=0, so the condition first holds one
+      # evaluation later, and `for: 30m` fires it at 31m.
+      - alertname: RevisionFeatureCountsWikiMapStale
+        eval_time: 31m
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              team: data-engineering
+            exp_annotations:
+              summary: "RevisionFeatureCounts has not read the wiki map for 7 days in eqiad"
+              description: "A pod last read the Sitematrix API more than 7 days ago, so at least 7 daily reads failed. A wiki made since then is refused with INVALID_ARGUMENT. A restart reads the map at once."
+              dashboard: https://grafana.wikimedia.org/d/revision-feature-counts/revision-feature-counts?orgId=1&var-site=eqiad&var-prometheus=k8s&viewPanel=50
+              runbook: https://wikitech.wikimedia.org/wiki/Revision_Feature_Counts#RevisionFeatureCountsWikiMapStale
+
+  # A map read six days ago is not stale enough.
+  - interval: 1m
+    input_series:
+      - series: 'rfc_wiki_map_updated_timestamp_seconds{kubernetes_namespace="lac-lambdas", kubernetes_pod_name="lac-lambdas-revision-feature-counts-abc123"}'
+        values: '-518400x40'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: RevisionFeatureCountsWikiMapStale
+        eval_time: 31m
+        exp_alerts: []
+
+  # --- the parser library failed on a feature ----------------------------
+  - interval: 5m
+    input_series:
+      - series: 'rfc_feature_errors_total{kubernetes_namespace="lac-lambdas", feature="wikitable", error_type="AttributeError"}'
+        values: '0+1x30'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: RevisionFeatureCountsLibraryErrors
+        eval_time: 65m
+        exp_alerts:
+          - exp_labels:
+              severity: task
+              team: data-engineering
+            exp_annotations:
+              summary: "mwparserfromhtml failed to count a feature for RevisionFeatureCounts"
+              description: "An extractor in mwparserfromhtml raised while counting features. Feature caching may be affected if strict mode is enabled."
+              dashboard: https://grafana.wikimedia.org/d/revision-feature-counts/revision-feature-counts?orgId=1&var-site=eqiad&var-prometheus=k8s&viewPanel=20
+              runbook: https://wikitech.wikimedia.org/wiki/Revision_Feature_Counts#RevisionFeatureCountsLibraryErrors
+
+  # --- what the Linked Artifact Cache sees -------------------------------
+  # 8 of every 10 calls for this cache fail.
+  - interval: 1m
+    input_series:
+      - series: 'lambda_request_duration_seconds_count{kubernetes_namespace="linked-artifacts", cache="revision_feature_counts", status="error"}'
+        values: '0+8x40'
+      - series: 'lambda_request_duration_seconds_count{kubernetes_namespace="linked-artifacts", cache="revision_feature_counts", status="success"}'
+        values: '0+2x40'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: RevisionFeatureCountsLambdaFailingFromLac
+        eval_time: 31m
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              team: data-engineering
+            exp_annotations:
+              summary: "The Linked Artifact Cache cannot reach RevisionFeatureCounts in eqiad"
+              description: "More than half of the calls LAC makes for the revision_feature_counts artifact fail. The lambda may be down, refusing calls, or slower than the timeout LAC allows for this table."
+              dashboard: https://grafana.wikimedia.org/d/revision-feature-counts/revision-feature-counts?orgId=1&var-site=eqiad&var-prometheus=k8s&viewPanel=60
+              runbook: https://wikitech.wikimedia.org/wiki/Revision_Feature_Counts#RevisionFeatureCountsLambdaFailingFromLac
+
+  # A minority of failures must not fire the critical alert: 30% errors,
+  # well above the 10-error floor but below the 50% threshold.
+  - interval: 1m
+    input_series:
+      - series: 'lambda_request_duration_seconds_count{kubernetes_namespace="linked-artifacts", cache="revision_feature_counts", status="error"}'
+        values: '0+3x40'
+      - series: 'lambda_request_duration_seconds_count{kubernetes_namespace="linked-artifacts", cache="revision_feature_counts", status="success"}'
+        values: '0+7x40'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: RevisionFeatureCountsLambdaFailingFromLac
+        eval_time: 31m
+        exp_alerts: []
+
+  # --- the pod was killed for memory --------------------------------------
+  - interval: 1m
+    input_series:
+      - series: 'kube_pod_container_status_restarts_total{namespace="lac-lambdas", pod="lac-lambdas-revision-feature-counts-abc", container="revision-feature-counts"}'
+        values: '0+0x20 2+0x30'
+      - series: 'kube_pod_container_status_last_terminated_exitcode{namespace="lac-lambdas", pod="lac-lambdas-revision-feature-counts-abc", container="revision-feature-counts"}'
+        values: '137+0x60'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: RevisionFeatureCountsOomKilled
+        eval_time: 30m
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              team: data-engineering
+              namespace: lac-lambdas
+              pod: lac-lambdas-revision-feature-counts-abc
+              container: revision-feature-counts
+            exp_annotations:
+              summary: "RevisionFeatureCounts container revision-feature-counts has been OOM killed at least twice in 10min in eqiad"
+              description: "The container revision-feature-counts in the pod lac-lambdas-revision-feature-counts-abc was stopped twice in ten minutes for using more memory than its limit. The calls it was serving were lost. Read the memory panel to see how near the limit the other pods are: one pod killed usually means the limit is too low for the work, not that this pod is special."
+              dashboard: https://grafana.wikimedia.org/d/revision-feature-counts/revision-feature-counts?orgId=1&var-site=eqiad&var-prometheus=k8s&viewPanel=71
+              runbook: https://wikitech.wikimedia.org/wiki/Revision_Feature_Counts#RevisionFeatureCountsOomKilled
+
+  # A restart for another reason is not a memory kill. Exit code 1 is the
+  # process stopping on its own.
+  - interval: 1m
+    input_series:
+      - series: 'kube_pod_container_status_restarts_total{namespace="lac-lambdas", pod="lac-lambdas-revision-feature-counts-abc", container="revision-feature-counts"}'
+        values: '0+0x20 2+0x30'
+      - series: 'kube_pod_container_status_last_terminated_exitcode{namespace="lac-lambdas", pod="lac-lambdas-revision-feature-counts-abc", container="revision-feature-counts"}'
+        values: '1+0x60'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: RevisionFeatureCountsOomKilled
+        eval_time: 30m
+        exp_alerts: []
+
+  # --- the pod starts again and again -------------------------------------
+  - interval: 1m
+    input_series:
+      - series: 'kube_pod_container_status_restarts_total{namespace="lac-lambdas", pod="lac-lambdas-revision-feature-counts-abc", container="revision-feature-counts"}'
+        values: '0+0x30 4+0x44'
+      - series: 'kube_pod_container_status_last_terminated_exitcode{namespace="lac-lambdas", pod="lac-lambdas-revision-feature-counts-abc", container="revision-feature-counts"}'
+        values: '1+0x75'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: RevisionFeatureCountsRestarting
+        eval_time: 70m
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              team: data-engineering
+              namespace: lac-lambdas
+              pod: lac-lambdas-revision-feature-counts-abc
+              container: revision-feature-counts
+            exp_annotations:
+              summary: "RevisionFeatureCounts container revision-feature-counts restarts again and again in eqiad"
+              description: "The container revision-feature-counts in the pod lac-lambdas-revision-feature-counts-abc started 3 or more times in the last hour. Read the last exit code panel to tell why: 137 is a memory kill, and another code is the process stopping on its own."
+              dashboard: https://grafana.wikimedia.org/d/revision-feature-counts/revision-feature-counts?orgId=1&var-site=eqiad&var-prometheus=k8s&viewPanel=70
+              runbook: https://wikitech.wikimedia.org/wiki/Revision_Feature_Counts#RevisionFeatureCountsRestarting
+
+  # --- memory near the limit ----------------------------------------------
+  # 1.95 GiB used against a 2 GiB limit is above the 95% threshold.
+  - interval: 1m
+    input_series:
+      - series: 'container_memory_working_set_bytes{namespace="lac-lambdas", pod="lac-lambdas-revision-feature-counts-abc", container="revision-feature-counts"}'
+        values: '2094080000+0x40'
+      - series: 'container_spec_memory_limit_bytes{namespace="lac-lambdas", pod="lac-lambdas-revision-feature-counts-abc", container="revision-feature-counts"}'
+        values: '2147483648+0x40'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: RevisionFeatureCountsNearMemoryLimit
+        eval_time: 15m
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              team: data-engineering
+            exp_annotations:
+              summary: "RevisionFeatureCounts uses more than 95% of its memory limit in eqiad"
+              description: "A container has stayed above 95% of its memory limit for ten minutes and is near being killed. One large page held by each worker thread can be enough, so read the revision HTML size panel as well as the memory panel."
+              dashboard: https://grafana.wikimedia.org/d/revision-feature-counts/revision-feature-counts?orgId=1&var-site=eqiad&var-prometheus=k8s&viewPanel=41
+              runbook: https://wikitech.wikimedia.org/wiki/Revision_Feature_Counts#RevisionFeatureCountsNearMemoryLimit
+
+  # Half of the limit is normal and must not alert.
+  - interval: 1m
+    input_series:
+      - series: 'container_memory_working_set_bytes{namespace="lac-lambdas", pod="lac-lambdas-revision-feature-counts-abc", container="revision-feature-counts"}'
+        values: '1073741824+0x40'
+      - series: 'container_spec_memory_limit_bytes{namespace="lac-lambdas", pod="lac-lambdas-revision-feature-counts-abc", container="revision-feature-counts"}'
+        values: '2147483648+0x40'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: RevisionFeatureCountsNearMemoryLimit
+        eval_time: 15m
+        exp_alerts: []
+
+  # --- a replica that cannot come back ------------------------------------
+  # One unavailable replica held for a whole hour.
+  - interval: 1m
+    input_series:
+      - series: 'kube_deployment_status_replicas_unavailable{namespace="lac-lambdas", deployment="lac-lambdas-revision-feature-counts"}'
+        values: '1+0x70'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: RevisionFeatureCountsUnavailableReplicas
+        eval_time: 65m
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              team: data-engineering
+              namespace: lac-lambdas
+              deployment: lac-lambdas-revision-feature-counts
+            exp_annotations:
+              summary: "RevisionFeatureCounts deployment lac-lambdas-revision-feature-counts has persistently unavailable replicas in eqiad"
+              description: "The deployment lac-lambdas-revision-feature-counts in lac-lambdas has had a replica that Kubernetes cannot make ready for a whole hour. Read the restart and last exit code panels: a pod that cannot start again is the usual cause."
+              dashboard: https://grafana.wikimedia.org/d/revision-feature-counts/revision-feature-counts?orgId=1&var-site=eqiad&var-prometheus=k8s&viewPanel=70
+              runbook: https://wikitech.wikimedia.org/wiki/Revision_Feature_Counts#RevisionFeatureCountsUnavailableReplicas
+
+  # Every replica available must not alert.
+  - interval: 1m
+    input_series:
+      - series: 'kube_deployment_status_replicas_unavailable{namespace="lac-lambdas", deployment="lac-lambdas-revision-feature-counts"}'
+        values: '0+0x70'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: RevisionFeatureCountsUnavailableReplicas
+        eval_time: 65m
+        exp_alerts: []
+
+  # --- a deploy that did not finish ---------------------------------------
+  - interval: 1m
+    input_series:
+      - series: 'helm_release_status{namespace="lac-lambdas", name="revision-feature-counts", status="pending-upgrade"}'
+        values: '1+0x30'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: RevisionFeatureCountsHelmReleaseBadStatus
+        eval_time: 15m
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              team: data-engineering
+              namespace: lac-lambdas
+              name: revision-feature-counts
+              status: pending-upgrade
+            exp_annotations:
+              summary: "RevisionFeatureCounts helm release revision-feature-counts is in state pending-upgrade in eqiad"
+              description: "The helm release lac-lambdas/revision-feature-counts has not reached the deployed state after eleven minutes. A deploy that is stuck leaves the old pods running, so the service may still answer while the new version never arrives."
+              dashboard: https://grafana.wikimedia.org/d/revision-feature-counts/revision-feature-counts?orgId=1&var-site=eqiad&var-prometheus=k8s
+              runbook: https://wikitech.wikimedia.org/wiki/Revision_Feature_Counts#RevisionFeatureCountsHelmReleaseBadStatus
+
+  # A release that reached the deployed state must not alert.
+  - interval: 1m
+    input_series:
+      - series: 'helm_release_status{namespace="lac-lambdas", name="revision-feature-counts", status="deployed"}'
+        values: '1+0x30'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: RevisionFeatureCountsHelmReleaseBadStatus
+        eval_time: 15m
+        exp_alerts: []

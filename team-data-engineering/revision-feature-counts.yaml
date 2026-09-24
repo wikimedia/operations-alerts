@@ -1,0 +1,209 @@
+# deploy-tag: k8s
+# deploy-site: eqiad, codfw
+groups:
+  - name: revision-feature-counts
+    rules:
+      - alert: RevisionFeatureCountsDown
+        # No pod can serve.
+        expr: |
+          kube_deployment_status_replicas_available{namespace="lac-lambdas", deployment="lac-lambdas-revision-feature-counts"} < 1
+        for: 5m
+        labels:
+          team: data-engineering
+          severity: critical
+        annotations:
+          summary: "RevisionFeatureCounts has no pod serving in {{ $externalLabels.site }}"
+          description: "The deployment {{ $labels.deployment }} in {{ $labels.namespace }} has no available replica."
+          dashboard: https://grafana.wikimedia.org/d/revision-feature-counts/revision-feature-counts?orgId=1&var-site={{ $externalLabels.site }}&var-prometheus=k8s
+          runbook: https://wikitech.wikimedia.org/wiki/Revision_Feature_Counts#RevisionFeatureCountsDown
+
+      - alert: RevisionFeatureCountsHighErrorRate
+        # Only considers server errors, not client errors.
+        # Starting with 5% error rate, and at least 10 errors in 15 minutes.
+        #
+        # The codes counted as a fault of the server:
+        #   INTERNAL           this service, or the parser library
+        #   UNAVAILABLE        the HTML fetch from MediaWiki failed
+        #   DEADLINE_EXCEEDED  the work did not finish inside the deadline the
+        #                      caller gave, so the caller got no artifact. The
+        #                      cause can be outside this service, but the
+        #                      result for the caller is the same as a failure.
+        # The codes left out, because the caller asked for something wrong or
+        # went away: INVALID_ARGUMENT, NOT_FOUND, CANCELLED.
+        expr: |
+          (
+            sum(increase(rfc_request_duration_seconds_count{kubernetes_namespace="lac-lambdas", grpc_code=~"INTERNAL|UNAVAILABLE|DEADLINE_EXCEEDED"}[15m]))
+            /
+            clamp_min(sum(increase(rfc_request_duration_seconds_count{kubernetes_namespace="lac-lambdas"}[15m])), 1)
+          ) > 0.05
+          and
+          sum(increase(rfc_request_duration_seconds_count{kubernetes_namespace="lac-lambdas", grpc_code=~"INTERNAL|UNAVAILABLE|DEADLINE_EXCEEDED"}[15m])) > 10
+        for: 15m
+        labels:
+          team: data-engineering
+          severity: warning
+        annotations:
+          summary: "RevisionFeatureCounts fails more than 5% of calls in {{ $externalLabels.site }}"
+          description: "More than 5% of GetRevisionArtifact calls fail in a way this service answers for. Break the rate down by the reason for more details."
+          dashboard: https://grafana.wikimedia.org/d/revision-feature-counts/revision-feature-counts?orgId=1&var-site={{ $externalLabels.site }}&var-prometheus=k8s&viewPanel=20
+          runbook: https://wikitech.wikimedia.org/wiki/Revision_Feature_Counts#RevisionFeatureCountsHighErrorRate
+
+      - alert: RevisionFeatureCountsLatencyHigh
+        # Only the calls that worked. A refusal is fast and a timeout is slow,
+        # so without the grpc_code label a rise in refusals would look like
+        # the service got faster.
+        expr: |
+          histogram_quantile(
+            0.95,
+            sum by (le) (rate(rfc_request_duration_seconds_bucket{kubernetes_namespace="lac-lambdas", grpc_code="OK"}[15m]))
+          ) > 5
+        for: 15m
+        labels:
+          team: data-engineering
+          severity: warning
+        annotations:
+          summary: "RevisionFeatureCounts is slow in {{ $externalLabels.site }}: p95 above 5s"
+          description: "The 95th percentile of the calls that succeeded is above 5 seconds. A cache miss on a large page is expected to take seconds, so read the html fetch and the parse panels to tell a slow MediaWiki from a slow parse."
+          dashboard: https://grafana.wikimedia.org/d/revision-feature-counts/revision-feature-counts?orgId=1&var-site={{ $externalLabels.site }}&var-prometheus=k8s&viewPanel=30
+          runbook: https://wikitech.wikimedia.org/wiki/Revision_Feature_Counts#RevisionFeatureCountsLatencyHigh
+
+      - alert: RevisionFeatureCountsWikiMapStale
+        # The map is read again once a day. 7 days stale map means the map fetch
+        # has failed 7 times in a row.
+        expr: |
+          time() - min(rfc_wiki_map_updated_timestamp_seconds{kubernetes_namespace="lac-lambdas"}) > 604800
+        for: 30m
+        labels:
+          team: data-engineering
+          severity: warning
+        annotations:
+          summary: "RevisionFeatureCounts has not read the wiki map for 7 days in {{ $externalLabels.site }}"
+          description: "A pod last read the Sitematrix API more than 7 days ago, so at least 7 daily reads failed. A wiki made since then is refused with INVALID_ARGUMENT. A restart reads the map at once."
+          dashboard: https://grafana.wikimedia.org/d/revision-feature-counts/revision-feature-counts?orgId=1&var-site={{ $externalLabels.site }}&var-prometheus=k8s&viewPanel=50
+          runbook: https://wikitech.wikimedia.org/wiki/Revision_Feature_Counts#RevisionFeatureCountsWikiMapStale
+
+      - alert: RevisionFeatureCountsLibraryErrors
+        # A fault in mwparserfromhtml, not in this service. It may need a code
+        # fix, not an operator, so it opens a task rather than mail or IRC.
+        expr: |
+          sum(increase(rfc_feature_errors_total{kubernetes_namespace="lac-lambdas"}[1h])) > 0
+        for: 1h
+        labels:
+          team: data-engineering
+          severity: task
+        annotations:
+          summary: "mwparserfromhtml failed to count a feature for RevisionFeatureCounts"
+          description: "An extractor in mwparserfromhtml raised while counting features. Feature caching may be affected if strict mode is enabled."
+          dashboard: https://grafana.wikimedia.org/d/revision-feature-counts/revision-feature-counts?orgId=1&var-site={{ $externalLabels.site }}&var-prometheus=k8s&viewPanel=20
+          runbook: https://wikitech.wikimedia.org/wiki/Revision_Feature_Counts#RevisionFeatureCountsLibraryErrors
+
+  - name: revision-feature-counts-pods
+    rules:
+      - alert: RevisionFeatureCountsOomKilled
+        # A copy of KubernetesContainerOomKilled from
+        # team-sre/kubernetes-prod.yaml
+        expr: |
+          (
+            kube_pod_container_status_restarts_total{namespace="lac-lambdas", pod=~"lac-lambdas-revision-feature-counts-.*"}
+            - kube_pod_container_status_restarts_total{namespace="lac-lambdas", pod=~"lac-lambdas-revision-feature-counts-.*"} offset 10m
+            >= 2
+          )
+          and
+          min_over_time(kube_pod_container_status_last_terminated_exitcode{namespace="lac-lambdas", pod=~"lac-lambdas-revision-feature-counts-.*"}[10m]) == 137
+        labels:
+          team: data-engineering
+          severity: warning
+        annotations:
+          summary: "RevisionFeatureCounts container {{ $labels.container }} has been OOM killed at least twice in 10min in {{ $externalLabels.site }}"
+          description: "The container {{ $labels.container }} in the pod {{ $labels.pod }} was stopped twice in ten minutes for using more memory than its limit. The calls it was serving were lost. Read the memory panel to see how near the limit the other pods are: one pod killed usually means the limit is too low for the work, not that this pod is special."
+          dashboard: https://grafana.wikimedia.org/d/revision-feature-counts/revision-feature-counts?orgId=1&var-site={{ $externalLabels.site }}&var-prometheus=k8s&viewPanel=71
+          runbook: https://wikitech.wikimedia.org/wiki/Revision_Feature_Counts#RevisionFeatureCountsOomKilled
+
+      - alert: RevisionFeatureCountsRestarting
+        # Any restart loop, whatever stopped the container.
+        expr: |
+          increase(kube_pod_container_status_restarts_total{namespace="lac-lambdas", pod=~"lac-lambdas-revision-feature-counts-.*"}[1h]) >= 3
+        for: 10m
+        labels:
+          team: data-engineering
+          severity: warning
+        annotations:
+          summary: "RevisionFeatureCounts container {{ $labels.container }} restarts again and again in {{ $externalLabels.site }}"
+          description: "The container {{ $labels.container }} in the pod {{ $labels.pod }} started 3 or more times in the last hour. Read the last exit code panel to tell why: 137 is a memory kill, and another code is the process stopping on its own."
+          dashboard: https://grafana.wikimedia.org/d/revision-feature-counts/revision-feature-counts?orgId=1&var-site={{ $externalLabels.site }}&var-prometheus=k8s&viewPanel=70
+          runbook: https://wikitech.wikimedia.org/wiki/Revision_Feature_Counts#RevisionFeatureCountsRestarting
+
+      - alert: RevisionFeatureCountsNearMemoryLimit
+        # A copy of KubernetesContainerReachingMemoryLimit from
+        # team-sre/kubernetes-prod.yaml.
+        expr: |
+          max(
+            container_memory_working_set_bytes{namespace="lac-lambdas", pod=~"lac-lambdas-revision-feature-counts-.*", container!=""}
+            /
+            (container_spec_memory_limit_bytes{namespace="lac-lambdas", pod=~"lac-lambdas-revision-feature-counts-.*", container!=""} > 0)
+          ) > 0.95
+        for: 10m
+        labels:
+          team: data-engineering
+          severity: warning
+        annotations:
+          summary: "RevisionFeatureCounts uses more than 95% of its memory limit in {{ $externalLabels.site }}"
+          description: "A container has stayed above 95% of its memory limit for ten minutes and is near being killed. One large page held by each worker thread can be enough, so read the revision HTML size panel as well as the memory panel."
+          dashboard: https://grafana.wikimedia.org/d/revision-feature-counts/revision-feature-counts?orgId=1&var-site={{ $externalLabels.site }}&var-prometheus=k8s&viewPanel=41
+          runbook: https://wikitech.wikimedia.org/wiki/Revision_Feature_Counts#RevisionFeatureCountsNearMemoryLimit
+
+      - alert: RevisionFeatureCountsUnavailableReplicas
+        # A copy of KubernetesDeploymentUnavailableReplicas from
+        # team-sre/kubernetes-wikikube.yaml.
+        #
+        # This is not the same as RevisionFeatureCountsDown. That rule fires
+        # when no replica at all can serve. This one fires while the service
+        # still serves, but with fewer pods than it should have.
+        expr: |
+          sum(kube_deployment_status_replicas_unavailable{namespace="lac-lambdas", deployment="lac-lambdas-revision-feature-counts"}) by (namespace, deployment) > 0
+        for: 1h
+        labels:
+          team: data-engineering
+          severity: critical
+        annotations:
+          summary: "RevisionFeatureCounts deployment {{ $labels.deployment }} has persistently unavailable replicas in {{ $externalLabels.site }}"
+          description: "The deployment {{ $labels.deployment }} in {{ $labels.namespace }} has had a replica that Kubernetes cannot make ready for a whole hour. Read the restart and last exit code panels: a pod that cannot start again is the usual cause."
+          dashboard: https://grafana.wikimedia.org/d/revision-feature-counts/revision-feature-counts?orgId=1&var-site={{ $externalLabels.site }}&var-prometheus=k8s&viewPanel=70
+          runbook: https://wikitech.wikimedia.org/wiki/Revision_Feature_Counts#RevisionFeatureCountsUnavailableReplicas
+
+  - name: revision-feature-counts-platform
+    rules:
+      - alert: RevisionFeatureCountsHelmReleaseBadStatus
+        # A copy of HelmReleaseBadStatus from team-sre/kubernetes-generic.yaml.
+        expr: |
+          helm_release_status{namespace="lac-lambdas", name="revision-feature-counts", status!="deployed"} == 1
+        for: 11m
+        labels:
+          team: data-engineering
+          severity: critical
+        annotations:
+          summary: "RevisionFeatureCounts helm release {{ $labels.name }} is in state {{ $labels.status }} in {{ $externalLabels.site }}"
+          description: "The helm release {{ $labels.namespace }}/{{ $labels.name }} has not reached the deployed state after eleven minutes. A deploy that is stuck leaves the old pods running, so the service may still answer while the new version never arrives."
+          dashboard: https://grafana.wikimedia.org/d/revision-feature-counts/revision-feature-counts?orgId=1&var-site={{ $externalLabels.site }}&var-prometheus=k8s
+          runbook: https://wikitech.wikimedia.org/wiki/Revision_Feature_Counts#RevisionFeatureCountsHelmReleaseBadStatus
+
+  - name: revision-feature-counts-lac
+    rules:
+      - alert: RevisionFeatureCountsLambdaFailingFromLac
+        expr: |
+          (
+            sum(increase(lambda_request_duration_seconds_count{kubernetes_namespace="linked-artifacts", cache="revision_feature_counts", status="error"}[15m]))
+            /
+            clamp_min(sum(increase(lambda_request_duration_seconds_count{kubernetes_namespace="linked-artifacts", cache="revision_feature_counts"}[15m])), 1)
+          ) > 0.5
+          and
+          sum(increase(lambda_request_duration_seconds_count{kubernetes_namespace="linked-artifacts", cache="revision_feature_counts", status="error"}[15m])) > 10
+        for: 15m
+        labels:
+          team: data-engineering
+          severity: critical
+        annotations:
+          summary: "The Linked Artifact Cache cannot reach RevisionFeatureCounts in {{ $externalLabels.site }}"
+          description: "More than half of the calls LAC makes for the revision_feature_counts artifact fail. The lambda may be down, refusing calls, or slower than the timeout LAC allows for this table."
+          dashboard: https://grafana.wikimedia.org/d/revision-feature-counts/revision-feature-counts?orgId=1&var-site={{ $externalLabels.site }}&var-prometheus=k8s&viewPanel=60
+          runbook: https://wikitech.wikimedia.org/wiki/Revision_Feature_Counts#RevisionFeatureCountsLambdaFailingFromLac
