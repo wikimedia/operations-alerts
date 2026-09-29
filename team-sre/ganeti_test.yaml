@@ -92,7 +92,7 @@ tests:
               instance: ganeti1003:9100
               job: node
               prometheus: ops
-              severity: warning
+              severity: task
               site: eqiad
               clustername: ganeti01.codfw.wmnet
               team: infrastructure-foundations
