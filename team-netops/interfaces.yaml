@@ -84,9 +84,9 @@ groups:
       - alert: CoreOutboundSaturation
         expr: |
           (
-          irate(gnmi_interfaces_interface_state_counters_out_octets{instance=~"(cr|pfw|(f?[lsa]sw)).*", interface_description=~"Core.*"}[5m])
+          irate(gnmi_interfaces_interface_state_counters_out_octets{instance=~"(cr|pfw|(f?[lsa]sw)).*", interface_description=~"Core.*", interface_name!~"ae[0-9]"}[5m])
           /
-          (gnmi_interfaces_interface_state_high_speed{instance=~"(cr|pfw|(f?[lsa]sw)).*", interface_description=~"Core.*"}/8*1000000)
+          (gnmi_interfaces_interface_state_high_speed{instance=~"(cr|pfw|(f?[lsa]sw)).*", interface_description=~"Core.*", interface_name!~"ae[0-9]"}/8*1000000)
           ) > 0.9
         for: 12m
         labels:
