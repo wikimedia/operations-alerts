@@ -1,0 +1,48 @@
+rule_files:
+  - host_down.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    input_series:
+      - series: 'role_owner{instance="alert1001:9100",team="o11y"}'
+        values: '1x40'
+      - series: 'up{job="node",instance="alert1001:9100"}'
+        values: '0x40'
+    alert_rule_test:
+    - alertname: HostDown
+      eval_time: 10m
+      exp_alerts:
+       - exp_labels:
+           severity: warning
+           team: o11y
+           instance: alert1001:9100
+           job: node
+         exp_annotations:
+           summary: Host alert1001 is down
+           description: 'No node-exporter metrics from alert1001 for more than 10 minutes.'
+           dashboard: 'https://grafana.wikimedia.org/d/000000377/host-overview?orgId=1&var-server=alert1001'
+           runbook: TODO
+
+    - alertname: HostDown
+      eval_time: 30m
+      exp_alerts:
+       - exp_labels:
+           severity: warning
+           team: o11y
+           instance: alert1001:9100
+           job: node
+         exp_annotations:
+           summary: Host alert1001 is down
+           description: 'No node-exporter metrics from alert1001 for more than 10 minutes.'
+           dashboard: 'https://grafana.wikimedia.org/d/000000377/host-overview?orgId=1&var-server=alert1001'
+           runbook: TODO
+       - exp_labels:
+           severity: critical
+           team: o11y
+           instance: alert1001:9100
+           job: node
+         exp_annotations:
+           summary: Host alert1001 is down
+           description: 'No node-exporter metrics from alert1001 for more than 30 minutes.'
+           dashboard: 'https://grafana.wikimedia.org/d/000000377/host-overview?orgId=1&var-server=alert1001'
+           runbook: TODO

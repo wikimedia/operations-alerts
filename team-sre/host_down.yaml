@@ -1,0 +1,29 @@
+# deploy-tag: ops
+
+# Consider a host down when we cannot check node-exporter metrics.
+groups:
+  - name: host_down
+    rules:
+      - alert: HostDown
+        annotations:
+          summary: 'Host {{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }} is down'
+          description: 'No node-exporter metrics from {{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }} for more than 10 minutes.'
+          dashboard: 'https://grafana.wikimedia.org/d/000000377/host-overview?orgId=1&var-server={{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}'
+          runbook: TODO
+        expr: |
+          up{job="node"} * on (instance) group_left(team) role_owner == 0
+        for: 10m
+        labels:
+          severity: warning
+
+      - alert: HostDown
+        annotations:
+          summary: 'Host {{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }} is down'
+          description: 'No node-exporter metrics from {{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }} for more than 30 minutes.'
+          dashboard: 'https://grafana.wikimedia.org/d/000000377/host-overview?orgId=1&var-server={{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}'
+          runbook: TODO
+        expr: |
+          up{job="node"} * on (instance) group_left(team) role_owner == 0
+        for: 30m
+        labels:
+          severity: critical
