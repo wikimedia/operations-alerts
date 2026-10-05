@@ -1,0 +1,43 @@
+rule_files:
+  - zarcillo.yaml
+
+evaluation_interval: 1m
+
+tests:
+  - interval: 1m
+    input_series:
+      - series: 'zarcillo_data_ingestion_last_timestamp_seconds{table_name="netbox"}'
+        values: '0+0x40' # from 1970
+    alert_rule_test:
+      - eval_time: 28m   # lag ok
+        alertname: ZarcilloDataIngestionLag
+        exp_alerts: []
+      - eval_time: 32m   # high lag
+        alertname: ZarcilloDataIngestionLag
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              team: data-persistence
+              table_name: netbox
+            exp_annotations:
+              summary: 'Zarcillo data ingestion lag too high for table netbox'
+              runbook: https://wikitech.wikimedia.org/wiki/MariaDB/Zarcillo
+              dashboard: https://grafana.wikimedia.org/d/celrzpf6av8qob/zarcillo
+              description: 'Data ingestion for table netbox too old: 32m 0s'
+
+  - interval: 1m
+    input_series:
+      - series: 'zarcillo_data_ingestion_last_timestamp_seconds{table_name="netbox"}'
+        values: '0+60x5 _x40'
+    alert_rule_test:
+      - eval_time: 20m
+        alertname: ZarcilloDataIngestionMetricAbsent
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              team: data-persistence
+            exp_annotations:
+              summary: 'Zarcillo data ingestion metric is missing'
+              runbook: https://wikitech.wikimedia.org/wiki/MariaDB/Zarcillo
+              dashboard: https://grafana.wikimedia.org/d/celrzpf6av8qob/zarcillo
+              description: "zarcillo_data_ingestion_last_timestamp_seconds datapoints are missing"

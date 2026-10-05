@@ -1,0 +1,29 @@
+# deploy-tag: k8s-aux
+# deploy-site: eqiad, codfw
+
+groups:
+  - name: zarcillo-data-ingestion
+    rules:
+      - alert: ZarcilloDataIngestionLag
+        expr: (time() - max by (table_name) (last_over_time(zarcillo_data_ingestion_last_timestamp_seconds[2m]))) > 1800
+        for: 1m
+        labels:
+          severity: warning
+          team: data-persistence
+        annotations:
+          summary: "Zarcillo data ingestion lag too high for table {{ $labels.table_name }}"
+          runbook: https://wikitech.wikimedia.org/wiki/MariaDB/Zarcillo
+          dashboard: https://grafana.wikimedia.org/d/celrzpf6av8qob/zarcillo
+          description: "Data ingestion for table {{ $labels.table_name }} too old: {{ $value | humanizeDuration }}"
+
+      - alert: ZarcilloDataIngestionMetricAbsent
+        expr: absent_over_time(zarcillo_data_ingestion_last_timestamp_seconds[5m])
+        for: 5m
+        labels:
+          severity: warning
+          team: data-persistence
+        annotations:
+          summary: "Zarcillo data ingestion metric is missing"
+          runbook: https://wikitech.wikimedia.org/wiki/MariaDB/Zarcillo
+          dashboard: https://grafana.wikimedia.org/d/celrzpf6av8qob/zarcillo
+          description: "zarcillo_data_ingestion_last_timestamp_seconds datapoints are missing"
