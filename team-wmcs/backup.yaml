@@ -1,7 +1,10 @@
-# deploy-tag: cloud
+# deploy-tag: ops
 # deploy-site: eqiad, codfw
 
-# Alerts for the WMCS backup collector (backy2)
+# Alerts for the WMCS backup collector (backy2).
+# Note the alerts are deployed in 'ops' Prometheus not 'cloud' because they
+# come from node-exporter's textfile collector.
+
 groups:
   - name: backup
     rules:
