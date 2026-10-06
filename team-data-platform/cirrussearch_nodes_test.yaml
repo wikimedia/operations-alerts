@@ -59,3 +59,206 @@ tests:
               summary: 'cirrussearch1111:9100 is stalled on IO, current value 11.67%'
               dashboard: https://grafana.wikimedia.org/d/popinski/node-exporter-cirrussearch-hosts?orgId=1&from=now-30m&to=now&timezone=browser&var-DS_PROMETHEUS=000000006&var-job=node&var-node=cirrussearch1111:9100&refresh=1m
               runbook: 'TODO'
+
+### Master-eligible node counts
+
+  - name: Four masters fire after 45 minutes independently of healthy clusters
+    interval: 1m
+    input_series:
+      - series: 'elasticsearch_thread_pool_threads_count{cluster="elasticsearch", exported_cluster="production-search-eqiad", es_master_node="true", type="flush", instance="node0:9108"}'
+        values: '10+0x60'
+      - series: 'elasticsearch_thread_pool_threads_count{cluster="elasticsearch", exported_cluster="production-search-eqiad", es_master_node="true", type="flush", instance="node1:9108"}'
+        values: '10+0x60'
+      - series: 'elasticsearch_thread_pool_threads_count{cluster="elasticsearch", exported_cluster="production-search-eqiad", es_master_node="true", type="flush", instance="node2:9108"}'
+        values: '10+0x60'
+      - series: 'elasticsearch_thread_pool_threads_count{cluster="elasticsearch", exported_cluster="production-search-eqiad", es_master_node="true", type="flush", instance="node3:9108"}'
+        values: '10+0x60'
+      - series: 'elasticsearch_thread_pool_threads_count{cluster="elasticsearch", exported_cluster="production-search-omega-eqiad", es_master_node="true", type="flush", instance="node0:9108"}'
+        values: '0+0x60'
+      - series: 'elasticsearch_thread_pool_threads_count{cluster="elasticsearch", exported_cluster="production-search-omega-eqiad", es_master_node="true", type="flush", instance="node1:9108"}'
+        values: '0+0x60'
+      - series: 'elasticsearch_thread_pool_threads_count{cluster="elasticsearch", exported_cluster="production-search-omega-eqiad", es_master_node="true", type="flush", instance="node2:9108"}'
+        values: '0+0x60'
+      - series: 'elasticsearch_thread_pool_threads_count{cluster="elasticsearch", exported_cluster="production-search-omega-eqiad", es_master_node="true", type="flush", instance="node3:9108"}'
+        values: '0+0x60'
+      - series: 'elasticsearch_thread_pool_threads_count{cluster="elasticsearch", exported_cluster="production-search-omega-eqiad", es_master_node="true", type="flush", instance="node4:9108"}'
+        values: '0+0x60'
+      - series: 'elasticsearch_thread_pool_threads_count{cluster="elasticsearch", exported_cluster="production-search-codfw", es_master_node="true", type="flush", instance="node0:9108"}'
+        values: '1+0x60'
+      - series: 'elasticsearch_thread_pool_threads_count{cluster="elasticsearch", exported_cluster="production-search-codfw", es_master_node="true", type="flush", instance="node1:9108"}'
+        values: '1+0x60'
+      - series: 'elasticsearch_thread_pool_threads_count{cluster="elasticsearch", exported_cluster="production-search-codfw", es_master_node="true", type="flush", instance="node2:9108"}'
+        values: '1+0x60'
+      - series: 'elasticsearch_thread_pool_threads_count{cluster="elasticsearch", exported_cluster="production-search-codfw", es_master_node="true", type="flush", instance="node3:9108"}'
+        values: '1+0x60'
+      - series: 'elasticsearch_thread_pool_threads_count{cluster="elasticsearch", exported_cluster="production-search-codfw", es_master_node="true", type="flush", instance="node4:9108"}'
+        values: '1+0x60'
+      - series: 'elasticsearch_thread_pool_threads_count{cluster="elasticsearch", exported_cluster="production-search-codfw", es_master_node="true", type="flush", instance="node5:9108"}'
+        values: '1+0x60'
+      - series: 'elasticsearch_thread_pool_threads_count{cluster="elasticsearch", exported_cluster="production-search-eqiad", es_master_node="false", type="flush", instance="data:9108"}'
+        values: '10+0x100'
+      - series: 'elasticsearch_thread_pool_threads_count{cluster="elasticsearch", exported_cluster="production-search-eqiad", es_master_node="true", type="search", instance="node0:9108"}'
+        values: '10+0x100'
+      - series: 'elasticsearch_thread_pool_threads_count{cluster="other", exported_cluster="production-search-eqiad", es_master_node="true", type="flush", instance="other:9108"}'
+        values: '10+0x100'
+    alert_rule_test:
+      - alertname: cirrusNotEnoughMasterEligibleNodes
+        eval_time: 0m
+        exp_alerts: []
+      - alertname: cirrusNotEnoughMasterEligibleNodes
+        eval_time: 44m
+        exp_alerts: []
+      - alertname: cirrusNotEnoughMasterEligibleNodes
+        eval_time: 45m
+        exp_alerts:
+          - exp_labels:
+              cluster: elasticsearch
+              exported_cluster: production-search-eqiad
+              severity: critical
+              team: data-platform
+            exp_annotations:
+              description: 'production-search-eqiad has had fewer than 5 master-eligible nodes for 45 minutes.'
+              summary: 'production-search-eqiad has only 4 master-eligible nodes'
+              dashboard: 'https://grafana.wikimedia.org/d/e7219710-20bb-4007-8af8-c9d6dd7e0b35/cirrussearch-opensearch-ops-dashboard-wip?orgId=1&from=now-3h&to=now&timezone=utc&var-cluster=elasticsearch&var-site=eqiad&var-exported_cluster=production-search&refresh=30s'
+              runbook: 'https://grafana.wikimedia.org/goto/s557db?orgId=default'
+      - alertname: cirrusNotEnoughMasterEligibleNodes
+        eval_time: 60m
+        exp_alerts:
+          - exp_labels:
+              cluster: elasticsearch
+              exported_cluster: production-search-eqiad
+              severity: critical
+              team: data-platform
+            exp_annotations:
+              description: 'production-search-eqiad has had fewer than 5 master-eligible nodes for 45 minutes.'
+              summary: 'production-search-eqiad has only 4 master-eligible nodes'
+              dashboard: 'https://grafana.wikimedia.org/d/e7219710-20bb-4007-8af8-c9d6dd7e0b35/cirrussearch-opensearch-ops-dashboard-wip?orgId=1&from=now-3h&to=now&timezone=utc&var-cluster=elasticsearch&var-site=eqiad&var-exported_cluster=production-search&refresh=30s'
+              runbook: 'https://grafana.wikimedia.org/goto/s557db?orgId=default'
+
+  - name: Separate underprovisioned clusters both fire
+    interval: 1m
+    input_series:
+      - series: 'elasticsearch_thread_pool_threads_count{cluster="elasticsearch", exported_cluster="production-search-eqiad", es_master_node="true", type="flush", instance="node0:9108"}'
+        values: '1+0x45'
+      - series: 'elasticsearch_thread_pool_threads_count{cluster="elasticsearch", exported_cluster="production-search-eqiad", es_master_node="true", type="flush", instance="node1:9108"}'
+        values: '1+0x45'
+      - series: 'elasticsearch_thread_pool_threads_count{cluster="elasticsearch", exported_cluster="production-search-eqiad", es_master_node="true", type="flush", instance="node2:9108"}'
+        values: '1+0x45'
+      - series: 'elasticsearch_thread_pool_threads_count{cluster="elasticsearch", exported_cluster="production-search-omega-eqiad", es_master_node="true", type="flush", instance="node0:9108"}'
+        values: '1+0x45'
+      - series: 'elasticsearch_thread_pool_threads_count{cluster="elasticsearch", exported_cluster="production-search-omega-eqiad", es_master_node="true", type="flush", instance="node1:9108"}'
+        values: '1+0x45'
+    alert_rule_test:
+      - alertname: cirrusNotEnoughMasterEligibleNodes
+        eval_time: 45m
+        exp_alerts:
+          - exp_labels:
+              cluster: elasticsearch
+              exported_cluster: production-search-eqiad
+              severity: critical
+              team: data-platform
+            exp_annotations:
+              description: 'production-search-eqiad has had fewer than 5 master-eligible nodes for 45 minutes.'
+              summary: 'production-search-eqiad has only 3 master-eligible nodes'
+              dashboard: 'https://grafana.wikimedia.org/d/e7219710-20bb-4007-8af8-c9d6dd7e0b35/cirrussearch-opensearch-ops-dashboard-wip?orgId=1&from=now-3h&to=now&timezone=utc&var-cluster=elasticsearch&var-site=eqiad&var-exported_cluster=production-search&refresh=30s'
+              runbook: 'https://grafana.wikimedia.org/goto/s557db?orgId=default'
+          - exp_labels:
+              cluster: elasticsearch
+              exported_cluster: production-search-omega-eqiad
+              severity: critical
+              team: data-platform
+            exp_annotations:
+              description: 'production-search-omega-eqiad has had fewer than 5 master-eligible nodes for 45 minutes.'
+              summary: 'production-search-omega-eqiad has only 2 master-eligible nodes'
+              dashboard: 'https://grafana.wikimedia.org/d/e7219710-20bb-4007-8af8-c9d6dd7e0b35/cirrussearch-opensearch-ops-dashboard-wip?orgId=1&from=now-3h&to=now&timezone=utc&var-cluster=elasticsearch&var-site=eqiad&var-exported_cluster=production-search-omega&refresh=30s'
+              runbook: 'https://grafana.wikimedia.org/goto/s557db?orgId=default'
+
+  - name: Alert resolves when a fifth master returns
+    interval: 1m
+    input_series:
+      - series: 'elasticsearch_thread_pool_threads_count{cluster="elasticsearch", exported_cluster="production-search-eqiad", es_master_node="true", type="flush", instance="node0:9108"}'
+        values: '1+0x60'
+      - series: 'elasticsearch_thread_pool_threads_count{cluster="elasticsearch", exported_cluster="production-search-eqiad", es_master_node="true", type="flush", instance="node1:9108"}'
+        values: '1+0x60'
+      - series: 'elasticsearch_thread_pool_threads_count{cluster="elasticsearch", exported_cluster="production-search-eqiad", es_master_node="true", type="flush", instance="node2:9108"}'
+        values: '1+0x60'
+      - series: 'elasticsearch_thread_pool_threads_count{cluster="elasticsearch", exported_cluster="production-search-eqiad", es_master_node="true", type="flush", instance="node3:9108"}'
+        values: '1+0x60'
+      - series: 'elasticsearch_thread_pool_threads_count{cluster="elasticsearch", exported_cluster="production-search-eqiad", es_master_node="true", type="flush", instance="node4:9108"}'
+        values: '_x50 1+0x10'
+    alert_rule_test:
+      - alertname: cirrusNotEnoughMasterEligibleNodes
+        eval_time: 45m
+        exp_alerts:
+          - exp_labels:
+              cluster: elasticsearch
+              exported_cluster: production-search-eqiad
+              severity: critical
+              team: data-platform
+            exp_annotations:
+              description: 'production-search-eqiad has had fewer than 5 master-eligible nodes for 45 minutes.'
+              summary: 'production-search-eqiad has only 4 master-eligible nodes'
+              dashboard: 'https://grafana.wikimedia.org/d/e7219710-20bb-4007-8af8-c9d6dd7e0b35/cirrussearch-opensearch-ops-dashboard-wip?orgId=1&from=now-3h&to=now&timezone=utc&var-cluster=elasticsearch&var-site=eqiad&var-exported_cluster=production-search&refresh=30s'
+              runbook: 'https://grafana.wikimedia.org/goto/s557db?orgId=default'
+      - alertname: cirrusNotEnoughMasterEligibleNodes
+        eval_time: 49m
+        exp_alerts:
+          - exp_labels:
+              cluster: elasticsearch
+              exported_cluster: production-search-eqiad
+              severity: critical
+              team: data-platform
+            exp_annotations:
+              description: 'production-search-eqiad has had fewer than 5 master-eligible nodes for 45 minutes.'
+              summary: 'production-search-eqiad has only 4 master-eligible nodes'
+              dashboard: 'https://grafana.wikimedia.org/d/e7219710-20bb-4007-8af8-c9d6dd7e0b35/cirrussearch-opensearch-ops-dashboard-wip?orgId=1&from=now-3h&to=now&timezone=utc&var-cluster=elasticsearch&var-site=eqiad&var-exported_cluster=production-search&refresh=30s'
+              runbook: 'https://grafana.wikimedia.org/goto/s557db?orgId=default'
+      - alertname: cirrusNotEnoughMasterEligibleNodes
+        eval_time: 50m
+        exp_alerts: []
+      - alertname: cirrusNotEnoughMasterEligibleNodes
+        eval_time: 60m
+        exp_alerts: []
+
+  - name: Short drops do not fire and recovery resets the pending timer
+    interval: 1m
+    input_series:
+      - series: 'elasticsearch_thread_pool_threads_count{cluster="elasticsearch", exported_cluster="production-search-eqiad", es_master_node="true", type="flush", instance="node0:9108"}'
+        values: '1+0x100'
+      - series: 'elasticsearch_thread_pool_threads_count{cluster="elasticsearch", exported_cluster="production-search-eqiad", es_master_node="true", type="flush", instance="node1:9108"}'
+        values: '1+0x100'
+      - series: 'elasticsearch_thread_pool_threads_count{cluster="elasticsearch", exported_cluster="production-search-eqiad", es_master_node="true", type="flush", instance="node2:9108"}'
+        values: '1+0x100'
+      - series: 'elasticsearch_thread_pool_threads_count{cluster="elasticsearch", exported_cluster="production-search-eqiad", es_master_node="true", type="flush", instance="node3:9108"}'
+        values: '1+0x100'
+      - series: 'elasticsearch_thread_pool_threads_count{cluster="elasticsearch", exported_cluster="production-search-eqiad", es_master_node="true", type="flush", instance="node4:9108"}'
+        values: '1 stale _x28 1+0x9 stale _x59'
+    alert_rule_test:
+      - alertname: cirrusNotEnoughMasterEligibleNodes
+        eval_time: 29m
+        exp_alerts: []
+      - alertname: cirrusNotEnoughMasterEligibleNodes
+        eval_time: 30m
+        exp_alerts: []
+      - alertname: cirrusNotEnoughMasterEligibleNodes
+        eval_time: 40m
+        exp_alerts: []
+      - alertname: cirrusNotEnoughMasterEligibleNodes
+        eval_time: 45m
+        exp_alerts: []
+      - alertname: cirrusNotEnoughMasterEligibleNodes
+        eval_time: 84m
+        exp_alerts: []
+      - alertname: cirrusNotEnoughMasterEligibleNodes
+        eval_time: 85m
+        exp_alerts:
+          - exp_labels:
+              cluster: elasticsearch
+              exported_cluster: production-search-eqiad
+              severity: critical
+              team: data-platform
+            exp_annotations:
+              description: 'production-search-eqiad has had fewer than 5 master-eligible nodes for 45 minutes.'
+              summary: 'production-search-eqiad has only 4 master-eligible nodes'
+              dashboard: 'https://grafana.wikimedia.org/d/e7219710-20bb-4007-8af8-c9d6dd7e0b35/cirrussearch-opensearch-ops-dashboard-wip?orgId=1&from=now-3h&to=now&timezone=utc&var-cluster=elasticsearch&var-site=eqiad&var-exported_cluster=production-search&refresh=30s'
+              runbook: 'https://grafana.wikimedia.org/goto/s557db?orgId=default'

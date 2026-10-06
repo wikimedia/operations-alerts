@@ -9,6 +9,23 @@ groups:
 ### Main clusters (cirrussearch)
 ### ========================
 
+      - alert: cirrusNotEnoughMasterEligibleNodes
+        expr: |
+          count by (cluster, exported_cluster) (
+            elasticsearch_thread_pool_threads_count{
+              cluster="elasticsearch", es_master_node="true", type="flush"
+            }
+          ) < 5
+        for: 45m
+        labels:
+          severity: critical
+          team: 'data-platform'
+        annotations:
+          description: '{{ $labels.exported_cluster }} has had fewer than 5 master-eligible nodes for 45 minutes.'
+          summary: '{{ $labels.exported_cluster }} has only {{ $value }} master-eligible nodes'
+          dashboard: 'https://grafana.wikimedia.org/d/e7219710-20bb-4007-8af8-c9d6dd7e0b35/cirrussearch-opensearch-ops-dashboard-wip?orgId=1&from=now-3h&to=now&timezone=utc&var-cluster={{ $labels.cluster }}&var-site={{ $labels.exported_cluster | reReplaceAll "^.*-(eqiad|codfw)$" "${1}" }}&var-exported_cluster={{ $labels.exported_cluster | reReplaceAll "-(eqiad|codfw)$" "" }}&refresh=30s'
+          runbook: 'https://grafana.wikimedia.org/goto/s557db?orgId=default'
+
       - alert: cirrusNodeMemoryStall
         expr: |
           rate(node_pressure_memory_stalled_seconds_total{
