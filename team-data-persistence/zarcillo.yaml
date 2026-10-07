@@ -1,5 +1,5 @@
 # deploy-tag: k8s-aux
-# deploy-site: eqiad, codfw
+# deploy-site: eqiad
 
 groups:
   - name: zarcillo-data-ingestion
