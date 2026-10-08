@@ -1,0 +1,32 @@
+rule_files:
+  - node-exporter.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    input_series:
+      - series: 'node_textfile_scrape_error{instance="prometheus1001:9100", job="node"}'
+        values: '0x30 1x90'
+      - series: 'node_textfile_scrape_error{instance="prometheus1002:9100", job="node"}'
+        values: '0x120'
+    alert_rule_test:
+      # Errors started at 30m, not yet firing after 45m.
+      - alertname: NodeTextfileScrapeError
+        eval_time: 75m
+        exp_alerts: []
+      - alertname: NodeTextfileScrapeError
+        eval_time: 95m
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              team: o11y
+              instance: prometheus1001:9100
+              job: node
+            exp_annotations:
+              summary: "Textfile collector scrape error on prometheus1001:9100"
+              description: >-
+                node-exporter failed to read one or more textfiles in
+                /var/lib/prometheus/node.d on prometheus1001:9100, and metrics from
+                those files are missing. Check the node-exporter logs on the host for
+                the offending file.
+              dashboard: https://grafana.wikimedia.org/d/knkl4dCWz/node-exporter-textfile
+              runbook: https://wikitech.wikimedia.org/wiki/Prometheus#Node-exporter_textfile_scrape_error

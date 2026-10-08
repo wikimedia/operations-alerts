@@ -1,0 +1,20 @@
+# deploy-tag: ops
+
+groups:
+  - name: node_exporter_textfile
+    rules:
+      - alert: NodeTextfileScrapeError
+        expr: node_textfile_scrape_error == 1
+        for: 1h
+        labels:
+          team: o11y
+          severity: warning
+        annotations:
+          summary: "Textfile collector scrape error on {{ $labels.instance }}"
+          description: >-
+            node-exporter failed to read one or more textfiles in
+            /var/lib/prometheus/node.d on {{ $labels.instance }}, and metrics from
+            those files are missing. Check the node-exporter logs on the host for
+            the offending file.
+          dashboard: https://grafana.wikimedia.org/d/knkl4dCWz/node-exporter-textfile
+          runbook: https://wikitech.wikimedia.org/wiki/Prometheus#Node-exporter_textfile_scrape_error
