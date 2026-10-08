@@ -1,0 +1,112 @@
+rule_files:
+  - hummingbird.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    input_series:
+    - series: kube_deployment_status_replicas_available{namespace="liftwing-studio", deployment="liftwing-studio-production"}
+      values: '0x10'
+    - series: kube_deployment_status_replicas_available{namespace="liftwing-studio", deployment="ferretdb-ferretdb-liftwing-studio"}
+      values: '1x10'
+    alert_rule_test:
+    - alertname: HummingbirdDeploymentUnavailable
+      eval_time: 6m
+      exp_alerts:
+      - exp_labels:
+          deployment: liftwing-studio-production
+          severity: critical
+          team: data-platform
+        exp_annotations:
+          description: 'Deployment liftwing-studio-production in namespace liftwing-studio has no available replicas on dse-k8s-eqiad'
+          summary: 'Hummingbird: liftwing-studio-production is unavailable'
+          dashboard: "https://grafana.wikimedia.org/d/hummingbird/hummingbird"
+          runbook: "https://wikitech.wikimedia.org/wiki/Hummingbird#Runbooks"
+
+  - interval: 1m
+    input_series:
+    - series: envoy_http_downstream_rq_xx{kubernetes_namespace="liftwing-studio", envoy_http_conn_manager_prefix="ingress_https_production", envoy_response_code_class="2"}
+      values: '0+60x40'
+    - series: envoy_http_downstream_rq_xx{kubernetes_namespace="liftwing-studio", envoy_http_conn_manager_prefix="ingress_https_production", envoy_response_code_class="5"}
+      values: '0+60x40'
+    alert_rule_test:
+    - alertname: HummingbirdHighErrorRate
+      eval_time: 25m
+      exp_alerts:
+      - exp_labels:
+          severity: critical
+          team: data-platform
+        exp_annotations:
+          description: '50% of requests to Hummingbird returned 5xx over the last 10 minutes'
+          summary: 'Hummingbird: high 5xx rate'
+          dashboard: "https://grafana.wikimedia.org/d/hummingbird/hummingbird"
+          runbook: "https://wikitech.wikimedia.org/wiki/Hummingbird#Runbooks"
+
+  - interval: 1m
+    input_series:
+    - series: envoy_http_downstream_rq_xx{kubernetes_namespace="liftwing-studio", envoy_http_conn_manager_prefix="ingress_https_production", envoy_response_code_class="2"}
+      values: '0+1x40'
+    - series: envoy_http_downstream_rq_xx{kubernetes_namespace="liftwing-studio", envoy_http_conn_manager_prefix="ingress_https_production", envoy_response_code_class="5"}
+      values: '0+1x40'
+    alert_rule_test:
+    - alertname: HummingbirdHighErrorRate
+      eval_time: 25m
+      exp_alerts: []
+
+  - interval: 1m
+    input_series:
+    - series: litellm_deployment_state{kubernetes_namespace="liftwing-studio", litellm_model_name="llm-qwen3-14b"}
+      values: '2x20'
+    - series: litellm_deployment_state{kubernetes_namespace="liftwing-studio", litellm_model_name="llm-qwen36-27b"}
+      values: '0x20'
+    alert_rule_test:
+    - alertname: HummingbirdModelUnhealthy
+      eval_time: 11m
+      exp_alerts:
+      - exp_labels:
+          litellm_model_name: llm-qwen3-14b
+          severity: warning
+          team: data-platform
+        exp_annotations:
+          description: 'LiteLLM reports model llm-qwen3-14b in state 2 (1 = partial outage, 2 = complete outage)'
+          summary: 'Hummingbird: model llm-qwen3-14b is unhealthy'
+          dashboard: "https://grafana.wikimedia.org/d/hummingbird/hummingbird"
+          runbook: "https://wikitech.wikimedia.org/wiki/Hummingbird#Runbooks"
+
+  - interval: 1m
+    input_series:
+    - series: litellm_proxy_total_requests_metric_total{kubernetes_namespace="liftwing-studio", requested_model="qwen3-14b", status_code="500"}
+      values: '0+10x40'
+    - series: litellm_proxy_failed_requests_metric_total{kubernetes_namespace="liftwing-studio", requested_model="qwen3-14b"}
+      values: '0+10x40'
+    alert_rule_test:
+    - alertname: HummingbirdModelRequestFailures
+      eval_time: 25m
+      exp_alerts:
+      - exp_labels:
+          requested_model: qwen3-14b
+          severity: warning
+          team: data-platform
+        exp_annotations:
+          description: '100% of requests to model qwen3-14b failed over the last 10 minutes'
+          summary: 'Hummingbird: requests to qwen3-14b are failing'
+          dashboard: "https://grafana.wikimedia.org/d/hummingbird/hummingbird"
+          runbook: "https://wikitech.wikimedia.org/wiki/Hummingbird#Runbooks"
+
+  - interval: 1m
+    input_series:
+    - series: kube_pod_container_status_restarts_total{namespace="liftwing-studio", pod="liftwing-studio-production-746c5bfcfc-6677t", container="liftwing-studio-production-litellm"}
+      values: '0+1x60'
+    alert_rule_test:
+    - alertname: HummingbirdContainerRestarting
+      eval_time: 40m
+      exp_alerts:
+      - exp_labels:
+          pod: liftwing-studio-production-746c5bfcfc-6677t
+          container: liftwing-studio-production-litellm
+          severity: warning
+          team: data-platform
+        exp_annotations:
+          description: 'Container liftwing-studio-production-litellm in pod liftwing-studio-production-746c5bfcfc-6677t restarted 30 times in the last 30 minutes'
+          summary: 'Hummingbird: liftwing-studio-production-litellm is restarting'
+          dashboard: "https://grafana.wikimedia.org/d/hummingbird/hummingbird"
+          runbook: "https://wikitech.wikimedia.org/wiki/Hummingbird#Runbooks"

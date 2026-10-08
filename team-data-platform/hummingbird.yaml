@@ -1,0 +1,77 @@
+# deploy-tag: k8s-dse
+# deploy-site: eqiad
+
+groups:
+  - name: hummingbird
+    rules:
+    - alert: HummingbirdDeploymentUnavailable
+      annotations:
+        description: 'Deployment {{ $labels.deployment }} in namespace liftwing-studio has no available replicas on dse-k8s-eqiad'
+        summary: 'Hummingbird: {{ $labels.deployment }} is unavailable'
+        dashboard: "https://grafana.wikimedia.org/d/hummingbird/hummingbird"
+        runbook: "https://wikitech.wikimedia.org/wiki/Hummingbird#Runbooks"
+      expr: max by (deployment) (kube_deployment_status_replicas_available{namespace="liftwing-studio"}) < 1
+      for: 5m
+      labels:
+        severity: critical
+        team: data-platform
+
+    - alert: HummingbirdHighErrorRate
+      annotations:
+        description: '{{ $value | humanizePercentage }} of requests to Hummingbird returned 5xx over the last 10 minutes'
+        summary: 'Hummingbird: high 5xx rate'
+        dashboard: "https://grafana.wikimedia.org/d/hummingbird/hummingbird"
+        runbook: "https://wikitech.wikimedia.org/wiki/Hummingbird#Runbooks"
+      expr: |
+        (
+          sum(rate(envoy_http_downstream_rq_xx{kubernetes_namespace="liftwing-studio", envoy_http_conn_manager_prefix="ingress_https_production", envoy_response_code_class="5"}[10m]))
+          /
+          sum(rate(envoy_http_downstream_rq_xx{kubernetes_namespace="liftwing-studio", envoy_http_conn_manager_prefix="ingress_https_production"}[10m]))
+        ) > 0.05
+        and
+        sum(rate(envoy_http_downstream_rq_xx{kubernetes_namespace="liftwing-studio", envoy_http_conn_manager_prefix="ingress_https_production"}[10m])) > 0.05
+      for: 10m
+      labels:
+        severity: critical
+        team: data-platform
+
+    - alert: HummingbirdModelUnhealthy
+      annotations:
+        description: 'LiteLLM reports model {{ $labels.litellm_model_name }} in state {{ $value }} (1 = partial outage, 2 = complete outage)'
+        summary: 'Hummingbird: model {{ $labels.litellm_model_name }} is unhealthy'
+        dashboard: "https://grafana.wikimedia.org/d/hummingbird/hummingbird"
+        runbook: "https://wikitech.wikimedia.org/wiki/Hummingbird#Runbooks"
+      expr: max by (litellm_model_name) (litellm_deployment_state{kubernetes_namespace="liftwing-studio"}) > 0
+      for: 10m
+      labels:
+        severity: warning
+        team: data-platform
+
+    - alert: HummingbirdModelRequestFailures
+      annotations:
+        description: '{{ $value | humanizePercentage }} of requests to model {{ $labels.requested_model }} failed over the last 10 minutes'
+        summary: 'Hummingbird: requests to {{ $labels.requested_model }} are failing'
+        dashboard: "https://grafana.wikimedia.org/d/hummingbird/hummingbird"
+        runbook: "https://wikitech.wikimedia.org/wiki/Hummingbird#Runbooks"
+      expr: |
+        (
+          sum by (requested_model) (rate(litellm_proxy_failed_requests_metric_total{kubernetes_namespace="liftwing-studio"}[10m]))
+          /
+          sum by (requested_model) (rate(litellm_proxy_total_requests_metric_total{kubernetes_namespace="liftwing-studio"}[10m]))
+        ) > 0.1
+      for: 10m
+      labels:
+        severity: warning
+        team: data-platform
+
+    - alert: HummingbirdContainerRestarting
+      annotations:
+        description: 'Container {{ $labels.container }} in pod {{ $labels.pod }} restarted {{ $value | humanize }} times in the last 30 minutes'
+        summary: 'Hummingbird: {{ $labels.container }} is restarting'
+        dashboard: "https://grafana.wikimedia.org/d/hummingbird/hummingbird"
+        runbook: "https://wikitech.wikimedia.org/wiki/Hummingbird#Runbooks"
+      expr: max by (pod, container) (increase(kube_pod_container_status_restarts_total{namespace="liftwing-studio"}[30m])) > 2
+      for: 5m
+      labels:
+        severity: warning
+        team: data-platform
