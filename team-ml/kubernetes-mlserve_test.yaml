@@ -26,3 +26,42 @@ tests:
         description: "Deployment fakedeploy in namespace fakespace at site moon has had non-zero unavailable replicas (current: 3) for at least 30m"
         runbook: "https://wikitech.wikimedia.org/wiki/Kubernetes/Troubleshooting#Troubleshooting_a_deployment"
         dashboard: https://grafana.wikimedia.org/d/a260da06-259a-4ee4-9540-5cab01a246c8/kubernetes-deployment-details?var-site=moon&var-cluster=eagle&var-namespace=fakespace&var-deployment=fakedeploy
+- interval: 1m
+  input_series:
+  # unschedulable from t=5m
+  - series: kube_pod_status_unschedulable{namespace="llm", pod="gpupod"}
+    values: "0x5 1x30"
+  # unschedulable throughout
+  - series: kube_pod_status_unschedulable{namespace="revertrisk", pod="cpupod"}
+    values: "1x35"
+  # scheduled fine: must not fire
+  - series: kube_pod_status_unschedulable{namespace="llm", pod="okpod"}
+    values: "0x35"
+  external_labels:
+    site: moon
+    prometheus: eagle
+  alert_rule_test:
+  - alertname: KubernetesPodUnschedulable
+    eval_time: 15m
+    exp_alerts:  # only cpupod: gpupod has been unschedulable for 10m
+    - exp_labels: {severity: warning, team: ml, namespace: revertrisk, pod: cpupod}
+      exp_annotations:
+        summary: "Pod cpupod in revertrisk at moon cannot be scheduled"
+        description: "Pod cpupod in namespace revertrisk at site moon has been unschedulable for at least 15m. For a GPU pod, check that the GPU pool it tolerates has a free partition."
+        runbook: "https://wikitech.wikimedia.org/wiki/Kubernetes/Troubleshooting#Troubleshooting_a_deployment"
+        dashboard: "https://grafana.wikimedia.org/d/hyl18XgMk/kubernetes-container-details?orgId=1&var-datasource=moon%2Bprometheus/eagle&var-namespace=revertrisk&var-container=All"
+  - alertname: KubernetesPodUnschedulable
+    eval_time: 25m
+    exp_alerts:
+    - exp_labels: {severity: warning, team: ml, namespace: llm, pod: gpupod}
+      exp_annotations:
+        summary: "Pod gpupod in llm at moon cannot be scheduled"
+        description: "Pod gpupod in namespace llm at site moon has been unschedulable for at least 15m. For a GPU pod, check that the GPU pool it tolerates has a free partition."
+        runbook: "https://wikitech.wikimedia.org/wiki/Kubernetes/Troubleshooting#Troubleshooting_a_deployment"
+        dashboard: "https://grafana.wikimedia.org/d/hyl18XgMk/kubernetes-container-details?orgId=1&var-datasource=moon%2Bprometheus/eagle&var-namespace=llm&var-container=All"
+    - exp_labels: {severity: warning, team: ml, namespace: revertrisk, pod: cpupod}
+      exp_annotations:
+        summary: "Pod cpupod in revertrisk at moon cannot be scheduled"
+        description: "Pod cpupod in namespace revertrisk at site moon has been unschedulable for at least 15m. For a GPU pod, check that the GPU pool it tolerates has a free partition."
+        runbook: "https://wikitech.wikimedia.org/wiki/Kubernetes/Troubleshooting#Troubleshooting_a_deployment"
+        dashboard: "https://grafana.wikimedia.org/d/hyl18XgMk/kubernetes-container-details?orgId=1&var-datasource=moon%2Bprometheus/eagle&var-namespace=revertrisk&var-container=All"

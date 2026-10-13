@@ -13,3 +13,14 @@ groups:
       description: "Deployment {{ $labels.deployment }} in namespace {{ $labels.namespace }} at site {{ $externalLabels.site }} has had non-zero unavailable replicas (current: {{ $value }}) for at least 30m"
       runbook: "https://wikitech.wikimedia.org/wiki/Kubernetes/Troubleshooting#Troubleshooting_a_deployment"
       dashboard: https://grafana.wikimedia.org/d/a260da06-259a-4ee4-9540-5cab01a246c8/kubernetes-deployment-details?var-site={{ $externalLabels.site }}&var-cluster={{ $externalLabels.prometheus }}&var-namespace={{ $labels.namespace }}&var-deployment={{ $labels.deployment }}
+  - alert: KubernetesPodUnschedulable
+    expr: max by (namespace, pod) (kube_pod_status_unschedulable == 1)
+    for: 15m
+    labels:
+      team: ml
+      severity: warning
+    annotations:
+      summary: "Pod {{ $labels.pod }} in {{ $labels.namespace }} at {{ $externalLabels.site }} cannot be scheduled"
+      description: "Pod {{ $labels.pod }} in namespace {{ $labels.namespace }} at site {{ $externalLabels.site }} has been unschedulable for at least 15m. For a GPU pod, check that the GPU pool it tolerates has a free partition."
+      runbook: "https://wikitech.wikimedia.org/wiki/Kubernetes/Troubleshooting#Troubleshooting_a_deployment"
+      dashboard: "https://grafana.wikimedia.org/d/hyl18XgMk/kubernetes-container-details?orgId=1&var-datasource={{ $externalLabels.site }}%2Bprometheus/{{ $externalLabels.prometheus }}&var-namespace={{ $labels.namespace }}&var-container=All"
