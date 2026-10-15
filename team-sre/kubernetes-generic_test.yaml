@@ -36,6 +36,8 @@ tests:
     values: "1+1x16"
   - series: 'apiserver_request_duration_seconds_bucket{verb="GET", resource="shoes", le="+0.6"}'
     values: "0+0x16"
+  - series: 'coredns_proxy_healthcheck_failures_total{kubernetes_pod_name="coredns-f00bar", to="1.2.3.4"}'
+    values: "0+60x15"
   - series: 'kube_node_spec_unschedulable{node="kubefakenode"}'
     values: "1x1440"
   - series: 'kube_pod_container_resource_requests{namespace="kube-system", container="calico-node", pod="calico-node-f00bar", resource="memory"}'
@@ -100,6 +102,20 @@ tests:
         description: "The certificate fakename in namespace fakespace is in a not ready state for at least 10min (eagle@moon)"
         runbook: https://wikitech.wikimedia.org/wiki/Kubernetes/cert-manager
         dashboard: https://grafana.wikimedia.org/d/vo5tiJTnz?var-site=moon&var-cluster=eagle&var-namespace=fakespace
+
+  - alertname: CoreDNSUpstreamHealthcheckFailures
+    eval_time: 6m
+    exp_alerts:
+    - exp_labels:
+        severity: warning
+        team: sre
+        kubernetes_pod_name: coredns-f00bar
+        to: 1.2.3.4
+      exp_annotations:
+        summary: "CoreDNS pod coredns-f00bar upstream health checks are failing on eagle@moon"
+        description: "CoreDNS pod coredns-f00bar on eagle@moon has failing upstream health checks to 1.2.3.4"
+        runbook: https://wikitech.wikimedia.org/wiki/CoreDNS#CoreDNSUpstreamHealthcheckFailures
+        dashboard: https://grafana.wikimedia.org/d/-sq5te5Wk/kubernetes-dns?var-site=moon&var-cluster=eagle&var-k8s_app=kube-dns
 
   - alertname: HelmReleaseBadStatus
     eval_time: 12m

@@ -121,6 +121,20 @@ groups:
       runbook: https://wikitech.wikimedia.org/wiki/Kubernetes/cert-manager
       dashboard: https://grafana.wikimedia.org/d/vo5tiJTnz?var-site={{ $externalLabels.site }}&var-cluster={{ $externalLabels.prometheus }}&var-namespace={{ $labels.namespace }}
 
+- name: coredns
+  rules:
+  - alert: CoreDNSUpstreamHealthcheckFailures
+    expr: sum by (kubernetes_pod_name, to) (rate(coredns_proxy_healthcheck_failures_total{}[5m])) > 0.02
+    for: 5m
+    labels:
+      team: sre
+      severity: warning
+    annotations:
+      summary: "CoreDNS pod {{ $labels.kubernetes_pod_name }} upstream health checks are failing on {{ $externalLabels.prometheus }}@{{ $externalLabels.site }}"
+      description: "CoreDNS pod {{ $labels.kubernetes_pod_name }} on {{ $externalLabels.prometheus }}@{{ $externalLabels.site }} has failing upstream health checks to {{ $labels.to }}"
+      runbook: https://wikitech.wikimedia.org/wiki/CoreDNS#CoreDNSUpstreamHealthcheckFailures
+      dashboard: https://grafana.wikimedia.org/d/-sq5te5Wk/kubernetes-dns?var-site={{ $externalLabels.site }}&var-cluster={{ $externalLabels.prometheus }}&var-k8s_app=kube-dns
+
 - name: helmrelease
   rules:
   - alert: HelmReleaseBadStatus
