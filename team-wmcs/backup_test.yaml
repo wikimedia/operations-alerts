@@ -25,8 +25,8 @@ tests:
             exp_annotations:
               summary: "Backup collector on cloudbackup1003:9100 failed to list backups"
               description: "The backup collector on cloudbackup1003:9100 (eqiad) is failing to list the backy2 backups, so all backup metrics from this node are untrustworthy."
-              dashboard: TODO
-              runbook: TODO
+              dashboard: https://grafana.wikimedia.org/d/fisr2p9/wmcs-backup?viewPanel=12&var-site=eqiad
+              runbook: "https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/Backup#BackupCollectorError"
 
   - interval: 1m
     input_series:
@@ -65,8 +65,8 @@ tests:
             exp_annotations:
               summary: "Newest volume backup on cloudbackup2003:9100 is 1d 3h 13m 20s old"
               description: "The newest volume backup on cloudbackup2003:9100 (codfw) has not been updated for 1d 3h 13m 20s. Backups should be created at least daily; the backup job may have stopped."
-              dashboard: TODO
-              runbook: TODO
+              dashboard: https://grafana.wikimedia.org/d/fisr2p9/wmcs-backup?viewPanel=16&var-kind=volume&var-site=codfw
+              runbook: "https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/Backup#BackupStale"
 
   - interval: 1m
     input_series:
@@ -105,8 +105,8 @@ tests:
             exp_annotations:
               summary: "volume backups are gone on cloudbackup2003:9100"
               description: "The volume backup set on cloudbackup2003:9100 (codfw) has no backup entries, while 7 days ago it had some. Check for accidental deletion or a broken backup job."
-              dashboard: TODO
-              runbook: TODO
+              dashboard: https://grafana.wikimedia.org/d/fisr2p9/wmcs-backup?viewPanel=17&var-kind=volume&var-site=codfw
+              runbook: "https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/Backup#BackupKindGone"
 
   - interval: 1m
     input_series:
@@ -145,8 +145,8 @@ tests:
             exp_annotations:
               summary: "instance backup coverage dropped on cloudbackup1003:9100"
               description: "Only 174 distinct instance objects are backed up on cloudbackup1003:9100 (eqiad), below 90% of the level 24h ago. Some backups may have been lost."
-              dashboard: TODO
-              runbook: TODO
+              dashboard: https://grafana.wikimedia.org/d/fisr2p9/wmcs-backup?viewPanel=21&var-kind=instance&var-site=eqiad
+              runbook: "https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/Backup#BackupCoverageDrop"
 
   - interval: 1m
     input_series:
@@ -183,8 +183,8 @@ tests:
             exp_annotations:
               summary: "Many invalid instance backups on cloudbackup1004:9100"
               description: "15 invalid instance backup versions on cloudbackup1004:9100 (eqiad). Invalid backups cannot be restored and may indicate corruption."
-              dashboard: TODO
-              runbook: TODO
+              dashboard: https://grafana.wikimedia.org/d/fisr2p9/wmcs-backup?viewPanel=20&var-kind=instance&var-site=eqiad
+              runbook: "https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/Backup#BackupInvalidSpike"
 
   - interval: 1m
     input_series:
@@ -210,8 +210,8 @@ tests:
             exp_annotations:
               summary: "Many invalid volume backups on cloudbackup2004:9100"
               description: "4 invalid volume backup versions on cloudbackup2004:9100 (codfw). Invalid backups cannot be restored and may indicate corruption."
-              dashboard: TODO
-              runbook: TODO
+              dashboard: https://grafana.wikimedia.org/d/fisr2p9/wmcs-backup?viewPanel=20&var-kind=volume&var-site=codfw
+              runbook: "https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/Backup#BackupInvalidSpike"
 
   - interval: 1m
     input_series:
@@ -250,8 +250,8 @@ tests:
             exp_annotations:
               summary: "Oldest volume backup on cloudbackup2003:9100 is 39d 23h 43m 20s old"
               description: "The oldest volume backup on cloudbackup2003:9100 (codfw) is 39d 23h 43m 20s old while backup entries still exist. The purge/GC may not be removing expired backups."
-              dashboard: TODO
-              runbook: TODO
+              dashboard: https://grafana.wikimedia.org/d/fisr2p9/wmcs-backup?viewPanel=19&var-kind=volume&var-site=codfw
+              runbook: "https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/Backup#BackupGcStalled"
 
   - interval: 1m
     input_series:
@@ -290,8 +290,8 @@ tests:
             exp_annotations:
               summary: "instance backup size on cloudbackup1003:9100 grew by more than 50% in a week"
               description: "The instance backup size on cloudbackup1003:9100 (eqiad) grew by more than 50% compared to a week ago. Check for unexpected growth or a runaway backup job."
-              dashboard: TODO
-              runbook: TODO
+              dashboard: https://grafana.wikimedia.org/d/fisr2p9/wmcs-backup?viewPanel=22&var-kind=instance&var-site=eqiad
+              runbook: "https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/Backup#BackupSizeAnomaly"
 
   - interval: 1m
     input_series:
