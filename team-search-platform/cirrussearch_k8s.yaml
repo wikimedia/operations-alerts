@@ -26,7 +26,9 @@ groups:
         runbook: 'https://wikitech.wikimedia.org/wiki/Search/CirrusStreamingUpdater#San(e)itizing'
         dashboard: 'https://grafana.wikimedia.org/d/JLK3I_siz/elasticsearch-indexing?viewPanel=59&orgId=1&from=now-6M&to=now&var-search_cluster={{ $labels.search_cluster }}'
     - alert: CirrusSearchFullTextLatencyTooHigh
-      expr: histogram_quantile(0.95, sum by (le, search_cluster) (rate(mediawiki_CirrusSearch_request_time_seconds_bucket{type="full_text"}[5m]))) > 1.0
+      expr: >
+        histogram_quantile(0.95, sum by (le, search_cluster) (rate(mediawiki_CirrusSearch_request_time_seconds_bucket{type="full_text"}[5m]))) > 1.0
+        and on (search_cluster) sum by (search_cluster) (rate(mediawiki_CirrusSearch_request_time_seconds_count{type="full_text"}[5m])) > 1
       for: 5m
       labels:
         team: search-platform
@@ -37,7 +39,9 @@ groups:
         runbook: 'https://wikitech.wikimedia.org/wiki/Search#Health/Activity_Monitoring'
         dashboard: 'https://grafana.wikimedia.org/d/dc04b9f2-b8d5-4ab6-9482-5d9a75728951/elasticsearch-percentiles?orgId=1'
     - alert: CirrusSearchCompletionLatencyTooHigh
-      expr: histogram_quantile(0.95, sum by (le, search_cluster) (rate(mediawiki_CirrusSearch_request_time_seconds_bucket{type="comp_suggest"}[5m]))) > 0.25
+      expr: >
+        histogram_quantile(0.95, sum by (le, search_cluster) (rate(mediawiki_CirrusSearch_request_time_seconds_bucket{type="comp_suggest"}[5m]))) > 0.25
+        and on (search_cluster) sum by (search_cluster) (rate(mediawiki_CirrusSearch_request_time_seconds_count{type="comp_suggest"}[5m])) > 1
       for: 5m
       labels:
         team: search-platform
@@ -48,7 +52,9 @@ groups:
         runbook: 'https://wikitech.wikimedia.org/wiki/Search#Health/Activity_Monitoring'
         dashboard: 'https://grafana.wikimedia.org/d/dc04b9f2-b8d5-4ab6-9482-5d9a75728951/elasticsearch-percentiles?orgId=1'
     - alert: CirrusSearchMoreLikeLatencyTooHigh
-      expr: histogram_quantile(0.95, sum by (le, search_cluster) (rate(mediawiki_CirrusSearch_request_time_seconds_bucket{type="more_like"}[5m]))) > 1.5
+      expr: >
+        histogram_quantile(0.95, sum by (le, search_cluster) (rate(mediawiki_CirrusSearch_request_time_seconds_bucket{type="more_like"}[5m]))) > 1.5
+        and on (search_cluster) sum by (search_cluster) (rate(mediawiki_CirrusSearch_request_time_seconds_count{type="more_like"}[5m])) > 1
       for: 5m
       labels:
         team: search-platform

@@ -56,6 +56,8 @@ tests:
         values: '0+95x6'
       - series: mediawiki_CirrusSearch_request_time_seconds_bucket{search_cluster="eqiad", type="full_text", le="0.5"}
         values: '0+10x6'
+      - series: mediawiki_CirrusSearch_request_time_seconds_count{search_cluster="eqiad", type="full_text"}
+        values: '0+350x6'
 
       # histograms for full_text search to codfw p95 is 972.3ms
       - series: mediawiki_CirrusSearch_request_time_seconds_bucket{search_cluster="codfw", type="full_text", le="+Inf"}
@@ -66,6 +68,8 @@ tests:
         values: '0+101x6'
       - series: mediawiki_CirrusSearch_request_time_seconds_bucket{search_cluster="codfw", type="full_text", le="0.5"}
         values: '0+10x6'
+      - series: mediawiki_CirrusSearch_request_time_seconds_count{search_cluster="codfw", type="full_text"}
+        values: '0+350x6'
 
       # histograms for comp_suggest search to eqiad p95 is 289.6ms
       - series: mediawiki_CirrusSearch_request_time_seconds_bucket{search_cluster="eqiad", type="comp_suggest", le="+Inf"}
@@ -76,6 +80,8 @@ tests:
         values: '0+95x6'
       - series: mediawiki_CirrusSearch_request_time_seconds_bucket{search_cluster="eqiad", type="comp_suggest", le="0.1"}
         values: '0+10x6'
+      - series: mediawiki_CirrusSearch_request_time_seconds_count{search_cluster="eqiad", type="comp_suggest"}
+        values: '0+350x6'
 
       # histograms for comp_suggest search to codfw p95 is 241.7ms
       - series: mediawiki_CirrusSearch_request_time_seconds_bucket{search_cluster="codfw", type="comp_suggest", le="+Inf"}
@@ -86,6 +92,8 @@ tests:
         values: '0+101x6'
       - series: mediawiki_CirrusSearch_request_time_seconds_bucket{search_cluster="codfw", type="comp_suggest", le="0.1"}
         values: '0+10x6'
+      - series: mediawiki_CirrusSearch_request_time_seconds_count{search_cluster="codfw", type="comp_suggest"}
+        values: '0+350x6'
 
       # histograms for more_like search to eqiad p95 is 1.75s
       - series: mediawiki_CirrusSearch_request_time_seconds_bucket{search_cluster="eqiad", type="more_like", le="+Inf"}
@@ -94,6 +102,8 @@ tests:
         values: '0+100x6'
       - series: mediawiki_CirrusSearch_request_time_seconds_bucket{search_cluster="eqiad", type="more_like", le="1"}
         values: '0+90x6'
+      - series: mediawiki_CirrusSearch_request_time_seconds_count{search_cluster="eqiad", type="more_like"}
+        values: '0+350x6'
 
       # histograms for more_like search to codfw p95 is 1.429s
       - series: mediawiki_CirrusSearch_request_time_seconds_bucket{search_cluster="codfw", type="more_like", le="+Inf"}
@@ -102,6 +112,8 @@ tests:
         values: '0+100x6'
       - series: mediawiki_CirrusSearch_request_time_seconds_bucket{search_cluster="codfw", type="more_like", le="1"}
         values: '0+93x6'
+      - series: mediawiki_CirrusSearch_request_time_seconds_count{search_cluster="codfw", type="more_like"}
+        values: '0+350x6'
     external_labels:
       site: eqiad
     alert_rule_test:
