@@ -9,9 +9,9 @@ groups:
           severity: warning
           team: sre
         annotations:
-          summary: "Disk not healthy"
+          summary: "Disk {{ $labels.device }} not healthy"
           description: >-
-            The disk SMART status is *not* healthy, this could be an early
+            The disk SMART status of {{ $labels.device }} is *not* healthy, this could be an early
             warning before the disk fails.
           # TODO: At present we do not have the hostname as a label in
           # prometheus, once we do this dashboard can be updated to
