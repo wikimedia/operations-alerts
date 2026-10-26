@@ -24,8 +24,15 @@ tests:
 
   - interval: 1m
     input_series:
+      # cpu 0: NIC-assigned, busy -> should fire
       - series: 'node_cpu_seconds_total{cluster="lvs", cpu="0", instance="lvs1017:9100", job="node", mode="softirq"}'
         values: '2000000000000+3000000000000x58'
+      # cpu 1: busy but not assigned to any NIC queue -> must not fire
+      - series: 'node_cpu_seconds_total{cluster="lvs", cpu="1", instance="lvs1017:9100", job="node", mode="softirq"}'
+        values: '2000000000000+3000000000000x58'
+      # NIC queue assignments
+      - series: 'node_nic_queue_cpu_assigned{cluster="lvs", cpu="0", interface="eth0", job="node", instance="lvs1017:9100"}'
+        values: '1x15'
     alert_rule_test:
     - alertname: LVSHighCPU
       eval_time: 10m

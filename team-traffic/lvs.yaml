@@ -16,7 +16,7 @@ groups:
           runbook: 'https://bit.ly/wmf-lvsrx'
 
       - alert: LVSHighCPU
-        expr: sum by (instance, cpu) (irate(node_cpu_seconds_total{mode!="idle",cluster=~"(lvs|liberica)"}[5m])) > 0.7
+        expr: sum by (instance, cpu) (irate(node_cpu_seconds_total{mode!="idle",cluster=~"(lvs|liberica)"}[5m])) > 0.7 and on (instance, cpu) node_nic_queue_cpu_assigned
         for: 1m
         labels:
           team: traffic
