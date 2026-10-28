@@ -68,3 +68,24 @@ tests:
               description: "Maintain-dbusers did not do any run for the last 46m 0s"
               runbook: "https://wikitech.wikimedia.org/wiki/Portal:Toolforge/Admin/Runbooks/MaintainDBUsersStuck"
               summary: "Maintain-dbusers is stuck"
+
+  - interval: 1m
+    input_series:
+      - series: maintain_dbusers_population_success{account_type="paws"}
+        # time() behavior in unit tests is from zero, using eval_time, not the current time.  See:
+        # https://github.com/prometheus/prometheus/issues/4817#issuecomment-514765285
+        values: "0+0x120"
+    alert_rule_test:
+      - alertname: MaintainDBUsersPopulationFailing
+        eval_time: 46m
+        exp_alerts:
+          - exp_labels:
+              service: "openstack,cloudvps,maintaindbusers,toolforge,paws"
+              severity: "warning"
+              team: "wmcs"
+              account_type: paws
+            exp_annotations:
+              dashboard: "https://grafana.wikimedia.org/d/ae240a06-c13e-49f3-b12c-58432c551e85/wmcs-maintain-dbusers"
+              description: "Maintain-dbusers has been failing to populate accounts of type paws for more than 30m"
+              runbook: "https://wikitech.wikimedia.org/wiki/Portal:Toolforge/Admin/Runbooks/MaintainDBUsersPopulationFailing"
+              summary: "Maintain-dbusers is failing to populate accounts"
