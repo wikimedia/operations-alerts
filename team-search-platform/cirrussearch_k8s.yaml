@@ -4,8 +4,8 @@ groups:
  - name: cirrussearch
    rules:
     - alert: CirrusSearchPoolCounterRejectionTooHigh
-      expr: sum(rate(mediawiki_CirrusSearch_pool_counter_seconds_count{status="failure", type!="Automated"}[5m])) > 1000
-      for: 1m
+      expr: sum(rate(mediawiki_CirrusSearch_pool_counter_seconds_count{status="failure", type!="Automated"}[5m])) > 200
+      for: 10m
       labels:
         team: search-platform
         severity: critical

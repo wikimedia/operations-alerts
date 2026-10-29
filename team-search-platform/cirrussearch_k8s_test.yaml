@@ -5,16 +5,20 @@ tests:
   - interval: 1m
     input_series:
       - series: mediawiki_CirrusSearch_pool_counter_seconds_count{status="success", type="fulltext"}
-        values: '0+120000x6'
+        values: '0+120000x15'
       - series: mediawiki_CirrusSearch_pool_counter_seconds_count{status="failure", type="fulltext"}
-        values: '0+30001x6'
+        values: '0+6001x15'
       - series: mediawiki_CirrusSearch_pool_counter_seconds_count{status="failure", type="completion"}
-        values: '0+30000x6'
+        values: '0+6000x15'
     external_labels:
       site: eqiad
     alert_rule_test:
+      # The 5m rate window reaches >200/sec at 5m, then must stay there for 10m.
       - alertname: CirrusSearchPoolCounterRejectionTooHigh
-        eval_time: 6m
+        eval_time: 14m
+        exp_alerts: []
+      - alertname: CirrusSearchPoolCounterRejectionTooHigh
+        eval_time: 15m
         exp_alerts:
           - exp_labels:
               severity: critical
