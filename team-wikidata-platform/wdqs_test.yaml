@@ -1,0 +1,177 @@
+rule_files:
+  - wdqs.yaml
+evaluation_interval: 1m
+tests:
+  # Update lag above the 10 minute threshold fires, and only for the lagging pod.
+  - interval: 1m
+    external_labels:
+      site: eqiad
+    input_series:
+      - series: 'wdqs_streaming_updater_update_lag_ms_Value{kubernetes_namespace="wdqs", release="main-external", kubernetes_pod_name="main-external-backend-0", app="wdqs", component="backend"}'
+        values: "900000x40"
+      - series: 'wdqs_streaming_updater_update_lag_ms_Value{kubernetes_namespace="wdqs", release="main-external", kubernetes_pod_name="main-external-backend-1", app="wdqs", component="backend"}'
+        values: "60000x40"
+    alert_rule_test:
+      - alertname: WdqsUpdateLagHigh
+        eval_time: 31m
+        exp_alerts:
+          - exp_labels:
+              team: wikidata-platform
+              severity: critical
+              kubernetes_namespace: wdqs
+              release: main-external
+              kubernetes_pod_name: main-external-backend-0
+            exp_annotations:
+              summary: "WDQSv2 update lag on main-external-backend-0 is above 10 minutes"
+              description: |
+                The streaming updater consumer on main-external-backend-0 (main-external,
+                eqiad) is 15 minutes behind the mutation stream.
+                Queries answered by this pod return stale data.
+              runbook: https://wikitech.wikimedia.org/wiki/Wikidata_Platform/Runbook/WdqsUpdateLagHigh
+              dashboard: https://grafana.wikimedia.org/d/gmq64rt/wdqsv2-ga?from=now-6h&to=now&timezone=utc&var-namespace=wdqs&var-release=main-external&var-datacenter=eqiad
+
+  # Lag below the threshold, and lag in the wdqs-next staging namespace, stay quiet.
+  - interval: 1m
+    input_series:
+      - series: 'wdqs_streaming_updater_update_lag_ms_Value{kubernetes_namespace="wdqs", release="scholarly-external", kubernetes_pod_name="scholarly-external-backend-0"}'
+        values: "540000x40"
+      - series: 'wdqs_streaming_updater_update_lag_ms_Value{kubernetes_namespace="wdqs-next", release="main-external", kubernetes_pod_name="main-external-backend-0"}'
+        values: "3600000x40"
+    alert_rule_test:
+      - alertname: WdqsUpdateLagHigh
+        eval_time: 40m
+        exp_alerts: []
+
+  # 10% of requests answered with a 503 breaches the availability SLO. The
+  # timeout alert stays quiet: no 504s.
+  - interval: 1m
+    external_labels:
+      site: codfw
+    input_series:
+      - series: 'envoy_cluster_upstream_rq{kubernetes_namespace="wdqs", envoy_cluster_name="LOCAL_wdqs", envoy_response_code="503", release="main-external", kubernetes_pod_name="wdqs-main-external-proxy-abc", app="wdqs", component="proxy"}'
+        values: "0+6x40"
+      - series: 'envoy_cluster_upstream_rq{kubernetes_namespace="wdqs", envoy_cluster_name="LOCAL_wdqs", envoy_response_code="200", release="main-external", kubernetes_pod_name="wdqs-main-external-proxy-abc", app="wdqs", component="proxy"}'
+        values: "0+54x40"
+      # Egress through the same sidecar must not land in the denominator.
+      - series: 'envoy_cluster_upstream_rq{kubernetes_namespace="wdqs", envoy_cluster_name="eventgate-analytics", envoy_response_code="200", release="main-external", kubernetes_pod_name="wdqs-main-external-proxy-abc"}'
+        values: "0+600x40"
+    alert_rule_test:
+      - alertname: WdqsHighErrorRate
+        eval_time: 20m
+        exp_alerts:
+          - exp_labels:
+              team: wikidata-platform
+              severity: critical
+              kubernetes_namespace: wdqs
+              release: main-external
+            exp_annotations:
+              summary: "WDQSv2 error rate for main-external is above the 5% error budget"
+              description: |
+                10% of the queries sent to the main-external endpoint in
+                codfw are answered with a 5xx other than 504, which breaches the 95%
+                availability target. Either qlever is returning errors, or wdqs-proxy cannot reach it at all.
+              runbook: https://wikitech.wikimedia.org/wiki/Wikidata_Platform/Runbook/WdqsHighErrorRate
+              dashboard: https://grafana.wikimedia.org/d/gmq64rt/wdqsv2-ga?from=now-6h&to=now&timezone=utc&var-namespace=wdqs&var-release=main-external&var-datacenter=codfw
+      - alertname: WdqsHighTimeoutRate
+        eval_time: 25m
+        exp_alerts: []
+
+  # 10% of requests timing out warns, and does not breach the availability SLO:
+  # 504 is excluded from the error numerator.
+  - interval: 1m
+    external_labels:
+      site: codfw
+    input_series:
+      - series: 'envoy_cluster_upstream_rq{kubernetes_namespace="wdqs", envoy_cluster_name="LOCAL_wdqs", envoy_response_code="504", release="main-external"}'
+        values: "0+6x40"
+      - series: 'envoy_cluster_upstream_rq{kubernetes_namespace="wdqs", envoy_cluster_name="LOCAL_wdqs", envoy_response_code="200", release="main-external"}'
+        values: "0+54x40"
+    alert_rule_test:
+      - alertname: WdqsHighTimeoutRate
+        eval_time: 25m
+        exp_alerts:
+          - exp_labels:
+              team: wikidata-platform
+              severity: warning
+              kubernetes_namespace: wdqs
+              release: main-external
+            exp_annotations:
+              summary: "WDQSv2 timeout rate for main-external is above 5%"
+              description: |
+                10% of the queries sent to the main-external endpoint in
+                codfw are answered with a 504. This does not breach the availability SLO. Either qlever is over capacity or queries are exceeding the 60s downstream read timeout.
+              runbook: https://wikitech.wikimedia.org/wiki/Wikidata_Platform/Runbook/WdqsHighTimeoutRate
+              dashboard: https://grafana.wikimedia.org/d/gmq64rt/wdqsv2-ga?from=now-6h&to=now&timezone=utc&var-namespace=wdqs&var-release=main-external&var-datacenter=codfw
+      - alertname: WdqsHighErrorRate
+        eval_time: 25m
+        exp_alerts: []
+
+  # 429 is ignored entirely: a flood of them must not dilute the ratio. Without
+  # the exclusion the 503 rate below would read as 4% and stay under the budget.
+  - interval: 1m
+    external_labels:
+      site: eqiad
+    input_series:
+      - series: 'envoy_cluster_upstream_rq{kubernetes_namespace="wdqs", envoy_cluster_name="LOCAL_wdqs", envoy_response_code="429", release="main-external"}'
+        values: "0+90x40"
+      - series: 'envoy_cluster_upstream_rq{kubernetes_namespace="wdqs", envoy_cluster_name="LOCAL_wdqs", envoy_response_code="503", release="main-external"}'
+        values: "0+6x40"
+      - series: 'envoy_cluster_upstream_rq{kubernetes_namespace="wdqs", envoy_cluster_name="LOCAL_wdqs", envoy_response_code="200", release="main-external"}'
+        values: "0+54x40"
+    alert_rule_test:
+      - alertname: WdqsHighErrorRate
+        eval_time: 20m
+        exp_alerts:
+          - exp_labels:
+              team: wikidata-platform
+              severity: critical
+              kubernetes_namespace: wdqs
+              release: main-external
+            exp_annotations:
+              summary: "WDQSv2 error rate for main-external is above the 5% error budget"
+              description: |
+                10% of the queries sent to the main-external endpoint in
+                eqiad are answered with a 5xx other than 504, which breaches the 95%
+                availability target. Either qlever is returning errors, or wdqs-proxy cannot reach it at all.
+              runbook: https://wikitech.wikimedia.org/wiki/Wikidata_Platform/Runbook/WdqsHighErrorRate
+              dashboard: https://grafana.wikimedia.org/d/gmq64rt/wdqsv2-ga?from=now-6h&to=now&timezone=utc&var-namespace=wdqs&var-release=main-external&var-datacenter=eqiad
+
+  # An endpoint serving 0.15 req/s is below the minimum traffic gate, so neither
+  # ratio alert fires even though a third of its requests are failing.
+  - interval: 1m
+    input_series:
+      - series: 'envoy_cluster_upstream_rq{kubernetes_namespace="wdqs", envoy_cluster_name="LOCAL_wdqs", envoy_response_code="503", release="scholarly-external"}'
+        values: "0+3x40"
+      - series: 'envoy_cluster_upstream_rq{kubernetes_namespace="wdqs", envoy_cluster_name="LOCAL_wdqs", envoy_response_code="504", release="scholarly-external"}'
+        values: "0+3x40"
+      - series: 'envoy_cluster_upstream_rq{kubernetes_namespace="wdqs", envoy_cluster_name="LOCAL_wdqs", envoy_response_code="200", release="scholarly-external"}'
+        values: "0+3x40"
+    alert_rule_test:
+      - alertname: WdqsHighErrorRate
+        eval_time: 25m
+        exp_alerts: []
+      - alertname: WdqsHighTimeoutRate
+        eval_time: 25m
+        exp_alerts: []
+
+  # A healthy endpoint at 2% errors and 2% timeouts stays below both thresholds,
+  # and the staging namespace is ignored even when it is entirely failing.
+  - interval: 1m
+    input_series:
+      - series: 'envoy_cluster_upstream_rq{kubernetes_namespace="wdqs", envoy_cluster_name="LOCAL_wdqs", envoy_response_code="503", release="main-external"}'
+        values: "0+2x40"
+      - series: 'envoy_cluster_upstream_rq{kubernetes_namespace="wdqs", envoy_cluster_name="LOCAL_wdqs", envoy_response_code="504", release="main-external"}'
+        values: "0+2x40"
+      - series: 'envoy_cluster_upstream_rq{kubernetes_namespace="wdqs", envoy_cluster_name="LOCAL_wdqs", envoy_response_code="200", release="main-external"}'
+        values: "0+96x40"
+      - series: 'envoy_cluster_upstream_rq{kubernetes_namespace="wdqs-next", envoy_cluster_name="LOCAL_wdqs-next", envoy_response_code="503", release="main-external"}'
+        values: "0+120x40"
+      - series: 'envoy_cluster_upstream_rq{kubernetes_namespace="wdqs-next", envoy_cluster_name="LOCAL_wdqs-next", envoy_response_code="504", release="main-external"}'
+        values: "0+120x40"
+    alert_rule_test:
+      - alertname: WdqsHighErrorRate
+        eval_time: 25m
+        exp_alerts: []
+      - alertname: WdqsHighTimeoutRate
+        eval_time: 25m
+        exp_alerts: []

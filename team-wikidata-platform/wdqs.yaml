@@ -1,0 +1,101 @@
+# WDQS v2 (qlever) service health.
+#
+# Only the production "wdqs" namespace is covered. "wdqs-next" is staging and is left out so that experiments there stay quiet.
+#
+# SLO (T436018, in review): availability is the share of requests not answered
+# with a 5xx, measured at the envoy ingress sidecar in front of wdqs-proxy.
+# 504 is excluded and tracked separately, because users can send arbitrarily
+# expensive queries and a timeout cannot be attributed to the server. 429 is
+# ignored entirely as intentional rate limiting. Caveat: wdqs-proxy remaps
+# QLever's own 429 (over capacity) onto 504, so real saturation currently hides
+# in the timeout bucket; see T436018.
+#
+# deploy-tag: k8s-dse
+# deploy-site: eqiad, codfw
+
+groups:
+  - name: wdqs
+    rules:
+      - alert: WdqsUpdateLagHigh
+        # Backend pods are not depooled on lag, so a lagging pod is still serving
+        # stale results and is worth an alert on its own rather than only
+        # on the cluster-wide max.
+        expr: |
+          max by (kubernetes_namespace, release, kubernetes_pod_name) (
+            wdqs_streaming_updater_update_lag_ms_Value{kubernetes_namespace="wdqs"}
+          ) / 1000 / 60 > 10
+        for: 30m
+        labels:
+          team: wikidata-platform
+          severity: critical
+        annotations:
+          summary: "WDQSv2 update lag on {{ $labels.kubernetes_pod_name }} is above 10 minutes"
+          description: |
+            The streaming updater consumer on {{ $labels.kubernetes_pod_name }} ({{ $labels.release }},
+            {{ $externalLabels.site }}) is {{ $value | humanize }} minutes behind the mutation stream.
+            Queries answered by this pod return stale data.
+          runbook: https://wikitech.wikimedia.org/wiki/Wikidata_Platform/Runbook/WdqsUpdateLagHigh
+          dashboard: https://grafana.wikimedia.org/d/gmq64rt/wdqsv2-ga?from=now-6h&to=now&timezone=utc&var-namespace={{ $labels.kubernetes_namespace }}&var-release={{ $labels.release }}&var-datacenter={{ $externalLabels.site }}
+
+      - alert: WdqsHighErrorRate
+        # The 95% availability target. Errors are "5xx except 504". Measured at envoy.
+        # The > 0.2 req/s threshold is about 60 requests over the window. This is (estimate) a lower bound to make a 5% ratio meaningful.
+        expr: |
+          (
+            sum by (kubernetes_namespace, release) (
+              rate(envoy_cluster_upstream_rq{kubernetes_namespace="wdqs", envoy_cluster_name=~"(local_service|LOCAL_.*)", envoy_response_code=~"5..", envoy_response_code!="504"}[5m])
+            )
+            /
+            sum by (kubernetes_namespace, release) (
+              rate(envoy_cluster_upstream_rq{kubernetes_namespace="wdqs", envoy_cluster_name=~"(local_service|LOCAL_.*)", envoy_response_code!="429"}[5m])
+            )
+          ) > 0.05
+          and
+          sum by (kubernetes_namespace, release) (
+            rate(envoy_cluster_upstream_rq{kubernetes_namespace="wdqs", envoy_cluster_name=~"(local_service|LOCAL_.*)", envoy_response_code!="429"}[5m])
+          ) > 0.2
+        for: 10m
+        labels:
+          team: wikidata-platform
+          severity: critical
+        annotations:
+          summary: "WDQSv2 error rate for {{ $labels.release }} is above the 5% error budget"
+          description: |
+            {{ $value | humanizePercentage }} of the queries sent to the {{ $labels.release }} endpoint in
+            {{ $externalLabels.site }} are answered with a 5xx other than 504, which breaches the 95%
+            availability target. Either qlever is returning errors, or wdqs-proxy cannot reach it at all.
+          runbook: https://wikitech.wikimedia.org/wiki/Wikidata_Platform/Runbook/WdqsHighErrorRate
+          dashboard: https://grafana.wikimedia.org/d/gmq64rt/wdqsv2-ga?from=now-6h&to=now&timezone=utc&var-namespace={{ $labels.kubernetes_namespace }}&var-release={{ $labels.release }}&var-datacenter={{ $externalLabels.site }}
+
+      - alert: WdqsHighTimeoutRate
+        # Under the SLO a 504 is a client error, this
+        # does not burn availability budget. A shift in traffic
+        # towards "expensive" queries moves it with nothing necessarily broken.
+        #
+        # 504 conflates envoy's 65s mesh.upstream_timeout, wdqs-proxy's 60s read
+        # timeout, and QLever's remapped 429.
+        expr: |
+          (
+            sum by (kubernetes_namespace, release) (
+              rate(envoy_cluster_upstream_rq{kubernetes_namespace="wdqs", envoy_cluster_name=~"(local_service|LOCAL_.*)", envoy_response_code="504"}[5m])
+            )
+            /
+            sum by (kubernetes_namespace, release) (
+              rate(envoy_cluster_upstream_rq{kubernetes_namespace="wdqs", envoy_cluster_name=~"(local_service|LOCAL_.*)", envoy_response_code!="429"}[5m])
+            )
+          ) > 0.05
+          and
+          sum by (kubernetes_namespace, release) (
+            rate(envoy_cluster_upstream_rq{kubernetes_namespace="wdqs", envoy_cluster_name=~"(local_service|LOCAL_.*)", envoy_response_code!="429"}[5m])
+          ) > 0.2
+        for: 15m
+        labels:
+          team: wikidata-platform
+          severity: warning
+        annotations:
+          summary: "WDQSv2 timeout rate for {{ $labels.release }} is above 5%"
+          description: |
+            {{ $value | humanizePercentage }} of the queries sent to the {{ $labels.release }} endpoint in
+            {{ $externalLabels.site }} are answered with a 504. This does not breach the availability SLO. Either qlever is over capacity or queries are exceeding the 60s downstream read timeout.
+          runbook: https://wikitech.wikimedia.org/wiki/Wikidata_Platform/Runbook/WdqsHighTimeoutRate
+          dashboard: https://grafana.wikimedia.org/d/gmq64rt/wdqsv2-ga?from=now-6h&to=now&timezone=utc&var-namespace={{ $labels.kubernetes_namespace }}&var-release={{ $labels.release }}&var-datacenter={{ $externalLabels.site }}
