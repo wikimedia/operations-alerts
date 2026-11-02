@@ -2,50 +2,43 @@ rule_files:
   - swagger.yaml
 evaluation_interval: 1m
 tests:
-  - interval: 5m
+  - interval: 1m
     external_labels:
       site: eqiad
     input_series:
-      - series: 'service_checker_probe_success{instance="http://kartotherian.svc.eqiad.wmnet:6533", job="swagger_check_kartotherian_cluster_eqiad", site="eqiad"}'
-        values: '0'
-      - series: 'service_checker_probe_success{instance="http://kartotherian.svc.eqiad.wmnet:6533", job="probes/swagger", site="eqiad"}'
-        values: '0'
+      # endpoint check failing
+      - series: 'service_checker_probe_success{instance="http://kartotherian.svc.eqiad.wmnet:6533", job="probes/swagger"}'
+        values: '0x10'
+      # healthy
+      - series: 'service_checker_probe_success{instance="http://citoid.svc.eqiad.wmnet:4003", job="probes/swagger"}'
+        values: '1x10'
+      # probe could not run
+      - series: 'up{instance="http://mobileapps.svc.eqiad.wmnet:4102", job="probes/swagger"}'
+        values: '0x10'
     alert_rule_test:
       - alertname: SwaggerProbeHasFailures
-        eval_time: 5m
+        eval_time: 6m
         exp_alerts:
           - exp_labels:
               severity: critical
               team: sre
-              site: eqiad
               job: probes/swagger
               instance: http://kartotherian.svc.eqiad.wmnet:6533
             exp_annotations:
-              summary: Not all openapi/swagger endpoints returned healthy
-              description: Not all openapi/swagger endpoints returned healthy or probing failed for http://kartotherian.svc.eqiad.wmnet:6533 from eqiad
+              summary: "http://kartotherian.svc.eqiad.wmnet:6533: openapi/swagger endpoint check failed"
+              description: One or more openapi/swagger checks for http://kartotherian.svc.eqiad.wmnet:6533 returned an unexpected response (probed from eqiad).
               dashboard: https://grafana.wikimedia.org/d/_77ik484k/openapi-swagger-endpoint-state?var-site=eqiad
               runbook: https://wikitech.wikimedia.org/wiki/Runbook#http://kartotherian.svc.eqiad.wmnet:6533
+      - alertname: SwaggerProbeUnavailable
+        eval_time: 6m
+        exp_alerts:
           - exp_labels:
               severity: critical
               team: sre
-              site: eqiad
-              job: swagger_check_kartotherian_cluster_eqiad
-              instance: http://kartotherian.svc.eqiad.wmnet:6533
+              job: probes/swagger
+              instance: http://mobileapps.svc.eqiad.wmnet:4102
             exp_annotations:
-              summary: Not all openapi/swagger endpoints returned healthy
-              description: Not all openapi/swagger endpoints returned healthy or probing failed for http://kartotherian.svc.eqiad.wmnet:6533 from eqiad
+              summary: "http://mobileapps.svc.eqiad.wmnet:4102: openapi/swagger probe could not run (scrape failed)"
+              description: The openapi/swagger probe for http://mobileapps.svc.eqiad.wmnet:4102 could not complete (probed from eqiad).
               dashboard: https://grafana.wikimedia.org/d/_77ik484k/openapi-swagger-endpoint-state?var-site=eqiad
-              runbook: https://wikitech.wikimedia.org/wiki/Runbook#http://kartotherian.svc.eqiad.wmnet:6533
-
-  - interval: 5m
-    external_labels:
-      site: codfw
-    input_series:
-      - series: 'service_checker_probe_success{instance="http://kartotherian.svc.codfw.wmnet:6533", job="swagger_check_kartotherian_cluster_codfw", site="codfw"}'
-        values: '1'
-      - series: 'service_checker_probe_success{instance="http://kartotherian.svc.codfw.wmnet:6533", job="probes/swagger", site="codfw"}'
-        values: '1'
-    alert_rule_test:
-      - alertname: SwaggerProbeHasFailures
-        eval_time: 5m
-        exp_alerts: []
+              runbook: https://wikitech.wikimedia.org/wiki/Runbook#http://mobileapps.svc.eqiad.wmnet:4102
