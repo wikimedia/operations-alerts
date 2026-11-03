@@ -48,16 +48,18 @@ groups:
         # pint disable promql/series
         # 4xx series can be absent during very quiet periods, so the live linter
         # would otherwise flap on "series not found".
-        # Alert if more than 10% of HTTP requests result in a 4xx status,
-        # usually the sign of a scraper crawling Gerrit. The total request rate
-        # guard (> 20 req/s) keeps low-traffic replicas, whose ratio is naturally
-        # high, from firing; only the active host sustains that volume.
+        # Alert if more than 25% of HTTP requests result in a 4xx status, the
+        # sign of a scraper heavy enough to degrade Gerrit. Lighter scrapers
+        # stay below this threshold; the dashboard shows them. The total
+        # request rate guard (> 20 req/s) keeps low-traffic replicas, whose
+        # ratio is naturally high, from firing; only the active host sustains
+        # that volume.
         expr: |
           (
             sum by (instance) (rate(apache_http_status_total{instance=~"gerrit.*", status=~"4.*"}[5m]))
             /
             sum by (instance) (rate(apache_http_status_total{instance=~"gerrit.*"}[5m]))
-          ) * 100 > 10
+          ) * 100 > 25
           and
           sum by (instance) (rate(apache_http_status_total{instance=~"gerrit.*"}[5m])) > 20
         for: 15m
@@ -66,7 +68,7 @@ groups:
           team: collaboration-services
         annotations:
           summary: 'High rate of HTTP 4xx responses on {{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }} (probable scraper)'
-          description: 'More than 10% of HTTP requests to Gerrit on {{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }} returned a 4xx status over the last 10 minutes, this is usually caused by a scraper.'
+          description: 'More than 25% of HTTP requests to Gerrit on {{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }} returned a 4xx status for 15 minutes, this is usually caused by a scraper.'
           runbook: TODO
           dashboard: https://grafana.wikimedia.org/d/nX8li17Sk/gerrit-overview-sre-collab
 
