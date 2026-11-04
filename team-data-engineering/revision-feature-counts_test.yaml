@@ -57,8 +57,8 @@ tests:
               severity: warning
               team: data-engineering
             exp_annotations:
-              summary: "RevisionFeatureCounts fails more than 5% of calls in eqiad"
-              description: "More than 5% of GetRevisionArtifact calls fail in a way this service answers for. Break the rate down by the reason for more details."
+              summary: "RevisionFeatureCounts fails more than 2% of calls in eqiad"
+              description: "More than 2% of GetRevisionArtifact calls fail with server errors. Break the rate down by the reason for more details."
               dashboard: https://grafana.wikimedia.org/d/revision-feature-counts/revision-feature-counts?orgId=1&var-site=eqiad&var-prometheus=k8s&viewPanel=20
               runbook: https://wikitech.wikimedia.org/wiki/Revision_Feature_Counts#RevisionFeatureCountsHighErrorRate
 
@@ -90,21 +90,113 @@ tests:
         eval_time: 30m
         exp_alerts: []
 
+  # --- a lower error rate that does not stop -----------------------------
+  # 3 errors against 200 calls a minute is 1.5%. That is below the 2% of
+  # the fast alert, so only the sustained alert fires.
+  - interval: 1m
+    input_series:
+      - series: 'rfc_request_duration_seconds_count{kubernetes_namespace="lac-lambdas", grpc_code="DEADLINE_EXCEEDED", reason="deadline_exceeded"}'
+        values: '0+3x140'
+      - series: 'rfc_request_duration_seconds_count{kubernetes_namespace="lac-lambdas", grpc_code="OK", reason="ok"}'
+        values: '0+197x140'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: RevisionFeatureCountsErrorRateSustained
+        eval_time: 130m
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              team: data-engineering
+            exp_annotations:
+              summary: "RevisionFeatureCounts has failed more than 1% of calls for over an hour in eqiad"
+              description: "More than 1% of GetRevisionArtifact calls in the last hour failed with server errors, and the rate has stayed above 1% for an hour. Break the rate down by the reason for more details."
+              dashboard: https://grafana.wikimedia.org/d/revision-feature-counts/revision-feature-counts?orgId=1&var-site=eqiad&var-prometheus=k8s&viewPanel=20
+              runbook: https://wikitech.wikimedia.org/wiki/Revision_Feature_Counts#RevisionFeatureCountsErrorRateSustained
+      - alertname: RevisionFeatureCountsHighErrorRate
+        eval_time: 130m
+        exp_alerts: []
+
+  # The same 1.5% must not fire before it has held for an hour.
+  - interval: 1m
+    input_series:
+      - series: 'rfc_request_duration_seconds_count{kubernetes_namespace="lac-lambdas", grpc_code="DEADLINE_EXCEEDED", reason="deadline_exceeded"}'
+        values: '0+3x140'
+      - series: 'rfc_request_duration_seconds_count{kubernetes_namespace="lac-lambdas", grpc_code="OK", reason="ok"}'
+        values: '0+197x140'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: RevisionFeatureCountsErrorRateSustained
+        eval_time: 45m
+        exp_alerts: []
+
+  # 1 error against 200 calls a minute is 0.5%, below the 1% threshold.
+  - interval: 1m
+    input_series:
+      - series: 'rfc_request_duration_seconds_count{kubernetes_namespace="lac-lambdas", grpc_code="DEADLINE_EXCEEDED", reason="deadline_exceeded"}'
+        values: '0+1x140'
+      - series: 'rfc_request_duration_seconds_count{kubernetes_namespace="lac-lambdas", grpc_code="OK", reason="ok"}'
+        values: '0+199x140'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: RevisionFeatureCountsErrorRateSustained
+        eval_time: 130m
+        exp_alerts: []
+
+  # --- calls refused at the gateway -------------------------------------
+  # 2 refusals against 100 calls a minute is 2%.
+  - interval: 1m
+    input_series:
+      - series: 'istio_requests_total{destination_service_name="lac-lambdas-revision-feature-counts-tls-service", reporter="source", grpc_response_status="8"}'
+        values: '0+2x40'
+      - series: 'istio_requests_total{destination_service_name="lac-lambdas-revision-feature-counts-tls-service", reporter="source", grpc_response_status="0"}'
+        values: '0+98x40'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: RevisionFeatureCountsRefusingCalls
+        eval_time: 31m
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              team: data-engineering
+            exp_annotations:
+              summary: "RevisionFeatureCounts refuses more than 1% of calls in eqiad"
+              description: "More than 1% of calls through the gateway returned RESOURCE_EXHAUSTED. Usually every worker is busy and the queue is full, so the pods need more replicas or MediaWiki is slow. Read the calls held by the pod panel, and the rate_limited reason to rule out MediaWiki throttling."
+              dashboard: https://grafana.wikimedia.org/d/revision-feature-counts/revision-feature-counts?orgId=1&var-site=eqiad&var-prometheus=k8s&viewPanel=98
+              runbook: https://wikitech.wikimedia.org/wiki/Revision_Feature_Counts#RevisionFeatureCountsRefusingCalls
+
+  # 1 refusal against 200 calls a minute is 0.5%, below the threshold.
+  - interval: 1m
+    input_series:
+      - series: 'istio_requests_total{destination_service_name="lac-lambdas-revision-feature-counts-tls-service", reporter="source", grpc_response_status="8"}'
+        values: '0+1x40'
+      - series: 'istio_requests_total{destination_service_name="lac-lambdas-revision-feature-counts-tls-service", reporter="source", grpc_response_status="0"}'
+        values: '0+199x40'
+    external_labels:
+      site: eqiad
+    alert_rule_test:
+      - alertname: RevisionFeatureCountsRefusingCalls
+        eval_time: 31m
+        exp_alerts: []
+
   # --- latency of the calls that worked ----------------------------------
   # Every successful call lands above the 5s bucket, so p95 is above 5s.
   - interval: 1m
     input_series:
       - series: 'rfc_request_duration_seconds_bucket{kubernetes_namespace="lac-lambdas", grpc_code="OK", reason="ok", le="5.0"}'
-        values: '0x40'
+        values: '0x60'
       - series: 'rfc_request_duration_seconds_bucket{kubernetes_namespace="lac-lambdas", grpc_code="OK", reason="ok", le="10.0"}'
-        values: '0+10x40'
+        values: '0+10x60'
       - series: 'rfc_request_duration_seconds_bucket{kubernetes_namespace="lac-lambdas", grpc_code="OK", reason="ok", le="+Inf"}'
-        values: '0+10x40'
+        values: '0+10x60'
     external_labels:
       site: eqiad
     alert_rule_test:
       - alertname: RevisionFeatureCountsLatencyHigh
-        eval_time: 31m
+        eval_time: 45m
         exp_alerts:
           - exp_labels:
               severity: warning
@@ -120,14 +212,14 @@ tests:
   - interval: 1m
     input_series:
       - series: 'rfc_request_duration_seconds_bucket{kubernetes_namespace="lac-lambdas", grpc_code="DEADLINE_EXCEEDED", reason="deadline_exceeded", le="5.0"}'
-        values: '0x40'
+        values: '0x60'
       - series: 'rfc_request_duration_seconds_bucket{kubernetes_namespace="lac-lambdas", grpc_code="DEADLINE_EXCEEDED", reason="deadline_exceeded", le="+Inf"}'
-        values: '0+10x40'
+        values: '0+10x60'
     external_labels:
       site: eqiad
     alert_rule_test:
       - alertname: RevisionFeatureCountsLatencyHigh
-        eval_time: 31m
+        eval_time: 45m
         exp_alerts: []
 
   # --- the wiki map is not being read again ------------------------------
@@ -183,7 +275,7 @@ tests:
         eval_time: 65m
         exp_alerts:
           - exp_labels:
-              severity: task
+              severity: warning
               team: data-engineering
             exp_annotations:
               summary: "mwparserfromhtml failed to count a feature for RevisionFeatureCounts"
@@ -209,19 +301,19 @@ tests:
               severity: critical
               team: data-engineering
             exp_annotations:
-              summary: "The Linked Artifact Cache cannot reach RevisionFeatureCounts in eqiad"
-              description: "More than half of the calls LAC makes for the revision_feature_counts artifact fail. The lambda may be down, refusing calls, or slower than the timeout LAC allows for this table."
+              summary: "The Linked Artifact Cache fails more than 5% of its calls to RevisionFeatureCounts in eqiad"
+              description: "More than 5% of the calls LAC makes for the revision_feature_counts artifact fail. The lambda may be down, refusing calls, or slower than the timeout LAC allows for this table."
               dashboard: https://grafana.wikimedia.org/d/revision-feature-counts/revision-feature-counts?orgId=1&var-site=eqiad&var-prometheus=k8s&viewPanel=60
               runbook: https://wikitech.wikimedia.org/wiki/Revision_Feature_Counts#RevisionFeatureCountsLambdaFailingFromLac
 
-  # A minority of failures must not fire the critical alert: 30% errors,
-  # well above the 10-error floor but below the 50% threshold.
+  # A small share of failures must not fire the critical alert: 2.5% errors,
+  # above the 10-error floor but below the 5% threshold.
   - interval: 1m
     input_series:
       - series: 'lambda_request_duration_seconds_count{kubernetes_namespace="linked-artifacts", cache="revision_feature_counts", status="error"}'
-        values: '0+3x40'
+        values: '0+1x40'
       - series: 'lambda_request_duration_seconds_count{kubernetes_namespace="linked-artifacts", cache="revision_feature_counts", status="success"}'
-        values: '0+7x40'
+        values: '0+39x40'
     external_labels:
       site: eqiad
     alert_rule_test:
@@ -295,13 +387,13 @@ tests:
               runbook: https://wikitech.wikimedia.org/wiki/Revision_Feature_Counts#RevisionFeatureCountsRestarting
 
   # --- memory near the limit ----------------------------------------------
-  # 1.95 GiB used against a 2 GiB limit is above the 95% threshold.
+  # 0.98 GiB used against a 1 GiB limit is above the 95% threshold.
   - interval: 1m
     input_series:
       - series: 'container_memory_working_set_bytes{namespace="lac-lambdas", pod="lac-lambdas-revision-feature-counts-abc", container="revision-feature-counts"}'
-        values: '2094080000+0x40'
+        values: '1052266987+0x40'
       - series: 'container_spec_memory_limit_bytes{namespace="lac-lambdas", pod="lac-lambdas-revision-feature-counts-abc", container="revision-feature-counts"}'
-        values: '2147483648+0x40'
+        values: '1073741824+0x40'
     external_labels:
       site: eqiad
     alert_rule_test:
@@ -321,9 +413,9 @@ tests:
   - interval: 1m
     input_series:
       - series: 'container_memory_working_set_bytes{namespace="lac-lambdas", pod="lac-lambdas-revision-feature-counts-abc", container="revision-feature-counts"}'
-        values: '1073741824+0x40'
+        values: '536870912+0x40'
       - series: 'container_spec_memory_limit_bytes{namespace="lac-lambdas", pod="lac-lambdas-revision-feature-counts-abc", container="revision-feature-counts"}'
-        values: '2147483648+0x40'
+        values: '1073741824+0x40'
     external_labels:
       site: eqiad
     alert_rule_test:

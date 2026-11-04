@@ -19,7 +19,7 @@ groups:
 
       - alert: RevisionFeatureCountsHighErrorRate
         # Only considers server errors, not client errors.
-        # Starting with 5% error rate, and at least 10 errors in 15 minutes.
+        # Fires above a 2% error rate, with at least 10 errors in 15 minutes.
         #
         # The codes counted as a fault of the server:
         #   INTERNAL           this service, or the parser library
@@ -35,7 +35,7 @@ groups:
             sum(increase(rfc_request_duration_seconds_count{kubernetes_namespace="lac-lambdas", grpc_code=~"INTERNAL|UNAVAILABLE|DEADLINE_EXCEEDED"}[15m]))
             /
             clamp_min(sum(increase(rfc_request_duration_seconds_count{kubernetes_namespace="lac-lambdas"}[15m])), 1)
-          ) > 0.05
+          ) > 0.02
           and
           sum(increase(rfc_request_duration_seconds_count{kubernetes_namespace="lac-lambdas", grpc_code=~"INTERNAL|UNAVAILABLE|DEADLINE_EXCEEDED"}[15m])) > 10
         for: 15m
@@ -43,10 +43,55 @@ groups:
           team: data-engineering
           severity: warning
         annotations:
-          summary: "RevisionFeatureCounts fails more than 5% of calls in {{ $externalLabels.site }}"
-          description: "More than 5% of GetRevisionArtifact calls fail in a way this service answers for. Break the rate down by the reason for more details."
+          summary: "RevisionFeatureCounts fails more than 2% of calls in {{ $externalLabels.site }}"
+          description: "More than 2% of GetRevisionArtifact calls fail with server errors. Break the rate down by the reason for more details."
           dashboard: https://grafana.wikimedia.org/d/revision-feature-counts/revision-feature-counts?orgId=1&var-site={{ $externalLabels.site }}&var-prometheus=k8s&viewPanel=20
           runbook: https://wikitech.wikimedia.org/wiki/Revision_Feature_Counts#RevisionFeatureCountsHighErrorRate
+
+      - alert: RevisionFeatureCountsErrorRateSustained
+        # The same errors as RevisionFeatureCountsHighErrorRate, at a lower
+        # rate held for longer. The normal rate is below 0.1%, so a steady 1%
+        # is a fault even when it is too low for the 2% alert.
+        expr: |
+          (
+            sum(increase(rfc_request_duration_seconds_count{kubernetes_namespace="lac-lambdas", grpc_code=~"INTERNAL|UNAVAILABLE|DEADLINE_EXCEEDED"}[1h]))
+            /
+            clamp_min(sum(increase(rfc_request_duration_seconds_count{kubernetes_namespace="lac-lambdas"}[1h])), 1)
+          ) > 0.01
+          and
+          sum(increase(rfc_request_duration_seconds_count{kubernetes_namespace="lac-lambdas", grpc_code=~"INTERNAL|UNAVAILABLE|DEADLINE_EXCEEDED"}[1h])) > 10
+        for: 1h
+        labels:
+          team: data-engineering
+          severity: warning
+        annotations:
+          summary: "RevisionFeatureCounts has failed more than 1% of calls for over an hour in {{ $externalLabels.site }}"
+          description: "More than 1% of GetRevisionArtifact calls in the last hour failed with server errors, and the rate has stayed above 1% for an hour. Break the rate down by the reason for more details."
+          dashboard: https://grafana.wikimedia.org/d/revision-feature-counts/revision-feature-counts?orgId=1&var-site={{ $externalLabels.site }}&var-prometheus=k8s&viewPanel=20
+          runbook: https://wikitech.wikimedia.org/wiki/Revision_Feature_Counts#RevisionFeatureCountsErrorRateSustained
+
+      - alert: RevisionFeatureCountsRefusingCalls
+        # Read at the Istio gateway, because a call refused above
+        # rfc_max_concurrent_rpcs never reaches the servicer and is not in
+        # rfc_request_duration_seconds. Status 8 is RESOURCE_EXHAUSTED. It also
+        # includes rate_limited, which is MediaWiki throttling the fetches.
+        expr: |
+          (
+            sum(increase(istio_requests_total{destination_service_name="lac-lambdas-revision-feature-counts-tls-service", reporter="source", grpc_response_status="8"}[15m]))
+            /
+            clamp_min(sum(increase(istio_requests_total{destination_service_name="lac-lambdas-revision-feature-counts-tls-service", reporter="source"}[15m])), 1)
+          ) > 0.01
+          and
+          sum(increase(istio_requests_total{destination_service_name="lac-lambdas-revision-feature-counts-tls-service", reporter="source", grpc_response_status="8"}[15m])) > 10
+        for: 15m
+        labels:
+          team: data-engineering
+          severity: warning
+        annotations:
+          summary: "RevisionFeatureCounts refuses more than 1% of calls in {{ $externalLabels.site }}"
+          description: "More than 1% of calls through the gateway returned RESOURCE_EXHAUSTED. Usually every worker is busy and the queue is full, so the pods need more replicas or MediaWiki is slow. Read the calls held by the pod panel, and the rate_limited reason to rule out MediaWiki throttling."
+          dashboard: https://grafana.wikimedia.org/d/revision-feature-counts/revision-feature-counts?orgId=1&var-site={{ $externalLabels.site }}&var-prometheus=k8s&viewPanel=98
+          runbook: https://wikitech.wikimedia.org/wiki/Revision_Feature_Counts#RevisionFeatureCountsRefusingCalls
 
       - alert: RevisionFeatureCountsLatencyHigh
         # Only the calls that worked. A refusal is fast and a timeout is slow,
@@ -57,7 +102,7 @@ groups:
             0.95,
             sum by (le) (rate(rfc_request_duration_seconds_bucket{kubernetes_namespace="lac-lambdas", grpc_code="OK"}[15m]))
           ) > 5
-        for: 15m
+        for: 30m
         labels:
           team: data-engineering
           severity: warning
@@ -83,14 +128,14 @@ groups:
           runbook: https://wikitech.wikimedia.org/wiki/Revision_Feature_Counts#RevisionFeatureCountsWikiMapStale
 
       - alert: RevisionFeatureCountsLibraryErrors
-        # A fault in mwparserfromhtml, not in this service. It may need a code
-        # fix, not an operator, so it opens a task rather than mail or IRC.
+        # A fault in mwparserfromhtml, not in this service. The fix is usually
+        # a code change in the library.
         expr: |
           sum(increase(rfc_feature_errors_total{kubernetes_namespace="lac-lambdas"}[1h])) > 0
         for: 1h
         labels:
           team: data-engineering
-          severity: task
+          severity: warning
         annotations:
           summary: "mwparserfromhtml failed to count a feature for RevisionFeatureCounts"
           description: "An extractor in mwparserfromhtml raised while counting features. Feature caching may be affected if strict mode is enabled."
@@ -195,7 +240,7 @@ groups:
             sum(increase(lambda_request_duration_seconds_count{kubernetes_namespace="linked-artifacts", cache="revision_feature_counts", status="error"}[15m]))
             /
             clamp_min(sum(increase(lambda_request_duration_seconds_count{kubernetes_namespace="linked-artifacts", cache="revision_feature_counts"}[15m])), 1)
-          ) > 0.5
+          ) > 0.05
           and
           sum(increase(lambda_request_duration_seconds_count{kubernetes_namespace="linked-artifacts", cache="revision_feature_counts", status="error"}[15m])) > 10
         for: 15m
@@ -203,7 +248,7 @@ groups:
           team: data-engineering
           severity: critical
         annotations:
-          summary: "The Linked Artifact Cache cannot reach RevisionFeatureCounts in {{ $externalLabels.site }}"
-          description: "More than half of the calls LAC makes for the revision_feature_counts artifact fail. The lambda may be down, refusing calls, or slower than the timeout LAC allows for this table."
+          summary: "The Linked Artifact Cache fails more than 5% of its calls to RevisionFeatureCounts in {{ $externalLabels.site }}"
+          description: "More than 5% of the calls LAC makes for the revision_feature_counts artifact fail. The lambda may be down, refusing calls, or slower than the timeout LAC allows for this table."
           dashboard: https://grafana.wikimedia.org/d/revision-feature-counts/revision-feature-counts?orgId=1&var-site={{ $externalLabels.site }}&var-prometheus=k8s&viewPanel=60
           runbook: https://wikitech.wikimedia.org/wiki/Revision_Feature_Counts#RevisionFeatureCountsLambdaFailingFromLac
