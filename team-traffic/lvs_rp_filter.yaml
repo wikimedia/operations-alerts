@@ -1,0 +1,18 @@
+# deploy-tag: ops
+
+groups:
+  - name: lvs_rp_filter
+    rules:
+      - alert: LVSRpFilterEnabled
+        expr: sysctl_net_ipv4_conf_rp_filter{cluster="lvs", interface!~"lo.*"} > 0
+        for: 5m
+        labels:
+          team: traffic
+          severity: critical
+        annotations:
+          summary: "rp_filter is not disabled on {{ $labels.instance }} ({{ $labels.interface }})"
+          description: |
+            The network interface {{ $labels.interface }} on {{ $labels.instance }} has rp_filter
+            (reverse path filtering) enabled: net.ipv4.conf.{{ $labels.interface }}.rp_filter != 0.
+          dashboard: 'https://grafana.wikimedia.org/d/000000343/load-balancers-lvs&var-site={{ $externalLabels.site }}'
+          runbook: "https://wikitech.wikimedia.org/wiki/Monitoring/check_rp_filter_disabled"

@@ -1,0 +1,35 @@
+rule_files:
+  - lvs_rp_filter.yaml
+evaluation_interval: 1m
+tests:
+  - interval: 1m
+    external_labels:
+      site: eqiad
+    input_series:
+      - series: 'sysctl_net_ipv4_conf_rp_filter{cluster="lvs", instance="lvs1018:9100", interface="eno3"}'
+        values: '1x5'
+    alert_rule_test:
+      - alertname: LVSRpFilterEnabled
+        eval_time: 5m
+        exp_alerts:
+          - exp_labels:
+              cluster: lvs
+              instance: lvs1018:9100
+              interface: eno3
+              severity: critical
+              team: traffic
+            exp_annotations:
+              summary: 'rp_filter is not disabled on lvs1018:9100 (eno3)'
+              description: |
+                The network interface eno3 on lvs1018:9100 has rp_filter
+                (reverse path filtering) enabled: net.ipv4.conf.eno3.rp_filter != 0.
+              dashboard: 'https://grafana.wikimedia.org/d/000000343/load-balancers-lvs&var-site=eqiad'
+              runbook: "https://wikitech.wikimedia.org/wiki/Monitoring/check_rp_filter_disabled"
+
+  - interval: 1m
+    external_labels:
+      site: eqiad
+    input_series:
+      - series: 'sysctl_net_ipv4_conf_rp_filter{cluster="lvs", instance="lvs1018:9100", interface="lo"}'
+        values: '1x5'
+    alert_rule_test: []
