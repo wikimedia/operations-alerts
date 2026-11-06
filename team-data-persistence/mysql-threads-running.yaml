@@ -1,0 +1,28 @@
+# deploy-tag: ops
+# deploy-site: eqiad, codfw
+
+groups:
+  - name: mysql
+    rules:
+    - alert: MysqlHighThreadsRunning
+      annotations:
+        description: Instance {{ $labels.instance }} has {{ $value | printf "%.0f" }} threads running, possible query pile-up or lock contention.
+        runbook: https://wikitech.wikimedia.org/wiki/MariaDB/troubleshooting
+        dashboard: https://grafana.wikimedia.org/d/000000273/mysql?orgId=1&refresh=1m&var-job=All&var-server={{ $labels.instance | reReplaceAll ":.*" "" }}&var-port={{ $labels.instance | reReplaceAll ".*:" "" }}
+        summary: MySQL instance {{ $labels.instance }} has a high number of running threads ({{ $value | printf "%.0f" }})
+      expr: avg_over_time(mysql_global_status_threads_running{instance=~"pc[0-9]+.*"}[2m]) > 50
+      for: 5m
+      labels:
+        severity: warning
+        team: data-persistence
+    - alert: MysqlThreadPoolHighUsage
+      annotations:
+        description: Instance {{ $labels.instance }} has thread pool workers equal to {{ $value | humanizePercentage }} of max_connections, queries are piling up.
+        runbook: https://wikitech.wikimedia.org/wiki/MariaDB/troubleshooting
+        dashboard: https://grafana.wikimedia.org/d/000000273/mysql?orgId=1&refresh=1m&var-job=All&var-server={{ $labels.instance | reReplaceAll ":.*" "" }}&var-port={{ $labels.instance | reReplaceAll ".*:" "" }}
+        summary: MySQL instance {{ $labels.instance }} thread pool workers are at {{ $value | humanizePercentage }} of max_connections
+      expr: mysql_global_status_threadpool_threads{instance=~"pc[0-9]+.*"} / mysql_global_variables_max_connections{instance=~"pc[0-9]+.*"} > 0.5
+      for: 5m
+      labels:
+        severity: critical
+        team: data-persistence

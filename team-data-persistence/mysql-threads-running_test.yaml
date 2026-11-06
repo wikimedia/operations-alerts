@@ -1,0 +1,55 @@
+rule_files:
+  - mysql-threads-running.yaml
+evaluation_interval: 1m
+# mysql-threads-running_test.yaml
+tests:
+  - interval: 1m
+    input_series:
+      # pc host over both thresholds: should fire
+      - series: 'mysql_global_status_threads_running{job="mysql-core", instance="pc1011:9104"}'
+        values: '300x20'
+      - series: 'mysql_global_status_threadpool_threads{job="mysql-core", instance="pc1011:9104"}'
+        values: '3750x20'
+      - series: 'mysql_global_variables_max_connections{job="mysql-core", instance="pc1011:9104"}'
+        values: '5000x20'
+      # pc host under both thresholds: should not fire
+      - series: 'mysql_global_status_threads_running{job="mysql-core", instance="pc1012:9104"}'
+        values: '10x20'
+      - series: 'mysql_global_status_threadpool_threads{job="mysql-core", instance="pc1012:9104"}'
+        values: '100x20'
+      - series: 'mysql_global_variables_max_connections{job="mysql-core", instance="pc1012:9104"}'
+        values: '5000x20'
+      # non-pc host over both thresholds: should not fire
+      - series: 'mysql_global_status_threads_running{job="mysql-core", instance="db1163:9104"}'
+        values: '300x20'
+      - series: 'mysql_global_status_threadpool_threads{job="mysql-core", instance="db1163:9104"}'
+        values: '3750x20'
+      - series: 'mysql_global_variables_max_connections{job="mysql-core", instance="db1163:9104"}'
+        values: '5000x20'
+    alert_rule_test:
+      - eval_time: 10m
+        alertname: MysqlHighThreadsRunning
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              team: data-persistence
+              job: mysql-core
+              instance: pc1011:9104
+            exp_annotations:
+              description: 'Instance pc1011:9104 has 300 threads running, possible query pile-up or lock contention.'
+              summary: 'MySQL instance pc1011:9104 has a high number of running threads (300)'
+              dashboard: https://grafana.wikimedia.org/d/000000273/mysql?orgId=1&refresh=1m&var-job=All&var-server=pc1011&var-port=9104
+              runbook: https://wikitech.wikimedia.org/wiki/MariaDB/troubleshooting
+      - eval_time: 10m
+        alertname: MysqlThreadPoolHighUsage
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              team: data-persistence
+              job: mysql-core
+              instance: pc1011:9104
+            exp_annotations:
+              description: 'Instance pc1011:9104 has thread pool workers equal to 75% of max_connections, queries are piling up.'
+              summary: 'MySQL instance pc1011:9104 thread pool workers are at 75% of max_connections'
+              dashboard: https://grafana.wikimedia.org/d/000000273/mysql?orgId=1&refresh=1m&var-job=All&var-server=pc1011&var-port=9104
+              runbook: https://wikitech.wikimedia.org/wiki/MariaDB/troubleshooting
