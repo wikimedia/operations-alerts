@@ -144,7 +144,7 @@ tests:
               service: cloudvps
             exp_annotations:
               summary: "instance backup coverage dropped on cloudbackup1003:9100"
-              description: "Only 174 distinct instance objects are backed up on cloudbackup1003:9100 (eqiad), below 90% of the level 24h ago. Some backups may have been lost."
+              description: "Only 174 distinct instance objects are backed up on cloudbackup1003:9100 (eqiad), below 80% of the level 24h ago. Some backups may have been lost."
               dashboard: https://grafana.wikimedia.org/d/fisr2p9/wmcs-backup?viewPanel=21&var-kind=instance&var-site=eqiad
               runbook: "https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/Backup#BackupCoverageDrop"
 

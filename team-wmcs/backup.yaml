@@ -57,11 +57,11 @@ groups:
       - alert: BackupCoverageDrop
         annotations:
           summary: "{{ $labels.kind }} backup coverage dropped on {{ $labels.instance }}"
-          description: "Only {{ $value }} distinct {{ $labels.kind }} objects are backed up on {{ $labels.instance }} ({{ $externalLabels.site }}), below 90% of the level 24h ago. Some backups may have been lost."
+          description: "Only {{ $value }} distinct {{ $labels.kind }} objects are backed up on {{ $labels.instance }} ({{ $externalLabels.site }}), below 80% of the level 24h ago. Some backups may have been lost."
           dashboard: https://grafana.wikimedia.org/d/fisr2p9/wmcs-backup?viewPanel=21&var-kind={{ $labels.kind }}&var-site={{ $externalLabels.site }}
           runbook: "https://wikitech.wikimedia.org/wiki/Portal:Cloud_VPS/Admin/Runbooks/Backup#BackupCoverageDrop"
         expr: |
-          (wmcs_backup_distinct_backed_up < (wmcs_backup_distinct_backed_up offset 24h) * 0.9)
+          (wmcs_backup_distinct_backed_up < (wmcs_backup_distinct_backed_up offset 24h) * 0.8)
           and (wmcs_backup_distinct_backed_up offset 24h > 0)
         for: 30m
         labels:
