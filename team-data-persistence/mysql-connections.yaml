@@ -1,0 +1,28 @@
+# deploy-tag: ops
+# deploy-site: eqiad, codfw
+
+groups:
+  - name: mysql
+    rules:
+    - alert: MysqlConnectionsNearLimit
+      annotations:
+        description: Instance {{ $labels.instance }} has open connections at {{ $value | humanizePercentage }} of max_connections, new connections will be refused once the limit is reached.
+        runbook: https://wikitech.wikimedia.org/wiki/MariaDB/troubleshooting
+        dashboard: https://grafana.wikimedia.org/d/000000273/mysql?orgId=1&refresh=1m&var-job=All&var-server={{ $labels.instance | reReplaceAll ":.*" "" }}&var-port={{ $labels.instance | reReplaceAll ".*:" "" }}
+        summary: MySQL instance {{ $labels.instance }} connections are at {{ $value | humanizePercentage }} of max_connections
+      expr: mysql_global_status_threads_connected{instance=~"pc[0-9]+.*"} / mysql_global_variables_max_connections{instance=~"pc[0-9]+.*"} > 0.2
+      for: 5m
+      labels:
+        severity: warning
+        team: data-persistence
+    - alert: MysqlConnectionsRefused
+      annotations:
+        description: Instance {{ $labels.instance }} is refusing new connections because max_connections has been reached.
+        runbook: https://wikitech.wikimedia.org/wiki/MariaDB/troubleshooting
+        dashboard: https://grafana.wikimedia.org/d/000000273/mysql?orgId=1&refresh=1m&var-job=All&var-server={{ $labels.instance | reReplaceAll ":.*" "" }}&var-port={{ $labels.instance | reReplaceAll ".*:" "" }}
+        summary: MySQL instance {{ $labels.instance }} is refusing connections (max_connections reached)
+      expr: rate(mysql_global_status_connection_errors_total{instance=~"pc[0-9]+.*", error="max_connections"}[5m]) > 0
+      for: 2m
+      labels:
+        severity: critical
+        team: data-persistence

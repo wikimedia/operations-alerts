@@ -1,0 +1,56 @@
+rule_files:
+  - mysql-connections.yaml
+evaluation_interval: 1m
+# mysql-connections_test.yaml
+tests:
+  - interval: 1m
+    input_series:
+      # pc host near the limit and refusing connections: should fire
+      - series: 'mysql_global_status_threads_connected{job="mysql-parsercache", instance="pc1011:9104"}'
+        values: '4500x20'
+      - series: 'mysql_global_variables_max_connections{job="mysql-parsercache", instance="pc1011:9104"}'
+        values: '5000x20'
+      - series: 'mysql_global_status_connection_errors_total{job="mysql-parsercache", instance="pc1011:9104", error="max_connections"}'
+        values: '0+10x20'
+      # pc host with few connections and no errors: should not fire
+      - series: 'mysql_global_status_threads_connected{job="mysql-parsercache", instance="pc1012:9104"}'
+        values: '500x20'
+      - series: 'mysql_global_variables_max_connections{job="mysql-parsercache", instance="pc1012:9104"}'
+        values: '5000x20'
+      - series: 'mysql_global_status_connection_errors_total{job="mysql-parsercache", instance="pc1012:9104", error="max_connections"}'
+        values: '0x20'
+      # non-pc host near the limit and refusing connections: should not fire
+      - series: 'mysql_global_status_threads_connected{job="mysql-parsercache", instance="db1163:9104"}'
+        values: '9500x20'
+      - series: 'mysql_global_variables_max_connections{job="mysql-parsercache", instance="db1163:9104"}'
+        values: '10000x20'
+      - series: 'mysql_global_status_connection_errors_total{job="mysql-parsercache", instance="db1163:9104", error="max_connections"}'
+        values: '0+10x20'
+    alert_rule_test:
+      - eval_time: 10m
+        alertname: MysqlConnectionsNearLimit
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              team: data-persistence
+              job: mysql-parsercache
+              instance: pc1011:9104
+            exp_annotations:
+              description: 'Instance pc1011:9104 has open connections at 90% of max_connections, new connections will be refused once the limit is reached.'
+              summary: 'MySQL instance pc1011:9104 connections are at 90% of max_connections'
+              dashboard: https://grafana.wikimedia.org/d/000000273/mysql?orgId=1&refresh=1m&var-job=All&var-server=pc1011&var-port=9104
+              runbook: https://wikitech.wikimedia.org/wiki/MariaDB/troubleshooting
+      - eval_time: 10m
+        alertname: MysqlConnectionsRefused
+        exp_alerts:
+          - exp_labels:
+              severity: critical
+              team: data-persistence
+              job: mysql-parsercache
+              instance: pc1011:9104
+              error: max_connections
+            exp_annotations:
+              description: 'Instance pc1011:9104 is refusing new connections because max_connections has been reached.'
+              summary: 'MySQL instance pc1011:9104 is refusing connections (max_connections reached)'
+              dashboard: https://grafana.wikimedia.org/d/000000273/mysql?orgId=1&refresh=1m&var-job=All&var-server=pc1011&var-port=9104
+              runbook: https://wikitech.wikimedia.org/wiki/MariaDB/troubleshooting
