@@ -27,6 +27,9 @@ groups:
         summary: Puppet has failed on {{ $labels.cluster }} cluster
         dashboard: https://grafana.wikimedia.org/d/yOxVDGvWk/puppet?orgId=1&viewPanel=3&var-cluster={{$labels.cluster}}
         runbook: https://puppetboard.wikimedia.org/nodes?status=failed
+      # count0 only has series when at least one host reports zero resources,
+      # i.e. it is empty in the healthy state.
+      # pint disable promql/series(cluster:puppet_agent_resources_total:count0)
       expr: |
         cluster:puppet_agent_failed:sum / cluster:puppet_agent_failed:count >= 0.1
           or
