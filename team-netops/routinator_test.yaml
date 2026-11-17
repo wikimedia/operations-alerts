@@ -15,6 +15,7 @@ tests:
        - exp_labels:
            severity: critical
            team: sre
+           scope: network
            instance: rpki1001:9100
          exp_annotations:
            summary: 'Important drop of Routinator RTR connections on rpki1001:9100'
@@ -38,6 +39,7 @@ tests:
        - exp_labels:
            severity: critical
            team: sre
+           scope: network
          exp_annotations:
            summary: 'Routinator RRDP fetching issue in eqiad'
            description: 'RRDP error to 50% of targets'
@@ -56,6 +58,7 @@ tests:
        - exp_labels:
            severity: critical
            team: sre
+           scope: network
            instance: rpki1001:9100
          exp_annotations:
            summary: 'Important drop of valid Routinator ROAs on rpki1001:9100'

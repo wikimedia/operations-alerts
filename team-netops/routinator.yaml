@@ -10,6 +10,7 @@ groups:
         labels:
           team: sre
           severity: critical
+          scope: network
         annotations:
           summary: "Routinator RRDP fetching issue in {{ $externalLabels.site }}"
           description: "RRDP error to 50% of targets"
@@ -22,6 +23,7 @@ groups:
         labels:
           team: sre
           severity: critical
+          scope: network
         annotations:
           summary: "Important drop of valid Routinator ROAs on {{ $labels.instance }}"
           description: "Currently at {{ $value }}"
@@ -34,6 +36,7 @@ groups:
         labels:
           team: sre
           severity: critical
+          scope: network
         annotations:
           summary: "Important drop of Routinator RTR connections on {{ $labels.instance }}"
           description: "Currently at {{ $value }}"

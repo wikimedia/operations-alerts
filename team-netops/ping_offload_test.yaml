@@ -15,6 +15,7 @@ tests:
        - exp_labels:
            severity: critical
            team: sre
+           scope: network
            site: eqiad
            instance: ping1002:9100
          exp_annotations:

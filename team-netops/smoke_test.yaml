@@ -15,6 +15,7 @@ tests:
        - exp_labels:
            severity: warning
            team: sre
+           scope: network
            instance: cr2-eqsin:0
            address: 103.102.166.130
            family: ip4
@@ -41,6 +42,7 @@ tests:
        - exp_labels:
            severity: warning
            team: sre
+           scope: network
            instance: ns0.wikimedia.org:53
            job: smoke/dns
            module: dns_wikipedia_a

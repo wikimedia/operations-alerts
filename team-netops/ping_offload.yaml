@@ -10,6 +10,7 @@ groups:
         labels:
           team: sre
           severity: critical
+          scope: network
         annotations:
           summary: "Target IP missing on {{ $labels.instance }} loopback in {{ $externalLabels.site }}"
           description: "The server is receiving packets for an unknown IP"
