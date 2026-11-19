@@ -1,0 +1,74 @@
+rule_files:
+  - amd_gpu.yaml
+evaluation_interval: 1m
+tests:
+  # One of two GPUs disappears, then comes back: alert fires, then clears.
+  - interval: 1m
+    input_series:
+      - series: 'up{job="node", instance="ml-serve1009:9100"}'
+        values: '1x120'
+      - series: 'node_hwmon_chip_names{chip_name="amdgpu", instance="ml-serve1009:9100", chip="pci0000:00_0000:05:00_0"}'
+        values: '1x120'
+      - series: 'node_hwmon_chip_names{chip_name="amdgpu", instance="ml-serve1009:9100", chip="pci0000:00_0000:65:00_0"}'
+        values: '1x20 stale _x58 1x40'
+    alert_rule_test:
+      - alertname: AMDGPUMissing
+        eval_time: 30m
+        exp_alerts: []
+      - alertname: AMDGPUMissing
+        eval_time: 40m
+        exp_alerts:
+          - exp_labels:
+              instance: 'ml-serve1009:9100'
+              severity: warning
+              team: data-platform
+            exp_annotations:
+              summary: 'ml-serve1009:9100 is missing AMD GPUs'
+              description: 'ml-serve1009:9100 sees 1 AMD GPUs, fewer than in the last 7 days.'
+              dashboard: 'https://grafana.wikimedia.org/d/000000342/node-exporter-server-metrics?var-node=ml-serve1009%3A9100'
+              runbook: 'https://wikitech.wikimedia.org/wiki/Machine_Learning/AMD_GPU'
+      - alertname: AMDGPUMissing
+        eval_time: 85m
+        exp_alerts: []
+  # All GPUs disappear while the host is up (e.g. the driver fails to load).
+  - interval: 1m
+    input_series:
+      - series: 'up{job="node", instance="stat1010:9100"}'
+        values: '1x60'
+      - series: 'node_hwmon_chip_names{chip_name="amdgpu", instance="stat1010:9100", chip="pci0000:00_0000:c1:00_0"}'
+        values: '1x20 stale'
+    alert_rule_test:
+      - alertname: AMDGPUMissing
+        eval_time: 40m
+        exp_alerts:
+          - exp_labels:
+              instance: 'stat1010:9100'
+              severity: warning
+              team: data-platform
+            exp_annotations:
+              summary: 'stat1010:9100 is missing AMD GPUs'
+              description: 'stat1010:9100 sees 0 AMD GPUs, fewer than in the last 7 days.'
+              dashboard: 'https://grafana.wikimedia.org/d/000000342/node-exporter-server-metrics?var-node=stat1010%3A9100'
+              runbook: 'https://wikitech.wikimedia.org/wiki/Machine_Learning/AMD_GPU'
+  # Host is down: no GPU alert (host-down alerts cover it).
+  - interval: 1m
+    input_series:
+      - series: 'up{job="node", instance="ml-lab1001:9100"}'
+        values: '1x20 0x40'
+      - series: 'node_hwmon_chip_names{chip_name="amdgpu", instance="ml-lab1001:9100", chip="pci0000:00_0000:c1:00_0"}'
+        values: '1x20 stale'
+    alert_rule_test:
+      - alertname: AMDGPUMissing
+        eval_time: 40m
+        exp_alerts: []
+  # ml-staging is excluded.
+  - interval: 1m
+    input_series:
+      - series: 'up{job="node", instance="ml-staging2001:9100"}'
+        values: '1x60'
+      - series: 'node_hwmon_chip_names{chip_name="amdgpu", instance="ml-staging2001:9100", chip="pci0000:00_0000:c1:00_0"}'
+        values: '1x20 stale'
+    alert_rule_test:
+      - alertname: AMDGPUMissing
+        eval_time: 40m
+        exp_alerts: []

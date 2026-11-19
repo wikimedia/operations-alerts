@@ -1,0 +1,28 @@
+# deploy-tag: ops
+
+groups:
+  - name: amd_gpu
+    rules:
+      # Fires when a host sees fewer AMD GPU devices than it did at any point in
+      # the last 7 days (or none at all while the host is up), and clears when
+      # they're back. amdgpu registers one hwmon device per physical GPU, so
+      # partition mode changes don't affect the count.
+      # ml-staging is excluded.
+      - alert: AMDGPUMissing
+        expr: |
+          (
+            count by (instance) (node_hwmon_chip_names{chip_name="amdgpu", instance!~"ml-staging.*"})
+            or on (instance)
+            count by (instance) (up{job="node"} == 1) * 0
+          )
+          < on (instance)
+          max_over_time(count by (instance) (node_hwmon_chip_names{chip_name="amdgpu", instance!~"ml-staging.*"})[7d:1h])
+        for: 15m
+        labels:
+          severity: warning
+          team: data-platform
+        annotations:
+          summary: '{{ $labels.instance }} is missing AMD GPUs'
+          description: '{{ $labels.instance }} sees {{ $value }} AMD GPUs, fewer than in the last 7 days.'
+          dashboard: 'https://grafana.wikimedia.org/d/000000342/node-exporter-server-metrics?var-node={{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}%3A9100'
+          runbook: 'https://wikitech.wikimedia.org/wiki/Machine_Learning/AMD_GPU'
