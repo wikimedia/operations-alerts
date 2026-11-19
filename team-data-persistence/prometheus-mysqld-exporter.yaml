@@ -4,13 +4,43 @@
 groups:
   - name: prometheus-mysqld-exporter
     rules:
+    # mysqld_exporter >= 0.15 dropped mysql_exporter_last_scrape_error in favour
+    # of the per-collector mysql_exporter_collector_success gauge. Match both
+    # while the fleet runs mixed versions; drop the last_scrape_error half once
+    # all hosts are on >= 0.15.
     - alert: PrometheusMysqldExporterFailed
+      # mysql_exporter_last_scrape_error only exists on mysqld_exporter < 0.15
+      # and disappears as hosts are upgraded; remove it and this line once
+      # the fleet is fully on >= 0.15.
+      # pint disable promql/series(mysql_exporter_last_scrape_error)
       annotations:
         description: Prometheus mysqld exporter failed on {{$labels.instance}}, it probably needs restarting
         dashboard: https://grafana.wikimedia.org/d/000000278/mysql-aggregated
         runbook: TODO
         summary: Prometheus-mysqld-exporter failed ({{$labels.instance}})
-      expr: mysql_exporter_last_scrape_error{job=~"mysql-(core|dbstore|misc|parsercache)"} > 0
+      expr: |
+        (
+            mysql_exporter_last_scrape_error{job=~"mysql-(core|dbstore|misc|parsercache)"} > 0
+          or
+            min without (collector) (mysql_exporter_collector_success{job=~"mysql-(core|dbstore|misc|parsercache)"}) == 0
+        )
+        unless on (instance, job)
+          mysql_up{job=~"mysql-(core|dbstore|misc|parsercache)"} == 0
+      for: 30m
+      labels:
+        severity: warning
+        team: data-persistence
+
+    # On mysqld_exporter >= 0.15 a failed connection to MariaDB only sets
+    # mysql_up to 0 and emits no collector_success series, so it needs its own
+    # alert. Works the same on older exporters.
+    - alert: PrometheusMysqldExporterCannotConnect
+      annotations:
+        description: Prometheus mysqld exporter on {{$labels.instance}} is running but cannot connect to MariaDB
+        dashboard: https://grafana.wikimedia.org/d/000000278/mysql-aggregated
+        runbook: TODO
+        summary: Prometheus-mysqld-exporter cannot connect to MariaDB ({{$labels.instance}})
+      expr: mysql_up{job=~"mysql-(core|dbstore|misc|parsercache)"} == 0
       for: 30m
       labels:
         severity: warning
