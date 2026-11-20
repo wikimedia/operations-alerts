@@ -26,3 +26,18 @@ groups:
           description: '{{ $labels.instance }} sees {{ $value }} AMD GPUs, fewer than in the last 7 days.'
           dashboard: 'https://grafana.wikimedia.org/d/000000342/node-exporter-server-metrics?var-node={{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}%3A9100'
           runbook: 'https://wikitech.wikimedia.org/wiki/Machine_Learning/AMD_GPU'
+
+      # Fires when a GPU has had any uncorrectable RAS error since the driver
+      # was loaded (normally since boot). Only GPUs with RAS support export
+      # these counters.
+      - alert: AMDGPUUncorrectableErrors
+        expr: sum by (instance, bdf) (amd_rocm_gpu_ras_errors{type="ue", instance!~"ml-staging.*"}) > 0
+        for: 5m
+        labels:
+          severity: warning
+          team: data-platform
+        annotations:
+          summary: 'AMD GPU {{ $labels.bdf }} on {{ $labels.instance }} has uncorrectable errors'
+          description: 'AMD GPU {{ $labels.bdf }} on {{ $labels.instance }} has reported {{ $value }} uncorrectable RAS errors since the driver was loaded.'
+          dashboard: 'https://grafana.wikimedia.org/d/000000342/node-exporter-server-metrics?var-node={{ $labels.instance | reReplaceAll "^([^:]+).*" "${1}" }}%3A9100'
+          runbook: 'https://wikitech.wikimedia.org/wiki/Machine_Learning/AMD_GPU'

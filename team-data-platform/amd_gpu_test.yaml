@@ -72,3 +72,32 @@ tests:
       - alertname: AMDGPUMissing
         eval_time: 40m
         exp_alerts: []
+  # Uncorrectable errors on one GPU, summed across blocks; correctable
+  # errors alone and ml-staging don't alert.
+  - interval: 1m
+    input_series:
+      - series: 'amd_rocm_gpu_ras_errors{instance="ml-serve1012:9100", bdf="0000:05:00.0", block="umc", type="ue"}'
+        values: '0x10 1x30'
+      - series: 'amd_rocm_gpu_ras_errors{instance="ml-serve1012:9100", bdf="0000:05:00.0", block="gfx", type="ue"}'
+        values: '0x10 2x30'
+      - series: 'amd_rocm_gpu_ras_errors{instance="ml-serve1012:9100", bdf="0000:26:00.0", block="umc", type="ce"}'
+        values: '0x10 5x30'
+      - series: 'amd_rocm_gpu_ras_errors{instance="ml-staging2001:9100", bdf="0000:03:00.0", block="umc", type="ue"}'
+        values: '1x40'
+    alert_rule_test:
+      - alertname: AMDGPUUncorrectableErrors
+        eval_time: 10m
+        exp_alerts: []
+      - alertname: AMDGPUUncorrectableErrors
+        eval_time: 20m
+        exp_alerts:
+          - exp_labels:
+              instance: 'ml-serve1012:9100'
+              bdf: '0000:05:00.0'
+              severity: warning
+              team: data-platform
+            exp_annotations:
+              summary: 'AMD GPU 0000:05:00.0 on ml-serve1012:9100 has uncorrectable errors'
+              description: 'AMD GPU 0000:05:00.0 on ml-serve1012:9100 has reported 3 uncorrectable RAS errors since the driver was loaded.'
+              dashboard: 'https://grafana.wikimedia.org/d/000000342/node-exporter-server-metrics?var-node=ml-serve1012%3A9100'
+              runbook: 'https://wikitech.wikimedia.org/wiki/Machine_Learning/AMD_GPU'
