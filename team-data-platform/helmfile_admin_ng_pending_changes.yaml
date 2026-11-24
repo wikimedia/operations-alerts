@@ -14,4 +14,4 @@ groups:
       for: 1w
       labels:
         severity: warning
-        team: ml
+        team: data-platform

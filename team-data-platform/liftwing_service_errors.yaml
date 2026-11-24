@@ -22,7 +22,7 @@ groups:
           ) > 0.3
         for: 30m
         labels:
-          team: ml
+          team: data-platform
           severity: critical
         annotations:
           summary: "LiftWing service has a high rate of non 2/3/400 error code responses"

@@ -13,7 +13,7 @@ tests:
       eval_time: 1h
       exp_alerts:
        - exp_labels:
-           team: ml
+           team: data-platform
            severity: critical
            group: cpjobqueue-ORESFetchScoreJob
            exported_cluster: main-eqiad

@@ -18,7 +18,7 @@ tests:
     exp_alerts:
     - exp_labels:
         severity: warning
-        team: ml
+        team: data-platform
         namespace: fakespace
         deployment: fakedeploy
       exp_annotations:
@@ -44,7 +44,7 @@ tests:
   - alertname: KubernetesPodUnschedulable
     eval_time: 15m
     exp_alerts:  # only cpupod: gpupod has been unschedulable for 10m
-    - exp_labels: {severity: warning, team: ml, namespace: revertrisk, pod: cpupod}
+    - exp_labels: {severity: warning, team: data-platform, namespace: revertrisk, pod: cpupod}
       exp_annotations:
         summary: "Pod cpupod in revertrisk at moon cannot be scheduled"
         description: "Pod cpupod in namespace revertrisk at site moon has been unschedulable for at least 15m. For a GPU pod, check that the GPU pool it tolerates has a free partition."
@@ -53,13 +53,13 @@ tests:
   - alertname: KubernetesPodUnschedulable
     eval_time: 25m
     exp_alerts:
-    - exp_labels: {severity: warning, team: ml, namespace: llm, pod: gpupod}
+    - exp_labels: {severity: warning, team: data-platform, namespace: llm, pod: gpupod}
       exp_annotations:
         summary: "Pod gpupod in llm at moon cannot be scheduled"
         description: "Pod gpupod in namespace llm at site moon has been unschedulable for at least 15m. For a GPU pod, check that the GPU pool it tolerates has a free partition."
         runbook: "https://wikitech.wikimedia.org/wiki/Kubernetes/Troubleshooting#Troubleshooting_a_deployment"
         dashboard: "https://grafana.wikimedia.org/d/hyl18XgMk/kubernetes-container-details?orgId=1&var-datasource=moon%2Bprometheus/eagle&var-namespace=llm&var-container=All"
-    - exp_labels: {severity: warning, team: ml, namespace: revertrisk, pod: cpupod}
+    - exp_labels: {severity: warning, team: data-platform, namespace: revertrisk, pod: cpupod}
       exp_annotations:
         summary: "Pod cpupod in revertrisk at moon cannot be scheduled"
         description: "Pod cpupod in namespace revertrisk at site moon has been unschedulable for at least 15m. For a GPU pod, check that the GPU pool it tolerates has a free partition."

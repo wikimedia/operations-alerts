@@ -16,7 +16,7 @@ tests:
       eval_time: 60m
       exp_alerts:
        - exp_labels:
-           team: ml
+           team: data-platform
            severity: critical
            destination_canonical_service: testing_service
            destination_service_namespace: test_ns

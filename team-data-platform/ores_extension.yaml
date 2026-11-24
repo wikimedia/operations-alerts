@@ -7,7 +7,7 @@ groups:
         expr: avg by (exported_cluster, group) (kafka_burrow_partition_lag{group="cpjobqueue-ORESFetchScoreJob"}) > 100
         for: 1h
         labels:
-          team: ml
+          team: data-platform
           severity: critical
         annotations:
           summary: "Kafka consumer lag for ORESFetchScoreJob over threshold for past 1h."

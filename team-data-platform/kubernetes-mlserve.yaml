@@ -6,7 +6,7 @@ groups:
     expr: sum(kube_deployment_status_replicas_unavailable) by (namespace, deployment) > 0
     for: 30m
     labels:
-      team: ml
+      team: data-platform
       severity: warning
     annotations:
       summary: "Deployment {{ $labels.deployment }} in {{ $labels.namespace }} at {{ $externalLabels.site }} has persistently unavailable replicas"
@@ -17,7 +17,7 @@ groups:
     expr: max by (namespace, pod) (kube_pod_status_unschedulable == 1)
     for: 15m
     labels:
-      team: ml
+      team: data-platform
       severity: warning
     annotations:
       summary: "Pod {{ $labels.pod }} in {{ $labels.namespace }} at {{ $externalLabels.site }} cannot be scheduled"

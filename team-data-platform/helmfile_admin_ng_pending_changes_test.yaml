@@ -19,7 +19,7 @@ tests:
           alertname: HelmfileAdminNGPendingChanges
           exported_cluster: ml-serve-eqiad
           severity: warning
-          team: ml
+          team: data-platform
   - interval: 1h
     input_series:
     - series: helmfile_admin_ng_pending_changes{exported_cluster="ml-serve-codfw"}
@@ -37,7 +37,7 @@ tests:
           alertname: HelmfileAdminNGPendingChanges
           exported_cluster: ml-serve-codfw
           severity: warning
-          team: ml
+          team: data-platform
   - interval: 1h
     input_series:
     - series: helmfile_admin_ng_pending_changes{exported_cluster="ml-staging-codfw"}
@@ -55,4 +55,4 @@ tests:
           alertname: HelmfileAdminNGPendingChanges
           exported_cluster: ml-staging-codfw
           severity: warning
-          team: ml
+          team: data-platform
